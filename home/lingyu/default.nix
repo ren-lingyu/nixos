@@ -129,8 +129,16 @@
     shellAliases = {};
   };
 
-  home.file.".local/bin/ssha".text = builtins.readFile ./ssha.sh;
-  home.file.".local/bin/org".text = builtins.readFile ./org.sh;
+  home.file = {
+    ".local/bin/org" = {
+      text = builtins.readFile ./org.sh;
+      executable = true;
+    };
+    ".local/bin/ssha" = {
+      text = builtins.readFile ./ssha.sh;
+      executable = true;
+    };
+  };
 
   # This value determines the Home Manager release that your
   # configuration is compatible with. This helps avoid breakage
