@@ -5,50 +5,49 @@
   home.homeDirectory = "/home/lingyu";
 
   home.packages = with pkgs;[
-  		git
-		gh
-		git-filter-repo
-  		curl
-		wget
-		ripgrep
-		htop
-		unzip
-		gnutar
-		trash-cli
-		tree
-		gnumake
-		jq
-		dbus
-		rclone
-		fuse
-		fuse3
-		ghostscript
-		xclip
-		chafa
-		gcc
-		noto-fonts
-		noto-fonts-cjk-sans
-		noto-fonts-color-emoji
-		dejavu_fontsEnv
-		zenity
-		fcitx5
-		fcitx5-gtk
-    		qt6Packages.fcitx5-configtool
-    		qt6Packages.fcitx5-qt
-    		qt6Packages.fcitx5-chinese-addons
-		openssh
-		gnupg
-		pinentry-tty
-		emacs-gtk
-		vim
+    git
+    gh
+    git-filter-repo
+    curl
+    wget
+    ripgrep
+    htop
+    unzip
+    gnutar
+    trash-cli
+    tree
+    gnumake
+    jq
+    rclone
+    fuse
+    fuse3
+    ghostscript
+    xclip
+    chafa
+    gcc
+    dejavu_fontsEnv
+    # zenity
+    # qt6.qtbase
+    # qt6.qtwayland
+    # fcitx5
+    # fcitx5-gtk
+    # qt6Packages.fcitx5-configtool
+    # qt6Packages.fcitx5-qt
+    # qt6Packages.fcitx5-chinese-addons
+    openssh
+    gnupg
+    pinentry-tty
+    emacs-gtk
+    vim
   ];
 
   home.sessionVariables = {
-    GTK_IM_MODULE = "fcitx5";
-    QT_IM_MODULE = "fcitx5";
-    XMODIFIERS = "@im=fcitx5";
-    SDL_IM_MODULE = "fcitx5";
+    GTK_IM_MODULE = "fcitx";
+    QT_IM_MODULE = "fcitx";
+    XMODIFIERS = "@im=fcitx";
+    SDL_IM_MODULE = "fcitx";
     GLFW_IM_MODULE = "ibus";
+    QT_QPA_PLATFORM = "xcb";
   };
 
   programs.direnv = {
@@ -130,6 +129,10 @@
   };
 
   home.file = {
+    ".config/fcitx5/profile" = {
+      source = ./fcitx5/profile;
+      force = true;
+    };
     ".local/bin/org" = {
       text = builtins.readFile ./org.sh;
       executable = true;
