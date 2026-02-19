@@ -26,19 +26,10 @@
     chafa
     gcc
     dejavu_fontsEnv
-    # zenity
-    # qt6.qtbase
-    # qt6.qtwayland
-    # fcitx5
-    # fcitx5-gtk
-    # qt6Packages.fcitx5-configtool
-    # qt6Packages.fcitx5-qt
-    # qt6Packages.fcitx5-chinese-addons
     openssh
     gnupg
     pinentry-tty
-    emacs-gtk
-    vim
+    emacs-pgtk
   ];
 
   home.sessionVariables = {
@@ -105,8 +96,6 @@
     };
   };
 
-  # home.file.".config/starship-simple.toml".text = builtins.readFile ./starship-simple.toml;
-
   programs.alacritty = {
     enable = true;
     settings = {
@@ -123,22 +112,22 @@
   programs.bash = {
     enable = true;
     enableCompletion = true;
-    bashrcExtra = builtins.readFile ./bashrc-early.sh;
-    # initExtra = builtins.readFile ./bashrc-late.sh;
+    bashrcExtra = builtins.readFile ./.bashrc/early.sh;
+    # initExtra = builtins.readFile ./.bashrc/late.sh;
     shellAliases = {};
   };
 
   home.file = {
     ".config/fcitx5/profile" = {
-      source = ./fcitx5/profile;
+      source = ./.config/fcitx5/profile;
       force = true;
     };
     ".local/bin/org" = {
-      text = builtins.readFile ./org.sh;
+      text = builtins.readFile ./.local/bin/org.sh;
       executable = true;
     };
     ".local/bin/ssha" = {
-      text = builtins.readFile ./ssha.sh;
+      text = builtins.readFile ./.local/bin/ssha.sh;
       executable = true;
     };
   };

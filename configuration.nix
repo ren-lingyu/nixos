@@ -94,11 +94,10 @@
   nix.settings.experimental-features = [ "nix-command" "flakes" ];
   environment.systemPackages = with pkgs; [
     dbus
-    qt6Packages.fcitx5-configtool
     git
     vim
     wget
-    emacs-nox
+    qt6Packages.fcitx5-configtool
   ];
-  environment.variables.EDITOR = "emacs -Q -nw";
+  environment.variables.EDITOR = "vim";
 }
