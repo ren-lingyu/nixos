@@ -3,6 +3,7 @@ export NVM_DIR="$HOME/.config/nvm"
 [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"
 export PATH=$HOME/.local/bin:$PATH
 export GPG_TTY=$(tty)
+export $(dbus-launch)
 
 if ! pgrep -x fcitx5 > /dev/null; then
     fcitx5 --disable=wayland -d >/dev/null 2>&1
