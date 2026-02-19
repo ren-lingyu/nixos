@@ -13,16 +13,44 @@
   #   <nixos-wsl/modules>
   # ];
 
-  wsl.enable = true;
-  # wsl.defaultUser = "nixos";
-  wsl.defaultUser = "lingyu";
-  wsl.startMenuLaunchers = true;
-    users.users.lingyu = {
+  wsl = {
+    enable = true;
+    defaultUser = "lingyu";
+    interop = {
+      includePath = true;
+      register = true;   
+    };
+    wslConf = {
+      automount = {
+        enabled = true;
+        root = "/mnt";
+      };
+    };
+    startMenuLaunchers = true;
+    docker-desktop.enable = true;
+  };
+
+  users.groups.docker = {};
+  users.users.lingyu = {
     isNormalUser = true;
-    extraGroups = [ "wheel" ];
+    extraGroups = [ "wheel" "docker" ];
     home = "/home/lingyu";
   };
-  services.dbus.enable = true;
+  
+  services = {
+    dbus.enable = true;
+    vscode-server = {
+      enable = true;
+      enableFHS = true;
+    };
+  };
+
+  programs.nix-ld.enable = true;
+
+  environment = {
+    usrbinenv = lib.mkForce "${pkgs.coreutils}/bin/env";
+    binsh = "${pkgs.bash}/bin/sh";
+  };
   
   # This value determines the NixOS release from which the default
   # settings for stateful data, like file locations and database versions

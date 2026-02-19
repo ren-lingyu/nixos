@@ -7,15 +7,20 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
     home-manager = {
-    url = "github:nix-community/home-manager";
-    inputs.nixpkgs.follows = "nixpkgs";
+      url = "github:nix-community/home-manager";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+    vscode-server = {
+      url = "github:nix-community/nixos-vscode-server";
+      inputs.nixpkgs.follows = "nixpkgs";
     };
   };
-  outputs = { self, nixpkgs, nixos-wsl, home-manager, ... }@inputs: {
+  outputs = { self, nixpkgs, nixos-wsl, home-manager, vscode-server, ... }@inputs: {
     nixosConfigurations.nixos = nixpkgs.lib.nixosSystem {
       system = "x86_64-linux";
       modules = [
-        nixos-wsl.nixosModules.default 
+        nixos-wsl.nixosModules.default
+	vscode-server.nixosModules.default
         ./configuration.nix
         home-manager.nixosModules.home-manager {
           home-manager.useGlobalPkgs = true;
