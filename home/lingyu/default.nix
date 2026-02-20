@@ -25,6 +25,7 @@
     QT_QPA_PLATFORM = "xcb";
     XCURSOR_THEME = "Adwaita";
     XCURSOR_SIZE = "24";
+    # Do NOT force XDG_RUNTIME_DIR in your shell.
     # XDG_RUNTIME_DIR = "/mnt/wslg/runtime-dir";
   };
 
