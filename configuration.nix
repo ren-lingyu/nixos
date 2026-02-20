@@ -41,7 +41,7 @@
   services = {
     dbus = {
       enable = true;
-      packages = [ pkgs.dbus ];
+      implementation = "broker";
     };
     vscode-server = {
       enable = true;
@@ -56,15 +56,15 @@
     binsh = "${pkgs.bash}/bin/sh";
   };
 
-  systemd.user.services."dbus" = {
-    description = "D-Bus User Message Bus";
-    wantedBy = [ "default.target" ];
-    serviceConfig = {
-      Type = "simple";
-      ExecStart = "${pkgs.dbus}/bin/dbus-daemon --session --address=systemd: --nofork --nopidfile";
-      Restart = "on-failure";
-    };
-  };
+  # systemd.user.services."dbus" = {
+  #   description = "D-Bus User Message Bus";
+  #   wantedBy = [ "default.target" ];
+  #   serviceConfig = {
+  #     Type = "simple";
+  #     ExecStart = "${pkgs.dbus}/bin/dbus-daemon --session --address=systemd: --nofork --nopidfile";
+  #     Restart = "on-failure";
+  #   };
+  # };
 
   programs.dconf.enable = true;
   

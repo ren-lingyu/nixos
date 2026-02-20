@@ -8,10 +8,12 @@
     gh
     git-filter-repo
     trash-cli
-    xclip
     chafa
     dejavu_fontsEnv
-    emacs-pgtk
+    emacs-gtk
+    adwaita-icon-theme
+    xcursor-themes
+    xclip
   ];
 
   home.sessionVariables = {
@@ -21,6 +23,9 @@
     SDL_IM_MODULE = "fcitx";
     GLFW_IM_MODULE = "ibus";
     QT_QPA_PLATFORM = "xcb";
+    XCURSOR_THEME = "Adwaita";
+    XCURSOR_SIZE = "24";
+    # XDG_RUNTIME_DIR = "/mnt/wslg/runtime-dir";
   };
 
   programs.direnv = {
