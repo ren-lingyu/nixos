@@ -5,30 +5,12 @@
   home.homeDirectory = "/home/lingyu";
 
   home.packages = with pkgs;[
-    git
     gh
     git-filter-repo
-    curl
-    wget
-    ripgrep
-    htop
-    unzip
-    gnutar
     trash-cli
-    tree
-    gnumake
-    jq
-    rclone
-    fuse
-    fuse3
-    ghostscript
     xclip
     chafa
-    gcc
     dejavu_fontsEnv
-    openssh
-    gnupg
-    pinentry-tty
     emacs-pgtk
   ];
 

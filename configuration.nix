@@ -28,6 +28,7 @@
     };
     startMenuLaunchers = true;
     docker-desktop.enable = true;
+    useWindowsDriver = true;
   };
 
   users.groups.docker = {};
@@ -97,6 +98,23 @@
     git
     vim
     wget
+    curl
+    wget
+    ripgrep
+    htop
+    unzip
+    gnutar
+    tree
+    gnumake
+    jq
+    rclone
+    fuse
+    fuse3
+    ghostscript
+    gcc
+    openssh
+    gnupg
+    pinentry-tty
     qt6Packages.fcitx5-configtool
   ];
   environment.variables.EDITOR = "vim";
