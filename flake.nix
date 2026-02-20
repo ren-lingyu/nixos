@@ -1,17 +1,28 @@
 {
   description = "NixOS configuration";
   inputs = {
-    nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
+    nixpkgs = {
+      type = "github";
+      owner = "NixOS";
+      repo = "nixpkgs";
+      ref = "nixos-unstable";
+    };
     nixos-wsl = {
-      url = "github:nix-community/NixOS-WSL"; 
+      type = "github";
+      owner = "nix-community";
+      repo = "NixOS-WSL";
       inputs.nixpkgs.follows = "nixpkgs";
     };
     home-manager = {
-      url = "github:nix-community/home-manager";
+      type = "github";
+      owner = "nix-community";
+      repo = "home-manager";    
       inputs.nixpkgs.follows = "nixpkgs";
     };
     vscode-server = {
-      url = "github:nix-community/nixos-vscode-server";
+      type = "github";
+      owner = "nix-community";
+      repo = "nixos-vscode-server";
       inputs.nixpkgs.follows = "nixpkgs";
     };
   };
