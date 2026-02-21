@@ -2,10 +2,11 @@
   description = "NixOS configuration";
   inputs = {
     nixpkgs = {
-      type = "github";
-      owner = "NixOS";
-      repo = "nixpkgs";
-      ref = "nixos-unstable";
+      url = "git+https://mirrors.nju.edu.cn/git/nixpkgs.git?ref=nixos-unstable&shallow=1";
+      # type = "github";
+      # owner = "NixOS";
+      # repo = "nixpkgs";
+      # ref = "nixos-unstable";
     };
     nixos-wsl = {
       type = "github";
