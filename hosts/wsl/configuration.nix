@@ -8,6 +8,16 @@
 { config, lib, pkgs, ... }:
 
 {
+  hardware.graphics = {
+    enable = true;
+    extraPackages = with pkgs; [
+      intel-media-driver
+      vulkan-loader
+      vulkan-tools
+      mesa
+    ];
+  };
+
   # imports = [
   #   # include NixOS-WSL modules
   #   <nixos-wsl/modules>
@@ -38,7 +48,7 @@
       extraGroups = [ "wheel" "docker" ];
       home = "/home/lingyu";
     };
-  }; 
+  };
 
   nix.settings.experimental-features = [ "nix-command" "flakes" ];
   
@@ -68,7 +78,6 @@
     openssh
     gnupg
     pinentry-tty
-    qt6Packages.fcitx5-configtool
   ];
     
   services = {

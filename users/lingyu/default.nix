@@ -11,6 +11,7 @@
     chafa
     dejavu_fontsEnv
     emacs-gtk
+    qt6Packages.fcitx5-configtool
     adwaita-icon-theme
     xcursor-themes
     xclip
