@@ -2,7 +2,7 @@
   description = "NixOS configuration";
   inputs = {
     nixpkgs = {
-      url = "git+https://mirrors.nju.edu.cn/git/nixpkgs.git?ref=nixos-unstable&shallow=1";
+      url = "git+https://mirrors.tuna.tsinghua.edu.cn/git/nixpkgs.git?ref=nixos-unstable&shallow=1";
       # type = "github";
       # owner = "NixOS";
       # repo = "nixpkgs";
@@ -34,14 +34,14 @@
         system = "x86_64-linux";
         modules = [
           nixos-wsl.nixosModules.default
-	  vscode-server.nixosModules.default
-          ./hosts/wsl/configuration.nix
-          home-manager.nixosModules.home-manager {
-            home-manager.useGlobalPkgs = true;
-            home-manager.useUserPackages = true;
-            home-manager.users.lingyu = import ./users/lingyu;
-	    home-manager.extraSpecialArgs = inputs;
-	  }
+          vscode-server.nixosModules.default
+                ./hosts/wsl/configuration.nix
+                home-manager.nixosModules.home-manager {
+                  home-manager.useGlobalPkgs = true;
+                  home-manager.useUserPackages = true;
+                  home-manager.users.lingyu = import ./users/lingyu;
+            home-manager.extraSpecialArgs = inputs;
+          }
         ];
       };
     };
