@@ -122,5 +122,10 @@
     pinentry-tty
     qt6Packages.fcitx5-configtool
   ];
+  
   environment.variables.EDITOR = "vim";
+
+  nixpkgs.config.allowUnfreePredicate = pkg : builtins.elem (lib.getName pkg) [
+    "github-copilot-cli"
+  ];
 }

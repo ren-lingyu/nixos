@@ -28,19 +28,21 @@
     };
   };
   outputs = { self, nixpkgs, nixos-wsl, home-manager, vscode-server, ... }@inputs: {
-    nixosConfigurations.nixos = nixpkgs.lib.nixosSystem {
-      system = "x86_64-linux";
-      modules = [
-        nixos-wsl.nixosModules.default
-	vscode-server.nixosModules.default
-        ./configuration.nix
-        home-manager.nixosModules.home-manager {
-          home-manager.useGlobalPkgs = true;
-          home-manager.useUserPackages = true;
-          home-manager.users.lingyu = import ./home/lingyu;
-	  home-manager.extraSpecialArgs = inputs;
-	}
-      ];
+    nixosConfigurations = {
+      wsl = nixpkgs.lib.nixosSystem {
+        system = "x86_64-linux";
+        modules = [
+          nixos-wsl.nixosModules.default
+	  vscode-server.nixosModules.default
+          ./hosts/wsl/configuration.nix
+          home-manager.nixosModules.home-manager {
+            home-manager.useGlobalPkgs = true;
+            home-manager.useUserPackages = true;
+            home-manager.users.lingyu = import ./users/lingyu;
+	    home-manager.extraSpecialArgs = inputs;
+	  }
+        ];
+      };
     };
   };
 }

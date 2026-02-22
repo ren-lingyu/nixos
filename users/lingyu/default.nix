@@ -14,6 +14,9 @@
     adwaita-icon-theme
     xcursor-themes
     xclip
+    aichat
+    ollama
+    github-copilot-cli
   ];
 
   home.sessionVariables = {
