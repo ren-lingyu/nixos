@@ -1,6 +1,7 @@
 export NVM_DIR="$HOME/.config/nvm"
 [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
 [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"
+export PATH="/mnt/c/Users/Lingyu/AppData/Local/Programs/Microsoft VS Code/bin":$PATH
 export PATH=$HOME/.local/bin:$PATH
 export GPG_TTY=$(tty)
 export $(dbus-launch)

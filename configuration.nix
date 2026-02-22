@@ -17,7 +17,7 @@
     enable = true;
     defaultUser = "lingyu";
     interop = {
-      includePath = true;
+      includePath = false;
       register = true;   
     };
     wslConf = {
