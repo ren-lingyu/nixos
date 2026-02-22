@@ -97,7 +97,13 @@
   # Before changing this value read the documentation for this option
   # (e.g. man configuration.nix or on https://nixos.org/nixos/options.html).
   system.stateVersion = "25.05"; # Did you read the comment?
+
   nix.settings.experimental-features = [ "nix-command" "flakes" ];
+
+  nixpkgs.config.allowUnfreePredicate = pkg : builtins.elem (lib.getName pkg) [
+    "github-copilot-cli"
+  ];
+
   environment.systemPackages = with pkgs; [
     dbus
     git
@@ -123,9 +129,7 @@
     qt6Packages.fcitx5-configtool
   ];
   
-  environment.variables.EDITOR = "vim";
-
-  nixpkgs.config.allowUnfreePredicate = pkg : builtins.elem (lib.getName pkg) [
-    "github-copilot-cli"
-  ];
+  environment.variables = {
+    EDITOR = "vim";
+  };
 }

@@ -29,7 +29,8 @@
   };
   outputs = { self, nixpkgs, nixos-wsl, home-manager, vscode-server, ... }@inputs: {
     nixosConfigurations = {
-      wsl = nixpkgs.lib.nixosSystem {
+      # config on WSL2, set hostname as nixos for convience. 
+      nixos = nixpkgs.lib.nixosSystem {
         system = "x86_64-linux";
         modules = [
           nixos-wsl.nixosModules.default
