@@ -12,9 +12,7 @@
     enable = true;
     extraPackages = with pkgs; [
       intel-media-driver
-      vulkan-loader
-      vulkan-tools
-      mesa
+      intel-vaapi-driver
     ];
   };
 
@@ -56,29 +54,38 @@
     "github-copilot-cli"
   ];
 
-  environment.systemPackages = with pkgs; [
-    dbus
-    git
-    vim
-    wget
-    curl
-    wget
-    ripgrep
-    htop
-    unzip
-    gnutar
-    tree
-    gnumake
-    jq
-    rclone
-    fuse
-    fuse3
-    ghostscript
-    gcc
-    openssh
-    gnupg
-    pinentry-tty
-  ];
+  environment = {
+    systemPackages = with pkgs; [
+      dbus
+      git
+      vim
+      wget
+      curl
+      wget
+      ripgrep
+      htop
+      unzip
+      gnutar
+      tree
+      gnumake
+      jq
+      rclone
+      fuse
+      fuse3
+      ghostscript
+      gcc
+      openssh
+      gnupg
+      pinentry-tty
+      vulkan-loader
+      vulkan-tools
+    ];
+    usrbinenv = lib.mkForce "${pkgs.coreutils}/bin/env";
+    binsh = "${pkgs.bash}/bin/sh";
+    variables = {
+      EDITOR = "vim";
+    }; 
+  };
     
   services = {
     dbus = {
@@ -91,11 +98,11 @@
     };
     ollama = {
       enable = true;
-      package = pkgs.ollama-vulkan;
+      package = pkgs.ollama;
       host = "127.0.0.1";
       port = 11434; 
       loadModels = [
-        "phi3.5:3.8b-mini-instruct-q4_K_S"
+        "phi4-mini-reasoning:3.8b-q4_K_M"
       ];
       syncModels = true;
     };
@@ -105,14 +112,6 @@
     nix-ld.enable = true;
     dconf.enable = true;
   }; 
-
-  environment = {
-    usrbinenv = lib.mkForce "${pkgs.coreutils}/bin/env";
-    binsh = "${pkgs.bash}/bin/sh";
-    variables = {
-      EDITOR = "vim";
-    }; 
-  };
 
   systemd = {
     services = {
