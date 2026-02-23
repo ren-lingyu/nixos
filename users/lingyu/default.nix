@@ -109,17 +109,63 @@
     shellAliases = {};
   };
 
+  i18n.inputMethod = {
+    enable = true;
+    type = "fcitx5";
+    fcitx5 = {
+      addons = with pkgs; [
+        qt6Packages.fcitx5-chinese-addons
+        fcitx5-rime
+      ];
+      engines = [
+        { name = "keyboard-us"; }
+        { name = "pinyin"; }
+      ];
+      defaultInputMethod = "pinyin";
+      settings = {
+        Hotkey = {
+          TriggerKeys = [
+            "Control+Control_L"
+            "Control+Control_R"
+          ];
+        };
+        Behavior = {
+          ActiveByDefault = false;
+          resetStateWhenFocusIn = "No";
+          ShareInputState = "No";
+          PreeditEnabledByDefault = true;
+          ShowInputMethodInformation = true;
+          showInputMethodInformationWhenFocusIn = false;
+          CompactInputMethodInformation = true;
+          ShowFirstInputMethodInformation = true;
+          PreloadInputMethod = true;
+          AllowInputMethodForPassword = false;
+          ShowPreeditForPassword = false;
+          AutoSavePeriod = 30;
+        };
+      };
+    };
+  };
+  
+  fonts.packages = with pkgs; [
+    noto-fonts
+    noto-fonts-cjk-sans
+    noto-fonts-cjk-serif
+    noto-fonts-color-emoji
+    wqy_zenhei
+  ];
+
   home.file = {
-    ".config/fcitx5/profile" = {
-      source = ./.config/fcitx5/profile;
+    ".config/aichat/config.yaml" = {
+      source = ./.config/aichat/config.yaml
       force = true;
     };
     ".local/bin/org" = {
-      text = builtins.readFile ./.local/bin/org.sh;
+      source = ./.local/bin/org.sh;
       executable = true;
     };
     ".local/bin/ssha" = {
-      text = builtins.readFile ./.local/bin/ssha.sh;
+      source = ./.local/bin/ssha.sh;
       executable = true;
     };
   };

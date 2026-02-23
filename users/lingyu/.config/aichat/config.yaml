@@ -1,0 +1,11 @@
+# see https://github.com/sigoden/aichat/blob/main/config.example.yaml
+
+model: ollama:qwen3-coder-next:cloud
+clients:
+- type: openai-compatible
+  name: ollama
+  api_base: http://localhost:11434/v1
+  api_key: ollama
+  models:
+  - name: phi4-mini-reasoning:3.8b-q4_K_M
+  - name: qwen3-coder-next:cloud
