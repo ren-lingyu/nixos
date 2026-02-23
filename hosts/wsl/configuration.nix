@@ -103,7 +103,7 @@
       port = 11434; 
       loadModels = [
         "phi4-mini-reasoning:3.8b-q4_K_M"
-	"qwen3-coder-next:cloud"
+	      "qwen3-coder-next:cloud"
       ];
       syncModels = true;
     };
@@ -128,6 +128,63 @@
       "f /var/lib/systemd/linger/lingyu 0644 root root -"
     ];
   };
+
+  i18n.inputMethod = {
+    enable = true;
+    type = "fcitx5";
+    fcitx5 = {
+      addons = with pkgs; [
+        qt6Packages.fcitx5-chinese-addons
+        fcitx5-rime
+      ];
+      settings = {
+        inputMethod = {
+          "Groups/0" = {
+            Name = "Default";
+            "Default Layout" = "us";
+            DefaultIM = "pinyin";
+          };
+          "Groups/0/Items/0" = {
+            Name = "keyboard-us";
+          };
+          "Groups/0/Items/1" = {
+            Name = "pinyin";
+          };
+          "GroupOrder" = {
+            "0" = "Default";
+          };
+        };
+        globalOptions = {
+          "Hotkey/TriggerKeys" = {
+            "0" = "Control+Control_L";
+            "1" = "Control+Control_R";
+          };
+          "Behavior" = {
+            ActiveByDefault = false;
+            resetStateWhenFocusIn = "No";
+            ShareInputState = "No";
+            PreeditEnabledByDefault = true;
+            ShowInputMethodInformation = true;
+            showInputMethodInformationWhenFocusIn = false;
+            CompactInputMethodInformation = true;
+            ShowFirstInputMethodInformation = true;
+            PreloadInputMethod = true;
+            AllowInputMethodForPassword = false;
+            ShowPreeditForPassword = false;
+            AutoSavePeriod = 30;
+          };
+        }; 
+      };
+    };
+  };
+  
+  fonts.packages = with pkgs; [
+    noto-fonts
+    noto-fonts-cjk-sans
+    noto-fonts-cjk-serif
+    noto-fonts-color-emoji
+    wqy_zenhei
+  ];
   
   # This value determines the NixOS release from which the default
   # settings for stateful data, like file locations and database versions

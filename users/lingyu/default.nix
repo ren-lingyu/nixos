@@ -50,7 +50,7 @@
       user = {
         name = "ren-lingyu";
         email = "Ren_Lingyu@outlook.com";
-	signingkey = "65F85A2624D239F0";
+	      signingkey = "65F85A2624D239F0";
       };
       core = {
         editor = "emacs -Q -nw";
@@ -109,55 +109,9 @@
     shellAliases = {};
   };
 
-  i18n.inputMethod = {
-    enable = true;
-    type = "fcitx5";
-    fcitx5 = {
-      addons = with pkgs; [
-        qt6Packages.fcitx5-chinese-addons
-        fcitx5-rime
-      ];
-      engines = [
-        { name = "keyboard-us"; }
-        { name = "pinyin"; }
-      ];
-      defaultInputMethod = "pinyin";
-      settings = {
-        Hotkey = {
-          TriggerKeys = [
-            "Control+Control_L"
-            "Control+Control_R"
-          ];
-        };
-        Behavior = {
-          ActiveByDefault = false;
-          resetStateWhenFocusIn = "No";
-          ShareInputState = "No";
-          PreeditEnabledByDefault = true;
-          ShowInputMethodInformation = true;
-          showInputMethodInformationWhenFocusIn = false;
-          CompactInputMethodInformation = true;
-          ShowFirstInputMethodInformation = true;
-          PreloadInputMethod = true;
-          AllowInputMethodForPassword = false;
-          ShowPreeditForPassword = false;
-          AutoSavePeriod = 30;
-        };
-      };
-    };
-  };
-  
-  fonts.packages = with pkgs; [
-    noto-fonts
-    noto-fonts-cjk-sans
-    noto-fonts-cjk-serif
-    noto-fonts-color-emoji
-    wqy_zenhei
-  ];
-
   home.file = {
     ".config/aichat/config.yaml" = {
-      source = ./.config/aichat/config.yaml
+      source = ./.config/aichat/config.yaml;
       force = true;
     };
     ".local/bin/org" = {
