@@ -15,7 +15,7 @@
       intel-vaapi-driver
     ];
   };
-
+  
   # imports = [
   #   # include NixOS-WSL modules
   #   <nixos-wsl/modules>
@@ -38,7 +38,7 @@
     docker-desktop.enable = true;
     useWindowsDriver = true;
   };
-
+  
   users = {
     groups.docker = {};
     users.lingyu = {
@@ -47,13 +47,13 @@
       home = "/home/lingyu";
     };
   };
-
+  
   nix.settings.experimental-features = [ "nix-command" "flakes" ];
   
   nixpkgs.config.allowUnfreePredicate = pkg : builtins.elem (lib.getName pkg) [
     "github-copilot-cli"
   ];
-
+  
   environment = {
     systemPackages = with pkgs; [
       dbus
@@ -86,7 +86,7 @@
       EDITOR = "vim";
     }; 
   };
-    
+  
   services = {
     dbus = {
       enable = true;
@@ -108,12 +108,12 @@
       syncModels = true;
     };
   };
-
+  
   programs = {
     nix-ld.enable = true;
     dconf.enable = true;
   }; 
-
+  
   systemd = {
     services = {
       "user@" = {

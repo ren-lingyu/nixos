@@ -35,11 +35,11 @@
         modules = [
           nixos-wsl.nixosModules.default
           vscode-server.nixosModules.default
-                ./hosts/wsl/configuration.nix
-                home-manager.nixosModules.home-manager {
-                  home-manager.useGlobalPkgs = true;
-                  home-manager.useUserPackages = true;
-                  home-manager.users.lingyu = import ./users/lingyu;
+          ./hosts/wsl/configuration.nix
+          home-manager.nixosModules.home-manager {
+            home-manager.useGlobalPkgs = true;
+            home-manager.useUserPackages = true;
+            home-manager.users.lingyu = import ./users/lingyu;
             home-manager.extraSpecialArgs = inputs;
           }
         ];
