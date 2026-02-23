@@ -103,6 +103,7 @@
       port = 11434; 
       loadModels = [
         "phi4-mini-reasoning:3.8b-q4_K_M"
+	"qwen3-coder-next:cloud"
       ];
       syncModels = true;
     };
