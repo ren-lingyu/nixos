@@ -18,6 +18,7 @@
     aichat
     ollama
     github-copilot-cli
+    python3
   ];
 
   home.sessionVariables = {
