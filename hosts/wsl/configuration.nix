@@ -8,6 +8,11 @@
 { config, lib, pkgs, ... }:
 
 {
+  nix.settings = {
+    experimental-features = [ "nix-command" "flakes" ];
+    substituters = lib.mkForce [ "https://mirrors.tuna.tsinghua.edu.cn/nix-channels/store" ];
+  };
+  
   hardware.graphics = {
     enable = true;
     extraPackages = with pkgs; [
@@ -48,8 +53,6 @@
     };
   };
   
-  nix.settings.experimental-features = [ "nix-command" "flakes" ];
-  
   nixpkgs.config.allowUnfreePredicate = pkg : builtins.elem (lib.getName pkg) [
     "github-copilot-cli"
   ];
@@ -79,6 +82,7 @@
       pinentry-tty
       vulkan-loader
       vulkan-tools
+      gsettings-desktop-schemas
     ];
     usrbinenv = lib.mkForce "${pkgs.coreutils}/bin/env";
     binsh = "${pkgs.bash}/bin/sh";
@@ -126,6 +130,8 @@
     };
     tmpfiles.rules = [
       "f /var/lib/systemd/linger/lingyu 0644 root root -"
+      "L+ /run/user/1000/wayland-0 - - - - /mnt/wslg/runtime-dir/wayland-0"
+      "L+ /run/user/1000/wayland-0.lock - - - - /mnt/wslg/runtime-dir/wayland-0.lock"
     ];
   };
 
