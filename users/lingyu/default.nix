@@ -43,6 +43,19 @@
     pinentry.package = pkgs.pinentry-tty;
   };
 
+  programs.ssh = {
+    enable = true;
+    matchBlocks = {
+      "github.com" = {
+        hostname = "ssh.github.com";
+        port = 443;
+        user = "git";
+        serverAliveInterval = 60;
+        serverAliveCountMax = 3;
+      };
+    };
+  };
+
   programs.git = {
     enable = true;
     settings = {
