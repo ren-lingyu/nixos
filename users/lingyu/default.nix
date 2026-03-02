@@ -1,46 +1,63 @@
 { config, pkgs, ... }:
 
 {
-  home.username = "lingyu";
-  home.homeDirectory = "/home/lingyu";
-
-  home.packages = with pkgs;[
-    gh
-    git-filter-repo
-    trash-cli
-    chafa
-    dejavu_fontsEnv
-    emacs-gtk
-    qt6Packages.fcitx5-configtool
-    adwaita-icon-theme
-    xcursor-themes
-    xclip
-    aichat
-    ollama
-    github-copilot-cli
-    python3
-  ];
-
-  home.sessionVariables = {
-    GTK_IM_MODULE = "fcitx";
-    QT_IM_MODULE = "fcitx";
-    XMODIFIERS = "@im=fcitx";
-    SDL_IM_MODULE = "fcitx";
-    GLFW_IM_MODULE = "ibus";
-    QT_QPA_PLATFORM = "xcb";
-    XCURSOR_THEME = "Adwaita";
-    XCURSOR_SIZE = "24";
+  home = {
+    username = "lingyu";
+    homeDirectory = "/home/lingyu";
+    packages = with pkgs;[
+      gh
+      git-filter-repo
+      trash-cli
+      chafa
+      dejavu_fontsEnv
+      emacs-gtk
+      qt6Packages.fcitx5-configtool
+      adwaita-icon-theme
+      xcursor-themes
+      xclip
+      aichat
+      ollama
+      github-copilot-cli
+      python3
+    ];
+    sessionVariables = {
+      GTK_IM_MODULE = "fcitx";
+      QT_IM_MODULE = "fcitx";
+      XMODIFIERS = "@im=fcitx";
+      SDL_IM_MODULE = "fcitx";
+      GLFW_IM_MODULE = "ibus";
+      QT_QPA_PLATFORM = "xcb";
+      XCURSOR_THEME = "Adwaita";
+      XCURSOR_SIZE = "24";
+    };
+    file = {
+      ".config/aichat/config.yaml" = {
+        source = ./.config/aichat/config.yaml;
+        force = true;
+      };
+      ".local/bin/org" = {
+        source = ./.local/bin/org.sh;
+        executable = true;
+      };
+      ".local/bin/ssha" = {
+        source = ./.local/bin/ssha.sh;
+        executable = true;
+      };
+    };
   };
 
+  programs.bash = {
+    enable = true;
+    enableCompletion = true;
+    bashrcExtra = builtins.readFile ./.bashrc/early.sh;
+    # initExtra = builtins.readFile ./.bashrc/late.sh;
+    shellAliases = {};
+  };
+  
   programs.direnv = {
     enable = true;
     enableBashIntegration = true;
     nix-direnv.enable = true;
-  };
-
-  services.gpg-agent = {
-    enable = true;
-    pinentry.package = pkgs.pinentry-tty;
   };
 
   programs.ssh = {
@@ -87,7 +104,7 @@
         gpgSign = true;
       };
       signing = {
-	signByDefault = true;
+	      signByDefault = true;
       };
       gpg = {
         program = "${pkgs.gnupg}/bin/gpg";
@@ -126,29 +143,27 @@
     };
   };
 
-  programs.bash = {
-    enable = true;
-    enableCompletion = true;
-    bashrcExtra = builtins.readFile ./.bashrc/early.sh;
-    # initExtra = builtins.readFile ./.bashrc/late.sh;
-    shellAliases = {};
-  };
-
-  home.file = {
-    ".config/aichat/config.yaml" = {
-      source = ./.config/aichat/config.yaml;
-      force = true;
+  services = {
+    gpg-agent = {
+      enable = true;
+      pinentry.package = pkgs.pinentry-tty;
     };
-    ".local/bin/org" = {
-      source = ./.local/bin/org.sh;
-      executable = true;
-    };
-    ".local/bin/ssha" = {
-      source = ./.local/bin/ssha.sh;
-      executable = true;
+    emacs = {
+      enable = true;
+      package = pkgs.emacs-gtk;
+      extraOptions = ["--debug-init"];
+      defaultEditor = false;
+      socketActivation = {
+        enable = true;
+      };
+      startWithUserSession = false;
+      client = {
+        enable = false;
+        arguments = ["-c"];
+      };
     };
   };
-
+  
   # This value determines the Home Manager release that your
   # configuration is compatible with. This helps avoid breakage
   # when a new Home Manager release introduces backwards

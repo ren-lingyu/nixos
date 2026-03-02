@@ -48,6 +48,7 @@
     groups.docker = {};
     users.lingyu = {
       isNormalUser = true;
+      linger = true;
       extraGroups = [ "wheel" "docker" ];
       home = "/home/lingyu";
     };
@@ -92,6 +93,8 @@
   };
 
   programs = {
+    nix-ld.enable = true;
+    dconf.enable = true;
     ssh = {
       package = pkgs.openssh;
       pubkeyAcceptedKeyTypes = [
@@ -128,23 +131,28 @@
     };
   };
   
-  programs = {
-    nix-ld.enable = true;
-    dconf.enable = true;
-  }; 
-  
   systemd = {
     services = {
       "user@" = {
         overrideStrategy = "asDropin";
         serviceConfig = {
-          Delegate = "no";
-          DelegateSubgroup = "";
+          Delegate = "pids memory cpu";
+          DelegateSubgroup = "init.scope";
+        };
+      };
+    };
+    user = {
+      services = {
+        emacs = {
+          overrideStrategy = "asDropin";
+          serviceConfig = {
+            Restart = "on-failure";
+            Delegate = "yes";
+          };
         };
       };
     };
     tmpfiles.rules = [
-      "f /var/lib/systemd/linger/lingyu 0644 root root -"
       "L+ /run/user/1000/wayland-0 - - - - /mnt/wslg/runtime-dir/wayland-0"
       "L+ /run/user/1000/wayland-0.lock - - - - /mnt/wslg/runtime-dir/wayland-0.lock"
     ];
