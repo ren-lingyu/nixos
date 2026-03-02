@@ -93,7 +93,7 @@
 
   programs = {
     ssh = {
-      package = pkgs.openssh; 
+      package = pkgs.openssh;
       pubkeyAcceptedKeyTypes = [
         "ssh-ed25519"
       ];
