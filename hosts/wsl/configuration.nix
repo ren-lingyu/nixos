@@ -51,6 +51,13 @@
       linger = true;
       extraGroups = [ "wheel" "docker" ];
       home = "/home/lingyu";
+      openssh = {
+        authorizedKeys = {
+          keys = [
+            "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIJGeBOS0SKejDDcOPOWD106pexJwLjsl7PFIuXSyZtYp lingyu@DESKTOP-NIM6ULV"
+          ];
+        };
+      };
     };
   };
   
@@ -84,6 +91,7 @@
       vulkan-loader
       vulkan-tools
       gsettings-desktop-schemas
+      nodejs_22
     ];
     usrbinenv = lib.mkForce "${pkgs.coreutils}/bin/env";
     binsh = "${pkgs.bash}/bin/sh";
@@ -117,6 +125,7 @@
     vscode-server = {
       enable = true;
       enableFHS = true;
+      # nodejsPackage = pkgs.nodejs_22; # 强制指定该选项可能会导致问题, 建议保持默认.
     };
     ollama = {
       enable = true;
@@ -129,6 +138,24 @@
       ];
       syncModels = true;
     };
+    # 用来提供远程访问. 
+    # 本意是在 Remote-WSL 失效后的替代, 但现在似乎没用了. 
+    openssh = {
+      enable = false;
+      ports = [2222];
+      settings = {
+        PasswordAuthentication = false;
+        KbdInteractiveAuthentication = false;
+        PermitRootLogin = "no";
+        UseDns = false;
+      };
+      listenAddresses = [ 
+        { 
+          addr = "127.0.0.1"; 
+          port = 2222; 
+        }
+      ];
+    };
   };
   
   systemd = {
@@ -136,6 +163,7 @@
       "user@" = {
         overrideStrategy = "asDropin";
         serviceConfig = {
+          # 不要全局设置 Delegate = "no". 
           Delegate = "pids memory cpu";
           DelegateSubgroup = "init.scope";
         };
@@ -143,6 +171,13 @@
     };
     user = {
       services = {
+        auto-fix-vscode-server = {
+          serviceConfig = {
+            # 保证 vscode-server 正常运行.
+            # 有默认选项: Restart = "always". 不要在这里修改. 
+            Delegate = "no"; 
+          };
+        };
         emacs = {
           overrideStrategy = "asDropin";
           serviceConfig = {
