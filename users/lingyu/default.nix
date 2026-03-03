@@ -6,6 +6,8 @@
     homeDirectory = "/home/lingyu";
     packages = with pkgs;[
       gh
+      jq
+      rclone
       git-filter-repo
       trash-cli
       chafa
@@ -19,6 +21,15 @@
       ollama
       github-copilot-cli
       python3
+      ripgrep
+      htop
+      tree
+      ghostscript
+      tcpdump
+      mtr
+      nmap
+      netcat
+      dig
     ];
     sessionVariables = {
       GTK_IM_MODULE = "fcitx";

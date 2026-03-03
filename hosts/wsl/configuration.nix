@@ -70,20 +70,13 @@
       dbus
       git
       vim
-      wget
       curl
       wget
-      ripgrep
-      htop
       unzip
       gnutar
-      tree
       gnumake
-      jq
-      rclone
       fuse
       fuse3
-      ghostscript
       gcc
       openssh
       gnupg
