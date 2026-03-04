@@ -90,6 +90,7 @@
     binsh = "${pkgs.bash}/bin/sh";
     variables = {
       EDITOR = "vim";
+      DISPLAY = "localhost:0.0";
     }; 
   };
 

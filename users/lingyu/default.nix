@@ -30,6 +30,8 @@
       nmap
       netcat
       dig
+      xclock
+      xeyes
     ];
     sessionVariables = {
       GTK_IM_MODULE = "fcitx";
