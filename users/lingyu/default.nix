@@ -32,6 +32,7 @@
       dig
       xclock
       xeyes
+      socat
     ];
     sessionVariables = {
       GTK_IM_MODULE = "fcitx";

@@ -179,6 +179,18 @@
             Delegate = "yes";
           };
         };
+        x410-bridge = {
+          description = "X410 bridge via socat";
+          wantedBy = [ "default.target" ];
+          after = [ "default.target" ];
+          serviceConfig = {
+            Type = "simple";
+            Restart = "on-failure";
+            KillMode = "control-group";
+            ExecStartPre = "${pkgs.coreutils}/bin/mkdir -p %t/.x410";
+            ExecStart = "${pkgs.socat}/bin/socat UNIX-LISTEN:%t/.x410/X0,fork,unlink-early TCP:localhost:6000";
+          };
+        };
       };
     };
     tmpfiles.rules = [
