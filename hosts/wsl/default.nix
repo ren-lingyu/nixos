@@ -174,6 +174,10 @@
         };
         emacs = {
           overrideStrategy = "asDropin";
+          path = [
+            "/usr"
+            "/Docker/host"
+          ];
           serviceConfig = {
             Restart = "on-failure";
             Delegate = "yes";
