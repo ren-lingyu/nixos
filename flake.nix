@@ -1,5 +1,6 @@
 {
   description = "NixOS configuration";
+  
   inputs = {
     nixpkgs = {
       url = "git+https://mirrors.tuna.tsinghua.edu.cn/git/nixpkgs.git?ref=nixos-unstable&shallow=1";
@@ -27,15 +28,17 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
   };
+  
   outputs = { self, nixpkgs, nixos-wsl, home-manager, vscode-server, ... }@inputs: {
     nixosConfigurations = {
       # config on WSL2, set hostname as nixos for convience. 
       nixos = nixpkgs.lib.nixosSystem {
         system = "x86_64-linux";
         modules = [
+		  ./modules
+          ./hosts/wsl
           nixos-wsl.nixosModules.default
           vscode-server.nixosModules.default
-          ./hosts/wsl/configuration.nix
           home-manager.nixosModules.home-manager {
             home-manager.useGlobalPkgs = true;
             home-manager.useUserPackages = true;

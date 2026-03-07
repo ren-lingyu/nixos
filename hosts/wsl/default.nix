@@ -8,11 +8,6 @@
 { config, lib, pkgs, ... }:
 
 {
-  nix.settings = {
-    experimental-features = [ "nix-command" "flakes" ];
-    substituters = lib.mkForce [ "https://mirrors.tuna.tsinghua.edu.cn/nix-channels/store" ];
-  };
-  
   hardware.graphics = {
     enable = true;
     extraPackages = with pkgs; [
@@ -59,6 +54,11 @@
         };
       };
     };
+  };
+
+  nix.settings = {
+    experimental-features = [ "nix-command" "flakes" ];
+    trusted-users = [ "@wheel" "root" ];
   };
   
   nixpkgs.config.allowUnfreePredicate = pkg : builtins.elem (lib.getName pkg) [
