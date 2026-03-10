@@ -170,8 +170,8 @@
           models = [
             {
               name = "deepseek-v3.2:cloud";
-              supports_function_calling = true;
-              supports_vision = true;
+              supports_function_calling = false;
+              supports_vision = false;
             }
           ];
         }
