@@ -35,7 +35,8 @@
       nixos = nixpkgs.lib.nixosSystem {
         system = "x86_64-linux";
         modules = [
-		  ./modules
+		      ./modules/binary-cache.nix
+          ./modules/llm.nix
           ./hosts/wsl
           nixos-wsl.nixosModules.default
           vscode-server.nixosModules.default

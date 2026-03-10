@@ -45,10 +45,10 @@
       XCURSOR_SIZE = "24";
     };
     file = {
-      ".config/aichat/config.yaml" = {
-        source = ./.config/aichat/config.yaml;
-        force = true;
-      };
+      # ".config/aichat/config.yaml" = {
+      #   source = ./.config/aichat/config.yaml;
+      #   force = true;
+      # };
       ".local/bin/org" = {
         source = ./.local/bin/org.sh;
         executable = true;
@@ -157,6 +157,28 @@
     };
   };
 
+  programs.aichat = {
+    enable = true;
+    package = pkgs.aichat;
+    settings = {
+      model = "deepseek-v3.2:cloud";
+      clients = [
+        {
+          type = "openai-compatible";
+          name = "ollama";
+          api_base = "http://localhost:11434/v1";
+          models = [
+            {
+              name = "deepseek-v3.2:cloud";
+              supports_function_calling = true;
+              supports_vision = true;
+            }
+          ];
+        }
+      ];
+    };
+  };
+  
   services = {
     gpg-agent = {
       enable = true;

@@ -121,17 +121,6 @@
       enableFHS = true;
       # nodejsPackage = pkgs.nodejs_22; # 强制指定该选项可能会导致问题, 建议保持默认.
     };
-    ollama = {
-      enable = true;
-      package = pkgs.ollama;
-      host = "127.0.0.1";
-      port = 11434; 
-      loadModels = [
-        "phi4-mini-reasoning:3.8b-q4_K_M"
-	      "qwen3-coder-next:cloud"
-      ];
-      syncModels = true;
-    };
     # 用来提供远程访问. 
     # 本意是在 Remote-WSL 失效后的替代, 但现在似乎没用了. 
     openssh = {
