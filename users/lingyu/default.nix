@@ -161,7 +161,7 @@
     enable = true;
     package = pkgs.aichat;
     settings = {
-      model = "deepseek-v3.2:cloud";
+      model = "ollama:deepseek-v3.2:cloud";
       clients = [
         {
           type = "openai-compatible";
