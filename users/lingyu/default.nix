@@ -13,7 +13,7 @@
       chafa
       dejavu_fontsEnv
       emacs-gtk
-      qt6Packages.fcitx5-configtool
+      # qt6Packages.fcitx5-configtool
       adwaita-icon-theme
       xcursor-themes
       xclip
@@ -35,11 +35,11 @@
       socat
     ];
     sessionVariables = {
-      GTK_IM_MODULE = "fcitx";
-      QT_IM_MODULE = "fcitx";
-      XMODIFIERS = "@im=fcitx";
-      SDL_IM_MODULE = "fcitx";
-      GLFW_IM_MODULE = "ibus";
+      # GTK_IM_MODULE = "fcitx";
+      # QT_IM_MODULE = "fcitx";
+      # XMODIFIERS = "@im=fcitx";
+      # SDL_IM_MODULE = "fcitx";
+      # GLFW_IM_MODULE = "ibus";
       QT_QPA_PLATFORM = "xcb";
       XCURSOR_THEME = "Adwaita";
       XCURSOR_SIZE = "24";
