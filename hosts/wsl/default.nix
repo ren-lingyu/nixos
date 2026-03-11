@@ -144,6 +144,7 @@
   systemd = {
     services = {
       "user@" = {
+        enable = true;
         overrideStrategy = "asDropin";
         serviceConfig = {
           # 不要全局设置 Delegate = "no". 
@@ -155,6 +156,7 @@
     user = {
       services = {
         auto-fix-vscode-server = {
+          enable = true;
           serviceConfig = {
             # 保证 vscode-server 正常运行.
             # 有默认选项: Restart = "always". 不要在这里修改. 
@@ -162,6 +164,7 @@
           };
         };
         emacs = {
+          enable = true;
           overrideStrategy = "asDropin";
           path = [
             "/usr"
@@ -172,7 +175,9 @@
             Delegate = "yes";
           };
         };
+        # 弃用 x410 作为 X server
         x410-bridge = {
+          enable = true;
           description = "X410 bridge via socat";
           wantedBy = [ "default.target" ];
           after = [ "default.target" ];
