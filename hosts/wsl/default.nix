@@ -87,7 +87,7 @@
       nodejs_22
     ];
     usrbinenv = lib.mkForce "${pkgs.coreutils}/bin/env";
-    binsh = "${pkgs.bash}/bin/sh";
+    # binsh = "${pkgs.bash}/bin/sh";
     variables = {
       EDITOR = "vim";
       DISPLAY = "localhost:0.0";
@@ -252,6 +252,7 @@
     noto-fonts-cjk-serif
     noto-fonts-color-emoji
     wqy_zenhei
+    nerd-fonts.meslo-lg
   ];
   
   # This value determines the NixOS release from which the default
@@ -260,5 +261,5 @@
   # this value at the release version of the first install of this system.
   # Before changing this value read the documentation for this option
   # (e.g. man configuration.nix or on https://nixos.org/nixos/options.html).
-  system.stateVersion = "25.05"; # Did you read the comment?
+  system.stateVersion = "25.11"; # Did you read the comment?
 }

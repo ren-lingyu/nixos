@@ -1,4 +1,4 @@
-{ config, pkgs, ... }:
+{ config, lib, pkgs, ... }:
 {
   home = {
     username = "lingyu";
@@ -42,6 +42,8 @@
       QT_QPA_PLATFORM = "xcb";
       XCURSOR_THEME = "Adwaita";
       XCURSOR_SIZE = "24";
+      GPG_TTY = "$(tty)";
+      PATH = "$HOME/.local/bin:$PATH";
     };
     file = {
       # ".config/aichat/config.yaml" = {
@@ -60,11 +62,55 @@
   };
 
   programs.bash = {
-    enable = true;
+    enable = false;
     enableCompletion = true;
-    bashrcExtra = builtins.readFile ./.bashrc/early.sh;
+    # bashrcExtra = builtins.readFile ./.bashrc/early.sh;
     # initExtra = builtins.readFile ./.bashrc/late.sh;
     shellAliases = {};
+  };
+
+  programs.zsh = {
+    enable = true;
+    package = pkgs.zsh;
+    enableCompletion = true;
+    autosuggestion = {
+      enable = true;
+    };
+    syntaxHighlighting = {
+      enable = true;
+    };
+    history = {
+      size = 10000;
+      save = 10000;
+      share = true;
+      path = "$HOME/.zsh_history";
+      append = true;
+      extended = true; 
+      ignoreDups = true;
+      ignoreAllDups = true;
+      findNoDups = true;
+    };
+    initContent = lib.concatStringsSep "\n" [
+      "export $(dbus-launch)"
+      "[[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh"
+    ];
+    shellAliases = {};
+    plugins = [
+      {
+        name = "powerlevel10k";
+        src = pkgs.zsh-powerlevel10k;
+        file = "share/zsh-powerlevel10k/powerlevel10k.zsh-theme";
+      }
+    ];
+    oh-my-zsh = {
+      enable = true;
+      package = pkgs.oh-my-zsh;
+      plugins = [
+        "z"
+        "git"
+      ];
+      theme = "";
+    };
   };
   
   programs.direnv = {
@@ -133,7 +179,7 @@
   };
 
   programs.starship = {
-    enable = true;
+    enable = false;
     settings = {
       scan_timeout = 1000;
       add_newline = false;
