@@ -80,8 +80,8 @@
       enable = true;
     };
     history = {
-      size = 10000;
-      save = 10000;
+      size = 1000;
+      save = 1000;
       share = true;
       path = "$HOME/.zsh_history";
       append = true;
@@ -90,9 +90,16 @@
       ignoreAllDups = true;
       findNoDups = true;
     };
-    initContent = lib.concatStringsSep "\n" [
-      "export $(dbus-launch)"
-      "[[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh"
+    initContent = lib.mkMerge [
+      (lib.mkOrder 500 (lib.concatStringsSep "\n" [
+        "if [[ -r \"\${XDG_CACHE_HOME:-\$HOME/.cache}/p10k-instant-prompt-\${(%):-%n}.zsh\" ]]; then"
+        "source \"\${XDG_CACHE_HOME:-\$HOME/.cache}/p10k-instant-prompt-\${(%):-%n}.zsh\""
+        "fi"
+      ]))
+      (lib.mkOrder 1000 (lib.concatStringsSep "\n" [
+        "[[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh"
+        "export $(dbus-launch)"
+      ]))
     ];
     shellAliases = {};
     plugins = [
@@ -102,14 +109,16 @@
         file = "share/zsh-powerlevel10k/powerlevel10k.zsh-theme";
       }
     ];
-    oh-my-zsh = {
-      enable = true;
-      package = pkgs.oh-my-zsh;
+    # 没有采用静态加载且暂时用不到插件功能故禁用 antidote
+    antidote = {
+      enable = false;
+      package = pkgs.antidote;
       plugins = [
-        "z"
-        "git"
+        "ohmyzsh/ohmyzsh path:lib kind:defer"
+        "ohmyzsh/ohmyzsh path:plugins/git kind:defer"
+        "romkatv/zsh-bench kind:defer"
       ];
-      theme = "";
+      useFriendlyNames = true;
     };
   };
   

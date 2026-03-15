@@ -15,17 +15,8 @@
       syntaxHighlighting = {
         enable = true;
       };
-      histSize = 10000;
+      histSize = 1000;
       histFile = "$HOME/.zsh_history";
-      ohMyZsh = {
-        enable = true;
-        package = pkgs.oh-my-zsh;
-        plugins = [
-          "z"
-          "git"
-        ];
-        theme = "robbyrussell";
-      };
     };
   };
 }
