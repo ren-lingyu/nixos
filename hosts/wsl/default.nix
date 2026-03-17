@@ -67,6 +67,7 @@
   
   environment = {
     systemPackages = with pkgs; [
+      wslu
       dbus
       git
       vim
@@ -90,8 +91,41 @@
     # binsh = "${pkgs.bash}/bin/sh";
     variables = {
       EDITOR = "vim";
-      DISPLAY = "localhost:0.0";
-    }; 
+      # DISPLAY = "localhost:0.0";
+    };
+    sessionVariables = {
+      BROWSER = "${pkgs.wslu}/bin/wslview";
+    };
+  };
+
+  xdg = {
+    mime = {
+      enable = true;
+      defaultApplications = {
+        "x-scheme-handler/https" = "wslview.desktop";
+        "x-scheme-handler/http" = "wslview.desktop";
+        "text/html" = "wslview.desktop";
+        "text/xml" = "wslview.desktop";
+        "application/xhtml+xml" = "wslview.desktop";
+        "x-scheme-handler/about" = "wslview.desktop";
+        "x-scheme-handler/unknown" = "wslview.desktop";
+      };
+    };
+    portal = {
+      enable = true;
+      xdgOpenUsePortal = true;
+      extraPortals = [
+        pkgs.xdg-desktop-portal-gtk
+      ];
+      config = {
+        common = {
+          default = [
+            "wslview"
+            "gtk"
+          ];
+        };
+      };
+    };
   };
 
   programs = {
@@ -175,9 +209,9 @@
             Delegate = "yes";
           };
         };
-        # 弃用 x410 作为 X server
+        # 采用 x410 作为 X server
         x410-bridge = {
-          enable = true;
+          enable = false;
           description = "X410 bridge via socat";
           wantedBy = [ "default.target" ];
           after = [ "default.target" ];
@@ -192,8 +226,8 @@
       };
     };
     tmpfiles.rules = [
-      "L+ /run/user/1000/wayland-0 - - - - /mnt/wslg/runtime-dir/wayland-0"
-      "L+ /run/user/1000/wayland-0.lock - - - - /mnt/wslg/runtime-dir/wayland-0.lock"
+      "L+ %t/wayland-0 - - - - /mnt/wslg/runtime-dir/wayland-0"
+      "L+ %t/wayland-0.lock - - - - /mnt/wslg/runtime-dir/wayland-0.lock"
     ];
   };
 
