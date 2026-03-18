@@ -120,7 +120,6 @@
       config = {
         common = {
           default = [
-            "wslview"
             "gtk"
           ];
         };
