@@ -72,6 +72,7 @@
   programs.zsh = {
     enable = true;
     package = pkgs.zsh;
+    defaultKeymap = "emacs";
     enableCompletion = true;
     autosuggestion = {
       enable = true;

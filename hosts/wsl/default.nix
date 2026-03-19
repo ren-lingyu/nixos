@@ -107,12 +107,13 @@
         "text/html" = "wslview.desktop";
         "text/xml" = "wslview.desktop";
         "application/xhtml+xml" = "wslview.desktop";
+        "application/pdf" = "wslview.desktop";
         "x-scheme-handler/about" = "wslview.desktop";
         "x-scheme-handler/unknown" = "wslview.desktop";
       };
     };
     portal = {
-      enable = true;
+      enable = false;
       xdgOpenUsePortal = true;
       extraPortals = [
         pkgs.xdg-desktop-portal-gtk
