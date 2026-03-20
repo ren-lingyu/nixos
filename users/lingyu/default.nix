@@ -99,6 +99,7 @@
       # ]))
       (lib.mkOrder 1000 (lib.concatStringsSep "\n" [
         # "[[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh"
+        "bindkey '^[[3~' delete-char"
         "export $(dbus-launch)"
       ]))
     ];
