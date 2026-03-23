@@ -99,7 +99,15 @@
       # ]))
       (lib.mkOrder 1000 (lib.concatStringsSep "\n" [
         # "[[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh"
-        "bindkey '^[[3~' delete-char"
+        "function delete-char-or-kill-region {"
+        "if [[ $REGION_ACTIVE -eq 1 ]]; then"
+        "zle kill-region"
+        "else"
+        "zle delete-char"
+        "fi"
+        "}"
+        "zle -N delete-char-or-kill-region"
+        "bindkey '^[[3~' delete-char-or-kill-region"
         "export $(dbus-launch)"
       ]))
     ];
