@@ -1,0 +1,55 @@
+#+TITLE: NixOS Configuration
+#+AUTHOR: aRenCoco
+
+* 简介
+这是一个基于 Flake 的 NixOS 配置仓库，主机配置名为 =nixos=. 
+
+* 目录结构
+#+begin_example
+nixos/
+├── flake.nix
+├── flake.lock
+├── LICENSE
+├── README.org
+├── hosts/
+│   └── wsl/
+│       └── default.nix
+├── modules/
+│   ├── binary-cache.nix
+│   ├── llm.nix
+│   └── shell.nix
+└── users/
+    └── lingyu/
+        ├── default.nix
+        └── .local/
+            └── bin/
+                ├── org.sh
+                └── ssha.sh
+#+end_example
+
+* 关键点
+- [[./hosts]] 放置设备相关的系统级配置.
+- [[./users]] 放置用户级配置.
+- [[./modules]] 放置便于模块化的系统级配置. 
+- =nixpkgs= 使用 =nixos-unstable= (清华镜像). 
+- 启用 =nix-command= 与 =flakes=. 
+- 启用 =vscode-server= 与 =ollama= (=127.0.0.1:11434=). 
+- Home Manager 管理 zsh/git/ssh/emacs/aichat 等开发环境. 
+
+* 使用
+应用系统配置：
+#+begin_src bash
+sudo nixos-rebuild switch --flake .#nixos
+#+end_src
+
+更新依赖锁：
+#+begin_src bash
+nix flake update
+#+end_src
+
+* 脚本
+- =org=: 快捷调用有关脚本、同步 =~/org= 到 nutstore 等.
+- =ssha=: 自动启动 =ssh-agent= 并加载默认私钥.
+
+* 许可
+MIT License（见 [[./LICENSE][LICENSE]]）。
