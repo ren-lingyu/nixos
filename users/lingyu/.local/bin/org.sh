@@ -23,7 +23,8 @@ case "$1" in
 	make() { command make -f ~/org/config/Makefile $@; }
 	;;
     "-t"|"--texlive")
-	texlive() { command ~/org/config/texlive.sh $@; }
+	shift
+	~/org/config/texlive.sh "$@"
 	;;
     "-s"|"--sync")
 	rclone sync "$HOME/org" "nutstore:WSL/org" \
