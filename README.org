@@ -49,7 +49,7 @@ nix flake update
 
 * 脚本
 - =org=: 快捷调用有关脚本, 同步 =~/org= 到 nutstore 等.
-- =ssha=: 自动启动 =ssh-agent= 并加载默认私钥.
+- =ssha=: 启动 =ssh-agent= 加载默认私钥.
 
 * 许可
 MIT License (见 [[file:LICENSE][LICENSE]]).
