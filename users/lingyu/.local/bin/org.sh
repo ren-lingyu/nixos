@@ -1,8 +1,29 @@
 #!/bin/bash
 
+show_help() {
+    cat << EOF
+Usage: $(basename "$0") [OPTION]...
+
+Options:
+  -m, --make      Run make with custom Makefile (~/org/config/Makefile)
+  -s, --sync      Sync ~/org to nutstore:WSL/org via rclone
+  -h, --help      Show this help message
+
+If no option is given, the script defaults to entering ~/org and
+preparing the make function (same as --make).
+EOF
+}
+
 case "$1" in
+    "-h"|"--help")
+	show_help
+	exit 0
+	;;
     "-m"|"--make")
 	make() { command make -f ~/org/config/Makefile $@; }
+	;;
+    "-t"|"--texlive")
+	texlive() { command ~/org/config/texlive.sh $@; }
 	;;
     "-s"|"--sync")
 	rclone sync "$HOME/org" "nutstore:WSL/org" \
