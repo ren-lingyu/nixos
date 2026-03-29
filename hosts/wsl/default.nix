@@ -194,7 +194,7 @@
     user = {
       services = {
         auto-fix-vscode-server = {
-          enable = true;
+          enable = false;
           serviceConfig = {
             # 保证 vscode-server 正常运行.
             # 有默认选项: Restart = "always". 不要在这里修改. 
