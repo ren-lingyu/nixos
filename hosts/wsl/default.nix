@@ -129,8 +129,12 @@
   };
 
   programs = {
-    nix-ld.enable = true;
-    dconf.enable = true;
+    nix-ld = {
+      enable = true;
+    };
+    dconf = {
+      enable = true;
+    };
     ssh = {
       package = pkgs.openssh;
       pubkeyAcceptedKeyTypes = [
