@@ -32,6 +32,7 @@
       xclock
       xeyes
       socat
+      zathura
     ];
     sessionVariables = {
       # GTK_IM_MODULE = "fcitx";
@@ -251,6 +252,22 @@
           ];
         }
       ];
+    };
+  };
+
+  programs.zathura = {
+    enable = true;
+    package = pkgs.zathura;
+    options = {};
+    mappings = {};
+  };
+
+  xdg = {
+    mimeApps = {
+      enable = true;
+      defaultApplications = {
+        "application/pdf" = "org.pwmt.zathura.desktop";
+      };
     };
   };
   
