@@ -36,6 +36,7 @@
         system = "x86_64-linux";
         modules = [
           ./configuration.nix # the minimal configuration
+          ./modules/storage.nix
           ./modules/shell.nix
           ./modules/binary-cache.nix
           ./modules/llm.nix
