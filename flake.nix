@@ -37,7 +37,7 @@
         modules = [
           ./configuration.nix # the minimal configuration
           ./modules/shell.nix
-		      ./modules/binary-cache.nix
+          ./modules/binary-cache.nix
           ./modules/llm.nix
           ./hosts/wsl
           nixos-wsl.nixosModules.default
