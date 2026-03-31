@@ -46,7 +46,6 @@
     };
     sessionPath = [
       "$HOME/.local/bin"
-      "/mnt/c/Users/Lingyu/AppData/Local/Programs/Microsoft VS Code/bin"
     ];
     file = {
       # ".config/aichat/config.yaml" = {

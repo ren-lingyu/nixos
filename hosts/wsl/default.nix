@@ -26,7 +26,7 @@
     defaultUser = "lingyu";
     interop = {
       includePath = false;
-      register = true;   
+      register = true;
     };
     wslConf = {
       automount = {
@@ -91,6 +91,9 @@
     sessionVariables = {
       BROWSER = "${pkgs.wslu}/bin/wslview";
     };
+    extraInit = lib.concatStringsSep "\n" [
+      "export PATH=\"/mnt/c/Users/Lingyu/AppData/Local/Programs/Microsoft VS Code/bin\":\$PATH" 
+    ];
   };
 
   xdg = {
