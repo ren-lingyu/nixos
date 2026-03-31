@@ -2,7 +2,9 @@
 #+AUTHOR: aRenCoco
 
 * 简介
-这是一个基于 Flake 的 NixOS 配置仓库，主机配置名为 =nixos=. 
+这是一个基于 Flake 的 NixOS 配置仓库，主机配置名为 =nixos=.
+
+我自己打包的 nixos packages 仓库见 [[https://github.com/ren-lingyu/nixpkgs]]. 
 
 * 目录结构
 #+begin_example
