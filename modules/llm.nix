@@ -1,5 +1,7 @@
 { config, lib, pkgs, ... }:
+
 {
+  
   services = {
     ollama = {
       enable = true;
@@ -15,4 +17,5 @@
       syncModels = true;
     };
   };
+  
 }
