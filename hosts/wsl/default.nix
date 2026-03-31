@@ -55,11 +55,6 @@
       };
     };
   };
-
-  nix.settings = {
-    experimental-features = [ "nix-command" "flakes" ];
-    trusted-users = [ "@wheel" "root" ];
-  };
   
   nixpkgs.config.allowUnfreePredicate = pkg : builtins.elem (lib.getName pkg) [
     "github-copilot-cli"

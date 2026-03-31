@@ -35,6 +35,7 @@
       nixos = nixpkgs.lib.nixosSystem {
         system = "x86_64-linux";
         modules = [
+          ./configuration.nix # the minimal configuration
           ./modules/shell.nix
 		      ./modules/binary-cache.nix
           ./modules/llm.nix
