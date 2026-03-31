@@ -9,6 +9,13 @@
       # repo = "nixpkgs";
       # ref = "nixos-unstable";
     };
+    arcc-nixpkgs = {
+      type = "github";
+      owner = "ren-lingyu";
+      repo = "nixpkgs";
+      ref = "main";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
     nixos-wsl = {
       type = "github";
       owner = "nix-community";
@@ -29,17 +36,25 @@
     };
   };
   
-  outputs = { self, nixpkgs, nixos-wsl, home-manager, vscode-server, ... }@inputs: {
+  outputs = { self, nixpkgs, arcc-nixpkgs, nixos-wsl, home-manager, vscode-server, ... }@inputs: {
     nixosConfigurations = {
       # config on WSL2, set hostname as nixos for convience. 
       nixos = nixpkgs.lib.nixosSystem {
         system = "x86_64-linux";
         modules = [
+          ({
+            nixpkgs.overlays = [
+              (final: prev: {
+                arcc-nixpkgs = inputs.arcc-nixpkgs.packages."${prev.system}";
+              })
+            ];
+          })
           ./configuration.nix # the minimal configuration
           ./modules/storage.nix
           ./modules/shell.nix
           ./modules/binary-cache.nix
           ./modules/llm.nix
+          ./modules/texlive.nix
           ./hosts/wsl
           nixos-wsl.nixosModules.default
           vscode-server.nixosModules.default

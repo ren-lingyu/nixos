@@ -1,5 +1,26 @@
 {
   "nodes": {
+    "arcc-nixpkgs": {
+      "inputs": {
+        "nixpkgs": [
+          "nixpkgs"
+        ]
+      },
+      "locked": {
+        "lastModified": 1774991200,
+        "narHash": "sha256-5rt/iXe7BdE416QJsUv/qyPq0D/EtyFUAyefqckzz0M=",
+        "owner": "ren-lingyu",
+        "repo": "nixpkgs",
+        "rev": "883ca476c814b74eb0dc629496350c1d9a8c26d7",
+        "type": "github"
+      },
+      "original": {
+        "owner": "ren-lingyu",
+        "ref": "main",
+        "repo": "nixpkgs",
+        "type": "github"
+      }
+    },
     "flake-compat": {
       "flake": false,
       "locked": {
@@ -94,6 +115,7 @@
     },
     "root": {
       "inputs": {
+        "arcc-nixpkgs": "arcc-nixpkgs",
         "home-manager": "home-manager",
         "nixos-wsl": "nixos-wsl",
         "nixpkgs": "nixpkgs",
