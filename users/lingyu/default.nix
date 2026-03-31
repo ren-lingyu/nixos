@@ -43,12 +43,11 @@
       XCURSOR_THEME = "Adwaita";
       XCURSOR_SIZE = "24";
       GPG_TTY = "$(tty)";
-      PATH = lib.concatStringsSep ":" [
-        "$HOME/.local/bin"
-        "/mnt/c/Users/Lingyu/AppData/Local/Programs/Microsoft VS Code/bin"
-        "$PATH"
-      ];
     };
+    sessionPath = [
+      "$HOME/.local/bin"
+      "/mnt/c/Users/Lingyu/AppData/Local/Programs/Microsoft VS Code/bin"
+    ];
     file = {
       # ".config/aichat/config.yaml" = {
       #   source = ./.config/aichat/config.yaml;
