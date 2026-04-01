@@ -54,6 +54,7 @@
           ./modules/binary-cache.nix
           ./modules/llm.nix
           ./modules/texlive.nix
+          ./modules/font.nix
           ./hosts/wsl
           nixos-wsl.nixosModules.default
           vscode-server.nixosModules.default
