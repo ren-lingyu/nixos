@@ -8,13 +8,19 @@ let
     inherit (pkgs.texlive) scheme-full dvisvgm;
     inherit luadraw;
   };
+
+  packages = with pkgs; [
+    ghostscript
+    mupdf
+  ];
   
 in
 
 {
   
-  environment.systemPackages = [
-    tex
+  environment.systemPackages = builtins.concatLists [
+    [ tex ]
+    packages
   ];
   
 }
