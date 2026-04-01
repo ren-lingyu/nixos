@@ -10,10 +10,11 @@
       # ref = "nixos-unstable";
     };
     arcc-nixpkgs = {
-      type = "github";
-      owner = "ren-lingyu";
-      repo = "nixpkgs";
-      ref = "main";
+      url = "git+https://github.com/ren-lingyu/nixpkgs.git?ref=main&shallow=1";
+      # type = "github";
+      # owner = "ren-lingyu";
+      # repo = "nixpkgs";
+      # ref = "main";
       inputs.nixpkgs.follows = "nixpkgs";
     };
     nixos-wsl = {
@@ -42,11 +43,9 @@
       nixos = nixpkgs.lib.nixosSystem {
         system = "x86_64-linux";
         modules = [
-          ({
+          ({pkgs, ...} : {
             nixpkgs.overlays = [
-              (final: prev: {
-                arcc-nixpkgs = inputs.arcc-nixpkgs.packages."${prev.system}";
-              })
+              (final: prev: {arcc-nixpkgs = inputs.arcc-nixpkgs.packages."${prev.system}";})
             ];
           })
           ./configuration.nix # the minimal configuration

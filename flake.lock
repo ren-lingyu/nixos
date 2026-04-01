@@ -7,18 +7,19 @@
         ]
       },
       "locked": {
-        "lastModified": 1774991200,
-        "narHash": "sha256-5rt/iXe7BdE416QJsUv/qyPq0D/EtyFUAyefqckzz0M=",
-        "owner": "ren-lingyu",
-        "repo": "nixpkgs",
-        "rev": "883ca476c814b74eb0dc629496350c1d9a8c26d7",
-        "type": "github"
+        "lastModified": 1775022087,
+        "narHash": "sha256-HgMwhDQrwxgNCVqsRnyjqHI5YZ8C+HpbjVPB3n1DNOs=",
+        "ref": "main",
+        "rev": "ef356ddbc32336009886f014a42a8123a1b202ab",
+        "shallow": true,
+        "type": "git",
+        "url": "https://github.com/ren-lingyu/nixpkgs.git"
       },
       "original": {
-        "owner": "ren-lingyu",
         "ref": "main",
-        "repo": "nixpkgs",
-        "type": "github"
+        "shallow": true,
+        "type": "git",
+        "url": "https://github.com/ren-lingyu/nixpkgs.git"
       }
     },
     "flake-compat": {
