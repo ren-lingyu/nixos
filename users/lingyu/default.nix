@@ -44,6 +44,9 @@
       XCURSOR_THEME = "Adwaita";
       XCURSOR_SIZE = "24";
       GPG_TTY = "$(tty)";
+      TEXINPUTS = "$HOME/org/texmf//:";
+      BIBINPUTS = "$HOME/org/texmf//:";
+      BSTINPUTS = "$HOME/org/texmf//:";
     };
     sessionPath = [
       "$HOME/.local/bin"
