@@ -16,10 +16,13 @@ nixos/
 ├── hosts/
 │   └── wsl/
 │       └── default.nix
-├── modules/
+├── modules
 │   ├── binary-cache.nix
+│   ├── font.nix
 │   ├── llm.nix
-│   └── shell.nix
+│   ├── shell.nix
+│   ├── storage.nix
+│   └── texlive.nix
 └── users/
     └── lingyu/
         ├── default.nix
