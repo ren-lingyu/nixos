@@ -2,7 +2,7 @@
 
 let
 
-  luadraw = pkgs.arcc-nixpkgs.luadraw;
+  luadraw = pkgs.arcc-nixpkgs.texlivePackages.luadraw;
   
   tex = pkgs.texlive.combine {
     inherit (pkgs.texlive) scheme-full dvisvgm;
