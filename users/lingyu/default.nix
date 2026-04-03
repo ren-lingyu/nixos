@@ -273,6 +273,12 @@
       };
     };
   };
+
+  systemd = {
+    user = {
+      sessionVariables = config.home.sessionVariables;
+    };
+  };
   
   services = {
     gpg-agent = {
