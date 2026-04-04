@@ -175,6 +175,19 @@
         }
       ];
     };
+    ollama = {
+      enable = true;
+      package = pkgs.ollama-vulkan;
+      host = "127.0.0.1";
+      port = 11434; 
+      loadModels = [
+        "gemma4:e4b"
+	      "qwen3-coder-next:cloud"
+        "qwen3.5:cloud"
+        "deepseek-v3.2:cloud"
+      ];
+      syncModels = true;
+    };
   };
   
   systemd = {

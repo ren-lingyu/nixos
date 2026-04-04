@@ -52,7 +52,6 @@
           ./modules/storage.nix
           ./modules/shell.nix
           ./modules/binary-cache.nix
-          ./modules/llm.nix
           ./modules/texlive.nix
           ./modules/font.nix
           ./hosts/wsl
