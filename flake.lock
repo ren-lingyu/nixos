@@ -7,10 +7,10 @@
         ]
       },
       "locked": {
-        "lastModified": 1775104011,
-        "narHash": "sha256-foek+3fnZq1ThXeiaBFIVPOxS0VlzSPVv9DoebUhYEo=",
+        "lastModified": 1775202622,
+        "narHash": "sha256-OunJFMTzYtbB/ePukoz4rdwBUx1sgwFsK3eP6RFSen8=",
         "ref": "main",
-        "rev": "187122ad090fc70bc03ecab739c1eba8cb23ec58",
+        "rev": "5bc5253f29de5224961875bcc8c71a2fde20a237",
         "shallow": true,
         "type": "git",
         "url": "https://github.com/ren-lingyu/nixpkgs.git"
@@ -63,11 +63,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1774379316,
-        "narHash": "sha256-0nGNxWDUH2Hzlj/R3Zf4FEK6fsFNB/dvewuboSRZqiI=",
+        "lastModified": 1775320414,
+        "narHash": "sha256-pIDPHus8udcxO4lT+zUULBfvue2D08E73abzVEJNE+8=",
         "owner": "nix-community",
         "repo": "home-manager",
-        "rev": "1eb0549a1ab3fe3f5acf86668249be15fa0e64f7",
+        "rev": "5ee3b3ef63e469c84639c2c9e282726352c86069",
         "type": "github"
       },
       "original": {
@@ -84,11 +84,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1773882647,
-        "narHash": "sha256-VzcOcE0LLpEnyoxLuMuptZ9ZWCkSBn99bTgEQoz5Viw=",
+        "lastModified": 1774972752,
+        "narHash": "sha256-DnLIpFxznohpLkIFs390uZ0gxwkVyhtknhKNu+lQJK8=",
         "owner": "nix-community",
         "repo": "NixOS-WSL",
-        "rev": "fd0eae98d1ecee31024271f8d64676250a386ee7",
+        "rev": "d97e078f4788cddb8d11c3c99f72a4bb9ddec221",
         "type": "github"
       },
       "original": {
@@ -99,10 +99,10 @@
     },
     "nixpkgs": {
       "locked": {
-        "lastModified": 1774106199,
-        "narHash": "sha256-US5Tda2sKmjrg2lNHQL3jRQ6p96cgfWh3J1QBliQ8Ws=",
+        "lastModified": 1775036866,
+        "narHash": "sha256-ZojAnPuCdy657PbTq5V0Y+AHKhZAIwSIT2cb8UgAz/U=",
         "ref": "nixos-unstable",
-        "rev": "6c9a78c09ff4d6c21d0319114873508a6ec01655",
+        "rev": "6201e203d09599479a3b3450ed24fa81537ebc4e",
         "shallow": true,
         "type": "git",
         "url": "https://mirrors.tuna.tsinghua.edu.cn/git/nixpkgs.git"
