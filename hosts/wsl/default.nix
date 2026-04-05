@@ -185,13 +185,17 @@
     };
     ollama = {
       enable = true;
-      package = pkgs.ollama-vulkan;
+      package = pkgs.ollama;
       host = "127.0.0.1";
       port = 11434; 
       loadModels = [
-        "gemma4:e4b"
-        "phi4-mini-reasoning:3.8b"
+        "qwen3.5:0.8b"
+        "qwen3.5:2b"
         "qwen2.5:7b"
+        "gemma4:e2b"
+        "gemma4:e4b"
+        "phi4-mini:3.8b"
+        "phi4-mini-reasoning:3.8b"
 	      "qwen3-coder-next:cloud"
         "qwen3.5:cloud"
         "deepseek-v3.2:cloud"
