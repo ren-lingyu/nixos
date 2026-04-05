@@ -13,6 +13,8 @@
     extraPackages = with pkgs; [
       intel-media-driver
       intel-vaapi-driver
+      vpl-gpu-rt
+      intel-compute-runtime
     ];
   };
   
@@ -44,7 +46,7 @@
     users.lingyu = {
       isNormalUser = true;
       linger = true;
-      extraGroups = [ "wheel" "docker" ];
+      extraGroups = [ "wheel" "docker" "video" "render" ];
       home = "/home/lingyu";
       openssh = {
         authorizedKeys = {
@@ -79,8 +81,10 @@
       pinentry-tty
       vulkan-loader
       vulkan-tools
+      pciutils
       gsettings-desktop-schemas
       nodejs_22
+      # mesa-demos
     ];
     usrbinenv = lib.mkForce "${pkgs.coreutils}/bin/env";
     # binsh = "${pkgs.bash}/bin/sh";
@@ -90,6 +94,7 @@
     };
     sessionVariables = {
       BROWSER = "${pkgs.wslu}/bin/wslview";
+      LIBVA_DRIVER_NAME = "iHD";
     };
     extraInit = lib.concatStringsSep "\n" [
       "export PATH=\"/mnt/c/Users/Lingyu/AppData/Local/Programs/Microsoft VS Code/bin\":\$PATH" 
@@ -148,6 +153,9 @@
   };
   
   services = {
+    xserver = {
+      videoDrivers = [ "intel" "modesetting" ];
+    };
     dbus = {
       enable = true;
       implementation = "broker";
