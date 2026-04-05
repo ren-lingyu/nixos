@@ -182,9 +182,12 @@
       port = 11434; 
       loadModels = [
         "gemma4:e4b"
+        "phi4-mini-reasoning:3.8b"
+        "qwen2.5:7b"
 	      "qwen3-coder-next:cloud"
         "qwen3.5:cloud"
         "deepseek-v3.2:cloud"
+        "gemini-3-flash-preview:cloud"
       ];
       syncModels = true;
     };
