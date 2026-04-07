@@ -12,6 +12,9 @@
     liberation_ttf
     arphic-ukai
     arphic-uming
+    maple-mono.truetype
+    maple-mono.NF-unhinted
+    maple-mono.NF-CN-unhinted
   ];
 
 }
