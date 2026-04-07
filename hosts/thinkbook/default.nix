@@ -111,14 +111,7 @@
       EDITOR = "vim";
       DISPLAY = ":0";
     };
-    sessionVariables = {
-      GTK_IM_MODULE = "fcitx";
-      QT_IM_MODULE = "fcitx";
-      XMODIFIERS = "@im=fcitx";
-      SDL_IM_MODULE = "fcitx";
-      GLFW_IM_MODULE = "ibus";
-      # NIXOS_OZONE_WL = "1";
-    };
+    sessionVariables = {};
   };
 
   programs = {
