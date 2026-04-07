@@ -20,7 +20,7 @@
       systemd-boot.enable = true;
       efi.canTouchEfiVariables = true;
       grub = {
-        fontSize = 20;
+        fontSize = 32;
       };
     };
   };
@@ -61,7 +61,8 @@
   };
   
   console = {
-    font = "Lat2-Terminus16";
+    font = "latarcyrheb-sun32";
+    # font = "Lat2-Terminus16";
     # keyMap = "us";
     useXkbConfig = true; # use xkb.options in tty.
   };
