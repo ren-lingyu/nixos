@@ -1,4 +1,5 @@
 {
+  
   description = "NixOS configuration";
   
   inputs = {
@@ -39,8 +40,31 @@
   
   outputs = { self, nixpkgs, arcc-nixpkgs, nixos-wsl, home-manager, vscode-server, ... }@inputs: {
     nixosConfigurations = {
-      # config on WSL2, set hostname as nixos for convience. 
       nixos = nixpkgs.lib.nixosSystem {
+        system = "x86_64-linux";
+        modules = [
+          ({pkgs, ...} : {
+            nixpkgs.overlays = [
+              (final: prev: {arcc-nixpkgs = inputs.arcc-nixpkgs.packages."${prev.system}";})
+            ];
+          })
+          ./configuration.nix # the minimal configuration
+          ./modules/storage.nix
+          ./modules/shell.nix
+          ./modules/binary-cache.nix
+          ./modules/texlive.nix
+          ./modules/font.nix
+          nixos-wsl.nixosModules.default
+          vscode-server.nixosModules.default
+          home-manager.nixosModules.home-manager {
+            home-manager.useGlobalPkgs = true;
+            home-manager.useUserPackages = true;
+            home-manager.users.lingyu = import ./users/lingyu;
+            home-manager.extraSpecialArgs = inputs;
+          }
+        ];
+      };
+      nixos-wsl = nixpkgs.lib.nixosSystem {
         system = "x86_64-linux";
         modules = [
           ({pkgs, ...} : {
@@ -67,4 +91,5 @@
       };
     };
   };
+  
 }
