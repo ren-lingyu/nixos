@@ -90,7 +90,7 @@
     etc = {
       "libinput/local-overrides.quirks" = {
         text = lib.concatStringsSep "\n" [
-          "[Lenovo ThinkBook 14 G7+ ASP touchpad]"
+          "[Lenovo ThinkBook 14 G8+ IPH touchpad]"
           "MatchName=*GXTP5100*"
           "MatchDMIModalias=dmi:*svnLENOVO:*pvrThinkBook14G8+IPH*:*"
           "MatchUdevType=touchpad"
