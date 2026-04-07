@@ -49,7 +49,16 @@
     };
   };
 
-  i18n.defaultLocale = "en_US.UTF-8";
+  i18n = {
+    defaultLocale = "en_US.UTF-8";
+    inputMethod = {
+      enable = false;
+      type = "ibus";
+      ibus.engines = with pkgs.ibus-engines; [
+        libpinyin
+      ]; 
+    };
+  };
   
   console = {
     font = "Lat2-Terminus16";
@@ -102,7 +111,14 @@
       EDITOR = "vim";
       DISPLAY = ":0";
     };
-    sessionVariables = {};
+    sessionVariables = {
+      GTK_IM_MODULE = "fcitx";
+      QT_IM_MODULE = "fcitx";
+      XMODIFIERS = "@im=fcitx";
+      SDL_IM_MODULE = "fcitx";
+      GLFW_IM_MODULE = "ibus";
+      # NIXOS_OZONE_WL = "1";
+    };
   };
 
   programs = {
