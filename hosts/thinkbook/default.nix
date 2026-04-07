@@ -13,7 +13,7 @@
     kernelPackages = pkgs.linuxPackages_latest;
     kernelParams = [
       # "video=3840x2400@60"
-      # "psmouse.synaptics_intertouch=0"
+      "psmouse.synaptics_intertouch=0"
       # "pci=nocrs"
     ];
     loader = {
@@ -87,6 +87,17 @@
       vulkan-tools
     ];
     usrbinenv = lib.mkForce "${pkgs.coreutils}/bin/env";
+    etc = {
+      "libinput/local-overrides.quirks" = {
+        text = lib.concatStringsSep "\n" [
+          "[Lenovo ThinkBook 14 G7+ ASP touchpad]"
+          "MatchName=*GXTP5100*"
+          "MatchDMIModalias=dmi:*svnLENOVO:*pvrThinkBook14G8+IPH*:*"
+          "MatchUdevType=touchpad"
+          "ModelPressurePad=1"
+        ];
+      };
+    };
     variables = {
       EDITOR = "vim";
       DISPLAY = ":0";
