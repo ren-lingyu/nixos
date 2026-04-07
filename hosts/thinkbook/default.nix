@@ -95,6 +95,7 @@
       pciutils
       vulkan-loader
       vulkan-tools
+      microsoft-edge
     ];
     usrbinenv = lib.mkForce "${pkgs.coreutils}/bin/env";
     etc = {
@@ -134,8 +135,10 @@
         };
       };
     };
-    firefox = {
+    clash-verge = {
       enable = true;
+      package = pkgs.clash-verge-rev;
+      autoStart = false;
     };
   };
 
