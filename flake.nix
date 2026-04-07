@@ -55,7 +55,7 @@
           ./modules/storage.nix
           ./modules/shell.nix
           ./modules/binary-cache.nix
-          # ./modules/texlive.nix
+          ./modules/texlive.nix
           ./modules/font.nix
           ./hosts/thinkbook
           nixos-wsl.nixosModules.default
