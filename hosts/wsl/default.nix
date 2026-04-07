@@ -8,6 +8,12 @@
 { config, lib, pkgs, ... }:
 
 {
+
+  # imports = [
+  #   # include NixOS-WSL modules
+  #   <nixos-wsl/modules>
+  # ];
+  
   hardware.graphics = {
     enable = true;
     extraPackages = with pkgs; [
@@ -17,11 +23,10 @@
       intel-compute-runtime
     ];
   };
-  
-  # imports = [
-  #   # include NixOS-WSL modules
-  #   <nixos-wsl/modules>
-  # ];
+
+  time = {
+    timeZone = "Asia/Shanghai";
+  };
   
   wsl = {
     enable = true;
