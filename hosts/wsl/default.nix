@@ -13,6 +13,8 @@
   #   # include NixOS-WSL modules
   #   <nixos-wsl/modules>
   # ];
+
+  networking.hostName = "nixos-wsl";
   
   hardware.graphics = {
     enable = true;
@@ -62,10 +64,6 @@
       };
     };
   };
-  
-  nixpkgs.config.allowUnfreePredicate = pkg : builtins.elem (lib.getName pkg) [
-    "github-copilot-cli"
-  ];
   
   environment = {
     systemPackages = with pkgs; [

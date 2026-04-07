@@ -43,9 +43,12 @@
       nixos = nixpkgs.lib.nixosSystem {
         system = "x86_64-linux";
         modules = [
-          ({pkgs, ...} : {
+          ({pkgs, lib, ...} : {
             nixpkgs.overlays = [
               (final: prev: {arcc-nixpkgs = inputs.arcc-nixpkgs.packages."${prev.system}";})
+            ];
+            nixpkgs.config.allowUnfreePredicate = pkg : builtins.elem (lib.getName pkg) [
+              "github-copilot-cli"
             ];
           })
           ./configuration.nix # the minimal configuration
@@ -54,6 +57,7 @@
           ./modules/binary-cache.nix
           ./modules/texlive.nix
           ./modules/font.nix
+          ./hosts/thinkbook
           nixos-wsl.nixosModules.default
           vscode-server.nixosModules.default
           home-manager.nixosModules.home-manager {
@@ -67,9 +71,12 @@
       nixos-wsl = nixpkgs.lib.nixosSystem {
         system = "x86_64-linux";
         modules = [
-          ({pkgs, ...} : {
+          ({pkgs, lib, ...} : {
             nixpkgs.overlays = [
               (final: prev: {arcc-nixpkgs = inputs.arcc-nixpkgs.packages."${prev.system}";})
+            ];
+            nixpkgs.config.allowUnfreePredicate = pkg : builtins.elem (lib.getName pkg) [
+              "github-copilot-cli"
             ];
           })
           ./configuration.nix # the minimal configuration
