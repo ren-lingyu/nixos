@@ -49,6 +49,7 @@
             ];
             nixpkgs.config.allowUnfreePredicate = pkg : builtins.elem (lib.getName pkg) [
               "github-copilot-cli"
+              "microsoft-edge"
             ];
           })
           ./configuration.nix # the minimal configuration
