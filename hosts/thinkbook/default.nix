@@ -164,7 +164,7 @@
       enable = true;
       package = pkgs.clash-verge-rev;
       autoStart = false;
-      serviceMode = true;
+      serviceMode = false;
       tunMode = true;
     };
   };
