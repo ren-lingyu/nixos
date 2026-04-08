@@ -20,6 +20,7 @@ let
 in
 
 {
+  
   imports = [ # Include the results of the hardware scan.
     ./hardware-configuration.nix
   ];
@@ -43,11 +44,19 @@ in
   # Configure network connections interactively with nmcli or nmtui.
   networking = {
     hostName = "nixos";
-    networkmanager.enable = true;
+    networkmanager = {
+      enable = true;
+    };
+    firewall = {
+      enable = true;
+      allowedTCPPorts = [];
+      allowedUDPPorts = [];
+    };
+    proxy = {
+      default = ""; #"http://user:password@proxy:port/";
+      noProxy = ""; #"127.0.0.1,localhost,internal.domain";
+    };
   };
-  # Configure network proxy if necessary
-  # networking.proxy.default = "http://user:password@proxy:port/";
-  # networking.proxy.noProxy = "127.0.0.1,localhost,internal.domain";
   
   time = {
     timeZone = "Asia/Shanghai";
@@ -67,76 +76,6 @@ in
 	      home = nixosUserHome;
       };
     };
-  };
-
-  systemd = {
-    tmpfiles = {
-      rules = [
-        "d /mnt/c 0700 root root - -"
-        "d ${nixosUserHome}/knowhub 0755 lingyu users - -"
-        "d ${nixosUserHome}/Downloads 0755 lingyu users - -"
-        "d ${nixosUserHome}/Documents 0755 lingyu users - -"
-        "d ${nixosUserHome}/Pictures 0755 lingyu users - -"
-        "d ${nixosUserHome}/Videos 0755 lingyu users - -"
-        "d ${nixosUserHome}/Music 0755 lingyu users - -"
-      ];
-    };
-    mounts = [
-      {
-        what = "${windowsUserHome}/KnowledgeHub";
-        where = "${nixosUserHome}/knowhub";
-        type = "fuse.bindfs";
-        options = bindfsMountOptions;
-        wantedBy = [ "multi-user.target" ];
-        after = [ "mnt-c.mount" ];
-        requires = [ "mnt-c.mount" ];
-      }
-      {
-        what = "${windowsUserHome}/Downloads";
-        where = "${nixosUserHome}/Downloads";
-        type = "fuse.bindfs";
-        options = bindfsMountOptions;
-        wantedBy = [ "multi-user.target" ];
-        after = [ "mnt-c.mount" ];
-        requires = [ "mnt-c.mount" ];
-      }
-      {
-        what = "${windowsUserHome}/OneDrive/Documents";
-        where = "${nixosUserHome}/Documents";
-        type = "fuse.bindfs";
-        options = bindfsMountOptions;
-        wantedBy = [ "multi-user.target" ];
-        after = [ "mnt-c.mount" ];
-        requires = [ "mnt-c.mount" ];
-      }
-      {
-        what = "${windowsUserHome}/OneDrive/Pictures";
-        where = "${nixosUserHome}/Pictures";
-        type = "fuse.bindfs";
-        options = bindfsMountOptions;
-        wantedBy = [ "multi-user.target" ];
-        after = [ "mnt-c.mount" ];
-        requires = [ "mnt-c.mount" ];
-      }
-      {
-        what = "${windowsUserHome}/OneDrive/Videos";
-        where = "${nixosUserHome}/Videos";
-        type = "fuse.bindfs";
-        options = bindfsMountOptions;
-        wantedBy = [ "multi-user.target" ];
-        after = [ "mnt-c.mount" ];
-        requires = [ "mnt-c.mount" ];
-      }
-      {
-        what = "${windowsUserHome}/OneDrive/Music";
-        where = "${nixosUserHome}/Music";
-        type = "fuse.bindfs";
-        options = bindfsMountOptions;
-        wantedBy = [ "multi-user.target" ];
-        after = [ "mnt-c.mount" ];
-        requires = [ "mnt-c.mount" ];
-      }
-    ];
   };
 
   i18n = {
@@ -253,6 +192,9 @@ in
   };
 
   services = {
+    openssh = {
+      enable = true;
+    };
     xserver = {
       enable = true;
       videoDrivers = [ "intel" "modesetting" ];
@@ -264,6 +206,10 @@ in
     printing = {
       # Enable CUPS to print documents.
       enable = true;
+    };
+    pipewire = {
+      enable = true;
+      pulse = {enable = true;};
     };
     libinput = {
       # Enable touchpad support (enabled default in most desktopManager).
@@ -304,37 +250,75 @@ in
     };
   };
 
-  # Enable sound.
-  # services.pulseaudio.enable = true;
-  # OR
-  # services.pipewire = {
-  #   enable = true;
-  #   pulse.enable = true;
-  # };
-
-  # Some programs need SUID wrappers, can be configured further or are
-  # started in user sessions.
-  # programs.mtr.enable = true;
-  # programs.gnupg.agent = {
-  #   enable = true;
-  #   enableSSHSupport = true;
-  # };
-
-  # List services that you want to enable:
-
-  # Enable the OpenSSH daemon.
-  # services.openssh.enable = true;
-
-  # Open ports in the firewall.
-  # networking.firewall.allowedTCPPorts = [ ... ];
-  # networking.firewall.allowedUDPPorts = [ ... ];
-  # Or disable the firewall altogether.
-  # networking.firewall.enable = false;
-
-  # Copy the NixOS configuration file and link it from the resulting system
-  # (/run/current-system/configuration.nix). This is useful in case you
-  # accidentally delete configuration.nix.
-  # system.copySystemConfiguration = true;
+  systemd = {
+    tmpfiles = {
+      rules = [
+        "d /mnt/c 0700 root root - -"
+        "d ${nixosUserHome}/knowhub 0755 lingyu users - -"
+        "d ${nixosUserHome}/Downloads 0755 lingyu users - -"
+        "d ${nixosUserHome}/Documents 0755 lingyu users - -"
+        "d ${nixosUserHome}/Pictures 0755 lingyu users - -"
+        "d ${nixosUserHome}/Videos 0755 lingyu users - -"
+        "d ${nixosUserHome}/Music 0755 lingyu users - -"
+      ];
+    };
+    mounts = [
+      {
+        what = "${windowsUserHome}/KnowledgeHub";
+        where = "${nixosUserHome}/knowhub";
+        type = "fuse.bindfs";
+        options = bindfsMountOptions;
+        wantedBy = [ "multi-user.target" ];
+        after = [ "mnt-c.mount" ];
+        requires = [ "mnt-c.mount" ];
+      }
+      {
+        what = "${windowsUserHome}/Downloads";
+        where = "${nixosUserHome}/Downloads";
+        type = "fuse.bindfs";
+        options = bindfsMountOptions;
+        wantedBy = [ "multi-user.target" ];
+        after = [ "mnt-c.mount" ];
+        requires = [ "mnt-c.mount" ];
+      }
+      {
+        what = "${windowsUserHome}/OneDrive/Documents";
+        where = "${nixosUserHome}/Documents";
+        type = "fuse.bindfs";
+        options = bindfsMountOptions;
+        wantedBy = [ "multi-user.target" ];
+        after = [ "mnt-c.mount" ];
+        requires = [ "mnt-c.mount" ];
+      }
+      {
+        what = "${windowsUserHome}/OneDrive/Pictures";
+        where = "${nixosUserHome}/Pictures";
+        type = "fuse.bindfs";
+        options = bindfsMountOptions;
+        wantedBy = [ "multi-user.target" ];
+        after = [ "mnt-c.mount" ];
+        requires = [ "mnt-c.mount" ];
+      }
+      {
+        what = "${windowsUserHome}/OneDrive/Videos";
+        where = "${nixosUserHome}/Videos";
+        type = "fuse.bindfs";
+        options = bindfsMountOptions;
+        wantedBy = [ "multi-user.target" ];
+        after = [ "mnt-c.mount" ];
+        requires = [ "mnt-c.mount" ];
+      }
+      {
+        what = "${windowsUserHome}/OneDrive/Music";
+        where = "${nixosUserHome}/Music";
+        type = "fuse.bindfs";
+        options = bindfsMountOptions;
+        wantedBy = [ "multi-user.target" ];
+        after = [ "mnt-c.mount" ];
+        requires = [ "mnt-c.mount" ];
+      }
+    ];
+  };
 
   # This option defines the first version of NixOS you have installed on this particular machine,
   # and is used to maintain compatibility with application data (e.g. databases) created on older NixOS versions.
