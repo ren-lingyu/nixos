@@ -50,6 +50,7 @@
             nixpkgs.config.allowUnfreePredicate = pkg : builtins.elem (lib.getName pkg) [
               "github-copilot-cli"
               "microsoft-edge"
+              "feishu"
             ];
           })
           ./configuration.nix # the minimal configuration
