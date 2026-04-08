@@ -100,6 +100,7 @@
       vulkan-loader
       vulkan-tools
       microsoft-edge
+      feishu
     ];
     usrbinenv = lib.mkForce "${pkgs.coreutils}/bin/env";
     etc = {
