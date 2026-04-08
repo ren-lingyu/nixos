@@ -34,6 +34,7 @@
       zathura
       zotero
       calibre
+      xournalpp
     ];
     sessionVariables = {
       # GTK_IM_MODULE = "fcitx";
