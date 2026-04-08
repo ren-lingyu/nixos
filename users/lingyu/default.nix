@@ -32,6 +32,8 @@
       xeyes
       socat
       zathura
+      zotero
+      calibre
     ];
     sessionVariables = {
       # GTK_IM_MODULE = "fcitx";
