@@ -54,19 +54,18 @@
       "$HOME/.local/bin"
     ];
     file = {
-      # ".config/aichat/config.yaml" = {
-      #   source = ./.config/aichat/config.yaml;
-      #   force = true;
-      # };
       ".local/bin/nutstore" = {
+        enable = false;
         source = ./.local/bin/nutstore.sh;
         executable = true;
       };
       ".local/bin/org" = {
+        enable = true;
         source = ./.local/bin/org.sh;
         executable = true;
       };
       ".local/bin/ssha" = {
+        enable = true;
         source = ./.local/bin/ssha.sh;
         executable = true;
       };
@@ -76,8 +75,6 @@
   programs.bash = {
     enable = false;
     enableCompletion = true;
-    # bashrcExtra = builtins.readFile ./.bashrc/early.sh;
-    # initExtra = builtins.readFile ./.bashrc/late.sh;
     shellAliases = {};
   };
 
