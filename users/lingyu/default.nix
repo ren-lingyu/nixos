@@ -285,8 +285,11 @@
   
   services = {
     gpg-agent = {
-      enable = true;
+      enable = false;
       pinentry.package = pkgs.pinentry-tty;
+      enableZshIntegration = true;
+      grabKeyboardAndMouse = true;
+      enableSshSupport = true;
     };
     emacs = {
       enable = true;

@@ -167,6 +167,10 @@
       serviceMode = false;
       tunMode = true;
     };
+    gnupg.agent = {
+      enable = true;
+      enableSSHSupport = true;
+    };
   };
 
   services = {
