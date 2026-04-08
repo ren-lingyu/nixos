@@ -12,7 +12,7 @@
   boot = {
     kernelPackages = pkgs.linuxPackages_latest;
     kernelParams = [
-      # "video=3840x2400@60"
+      # "video=3072x1920@60"
       "psmouse.synaptics_intertouch=0"
       # "pci=nocrs"
     ];
