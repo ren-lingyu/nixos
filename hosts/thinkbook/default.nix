@@ -163,10 +163,10 @@
     libinput = {
       # Enable touchpad support (enabled default in most desktopManager).
       enable = true;
-      # touchpad = {
-      #   naturalScrolling = true;
-      #   tapping = true;
-      # };
+      touchpad = {
+        naturalScrolling = true;
+        tapping = true;
+      };
     };
     displayManager = {
       gdm = {
