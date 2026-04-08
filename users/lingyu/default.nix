@@ -58,6 +58,10 @@
       #   source = ./.config/aichat/config.yaml;
       #   force = true;
       # };
+      ".local/bin/nutstore" = {
+        source = ./.local/bin/nutstore.sh;
+        executable = true;
+      };
       ".local/bin/org" = {
         source = ./.local/bin/org.sh;
         executable = true;
