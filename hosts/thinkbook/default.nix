@@ -39,9 +39,14 @@
   };
 
   users = {
+    mutableUsers = false;
     users = {
+      root = {
+        hashedPassword = "$y$j9T$I75rvRCS.FR8zj/o3ivGb1$lteEgidoSR8AbjTXhxfemLeiXFIQsxUuUmSl1f0Ni10";
+      };
       lingyu = {
         isNormalUser = true;
+        hashedPassword = "$y$j9T$HZvnP.0ZR5uBiDAviT9xA.$MSExGgePZwjIDZq2n3fOUGGguWKEgvjuIKImW4uf7p4";
         linger = true;
         extraGroups = [ "wheel" "video" "render" ];
 	      home = "/home/lingyu";	
