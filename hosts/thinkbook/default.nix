@@ -99,6 +99,7 @@
       pciutils
       vulkan-loader
       vulkan-tools
+      bindfs
       microsoft-edge
       feishu
     ];
@@ -123,6 +124,21 @@
       XMODIFIERS = "@im=ibus";
       QT_IM_MODULE = "ibus";
     };
+  };
+
+
+  systemd = {
+    mounts = [
+      {
+        what = "/mnt/c/Users/Lingyu/KnowledgeHub";
+        where = "/home/lingyu/knowhub";
+        type = "fuse.bindfs";
+        options = "force-user=lingyu,force-group=100,perms=u=rwX:g=rX:o=,create-as-user,chown-ignore,chgrp-ignore";
+        wantedBy = [ "multi-user.target" ];
+        after = [ "mnt-c.mount" ];
+        requires = [ "mnt-c.mount" ];
+      }
+    ];
   };
 
   programs = {
