@@ -167,9 +167,13 @@
       serviceMode = false;
       tunMode = true;
     };
-    gnupg.agent = {
-      enable = true;
-      enableSSHSupport = true;
+    gnupg = {
+      package = pkgs.gnupg;
+      agent = {
+        enable = true;
+        enableSSHSupport = true;
+        pinentryPackage = pkgs.pinentry-gnome3;
+      };
     };
   };
 
@@ -203,6 +207,11 @@
     desktopManager = {
       gnome = {
         enable = true;
+      };
+    };
+    gnome = {
+      gnome-keyring = {
+        enable = false;
       };
     };
     ollama = {
