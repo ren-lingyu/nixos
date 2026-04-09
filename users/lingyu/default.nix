@@ -15,8 +15,6 @@
       adwaita-icon-theme
       xcursor-themes
       xclip
-      aichat
-      ollama
       github-copilot-cli
       python3
       ripgrep
@@ -32,9 +30,6 @@
       xeyes
       socat
       zathura
-      zotero
-      calibre
-      xournalpp
     ];
     sessionVariables = {
       # GTK_IM_MODULE = "fcitx";
@@ -240,7 +235,7 @@
   };
 
   programs.aichat = {
-    enable = true;
+    enable = false;
     package = pkgs.aichat;
     settings = {
       model = "ollama:deepseek-v3.2:cloud";

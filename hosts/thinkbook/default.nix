@@ -134,6 +134,9 @@ in
       bindfs
       microsoft-edge
       feishu
+      zotero
+      calibre
+      xournalpp
     ];
     usrbinenv = lib.mkForce "${pkgs.coreutils}/bin/env";
     etc = {
