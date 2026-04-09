@@ -8,7 +8,7 @@
   
   imports = [ # Include the results of the hardware scan.
     ./hardware-configuration.nix
-    ./desktop-manager.nix
+    ./desktop-environment.nix
     ./mount-windows-path.nix
   ];
 
