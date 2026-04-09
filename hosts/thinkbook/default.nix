@@ -137,6 +137,7 @@ in
       zotero
       calibre
       xournalpp
+      kitty
     ];
     usrbinenv = lib.mkForce "${pkgs.coreutils}/bin/env";
     etc = {
