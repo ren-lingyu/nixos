@@ -204,7 +204,6 @@ in
       };
     };
     printing = {
-      # Enable CUPS to print documents.
       enable = true;
     };
     pipewire = {
@@ -212,7 +211,6 @@ in
       pulse = {enable = true;};
     };
     libinput = {
-      # Enable touchpad support (enabled default in most desktopManager).
       enable = true;
       touchpad = {
         naturalScrolling = true;
