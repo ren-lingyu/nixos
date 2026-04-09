@@ -4,42 +4,39 @@
 
 { config, lib, pkgs, ... }:
 
-let
-
-  bindfsMountOptions = lib.concatStringsSep "," [
-    "force-user=lingyu"
-    "force-group=users"
-    "perms=u=rwX:g=rX:o="
-    "create-as-user"
-    "chown-ignore"
-    "chgrp-ignore"
-  ];
-  nixosUserHome = "/home/lingyu";
-  windowsUserHome = "/mnt/c/Users/Lingyu";
-
-in
-
 {
   
   imports = [ # Include the results of the hardware scan.
     ./hardware-configuration.nix
     ./desktop-manager.nix
-    ./window-manager.nix
+    ./mount-windows-path.nix
   ];
 
   boot = {
     kernelPackages = pkgs.linuxPackages_latest;
     kernelParams = [
-      # "video=3072x1920@60"
       "psmouse.synaptics_intertouch=0"
-      # "pci=nocrs"
     ];
     loader = {
-      systemd-boot.enable = true;
-      efi.canTouchEfiVariables = true;
+      systemd-boot = {
+        enable = true;
+        consoleMode = "auto";
+      };
+      efi = {
+        canTouchEfiVariables = true;
+      };
       grub = {
         fontSize = 32;
+        efiSupport = true;
+        gfxmodeEfi = "3072x1920";
+        gfxpayloadEfi = "keep";
+        gfxmodeBios = "3072x1920";
+        gfxpayloadBios = "keep";
       };
+    };
+    uvesafb = {
+      enable = true;
+      gfx-mode = "3072x1920-32";
     };
   };
 
@@ -75,7 +72,7 @@ in
         hashedPassword = "$y$j9T$HZvnP.0ZR5uBiDAviT9xA.$MSExGgePZwjIDZq2n3fOUGGguWKEgvjuIKImW4uf7p4";
         linger = true;
         extraGroups = [ "wheel" "video" "render" ];
-	      home = nixosUserHome;
+	      home = "/home/lingyu";
       };
     };
   };
@@ -96,6 +93,7 @@ in
   };
   
   console = {
+    enable = true;
     font = "latarcyrheb-sun32";
     # font = "Lat2-Terminus16";
     # keyMap = "us";
@@ -127,7 +125,6 @@ in
       gcc
       openssh
       gnupg
-      pinentry-tty
       pciutils
       vulkan-loader
       vulkan-tools
@@ -137,7 +134,6 @@ in
       zotero
       calibre
       xournalpp
-      kitty
     ];
     usrbinenv = lib.mkForce "${pkgs.coreutils}/bin/env";
     etc = {
@@ -219,7 +215,9 @@ in
     };
     pipewire = {
       enable = true;
-      pulse = {enable = true;};
+      pulse = {
+        enable = true;
+      };
     };
     libinput = {
       enable = true;
@@ -227,7 +225,7 @@ in
         naturalScrolling = false;
         tapping = true;
         scrollMethod = "twofinger";
-        disableWhileTyping = "true";
+        disableWhileTyping = true;
       };
     };
     ollama = {
@@ -243,76 +241,6 @@ in
       ];
       syncModels = true;
     };
-  };
-
-  systemd = {
-    tmpfiles = {
-      rules = [
-        "d /mnt/c 0700 root root - -"
-        "d ${nixosUserHome}/knowhub 0755 lingyu users - -"
-        "d ${nixosUserHome}/Downloads 0755 lingyu users - -"
-        "d ${nixosUserHome}/Documents 0755 lingyu users - -"
-        "d ${nixosUserHome}/Pictures 0755 lingyu users - -"
-        "d ${nixosUserHome}/Videos 0755 lingyu users - -"
-        "d ${nixosUserHome}/Music 0755 lingyu users - -"
-      ];
-    };
-    mounts = [
-      {
-        what = "${windowsUserHome}/KnowledgeHub";
-        where = "${nixosUserHome}/knowhub";
-        type = "fuse.bindfs";
-        options = bindfsMountOptions;
-        wantedBy = [ "multi-user.target" ];
-        after = [ "mnt-c.mount" ];
-        requires = [ "mnt-c.mount" ];
-      }
-      {
-        what = "${windowsUserHome}/Downloads";
-        where = "${nixosUserHome}/Downloads";
-        type = "fuse.bindfs";
-        options = bindfsMountOptions;
-        wantedBy = [ "multi-user.target" ];
-        after = [ "mnt-c.mount" ];
-        requires = [ "mnt-c.mount" ];
-      }
-      {
-        what = "${windowsUserHome}/OneDrive/Documents";
-        where = "${nixosUserHome}/Documents";
-        type = "fuse.bindfs";
-        options = bindfsMountOptions;
-        wantedBy = [ "multi-user.target" ];
-        after = [ "mnt-c.mount" ];
-        requires = [ "mnt-c.mount" ];
-      }
-      {
-        what = "${windowsUserHome}/OneDrive/Pictures";
-        where = "${nixosUserHome}/Pictures";
-        type = "fuse.bindfs";
-        options = bindfsMountOptions;
-        wantedBy = [ "multi-user.target" ];
-        after = [ "mnt-c.mount" ];
-        requires = [ "mnt-c.mount" ];
-      }
-      {
-        what = "${windowsUserHome}/OneDrive/Videos";
-        where = "${nixosUserHome}/Videos";
-        type = "fuse.bindfs";
-        options = bindfsMountOptions;
-        wantedBy = [ "multi-user.target" ];
-        after = [ "mnt-c.mount" ];
-        requires = [ "mnt-c.mount" ];
-      }
-      {
-        what = "${windowsUserHome}/OneDrive/Music";
-        where = "${nixosUserHome}/Music";
-        type = "fuse.bindfs";
-        options = bindfsMountOptions;
-        wantedBy = [ "multi-user.target" ];
-        after = [ "mnt-c.mount" ];
-        requires = [ "mnt-c.mount" ];
-      }
-    ];
   };
 
   # This option defines the first version of NixOS you have installed on this particular machine,
