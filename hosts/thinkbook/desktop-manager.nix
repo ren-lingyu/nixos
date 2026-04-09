@@ -5,13 +5,13 @@
   services = {
     displayManager = {
       gdm = {
-        enable = true;
+        enable = false;
         wayland = true;
       };
     };
     desktopManager = {
       gnome = {
-        enable = true;
+        enable = false;
       };
     };
     gnome = {
