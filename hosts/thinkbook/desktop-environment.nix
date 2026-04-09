@@ -36,6 +36,10 @@ in
         thunar-archive-plugin
       ];
     };
+    kdeconnect = {
+      enable = gnomeEnable;
+      package = pkgs.valent;
+    };
   };
 
   services = {
