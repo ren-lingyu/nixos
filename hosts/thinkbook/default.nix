@@ -23,6 +23,8 @@ in
   
   imports = [ # Include the results of the hardware scan.
     ./hardware-configuration.nix
+    ./desktop-manager.nix
+    ./window-manager.nix
   ];
 
   boot = {
@@ -115,6 +117,7 @@ in
       git
       vim
       curl
+      dbus
       wget
       unzip
       gnutar
@@ -189,13 +192,6 @@ in
       serviceMode = true;
       tunMode = true;
     };
-    hyprland = {
-      enable = true;
-      withUWSM = true;
-    };
-    hyprlock = {
-      enable = true;
-    };
   };
 
   services = {
@@ -210,6 +206,10 @@ in
         options = "eurosign:e,caps:escape";
       };
     };
+    dbus = {
+      enable = true;
+      implementation = "broker";
+    };
     printing = {
       enable = true;
     };
@@ -222,41 +222,6 @@ in
       touchpad = {
         naturalScrolling = true;
         tapping = true;
-      };
-    };
-    displayManager = {
-      gdm = {
-        enable = true;
-        wayland = true;
-      };
-    };
-    desktopManager = {
-      gnome = {
-        enable = true;
-      };
-    };
-    gnome = {
-      gnome-keyring = {
-        enable = false;
-      };
-    };
-    hypridle = {
-      enable = true;
-    };
-    greetd = {
-      enable = true;
-      settings = {
-        default_session = {
-          command = lib.concatStringsSep " " [
-            "${lib.getExe pkgs.tuigreet}"
-            "--sessions ${config.services.displayManager.sessionData.desktops}/share/wayland-sessions"
-            "--time"
-            "--time-format '%Y-%m-%d %H:%M:%S'"
-            "--asterisks"
-            "--remember"
-            "--remember-session"
-          ];
-        };
       };
     };
     ollama = {
@@ -364,4 +329,3 @@ in
   system.stateVersion = "25.11"; # Did you read the comment?
 
 }
-
