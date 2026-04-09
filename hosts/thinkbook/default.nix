@@ -224,8 +224,10 @@ in
     libinput = {
       enable = true;
       touchpad = {
-        naturalScrolling = true;
+        naturalScrolling = false;
         tapping = true;
+        scrollMethod = "twofinger";
+        disableWhileTyping = "true";
       };
     };
     ollama = {
