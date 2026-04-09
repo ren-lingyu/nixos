@@ -16,7 +16,14 @@
     kernelPackages = pkgs.linuxPackages_latest;
     kernelParams = [
       "psmouse.synaptics_intertouch=0"
+      "modprobe.blacklist=simpledrm"
     ];
+    initrd = {
+      enable = true;
+      kernelModules = {
+        "xe" = true;
+      };
+    };
     loader = {
       systemd-boot = {
         enable = true;
@@ -26,6 +33,8 @@
         canTouchEfiVariables = true;
       };
       grub = {
+        enable = false;
+        devices = [ "nodev" ];
         fontSize = 32;
         efiSupport = true;
         gfxmodeEfi = "3072x1920";
@@ -34,10 +43,19 @@
         gfxpayloadBios = "keep";
       };
     };
-    uvesafb = {
+  };
+
+  hardware = {
+    graphics = {
       enable = true;
-      gfx-mode = "3072x1920-32";
+      extraPackages = with pkgs; [
+        intel-media-driver
+        intel-vaapi-driver
+        vpl-gpu-rt
+        intel-compute-runtime
+      ];
     };
+    enableRedistributableFirmware = true;
   };
 
   # Configure network connections interactively with nmcli or nmtui.
@@ -100,16 +118,6 @@
     useXkbConfig = true; # use xkb.options in tty.
   };
 
-  hardware.graphics = {
-    enable = true;
-    extraPackages = with pkgs; [
-      intel-media-driver
-      intel-vaapi-driver
-      vpl-gpu-rt
-      intel-compute-runtime
-    ];
-  };
-
   environment = {
     systemPackages = with pkgs; [
       git
@@ -152,6 +160,7 @@
       DISPLAY = ":0";
     };
     sessionVariables = {
+      LIBVA_DRIVER_NAME = "iHD";
       GTK_IM_MODULE = "ibus";
       XMODIFIERS = "@im=ibus";
       QT_IM_MODULE = "ibus";

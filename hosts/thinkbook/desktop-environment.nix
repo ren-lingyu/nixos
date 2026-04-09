@@ -48,7 +48,7 @@ in
       package = pkgs.hypridle;
     };
     greetd = {
-      enable = hyprlandEnable;
+      enable = false;
       package = pkgs.greetd;
       useTextGreeter = false;
       settings = {
@@ -88,9 +88,10 @@ in
       gnome-user-share.enable = false;
       gnome-keyring.enable = false;
       gnome-online-accounts.enable = false;
-      gnome-browser-connector.enable = false;
+      gnome-browser-connector.enable = true;
       gnome-settings-daemon.enable = true;
-      core-apps.enable = false;
+      core-apps.enable = true;
+      core-shell.enable = true;
       games.enable = false;
     };
   };
