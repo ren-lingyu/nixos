@@ -9,7 +9,7 @@
   imports = [ # Include the results of the hardware scan.
     ./hardware-configuration.nix
     ./desktop-environment.nix
-    ./mount-windows-path.nix
+    ./mount-windows-directory.nix
   ];
 
   boot = {
