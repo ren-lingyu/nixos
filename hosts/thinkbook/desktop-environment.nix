@@ -84,9 +84,14 @@ in
       };
     };
     gnome = {
-      gnome-keyring = {
-        enable = false;
-      };
+      gnome-software.enable = false;
+      gnome-user-share.enable = false;
+      gnome-keyring.enable = false;
+      gnome-online-accounts.enable = false;
+      gnome-browser-connector.enable = false;
+      gnome-settings-daemon.enable = true;
+      core-apps.enable = false;
+      games.enable = false;
     };
   };
 
