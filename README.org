@@ -13,8 +13,15 @@ nixos/
 ├── flake.lock
 ├── LICENSE
 ├── README.org
-├── hosts/
-│   └── wsl/
+├── hosts
+│   ├── thinkbook
+│   │   ├── boot-manager.nix
+│   │   ├── default.nix
+│   │   ├── desktop-environment.nix
+│   │   ├── hardware-configuration.nix
+│   │   ├── mount-windows-directory.nix
+│   │   └── virtual-terminal.nix
+│   └── wsl
 │       └── default.nix
 ├── modules
 │   ├── binary-cache.nix
@@ -28,6 +35,7 @@ nixos/
         ├── default.nix
         └── .local/
             └── bin/
+                ├── nutstore.sh (disabled)
                 ├── org.sh
                 └── ssha.sh
 #+end_example
@@ -38,7 +46,6 @@ nixos/
 - [[file:modules][modules]] 放置便于模块化的系统级配置. 
 - =nixpkgs= 使用 =nixos-unstable= (清华镜像). 
 - 启用 =nix-command= 与 =flakes=. 
-- 启用 =vscode-server= 与 =ollama= (=127.0.0.1:11434=). 
 - Home Manager 管理 zsh/git/ssh/emacs/aichat 等开发环境. 
 
 * 使用
