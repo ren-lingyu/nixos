@@ -10,7 +10,7 @@
     ./hardware-configuration.nix
     ./desktop-environment.nix
     ./mount-windows-directory.nix
-    ./tty-resolution.nix
+    ./virtual-terminal.nix
   ];
 
   boot = {
