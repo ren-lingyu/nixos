@@ -6,24 +6,18 @@
 
 {
   
-  imports = [ # Include the results of the hardware scan.
+  imports = [
     ./hardware-configuration.nix
     ./desktop-environment.nix
     ./mount-windows-directory.nix
+    ./tty-resolution.nix
   ];
 
   boot = {
     kernelPackages = pkgs.linuxPackages_latest;
     kernelParams = [
       "psmouse.synaptics_intertouch=0"
-      "modprobe.blacklist=simpledrm"
     ];
-    initrd = {
-      enable = true;
-      kernelModules = {
-        "xe" = true;
-      };
-    };
     loader = {
       systemd-boot = {
         enable = true;
@@ -31,16 +25,6 @@
       };
       efi = {
         canTouchEfiVariables = true;
-      };
-      grub = {
-        enable = false;
-        devices = [ "nodev" ];
-        fontSize = 32;
-        efiSupport = true;
-        gfxmodeEfi = "3072x1920";
-        gfxpayloadEfi = "keep";
-        gfxmodeBios = "3072x1920";
-        gfxpayloadBios = "keep";
       };
     };
   };

@@ -4,6 +4,8 @@ let
 
   gnomeEnable = true;
   hyprlandEnable = false;
+  greetdEnable = false;
+  gdmEnale = true;
   
 in
 
@@ -48,7 +50,7 @@ in
       package = pkgs.hypridle;
     };
     greetd = {
-      enable = false;
+      enable = greetdEnable;
       package = pkgs.greetd;
       useTextGreeter = false;
       settings = {
@@ -74,7 +76,7 @@ in
     };
     displayManager = {
       gdm = {
-        enable = gnomeEnable;
+        enable = gdmEnale;
         wayland = true;
       };
     };
