@@ -94,14 +94,6 @@
     };
   };
   
-  console = {
-    enable = true;
-    font = "latarcyrheb-sun32";
-    # font = "Lat2-Terminus16";
-    # keyMap = "us";
-    useXkbConfig = true; # use xkb.options in tty.
-  };
-
   environment = {
     systemPackages = with pkgs; [
       git

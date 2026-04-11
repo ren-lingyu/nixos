@@ -20,7 +20,9 @@ in
 
 {
 
-  environment.systemPackages = with pkgs; [ fbset ];
+  environment.systemPackages = with pkgs; [
+    fbset
+  ];
 
   systemd.services = {
     fbset-before-display-manager = {
@@ -43,5 +45,14 @@ in
   };
 
   services.udev.extraRules = udevRule;
+
+  console = {
+    enable = true;
+    font = "latarcyrheb-sun32";
+    # font = "Lat2-Terminus16";
+    # keyMap = "us";
+    useXkbConfig = true; # use xkb.options in tty.
+  };
+
 
 }
