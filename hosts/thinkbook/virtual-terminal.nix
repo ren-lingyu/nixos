@@ -8,7 +8,7 @@ let
     "exec ${pkgs.fbset}/bin/fbset -fb /dev/fb0 -g 3072 1920 3072 1920 32"
   ]);
   
-  udevRule = lib.concatStringsSep ", " [
+  udevRule = lib.concatStringsSep "," [
     "ACTION==\"change\""
     "SUBSYSTEM==\"drm\""
     "KERNEL==\"card0\""
@@ -44,7 +44,10 @@ in
     };
   };
 
-  services.udev.extraRules = udevRule;
+  services.udev = {
+    enable = true;
+    extraRules = udevRule;
+  };
 
   console = {
     enable = true;

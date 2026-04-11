@@ -55,7 +55,7 @@ in
       useTextGreeter = false;
       settings = {
         default_session = {
-          command = lib.concatStringsSep " " [
+          command = lib.escapeShellArgs [
             "${lib.getExe pkgs.tuigreet}"
             "--sessions ${config.services.displayManager.sessionData.desktops}/share/wayland-sessions"
             "--time"
