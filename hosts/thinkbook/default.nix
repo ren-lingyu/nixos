@@ -11,6 +11,7 @@
     ./desktop-environment.nix
     ./mount-windows-directory.nix
     ./virtual-terminal.nix
+    ./boot-manager.nix
   ];
 
   boot = {
@@ -18,15 +19,6 @@
     kernelParams = [
       "psmouse.synaptics_intertouch=0"
     ];
-    loader = {
-      systemd-boot = {
-        enable = true;
-        consoleMode = "auto";
-      };
-      efi = {
-        canTouchEfiVariables = true;
-      };
-    };
   };
 
   hardware = {
