@@ -22,13 +22,14 @@
       AlwaysAllowUpdate = false;
     };
     GUI = {
+      Language = "zh_CN";
       AdvancedSettings = true;
       ApplicationTheme = "dark";
       CompactMode = true;
       HidePasswords = true;
       ShowTrayIcon = false;
       MinimizeToTray = false;
-      MinimizeOnClose = false;
+      MinimizeOnClose = true;
       CheckForUpdates = false;
     };
     SSHAgent.Enabled = true;
