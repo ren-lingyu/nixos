@@ -4,6 +4,7 @@
     ./editor.nix
     ./shell.nix
     ./terminal.nix
+    ./keyring.nix
   ];
   
   home = {
@@ -51,6 +52,12 @@
     };
   };
 
+  systemd = {
+    user = {
+      sessionVariables = config.home.sessionVariables;
+    };
+  };
+
   programs.direnv = {
     enable = true;
     package = pkgs.direnv;
@@ -94,21 +101,11 @@
         email = "Ren_Lingyu@outlook.com";
 	      signingkey = "65F85A2624D239F0";
       };
-      core = {
-        editor = "vim";
-      };
-      init = {
-        defaultBranch = "main";
-      };
-      commit = {
-        gpgSign = true;
-      };
-      signing = {
-	      signByDefault = true;
-      };
-      gpg = {
-        program = "${pkgs.gnupg}/bin/gpg";
-      };
+      core.editor = "vim";
+      init.defaultBranch = "main";
+      commit.gpgSign = true;
+      signing.signByDefault = true;
+      gpg.program = "${pkgs.gnupg}/bin/gpg";
     };
     ignores = [
       "NUL"
@@ -117,6 +114,23 @@
       "*#*"
       "*:Zone.Identifier"
     ];
+  };
+
+  programs.zathura = {
+    enable = true;
+    package = pkgs.zathura;
+    options = {};
+    mappings = {};
+  };
+
+  xdg = {
+    autostart.enable = true;
+    mimeApps = {
+      enable = true;
+      defaultApplications = {
+        "application/pdf" = "org.pwmt.zathura.desktop";
+      };
+    };
   };
 
   programs.aichat = {
@@ -138,38 +152,6 @@
           ];
         }
       ];
-    };
-  };
-
-  programs.zathura = {
-    enable = true;
-    package = pkgs.zathura;
-    options = {};
-    mappings = {};
-  };
-
-  xdg = {
-    mimeApps = {
-      enable = true;
-      defaultApplications = {
-        "application/pdf" = "org.pwmt.zathura.desktop";
-      };
-    };
-  };
-
-  systemd = {
-    user = {
-      sessionVariables = config.home.sessionVariables;
-    };
-  };
-  
-  services = {
-    gpg-agent = {
-      enable = false;
-      pinentry.package = pkgs.pinentry-tty;
-      enableZshIntegration = true;
-      grabKeyboardAndMouse = true;
-      enableSshSupport = true;
     };
   };
   

@@ -135,14 +135,6 @@
         };
       };
     };
-    gnupg = {
-      package = pkgs.gnupg;
-      agent = {
-        enable = true;
-        enableSSHSupport = true;
-        pinentryPackage = pkgs.pinentry-tty;
-      };
-    };
     clash-verge = {
       enable = true;
       package = pkgs.clash-verge-rev;
