@@ -22,6 +22,7 @@ in {
       rules = [
         "d /mnt/c 0700 root root - -"
         "d ${nixosUserHome}/knowhub 0755 lingyu users - -"
+        "d ${nixosUserHome}/ren 0755 lingyu users - -"
         "d ${nixosUserHome}/Downloads 0755 lingyu users - -"
         "d ${nixosUserHome}/Documents 0755 lingyu users - -"
         "d ${nixosUserHome}/Pictures 0755 lingyu users - -"
@@ -33,6 +34,15 @@ in {
       {
         what = "${windowsUserHome}/KnowledgeHub";
         where = "${nixosUserHome}/knowhub";
+        type = "fuse.bindfs";
+        options = bindfsMountOptions;
+        wantedBy = [ "multi-user.target" ];
+        after = [ "mnt-c.mount" ];
+        requires = [ "mnt-c.mount" ];
+      }
+      {
+        what = "${windowsUserHome}/Ren";
+        where = "${nixosUserHome}/ren";
         type = "fuse.bindfs";
         options = bindfsMountOptions;
         wantedBy = [ "multi-user.target" ];
