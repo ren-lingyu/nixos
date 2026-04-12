@@ -16,7 +16,7 @@
   programs.keepassxc = {
     enable = true;
     package = pkgs.keepassxc;
-    autostart = true;
+    autostart = false;
     settings = {
       General = {
         SingleInstance = true;
