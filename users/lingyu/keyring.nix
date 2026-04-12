@@ -68,7 +68,7 @@ in {
   programs.keepassxc = {
     enable = true;
     package = pkgs.keepassxc;
-    autostart = false;
+    autostart = true;
     # settings = keepassxcSettings;
   };
 
