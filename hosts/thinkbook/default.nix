@@ -86,23 +86,6 @@
   
   environment = {
     systemPackages = with pkgs; [
-      git
-      vim
-      curl
-      dbus
-      wget
-      unzip
-      gnutar
-      gnumake
-      fuse
-      fuse3
-      gcc
-      openssh
-      gnupg
-      pciutils
-      vulkan-loader
-      vulkan-tools
-      bindfs
       microsoft-edge
       feishu
       zotero

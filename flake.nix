@@ -9,28 +9,29 @@
     };
     arcc-nixpkgs = {
       url = "git+https://github.com/ren-lingyu/nixpkgs.git?ref=main&shallow=1";
-      # url = "github:ren-lingyu/nixpkgs.git/main";
       inputs.nixpkgs.follows = "nixpkgs";
     };
     home-manager = {
       url = "git+https://github.com/nix-community/home-manager.git?ref=master&shallow=1";
-      # url = "github:nix-community/home-manager/master";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+    nixvim = {
+      # the main branch of nixvim must be use in nixos-unstable
+      url = "git+https://github.com/nix-community/nixvim.git?ref=main&shallow=1";
       inputs.nixpkgs.follows = "nixpkgs";
     };
     nixos-wsl = {
       url = "git+https://github.com/nix-community/NixOS-WSL.git?ref=main&shallow=1";
-      # url = "github:nix-community/NixOS-WSL/main";
       inputs.nixpkgs.follows = "nixpkgs";
     };
     vscode-server = {
       url = "git+https://github.com/nix-community/nixos-vscode-server.git?ref=master&shallow=1";
-      # url = "github:nix-community/nixos-vscode-server/master";
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
   };
   
-  outputs = { self, nixpkgs, arcc-nixpkgs, nixos-wsl, home-manager, vscode-server, ... }@inputs : let
+  outputs = { self, nixpkgs, arcc-nixpkgs, home-manager, nixvim, nixos-wsl, vscode-server, ... }@inputs : let
 
     globalConfGenerate = { overlays ? [], unfreePackages ? [], ... } : { pkgs, lib, ... } : let
 
@@ -38,7 +39,10 @@
       arccNixpkgsOverlay = final: prev: {
         arcc = inputs.arcc-nixpkgs.packages."${prev.system}";
       };
-      allOverlays = concat [ [ arccNixpkgsOverlay ] overlays ];
+      allOverlays = concat [
+        [ arccNixpkgsOverlay ]
+        overlays
+      ];
       allUnfreePackages = concat [ [ "github-copilot-cli" ] unfreePackages ];
       
     in {
@@ -55,6 +59,8 @@
         git
         vim
         curl
+        wget
+        gnutar
       ];
 
     };
@@ -83,6 +89,9 @@
             home-manager.useUserPackages = true;
             home-manager.users.lingyu = import ./users/lingyu;
             home-manager.extraSpecialArgs = inputs;
+            # home-manager.extraSpecialArgs = {
+            #   inherit inputs;
+            # };
           }
         ];
       };

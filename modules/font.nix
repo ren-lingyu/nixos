@@ -20,6 +20,7 @@
       source-code-pro
       hack-font
       jetbrains-mono
+      dejavu_fonts
     ];
     fontDir = {
       enable = true;

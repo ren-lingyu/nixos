@@ -66,26 +66,6 @@
   environment = {
     systemPackages = with pkgs; [
       wslu
-      dbus
-      git
-      vim
-      curl
-      wget
-      unzip
-      gnutar
-      gnumake
-      fuse
-      fuse3
-      gcc
-      openssh
-      gnupg
-      pinentry-tty
-      vulkan-loader
-      vulkan-tools
-      pciutils
-      gsettings-desktop-schemas
-      nodejs_22
-      # mesa-demos
     ];
     usrbinenv = lib.mkForce "${pkgs.coreutils}/bin/env";
     # binsh = "${pkgs.bash}/bin/sh";

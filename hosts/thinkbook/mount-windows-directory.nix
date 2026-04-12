@@ -13,6 +13,10 @@
 
 in {
 
+  environment.systemPackages = with pkgs; [
+    bindfs
+  ];
+
   systemd = {
     tmpfiles = {
       rules = [
