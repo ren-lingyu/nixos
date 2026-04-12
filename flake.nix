@@ -13,15 +13,18 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
     home-manager = {
-      url = "github:nix-community/home-manager/master";
+      url = "git+https://github.com/nix-community/home-manager.git?ref=master&shallow=1";
+      # url = "github:nix-community/home-manager/master";
       inputs.nixpkgs.follows = "nixpkgs";
     };
     nixos-wsl = {
-      url = "github:nix-community/NixOS-WSL/main";
+      url = "git+https://github.com/nix-community/NixOS-WSL.git?ref=main&shallow=1";
+      # url = "github:nix-community/NixOS-WSL/main";
       inputs.nixpkgs.follows = "nixpkgs";
     };
     vscode-server = {
-      url = "github:nix-community/nixos-vscode-server/master";
+      url = "git+https://github.com/nix-community/nixos-vscode-server.git?ref=master&shallow=1";
+      # url = "github:nix-community/nixos-vscode-server/master";
       inputs.nixpkgs.follows = "nixpkgs";
     };
 

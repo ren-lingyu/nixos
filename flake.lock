@@ -65,16 +65,17 @@
       "locked": {
         "lastModified": 1775983377,
         "narHash": "sha256-ZeRjipGQnVtQ/6batI+yVOrL853FZsL0m9A63OaSfgM=",
-        "owner": "nix-community",
-        "repo": "home-manager",
+        "ref": "master",
         "rev": "e0ca734ffc85d25297715e98010b93303fa165c4",
-        "type": "github"
+        "shallow": true,
+        "type": "git",
+        "url": "https://github.com/nix-community/home-manager.git"
       },
       "original": {
-        "owner": "nix-community",
         "ref": "master",
-        "repo": "home-manager",
-        "type": "github"
+        "shallow": true,
+        "type": "git",
+        "url": "https://github.com/nix-community/home-manager.git"
       }
     },
     "nixos-wsl": {
@@ -87,16 +88,17 @@
       "locked": {
         "lastModified": 1774972752,
         "narHash": "sha256-DnLIpFxznohpLkIFs390uZ0gxwkVyhtknhKNu+lQJK8=",
-        "owner": "nix-community",
-        "repo": "NixOS-WSL",
+        "ref": "main",
         "rev": "d97e078f4788cddb8d11c3c99f72a4bb9ddec221",
-        "type": "github"
+        "shallow": true,
+        "type": "git",
+        "url": "https://github.com/nix-community/NixOS-WSL.git"
       },
       "original": {
-        "owner": "nix-community",
         "ref": "main",
-        "repo": "NixOS-WSL",
-        "type": "github"
+        "shallow": true,
+        "type": "git",
+        "url": "https://github.com/nix-community/NixOS-WSL.git"
       }
     },
     "nixpkgs": {
@@ -150,16 +152,17 @@
       "locked": {
         "lastModified": 1770124655,
         "narHash": "sha256-yHmd2B13EtBUPLJ+x0EaBwNkQr9LTne1arLVxT6hSnY=",
-        "owner": "nix-community",
-        "repo": "nixos-vscode-server",
+        "ref": "master",
         "rev": "92ce71c3ba5a94f854e02d57b14af4997ab54ef0",
-        "type": "github"
+        "shallow": true,
+        "type": "git",
+        "url": "https://github.com/nix-community/nixos-vscode-server.git"
       },
       "original": {
-        "owner": "nix-community",
         "ref": "master",
-        "repo": "nixos-vscode-server",
-        "type": "github"
+        "shallow": true,
+        "type": "git",
+        "url": "https://github.com/nix-community/nixos-vscode-server.git"
       }
     }
   },

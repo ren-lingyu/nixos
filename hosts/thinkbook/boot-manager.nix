@@ -30,7 +30,14 @@
       secureBoot = {
         enable = true;
         sbctl = pkgs.sbctl;
-        createAndEnrollKeys = false; # NOT INTENDED to be seted as true on a real system.
+        autoGenerateKeys = true;
+        autoEnrollKeys = {
+          enable = true;
+          extraArgs =   [
+            "--microsoft"
+            "--firmware-builtin"
+          ];
+        };
       };
       style = {
         wallpapers = [];
