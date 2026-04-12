@@ -1,6 +1,4 @@
-{ config, lib, pkgs, ... }:
-
-{
+{ config, lib, pkgs, ... } : {
 
   environment.systemPackages = with pkgs; [
     sbctl
@@ -22,8 +20,8 @@
       efiSupport = true;
       validateChecksums = true;
       maxGenerations = null;
-      extraEntries = lib.concatStringsSep "\n" [
-        (lib.concatStringsSep "\n\t" [
+      extraEntries = builtins.concatStringsSep "\n" [
+        (builtins.concatStringsSep "\n\t" [
           "/Windows 11"
           "protocol: efi_chainload"
           "path: boot():/EFI/Microsoft/Boot/bootmgfw.efi"

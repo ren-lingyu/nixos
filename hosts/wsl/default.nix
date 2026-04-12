@@ -5,9 +5,7 @@
 # NixOS-WSL specific options are documented on the NixOS-WSL repository:
 # https://github.com/nix-community/NixOS-WSL
 
-{ config, lib, pkgs, ... }:
-
-{
+{ config, lib, pkgs, ... } : {
 
   # imports = [
   #   # include NixOS-WSL modules
@@ -99,7 +97,7 @@
       BROWSER = "${pkgs.wslu}/bin/wslview";
       LIBVA_DRIVER_NAME = "iHD";
     };
-    extraInit = lib.concatStringsSep "\n" [
+    extraInit = builtins.concatStringsSep "\n" [
       "export PATH=\"/mnt/c/Users/Lingyu/AppData/Local/Programs/Microsoft VS Code/bin\":\$PATH" 
     ];
   };

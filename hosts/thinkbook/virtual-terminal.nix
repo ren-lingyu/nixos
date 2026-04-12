@@ -1,14 +1,12 @@
-{ config, lib, pkgs, ... }:
-
-let
-
-  forceFb0 = pkgs.writeShellScript "force-fb0-3072x1920" (lib.concatStringsSep "\n" [
+{ config, lib, pkgs, ... } : let
+  
+  forceFb0 = pkgs.writeShellScript "force-fb0-3072x1920" (builtins.concatStringsSep "\n" [
     "set -eu"
     "[ -e /dev/fb0 ] || exit 0"
     "exec ${pkgs.fbset}/bin/fbset -fb /dev/fb0 -g 3072 1920 3072 1920 32"
   ]);
   
-  udevRule = lib.concatStringsSep "," [
+  udevRule = builtins.concatStringsSep "," [
     "ACTION==\"change\""
     "SUBSYSTEM==\"drm\""
     "KERNEL==\"card0\""
@@ -16,9 +14,7 @@ let
     "ENV{SYSTEMD_WANTS}+=\"fbset-on-drm-change.service\""
   ];
 
-in
-
-{
+in {
 
   environment.systemPackages = with pkgs; [
     fbset

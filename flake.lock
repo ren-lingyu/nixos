@@ -63,15 +63,16 @@
         ]
       },
       "locked": {
-        "lastModified": 1775320414,
-        "narHash": "sha256-pIDPHus8udcxO4lT+zUULBfvue2D08E73abzVEJNE+8=",
+        "lastModified": 1775983377,
+        "narHash": "sha256-ZeRjipGQnVtQ/6batI+yVOrL853FZsL0m9A63OaSfgM=",
         "owner": "nix-community",
         "repo": "home-manager",
-        "rev": "5ee3b3ef63e469c84639c2c9e282726352c86069",
+        "rev": "e0ca734ffc85d25297715e98010b93303fa165c4",
         "type": "github"
       },
       "original": {
         "owner": "nix-community",
+        "ref": "master",
         "repo": "home-manager",
         "type": "github"
       }
@@ -93,6 +94,7 @@
       },
       "original": {
         "owner": "nix-community",
+        "ref": "main",
         "repo": "NixOS-WSL",
         "type": "github"
       }
@@ -155,6 +157,7 @@
       },
       "original": {
         "owner": "nix-community",
+        "ref": "master",
         "repo": "nixos-vscode-server",
         "type": "github"
       }

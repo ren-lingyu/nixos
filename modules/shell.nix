@@ -1,5 +1,5 @@
-{ config, lib, pkgs, ... }:
-{
+{ config, lib, pkgs, ... } : {
+  
   users = {
     defaultUserShell = pkgs.zsh;
   };
@@ -19,4 +19,5 @@
       histFile = "$HOME/.zsh_history";
     };
   };
+
 }

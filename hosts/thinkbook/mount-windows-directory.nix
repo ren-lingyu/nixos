@@ -1,8 +1,6 @@
-{ config, lib, pkgs, ... }:
+{ config, lib, pkgs, ... } : let
 
-let
-
-  bindfsMountOptions = lib.concatStringsSep "," [
+  bindfsMountOptions = builtins.concatStringsSep "," [
     "force-user=lingyu"
     "force-group=users"
     "perms=u=rwX:g=rX:o="
@@ -13,9 +11,7 @@ let
   nixosUserHome = "/home/lingyu";
   windowsUserHome = "/mnt/c/Users/Lingyu";
 
-in
-
-{
+in {
 
   systemd = {
     tmpfiles = {

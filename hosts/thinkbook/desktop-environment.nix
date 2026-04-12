@@ -1,15 +1,11 @@
-{ config, lib, pkgs, ... }:
-
-let
+{ config, lib, pkgs, ... } : let
 
   gnomeEnable = true;
   hyprlandEnable = false;
   greetdEnable = false;
   gdmEnale = true;
   
-in
-
-{
+in {
 
   environment = {
     systemPackages = with pkgs; [

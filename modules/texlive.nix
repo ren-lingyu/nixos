@@ -1,8 +1,6 @@
-{ config, pkgs, ... }:
+{ config, pkgs, ... } : let
 
-let
-
-  luadraw = pkgs.arcc-nixpkgs.texlivePackages.luadraw;
+  luadraw = pkgs.arcc.texlivePackages.luadraw;
   
   tex = pkgs.texlive.combine {
     inherit (pkgs.texlive) scheme-full dvisvgm;
@@ -14,9 +12,7 @@ let
     mupdf
   ];
   
-in
-
-{
+in {
   
   environment.systemPackages = builtins.concatLists [
     [ tex ]

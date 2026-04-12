@@ -5,63 +5,76 @@
   inputs = {
     nixpkgs = {
       url = "git+https://mirrors.tuna.tsinghua.edu.cn/git/nixpkgs.git?ref=nixos-unstable&shallow=1";
-      # type = "github";
-      # owner = "NixOS";
-      # repo = "nixpkgs";
-      # ref = "nixos-unstable";
+      # url = "github:NixOS/nixpkgs/nixos-unstable";
     };
     arcc-nixpkgs = {
       url = "git+https://github.com/ren-lingyu/nixpkgs.git?ref=main&shallow=1";
-      # type = "github";
-      # owner = "ren-lingyu";
-      # repo = "nixpkgs";
-      # ref = "main";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
-    nixos-wsl = {
-      type = "github";
-      owner = "nix-community";
-      repo = "NixOS-WSL";
+      # url = "github:ren-lingyu/nixpkgs.git/main";
       inputs.nixpkgs.follows = "nixpkgs";
     };
     home-manager = {
-      type = "github";
-      owner = "nix-community";
-      repo = "home-manager";    
+      url = "github:nix-community/home-manager/master";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+    nixos-wsl = {
+      url = "github:nix-community/NixOS-WSL/main";
       inputs.nixpkgs.follows = "nixpkgs";
     };
     vscode-server = {
-      type = "github";
-      owner = "nix-community";
-      repo = "nixos-vscode-server";
+      url = "github:nix-community/nixos-vscode-server/master";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+
   };
   
-  outputs = { self, nixpkgs, arcc-nixpkgs, nixos-wsl, home-manager, vscode-server, ... }@inputs: {
+  outputs = { self, nixpkgs, arcc-nixpkgs, nixos-wsl, home-manager, vscode-server, ... }@inputs : let
+
+    globalConfGenerate = { overlays ? [], unfreePackages ? [], ... } : { pkgs, lib, ... } : let
+
+      concat = builtins.concatLists ;
+      arccNixpkgsOverlay = final: prev: {
+        arcc = inputs.arcc-nixpkgs.packages."${prev.system}";
+      };
+      allOverlays = concat [ [ arccNixpkgsOverlay ] overlays ];
+      allUnfreePackages = concat [ [ "github-copilot-cli" ] unfreePackages ];
+      
+    in {
+
+      nix.settings = {
+        experimental-features = [ "nix-command" "flakes" ];
+        trusted-users = [ "@wheel" "root" ];
+      };
+      nixpkgs = {
+        overlays = allOverlays;
+        config.allowUnfreePredicate = pkg : builtins.elem (lib.getName pkg) allUnfreePackages;
+      };
+      environment.systemPackages = with pkgs; [
+        git
+        vim
+        curl
+      ];
+
+    };
+      
+  in {
+    
     nixosConfigurations = {
+
       nixos = nixpkgs.lib.nixosSystem {
         system = "x86_64-linux";
         modules = [
-          ({pkgs, lib, ...} : {
-            nixpkgs.overlays = [
-              (final: prev: {arcc-nixpkgs = inputs.arcc-nixpkgs.packages."${prev.system}";})
-            ];
-            nixpkgs.config.allowUnfreePredicate = pkg : builtins.elem (lib.getName pkg) [
-              "github-copilot-cli"
+          (globalConfGenerate {
+            unfreePackages = [
               "microsoft-edge"
               "feishu"
             ];
           })
-          ./configuration.nix # the minimal configuration
           ./modules/storage.nix
           ./modules/shell.nix
           ./modules/binary-cache.nix
           ./modules/texlive.nix
           ./modules/font.nix
           ./hosts/thinkbook
-          nixos-wsl.nixosModules.default
-          vscode-server.nixosModules.default
           home-manager.nixosModules.home-manager {
             home-manager.useGlobalPkgs = true;
             home-manager.useUserPackages = true;
@@ -70,18 +83,11 @@
           }
         ];
       };
+
       nixos-wsl = nixpkgs.lib.nixosSystem {
         system = "x86_64-linux";
         modules = [
-          ({pkgs, lib, ...} : {
-            nixpkgs.overlays = [
-              (final: prev: {arcc-nixpkgs = inputs.arcc-nixpkgs.packages."${prev.system}";})
-            ];
-            nixpkgs.config.allowUnfreePredicate = pkg : builtins.elem (lib.getName pkg) [
-              "github-copilot-cli"
-            ];
-          })
-          ./configuration.nix # the minimal configuration
+          (globalConfGenerate {})
           ./modules/storage.nix
           ./modules/shell.nix
           ./modules/binary-cache.nix
@@ -98,7 +104,9 @@
           }
         ];
       };
+
     };
+
   };
   
 }

@@ -2,9 +2,7 @@
 # your system. Help is available in the configuration.nix(5) man page, on
 # https://search.nixos.org/options and in the NixOS manual (`nixos-help`).
 
-{ config, lib, pkgs, ... }:
-
-{
+{ config, lib, pkgs, ... } : {
   
   imports = [
     ./hardware-configuration.nix
@@ -114,7 +112,7 @@
     usrbinenv = lib.mkForce "${pkgs.coreutils}/bin/env";
     etc = {
       "libinput/local-overrides.quirks" = {
-        text = lib.concatStringsSep "\n" [
+        text = builtins.concatStringsSep "\n" [
           "[Lenovo ThinkBook 14 G8+ IPH touchpad]"
           "MatchName=*GXTP5100*"
           "MatchDMIModalias=dmi:*svnLENOVO:*pvrThinkBook14G8+IPH*:*"
@@ -206,7 +204,7 @@
       };
     };
     ollama = {
-      enable = false;
+      enable = true;
       package = pkgs.ollama;
       host = "127.0.0.1";
       port = 11434; 

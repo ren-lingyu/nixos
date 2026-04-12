@@ -1,5 +1,5 @@
-{ config, lib, pkgs, ... }:
-{
+{ config, lib, pkgs, ... } : {
+
   home = {
     username = "lingyu";
     homeDirectory = "/home/lingyu";
@@ -96,12 +96,12 @@
       findNoDups = true;
     };
     initContent = lib.mkMerge [
-      # (lib.mkOrder 500 (lib.concatStringsSep "\n" [
+      # (lib.mkOrder 500 (builtins.concatStringsSep "\n" [
       #   "if [[ -r \"\${XDG_CACHE_HOME:-\$HOME/.cache}/p10k-instant-prompt-\${(%):-%n}.zsh\" ]]; then"
       #   "source \"\${XDG_CACHE_HOME:-\$HOME/.cache}/p10k-instant-prompt-\${(%):-%n}.zsh\""
       #   "fi"
       # ]))
-      (lib.mkOrder 1000 (lib.concatStringsSep "\n" [
+      (lib.mkOrder 1000 (builtins.concatStringsSep "\n" [
         # "[[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh"
         "function delete-char-or-kill-region {"
         "if [[ $REGION_ACTIVE -eq 1 ]]; then"
