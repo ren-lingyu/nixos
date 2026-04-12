@@ -4,8 +4,35 @@
   hyprlandEnable = false;
   greetdEnable = false;
   gdmEnale = true;
+  defaultBrowser = "microsoft-edge.desktop";
   
 in {
+
+  xdg = {
+    mime = {
+      enable = true;
+      defaultApplications = {
+        "x-scheme-handler/https" = defaultBrowser;
+        "x-scheme-handler/http" = defaultBrowser;
+        "text/html" = defaultBrowser;
+        "text/xml" = defaultBrowser;
+        "application/xhtml+xml" = defaultBrowser;
+        "application/pdf" = defaultBrowser;
+        "x-scheme-handler/about" = defaultBrowser;
+        "x-scheme-handler/unknown" = defaultBrowser;
+      };
+    };
+    portal = lib.mkIf (hyprlandEnable && !gnomeEnable) {
+      enable = hyprlandEnable;
+      xdgOpenUsePortal = true;
+      extraPortals = [
+        pkgs.xdg-desktop-portal-gnome
+      ];
+      config.common.default = [
+        "gtk"
+      ];
+    };
+  };
 
   environment = {
     systemPackages = with pkgs; [
