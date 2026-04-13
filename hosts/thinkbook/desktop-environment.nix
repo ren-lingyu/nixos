@@ -61,16 +61,56 @@ in {
         thunar-archive-plugin
       ];
     };
+  };
+  
+  programs = {
     kdeconnect = {
       enable = gnomeEnable;
       package = pkgs.valent;
     };
   };
-
+  
   services = {
     hypridle = {
       enable = hyprlandEnable;
       package = pkgs.hypridle;
+    };
+    tumbler = {
+      enable = hyprlandEnable;
+    };
+    gvfs = lib.mkIf (!gnomeEnable) {
+      enable = hyprlandEnable;
+      package = pkgs.gnome.gvfs;
+    };
+  };
+  
+  # gnome
+  services = {
+    desktopManager = {
+      gnome = {
+        enable = gnomeEnable;
+      };
+    };
+    gnome = {
+      gnome-software.enable = false;
+      gnome-user-share.enable = false;
+      gnome-keyring.enable = false;
+      gnome-online-accounts.enable = false;
+      gnome-browser-connector.enable = true;
+      gnome-settings-daemon.enable = true;
+      core-apps.enable = true;
+      core-shell.enable = true;
+      games.enable = false;
+    };
+  };
+
+  # greeters
+  services = {
+    displayManager = {
+      gdm = {
+        enable = gdmEnale;
+        wayland = true;
+      };
     };
     greetd = {
       enable = greetdEnable;
@@ -90,37 +130,8 @@ in {
         };
       };
     };
-    tumbler = {
-      enable = hyprlandEnable;
-    };
-    gvfs = {
-      enable = true;
-      package = pkgs.gnome.gvfs;
-    };
-    displayManager = {
-      gdm = {
-        enable = gdmEnale;
-        wayland = true;
-      };
-    };
-    desktopManager = {
-      gnome = {
-        enable = gnomeEnable;
-      };
-    };
-    gnome = {
-      gnome-software.enable = false;
-      gnome-user-share.enable = false;
-      gnome-keyring.enable = false;
-      gnome-online-accounts.enable = false;
-      gnome-browser-connector.enable = true;
-      gnome-settings-daemon.enable = true;
-      core-apps.enable = true;
-      core-shell.enable = true;
-      games.enable = false;
-    };
   };
-
+  
   security = {
     soteria = {
       enable = hyprlandEnable;
