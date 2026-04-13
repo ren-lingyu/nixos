@@ -53,6 +53,8 @@
     timeZone = "Asia/Shanghai";
   };
 
+  services.seatd.enable = true;
+
   users = {
     mutableUsers = false;
     users = {
@@ -63,7 +65,7 @@
         isNormalUser = true;
         hashedPassword = "$y$j9T$HZvnP.0ZR5uBiDAviT9xA.$MSExGgePZwjIDZq2n3fOUGGguWKEgvjuIKImW4uf7p4";
         linger = true;
-        extraGroups = [ "wheel" "video" "render" ];
+        extraGroups = [ "wheel" "video" "render" "input" "seat" ];
 	      home = "/home/lingyu";
       };
     };
@@ -113,6 +115,22 @@
       GTK_IM_MODULE = "ibus";
       XMODIFIERS = "@im=ibus";
       QT_IM_MODULE = "ibus";
+    };
+  };
+
+  xdg.mime = let
+    defaultBrowser = "microsoft-edge.desktop";
+  in {
+    enable = true;
+    defaultApplications = {
+      "x-scheme-handler/https" = defaultBrowser;
+      "x-scheme-handler/http" = defaultBrowser;
+      "text/html" = defaultBrowser;
+      "text/xml" = defaultBrowser;
+      "application/xhtml+xml" = defaultBrowser;
+      "application/pdf" = defaultBrowser;
+      "x-scheme-handler/about" = defaultBrowser;
+      "x-scheme-handler/unknown" = defaultBrowser;
     };
   };
 
