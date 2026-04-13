@@ -2,6 +2,9 @@
 
   gnomeEnable = true;
   hyprlandEnable = false;
+  niriEnable = true;
+  deEnable = gnomeEnable;
+  wmEnable = ( hyprlandEnable || niriEnable );
   greetdEnable = false;
   gdmEnale = true;
   defaultBrowser = "microsoft-edge.desktop";
@@ -22,8 +25,8 @@ in {
         "x-scheme-handler/unknown" = defaultBrowser;
       };
     };
-    portal = lib.mkIf (hyprlandEnable && !gnomeEnable) {
-      enable = hyprlandEnable;
+    portal = lib.mkIf ( wmEnable && !deEnable ) {
+      enable = false; # hyprlandEnable;
       xdgOpenUsePortal = true;
       extraPortals = [
         pkgs.xdg-desktop-portal-gnome
@@ -39,7 +42,15 @@ in {
       kitty
     ];
   };
-  
+
+  # niri
+  programs.niri = {
+    enable = niriEnable;
+    package = pkgs.niri;
+    useNautilus = true;
+  };
+
+  # hyprland
   programs = {
     hyprland = {
       enable = hyprlandEnable;
@@ -54,33 +65,33 @@ in {
       enable = hyprlandEnable;
       package = pkgs.hyprlock;
     };
-    thunar = {
-      enable = hyprlandEnable;
-      plugins = with pkgs; [
-        thunar-volman
-        thunar-archive-plugin
-      ];
-    };
   };
-  
-  programs = {
-    kdeconnect = {
-      enable = gnomeEnable;
-      package = pkgs.valent;
-    };
-  };
-  
+
   services = {
     hypridle = {
       enable = hyprlandEnable;
       package = pkgs.hypridle;
     };
+  };
+
+  # services and programs enabled in wm
+  services = {
     tumbler = {
-      enable = hyprlandEnable;
+      enable = ( wmEnable && !deEnable );
     };
     gvfs = lib.mkIf (!gnomeEnable) {
-      enable = hyprlandEnable;
+      enable = ( wmEnable && !deEnable );
       package = pkgs.gnome.gvfs;
+    };
+  };
+
+  programs = {
+    thunar = {
+      enable = ( wmEnable && !deEnable );
+      plugins = with pkgs; [
+        thunar-volman
+        thunar-archive-plugin
+      ];
     };
   };
   
@@ -101,6 +112,13 @@ in {
       core-apps.enable = true;
       core-shell.enable = true;
       games.enable = false;
+    };
+  };
+
+  programs = {
+    kdeconnect = {
+      enable = gnomeEnable;
+      package = pkgs.valent;
     };
   };
 
