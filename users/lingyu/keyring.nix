@@ -1,52 +1,55 @@
 { config, lib, pkgs, ... } : let
 
-  keepassxcSettings = {
-    General = {
-      SingleInstance = false;
-      RememberLastDatabases = false;
-      RememberLastKeyFiles = false;
-      OpenPreviousDatabasesOnStartup = false;
-      AutoSaveAfterEveryChange = false;
-      AutoSaveOnExit = false;
-      AutoReloadOnChange = true;
-      AutoTypeEntryTitleMatch = true;
-      AutoTypeEntryURLMatch = true;
-      UpdateCheckMessageShown = false;
-    };
-    Browser = {
-      Enabled = true;
-      UnlockDatabase = true;
-      BestMatchOnly = true;
-      SearchInAllDatabases = false;
-      AlwaysAllowAccess = false;
-      AlwaysAllowUpdate = false;
-    };
-    GUI = {
-      Language = "zh_CN";
-      AdvancedSettings = true;
-      ApplicationTheme = "dark";
-      CompactMode = true;
-      HidePasswords = true;
-      ShowTrayIcon = false;
-      MinimizeToTray = false;
-      MinimizeOnClose = true;
-      CheckForUpdates = false;
-    };
-    SSHAgent.Enabled = true;
-    Security = {
-      ClearClipboard = true;
-      ClearClipboardTimeout = 10;
-      LockDatabaseScreenLock = true;
-      LockDatabaseMinimize = false;
-      LockDatabaseIdle = false;
-    };
-    PasswordGenerator = {
-      Length = 20;
-      UpperCase = true;
-      LowerCase = true;
-      Numbers = true;
-      SpecialChars = true;
-      ExcludeAlike = true;
+  keepassxcPureDeclarative = {
+    enable = false;
+    settings = {
+      General = {
+        SingleInstance = false;
+        RememberLastDatabases = false;
+        RememberLastKeyFiles = false;
+        OpenPreviousDatabasesOnStartup = false;
+        AutoSaveAfterEveryChange = false;
+        AutoSaveOnExit = false;
+        AutoReloadOnChange = true;
+        AutoTypeEntryTitleMatch = true;
+        AutoTypeEntryURLMatch = true;
+        UpdateCheckMessageShown = false;
+      };
+      Browser = {
+        Enabled = true;
+        UnlockDatabase = true;
+        BestMatchOnly = true;
+        SearchInAllDatabases = false;
+        AlwaysAllowAccess = false;
+        AlwaysAllowUpdate = false;
+      };
+      GUI = {
+        Language = "zh_CN";
+        AdvancedSettings = true;
+        ApplicationTheme = "dark";
+        CompactMode = true;
+        HidePasswords = true;
+        ShowTrayIcon = false;
+        MinimizeToTray = false;
+        MinimizeOnClose = true;
+        CheckForUpdates = false;
+      };
+      SSHAgent.Enabled = true;
+      Security = {
+        ClearClipboard = true;
+        ClearClipboardTimeout = 10;
+        LockDatabaseScreenLock = true;
+        LockDatabaseMinimize = false;
+        LockDatabaseIdle = false;
+      };
+      PasswordGenerator = {
+        Length = 20;
+        UpperCase = true;
+        LowerCase = true;
+        Numbers = true;
+        SpecialChars = true;
+        ExcludeAlike = true;
+      };
     };
   };
 
@@ -69,7 +72,7 @@ in {
     enable = true;
     package = pkgs.keepassxc;
     autostart = false;
-    # settings = keepassxcSettings;
+    settings = lib.mkIf keepassxcPureDeclarative.enable keepassxcPureDeclarative.settings;
   };
 
   programs.git-credential-keepassxc = {
