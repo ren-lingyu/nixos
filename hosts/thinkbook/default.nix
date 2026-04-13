@@ -6,7 +6,7 @@
   
   imports = [
     ./hardware-configuration.nix
-    ./desktop-environment.nix
+    ./desktop-environment
     ./mount-windows-directory.nix
     ./virtual-terminal.nix
     ./boot-manager.nix
