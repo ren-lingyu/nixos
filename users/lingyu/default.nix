@@ -11,7 +11,7 @@
     username = "lingyu";
     homeDirectory = "/home/lingyu";
     packages = with pkgs; (builtins.concatLists [
-      [ gh git-filter-repo github-copilot-cli ]
+      [ git-filter-repo github-copilot-cli ]
       [ jq ripgrep unzip trash-cli tree ]
       [ htop pciutils tcpdump mtr nmap netcat socat dnsutils ]
       [ xclock xeyes xclip ]
@@ -114,6 +114,18 @@
       "*#*"
       "*:Zone.Identifier"
     ];
+  };
+
+  programs.gh = {
+    enable = true;
+    package = pkgs.gh;
+    gitCredentialHelper = {
+      enable = true;
+      hosts = [
+        "https://github.com"
+        "https://gist.github.com"
+      ];
+    };
   };
 
   programs.zathura = {
