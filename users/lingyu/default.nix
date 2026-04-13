@@ -5,13 +5,14 @@
     ./shell.nix
     ./terminal.nix
     ./keyring.nix
+    ./ai.nix
+    ./git.nix
   ];
   
   home = {
     username = "lingyu";
     homeDirectory = "/home/lingyu";
     packages = with pkgs; (builtins.concatLists [
-      [ git-filter-repo github-copilot-cli ]
       [ jq ripgrep unzip trash-cli tree ]
       [ htop pciutils tcpdump mtr nmap netcat socat dnsutils ]
       [ xclock xeyes xclip ]
@@ -69,15 +70,6 @@
     enable = true;
     enableDefaultConfig = false;
     matchBlocks = {
-      "github.com" = {
-        hostname = "github.com";
-        # hostname = "ssh.github.com";
-        port = 22;
-        # port = 443;
-        user = "git";
-        serverAliveInterval = 60;
-        serverAliveCountMax = 3;
-      };
       "*" = {
         forwardAgent = false;
       	serverAliveInterval = 0;
@@ -89,57 +81,6 @@
       	controlMaster = "no";
       	controlPath = "${config.home.homeDirectory}/.ssh/master-%r@%n:%p";
       	controlPersist = "no";
-      };
-    };
-  };
-
-  programs.git = {
-    enable = true;
-    settings = {
-      user = {
-        name = "ren-lingyu";
-        email = "Ren_Lingyu@outlook.com";
-	      signingkey = "65F85A2624D239F0";
-      };
-      core.editor = "vim";
-      init.defaultBranch = "main";
-      commit.gpgSign = true;
-      signing.signByDefault = true;
-      gpg.program = "${pkgs.gnupg}/bin/gpg";
-    };
-    ignores = [
-      "NUL"
-      "*~"
-      "*#"
-      "*#*"
-      "*:Zone.Identifier"
-    ];
-  };
-
-  programs.gh = {
-    enable = true;
-    package = pkgs.gh;
-    gitCredentialHelper = {
-      enable = true;
-      hosts = [
-        "https://github.com"
-        "https://gist.github.com"
-      ];
-    };
-    settings = {
-      git_protocol = "https";
-      editor = "";
-      prompt = "enabled";
-      prefer_editor_prompt = "disabled";
-      pager = "";
-      http_unix_socket = "";
-      browser = "";
-      color_labels = "disabled";
-      accessible_colors = "disabled";
-      accessible_prompter = "disabled";
-      spinner = "enabled";
-      aliases = {
-        co = "pr checkout";
       };
     };
   };
@@ -161,28 +102,6 @@
     };
   };
 
-  programs.aichat = {
-    enable = true;
-    package = pkgs.aichat;
-    settings = {
-      model = "ollama:deepseek-v3.2:cloud";
-      clients = [
-        {
-          type = "openai-compatible";
-          name = "ollama";
-          api_base = "http://localhost:11434/v1";
-          models = [
-            {
-              name = "deepseek-v3.2:cloud";
-              supports_function_calling = false;
-              supports_vision = false;
-            }
-          ];
-        }
-      ];
-    };
-  };
-  
   # This value determines the Home Manager release that your
   # configuration is compatible with. This helps avoid breakage
   # when a new Home Manager release introduces backwards
@@ -192,4 +111,5 @@
   # the Home Manager release notes for a list of state version
   # changes in each release.
   home.stateVersion = "26.05";
+
 }
