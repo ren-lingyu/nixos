@@ -35,9 +35,9 @@
       "$HOME/.local/bin"
     ];
     file = {
-      ".local/bin/nutstore" = {
+      ".local/bin/nut" = {
         enable = false;
-        source = ./.local/bin/nutstore.sh;
+        source = ./.local/bin/nut.sh;
         executable = true;
       };
       ".local/bin/org" = {
