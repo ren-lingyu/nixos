@@ -1,17 +1,11 @@
-{ config, lib, pkgs, ... } : {
+{ config, lib, pkgs, osConfig, ... } : {
 
   home.packages = with pkgs; [
     github-copilot-cli
   ];
-
-  services.ollama = {
-    enable = true;
-    host = "localhost";
-    port = 11434; 
-  };
   
   programs.aichat = {
-    enable = config.services.ollama.enable;
+    enable = osConfig.services.ollama.enable;
     package = pkgs.aichat;
     settings = {
       model = "ollama:deepseek-v3.2:cloud";
@@ -19,7 +13,7 @@
         {
           type = "openai-compatible";
           name = "ollama";
-          api_base = "http://localhost:${builtins.toString config.services.ollama.port}/v1";
+          api_base = "http://localhost:${builtins.toString osConfig.services.ollama.port}/v1";
           models = [
             {
               name = "deepseek-v3.2:cloud";
