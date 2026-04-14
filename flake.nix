@@ -87,6 +87,7 @@
           ./modules/texlive.nix
           ./modules/font.nix
           ./hosts/thinkbook
+          nix-flatpak.nixosModules.nix-flatpak
           home-manager.nixosModules.home-manager {
             home-manager.useGlobalPkgs = true;
             home-manager.useUserPackages = true;
