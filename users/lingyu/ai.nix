@@ -13,7 +13,7 @@
         {
           type = "openai-compatible";
           name = "ollama";
-          api_base = "http://localhost:${builtins.toString osConfig.services.ollama.port}/v1";
+          api_base = "http://${osConfig.services.ollama.host}:${builtins.toString osConfig.services.ollama.port}/v1";
           models = [
             {
               name = "deepseek-v3.2:cloud";
