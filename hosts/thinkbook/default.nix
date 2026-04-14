@@ -10,6 +10,7 @@
     ./mount-windows-directory.nix
     ./virtual-terminal.nix
     ./boot-manager.nix
+    ./flatpak.nix
   ];
 
   boot = {
