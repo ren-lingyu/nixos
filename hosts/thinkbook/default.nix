@@ -53,7 +53,10 @@
     timeZone = "Asia/Shanghai";
   };
 
-  services.seatd.enable = true;
+  services.seatd = {
+    enable = true;
+    group = "seat";
+  };
 
   users = {
     mutableUsers = false;
@@ -65,7 +68,10 @@
         isNormalUser = true;
         hashedPassword = "$y$j9T$HZvnP.0ZR5uBiDAviT9xA.$MSExGgePZwjIDZq2n3fOUGGguWKEgvjuIKImW4uf7p4";
         linger = true;
-        extraGroups = [ "wheel" "video" "render" "input" "seat" ];
+        extraGroups = builtins.concatLists [
+          [ "wheel" "video" "render" "input" ]
+          (lib.optionals config.services.seatd.enable [ config.services.seatd.group ])
+        ];
 	      home = "/home/lingyu";
       };
     };
