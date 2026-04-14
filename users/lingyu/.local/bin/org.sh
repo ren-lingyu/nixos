@@ -28,7 +28,7 @@ case "$1" in
 	~/org/config/texlive.sh "$@"
 	;;
     "-p"|"--push")
-	rclone sync "$HOME/org" "nutstore:WSL/org" \
+	rclone sync "$HOME/org" "nutstore:org" \
                --create-empty-src-dirs \
                --exclude ".git/**" \
                --exclude ".git" \
@@ -40,7 +40,7 @@ case "$1" in
                --progress
 	;;
     "-c"|"--clone")
-	rclone sync "nutstore:WSL/org" "$HOME/org" \
+	rclone sync "nutstore:org" "$HOME/org" \
                --create-empty-src-dirs \
                --exclude ".git/**" \
                --exclude ".git" \
