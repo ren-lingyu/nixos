@@ -36,7 +36,7 @@
     ];
     file = {
       ".local/bin/nut" = {
-        enable = false;
+        enable = true;
         source = ./.local/bin/nut.sh;
         executable = true;
       };
