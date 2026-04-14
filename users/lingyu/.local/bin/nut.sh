@@ -1,5 +1,12 @@
 #!/usr/bin/env sh
 
+case "$0" in
+    sh|bash|dash|ksh|zsh|-sh|-bash)
+        echo "Do not source this script. Execute it as a normal program." >&2
+        return 1 2>/dev/null || exit 1
+        ;;
+esac
+
 show_help_info() {
     cat << EOF
 Usage:
@@ -28,8 +35,27 @@ EOF
 }
 
 show_error_info() {
-    echo "[ERROR] Invalid Command!\n"
+    echo "[ERROR] Invalid Command!"
+    echo
     show_help_info
+}
+
+rclone_sync () {
+    source="$1"
+    destination="$2"
+    shift 2
+    rclone sync "$source" "$destination" \
+           --create-empty-src-dirs \
+           --transfers 1 \
+           --checkers 1 \
+           --tpslimit 1 \
+           --order-by "size,ascending" \
+           --fast-list \
+           --retries 5 \
+           --retries-sleep 30s \
+           --low-level-retries 5 \
+           --timeout 2m \
+           --progress "$@"
 }
 
 case "${1:-}" in
@@ -61,14 +87,7 @@ case "${1:-}" in
                         local_path="$2"
                         remote_subpath="$3"
                         shift 3
-                        rclone sync "$local_path" "nutstore:$remote_subpath" \
-                               --create-empty-src-dirs \
-                               --transfers 2 \
-                               --checkers 4 \
-                               --low-level-retries 10 \
-                               --retries 10 \
-                               --retries-sleep 10s \
-                               --progress "$@"
+                        rclone_sync "$local_path" "nutstore:$remote_subpath" "$@"
 	                    ;;
                 esac
 	            ;;
@@ -94,14 +113,7 @@ case "${1:-}" in
                         remote_subpath="$2"
                         local_path="$3"
                         shift 3
-	                    rclone sync "nutstore:$remote_subpath" "$local_path" \
-                               --create-empty-src-dirs \
-                               --transfers 2 \
-                               --checkers 4 \
-                               --low-level-retries 10 \
-                               --retries 10 \
-                               --retries-sleep 10s \
-                               --progress "$@"
+	                    rclone_sync "nutstore:$remote_subpath" "$local_path" "$@"
 	                    ;;
                 esac
 	            ;;
