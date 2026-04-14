@@ -28,10 +28,13 @@
       url = "git+https://github.com/nix-community/nixos-vscode-server.git?ref=master&shallow=1";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+    nix-flatpak = {
+      url = "git+https://github.com/gmodena/nix-flatpak.git?ref=refs/tags/latest&shallow=1";
+    };
 
   };
   
-  outputs = { self, nixpkgs, arcc-nixpkgs, home-manager, nixvim, nixos-wsl, vscode-server, ... }@inputs : let
+  outputs = { self, nixpkgs, arcc-nixpkgs, home-manager, nixvim, nixos-wsl, vscode-server, nix-flatpak, ... }@inputs : let
 
     globalConfGenerate = { overlays ? [], unfreePackages ? [], ... } : { pkgs, lib, ... } : let
 
