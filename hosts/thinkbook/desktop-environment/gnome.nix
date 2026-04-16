@@ -1,11 +1,8 @@
 { config, lib, pkgs, ... } : {
-
-  services = {
-    desktopManager.gnome = {
-        enable = true;
-      };
+  
+  services = lib.mkIf config.services.desktopManager.gnome.enable {
     displayManager.gdm = {
-      enable = config.services.desktopManager.gnome.enable;
+      enable = true;
       wayland = true;
     };
     gnome = {
