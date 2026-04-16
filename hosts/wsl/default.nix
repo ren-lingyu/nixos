@@ -78,7 +78,7 @@
       LIBVA_DRIVER_NAME = "iHD";
     };
     extraInit = builtins.concatStringsSep "\n" [
-      "export PATH=\"/mnt/c/Users/Lingyu/AppData/Local/Programs/Microsoft VS Code/bin\":\$PATH" 
+      "export PATH=\"${config.wsl.wslConf.automount.root}/c/Users/Lingyu/AppData/Local/Programs/Microsoft VS Code/bin\":\$PATH" 
     ];
   };
 
@@ -245,8 +245,9 @@
       };
     };
     tmpfiles.rules = [
-      "L+ %t/wayland-0 - - - - /mnt/wslg/runtime-dir/wayland-0"
-      "L+ %t/wayland-0.lock - - - - /mnt/wslg/runtime-dir/wayland-0.lock"
+      "L+ %t/wayland-0 - - - - ${config.wsl.wslConf.automount.root}/wslg/runtime-dir/wayland-0"
+      "L+ %t/wayland-0.lock - - - - ${config.wsl.wslConf.automount.root}/wslg/runtime-dir/wayland-0.lock"
+      "L+ ${config.users.users.lingyu.home}/ren - - - - ${config.wsl.wslConf.automount.root}/c/Users/Lingyu/Ren"
     ];
   };
 
