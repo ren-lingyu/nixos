@@ -125,11 +125,11 @@
     };
   };
 
-  xdg.mime = let
-    defaultBrowser = "microsoft-edge.desktop";
-  in {
+  xdg.mime = {
     enable = true;
-    defaultApplications = {
+    defaultApplications = let
+      defaultBrowser = "microsoft-edge.desktop";
+    in {
       "x-scheme-handler/https" = defaultBrowser;
       "x-scheme-handler/http" = defaultBrowser;
       "text/html" = defaultBrowser;

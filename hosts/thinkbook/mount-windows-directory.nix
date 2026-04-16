@@ -8,7 +8,7 @@
     "chown-ignore"
     "chgrp-ignore"
   ];
-  nixosUserHome = "/home/lingyu";
+  nixosUserHome = config.users.users.lingyu.home;
   windowsUserHome = "/mnt/c/Users/Lingyu";
 
 in {
