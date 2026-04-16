@@ -16,8 +16,8 @@ Usage:
 
 Options:
   -h, --help                Show this help message
-  --push                    Sync from LOCAL_PATH to nutstore:REMOTE_SUBPATH
-  --pull                    Sync from nutstore:REMOTE_SUBPATH to LOCAL_PATH
+  push                      Sync from LOCAL_PATH to nutstore:REMOTE_SUBPATH
+  pull                      Sync from nutstore:REMOTE_SUBPATH to LOCAL_PATH
 
 Examples:
   $(basename "$0") --push /home/user/data data
@@ -67,7 +67,7 @@ case "${1:-}" in
         show_error_info
 	    exit 1
 	    ;;
-    "--push")
+    "push")
         case "${2:-}" in
             "-h"|"--help")
 	            show_help_info
@@ -93,7 +93,7 @@ case "${1:-}" in
 	            ;;
         esac
         ;;
-    "--pull")
+    "pull")
         case "${2:-}" in
             "-h"|"--help")
 	            show_help_info
