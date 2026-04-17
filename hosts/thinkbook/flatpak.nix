@@ -1,7 +1,7 @@
 { config, lib, pkgs, ... } : {
 
   services.flatpak = {
-    enable = false;
+    enable = true;
     package = pkgs.flatpak;
     uninstallUnmanaged = true;
     update = {
@@ -21,7 +21,20 @@
         location = "https://flathub.org/beta-repo/flathub-beta.flatpakrepo";
       }
     ];
-    packages = [];
+    packages = [
+      {
+        appId = "com.github.tchx84.Flatseal";
+        origin = "flathub";
+      }
+      {
+        appId = "com.tencent.WeChat";
+        origin = "flathub";
+      }
+      {
+        appId = "com.tencent.wemeet";
+        origin = "flathub";
+      }
+    ];
   };
 
 }
