@@ -34,6 +34,10 @@
         appId = "com.tencent.wemeet";
         origin = "flathub";
       }
+      {
+        appId = "com.qq.QQ";
+        origin = "flathub";
+      }
     ];
   };
 
