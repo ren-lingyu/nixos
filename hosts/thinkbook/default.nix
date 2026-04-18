@@ -3,6 +3,11 @@
 # https://search.nixos.org/options and in the NixOS manual (`nixos-help`).
 
 { config, lib, pkgs, ... } : {
+
+  nix.settings = {
+    experimental-features = [ "nix-command" "flakes" ];
+    trusted-users = [ "@wheel" "root" ];
+  };
   
   imports = [
     ./hardware-configuration.nix

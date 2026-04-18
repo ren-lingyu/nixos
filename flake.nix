@@ -1,6 +1,19 @@
 {
   
   description = "NixOS configuration";
+
+  nixConfig = {
+    auto-optimise-store = true;
+    substituters = [
+      "https://mirrors.tuna.tsinghua.edu.cn/nix-channels/store"
+      "https://cache.nixos.org"
+      "https://nix-community.cachix.org"
+    ];
+    trusted-public-keys = [
+      "cache.nixos.org-1:6NCHdD59X431o0gWypbMrAURkbJ16ZPMQFGspcDShjY="
+      "nix-community.cachix.org-1:mB9FSh9qf2dCimDSUo8Zy7bkq5CX+/rkCWyvRCYg3Fs="
+    ];
+  };
   
   inputs = {
     nixpkgs = {
@@ -54,6 +67,13 @@
         experimental-features = [ "nix-command" "flakes" ];
         trusted-users = [ "@wheel" "root" ];
       };
+      
+      nix.gc = {
+        automatic = true;
+        dates = "weekly";
+        options = "--delete-older-than 7d";
+      };
+      
       nixpkgs = {
         overlays = allOverlays;
         config.allowUnfreePredicate = pkg : builtins.elem (lib.getName pkg) allUnfreePackages;
@@ -81,9 +101,7 @@
               "feishu"
             ];
           })
-          ./modules/storage.nix
           ./modules/shell.nix
-          ./modules/binary-cache.nix
           ./modules/texlive.nix
           ./modules/font.nix
           ./hosts/thinkbook
@@ -110,9 +128,7 @@
         system = "x86_64-linux";
         modules = [
           (globalConfGenerate {})
-          ./modules/storage.nix
           ./modules/shell.nix
-          ./modules/binary-cache.nix
           ./modules/texlive.nix
           ./modules/font.nix
           ./hosts/wsl
