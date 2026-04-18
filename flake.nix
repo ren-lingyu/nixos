@@ -89,13 +89,19 @@
           ./hosts/thinkbook
           nix-flatpak.nixosModules.nix-flatpak
           home-manager.nixosModules.home-manager {
-            home-manager.useGlobalPkgs = true;
-            home-manager.useUserPackages = true;
-            home-manager.users.lingyu = import ./users/lingyu;
-            home-manager.extraSpecialArgs = inputs;
-            # home-manager.extraSpecialArgs = {
-            #   inherit inputs;
-            # };
+            home-manager = {
+              useGlobalPkgs = true;
+              useUserPackages = true;
+              users.lingyu = {
+                imports = [
+                  ./users/lingyu
+                ];
+              };
+              extraSpecialArgs = {
+                nixvim = inputs.nixvim;
+                # inherit inputs;
+              };
+            };
           }
         ];
       };
@@ -113,10 +119,19 @@
           nixos-wsl.nixosModules.default
           vscode-server.nixosModules.default
           home-manager.nixosModules.home-manager {
-            home-manager.useGlobalPkgs = true;
-            home-manager.useUserPackages = true;
-            home-manager.users.lingyu = import ./users/lingyu;
-            home-manager.extraSpecialArgs = inputs;
+            home-manager = {
+              useGlobalPkgs = true;
+              useUserPackages = true;
+              users.lingyu = {
+                imports = [
+                  ./users/lingyu
+                ];
+              };
+              extraSpecialArgs = {
+                nixvim = inputs.nixvim;
+                # inherit inputs;
+              };
+            };
           }
         ];
       };
