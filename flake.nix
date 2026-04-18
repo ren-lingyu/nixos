@@ -62,11 +62,6 @@
       allUnfreePackages = concat [ [ "github-copilot-cli" ] unfreePackages ];
       
     in {
-
-      nix.settings = {
-        experimental-features = [ "nix-command" "flakes" ];
-        trusted-users = [ "@wheel" "root" ];
-      };
       
       nix.gc = {
         automatic = true;
