@@ -11,6 +11,7 @@ in {
         enable = true;
         wayland = true;
       };
+      gnome.gnome-keyring.enable = false;
       greetd = lib.mkIf (!config.services.displayManager.gdm.enable) {
         enable = config.programs.niri.enable;
         package = pkgs.greetd;
@@ -36,8 +37,21 @@ in {
       fuzzel
       swaylock
       mako
+      waybar
       swayidle
+      xwayland-satellite
+      polkit_gnome
+      libnotify
     ];
+
+    xdg.portal = {
+      enable = true;
+      xdgOpenUsePortal = true;
+      extraPortals = [
+        # pkgs.xdg-desktop-portal-gtk
+        pkgs.xdg-desktop-portal-gnome
+      ];
+    };
     
   };
   
