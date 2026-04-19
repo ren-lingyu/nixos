@@ -103,6 +103,7 @@ in {
         tree-sitter-nix
         tree-sitter-python
         tree-sitter-kdl
+        tree-sitter-lua
       ]))
     ];
   };
