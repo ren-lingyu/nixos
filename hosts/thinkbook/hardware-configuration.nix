@@ -26,7 +26,8 @@
 
   fileSystems."/mnt/c" =
     { device = "/dev/disk/by-uuid/FECEC681CEC63227";
-      fsType = "ntfs3";
+      fsType = "ntfs-3g";
+      options = [ "nofail" "x-systemd.device-timeout=2s" ];
     };
 
   swapDevices = [
