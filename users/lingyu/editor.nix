@@ -96,6 +96,15 @@ in {
   programs.emacs = {
     enable = true;
     package = pkgs.emacs-gtk;
+    extraPackages = epkgs: with epkgs; [
+      tree-sitter-langs
+      (treesit-grammars.with-grammars (grammars: with grammars; [
+        tree-sitter-bash
+        tree-sitter-nix
+        tree-sitter-python
+        tree-sitter-kdl
+      ]))
+    ];
   };
 
   services.emacs = {
