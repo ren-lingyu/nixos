@@ -59,7 +59,7 @@ in {
         requires = [ "mnt-c.mount" ];
       }
       {
-        what = "${windowsUserHome}/OneDrive/Documents";
+        what = "${windowsUserHome}/Documents";
         where = "${nixosUserHome}/Documents";
         type = "fuse.bindfs";
         options = bindfsMountOptions;
@@ -68,7 +68,7 @@ in {
         requires = [ "mnt-c.mount" ];
       }
       {
-        what = "${windowsUserHome}/OneDrive/Pictures";
+        what = "${windowsUserHome}/Pictures";
         where = "${nixosUserHome}/Pictures";
         type = "fuse.bindfs";
         options = bindfsMountOptions;
@@ -77,7 +77,7 @@ in {
         requires = [ "mnt-c.mount" ];
       }
       {
-        what = "${windowsUserHome}/OneDrive/Videos";
+        what = "${windowsUserHome}/Videos";
         where = "${nixosUserHome}/Videos";
         type = "fuse.bindfs";
         options = bindfsMountOptions;
@@ -86,7 +86,7 @@ in {
         requires = [ "mnt-c.mount" ];
       }
       {
-        what = "${windowsUserHome}/OneDrive/Music";
+        what = "${windowsUserHome}/Music";
         where = "${nixosUserHome}/Music";
         type = "fuse.bindfs";
         options = bindfsMountOptions;
