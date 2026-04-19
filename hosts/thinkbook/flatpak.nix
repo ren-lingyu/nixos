@@ -1,5 +1,7 @@
 { config, lib, pkgs, ... } : {
 
+  xdg.portal.enable = lib.mkIf config.services.flatpak.enable (lib.mkForce true);
+  
   services.flatpak = let
     flatpakPackages = {
       flatseal = {
