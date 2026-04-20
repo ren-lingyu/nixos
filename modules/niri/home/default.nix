@@ -32,9 +32,15 @@ in {
         package = pkgs.niri;
       };
       fuzzel = {
-        enable = true; # app launcher
+        enable = true;
         package = pkgs.fuzzel;
-        settings = {};
+        settings = {
+          main = {
+            terminal = "${lib.getExe config.programs.kitty.package}";
+            icon-theme = "Adwaita";
+            layer = "overlay";
+          };
+        };
       };
       swaylock = {
         enable = true;

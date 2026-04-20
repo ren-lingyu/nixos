@@ -5,6 +5,10 @@
       "Mod+Shift+Slash" = {
         action.show-hotkey-overlay = [];
       };
+      "Mod+E" = {
+        hotkey-overlay = { title = "Run an Editor: Emacs"; };
+        action.spawn = [ "emacs" ];
+      };
       "Mod+T" = {
         hotkey-overlay = { title = "Open a Terminal: kitty"; };
         action.spawn = [ "kitty" ];
