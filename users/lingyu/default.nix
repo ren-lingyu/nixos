@@ -32,22 +32,25 @@
       BSTINPUTS = "$HOME/org/texmf//:";
     };
     sessionPath = [
-      "$HOME/.local/bin"
+      "${config.xdg.binHome}"
     ];
     file = {
       ".local/bin/nut" = {
         enable = true;
         source = ./.local/bin/nut.sh;
+        target = ".local/bin/nut";
         executable = true;
       };
       ".local/bin/org" = {
         enable = true;
         source = ./.local/bin/org.sh;
+        target = ".local/bin/org";
         executable = true;
       };
       ".local/bin/ssha" = {
         enable = true;
         source = ./.local/bin/ssha.sh;
+        target = ".local/bin/ssha";
         executable = true;
       };
     };
@@ -93,6 +96,12 @@
   };
 
   xdg = {
+    enable = true;
+    cacheHome = "${config.home.homeDirectory}/.cache";
+    configHome = "${config.home.homeDirectory}/.config";
+    binHome = "${config.home.homeDirectory}/.local/bin";
+    dataHome = "${config.home.homeDirectory}/.local/share";
+    stateHome = "${config.home.homeDirectory}/.local/state";
     autostart.enable = true;
     mimeApps = {
       enable = true;
