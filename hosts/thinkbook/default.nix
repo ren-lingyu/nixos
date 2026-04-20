@@ -36,6 +36,11 @@
       ];
     };
     enableRedistributableFirmware = true;
+    bluetooth = {
+      enable = true;
+      package = pkgs.bluez;
+      powerOnBoot = true;
+    };
   };
 
   # Configure network connections interactively with nmcli or nmtui.
@@ -175,6 +180,13 @@
   };
 
   services = {
+    power-profiles-daemon = {
+      enable = true;
+      package = pkgs.power-profiles-daemon;
+    };
+    blueman = {
+      enable = true;
+    };
     openssh = {
       enable = true;
     };
