@@ -108,6 +108,7 @@
               users.lingyu = {
                 imports = [
                   ./users/lingyu
+                  ./modules/niri/home.nix
                 ];
               };
               extraSpecialArgs = {

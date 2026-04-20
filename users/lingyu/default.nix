@@ -7,7 +7,6 @@
     ./keyring.nix
     ./ai.nix
     ./git.nix
-    ./niri.nix
   ];
   
   home = {
