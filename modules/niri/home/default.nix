@@ -6,13 +6,8 @@ in {
 
   imports = [
     niri-flake.homeModules.niri
-    ./settings/top-level.nix
-    ./settings/input.nix
-    ./settings/outputs.nix
-    ./settings/layout.nix
-    ./settings/animations.nix
-    ./settings/window-rules.nix
-    ./settings/binds.nix
+    ./settings
+    ./waybar
   ];
 
   config = lib.mkIf niriEnable {
@@ -51,19 +46,17 @@ in {
       };
       swaylock = {
         enable = true;
-        package = pkgs.swaylock;
-        settings =  {};
-      };
-      waybar = {
-        enable = true;
-        package = pkgs.waybar;
-        settings = {};
-        style = null;
-        systemd = {
-          enable = true;
-          targets = [ config.wayland.systemd.target ];
-          enableDebug = false;
-          enableInspect = false;
+        package = pkgs.swaylock-effects;
+        settings = {
+          clock = true;
+          color = "000000";
+          font-size = 32;
+          indicator-idle-visible = true;
+          indicator-radius = 200;
+          indicator-thickness = 15;
+          line-color = "ffffff";
+          show-failed-attempts = true;
+          effect-blut = "10x5";
         };
       };
     };
@@ -90,12 +83,75 @@ in {
       swayidle = {
         enable = true; # idle management daemon
         package = pkgs.swayidle;
+        systemdTargets = [
+          config.wayland.systemd.target
+        ];
+        extraArgs = [
+          "-w"
+        ];
+        events = {
+          after-resume = "${lib.getExe config.programs.niri.package} msg action power-on-monitors";
+          before-sleep = builtins.concatStringsSep "&&" [
+            "${lib.getExe config.programs.niri.package} msg action power-off-monitors"
+            "${lib.getExe config.programs.swaylock.package} -fF"
+          ];
+          lock = builtins.concatStringsSep "&&" [
+            "${lib.getExe config.programs.niri.package} msg action power-off-monitors"
+            "${lib.getExe config.programs.swaylock.package} -fF"
+          ];
+          unlock = "${lib.getExe config.programs.niri.package} msg action power-on-monitors";
+        };
+        timeouts = [
+          {
+            timeout = 300;
+            command = "${lib.getExe config.programs.swaylock.package} -fF";
+          }
+          {
+            timeout = 600;
+            command = "${lib.getExe config.programs.niri.package} msg action power-off-monitors";
+            resumeCommand = "${lib.getExe config.programs.niri.package} msg action power-on-monitors";
+          }
+          {
+            timeout = 1200;
+            command = "${pkgs.systemd}/bin/systemctl suspend";
+          }
+        ];
       };
       polkit-gnome = {
         enable = true;
         package = pkgs.polkit_gnome;
       };
       gnome-keyring.enable = false;
+      cliphist = {
+        enable = true;
+        package = pkgs.cliphist;
+        clipboardPackage = pkgs.wl-clipboard;
+        systemdTarget = "${config.wayland.systemd.target}";
+        allowImages = true;
+        extraOptions = [
+          "-max-dedupe-search"
+          "10"
+          "-max-items"
+          "100"
+        ];
+      };
+      clipse = {
+        enable = false;
+        package = pkgs.clipse;
+        historySize = 100;
+        allowDuplicates = true;
+        systemdTarget = "${config.wayland.systemd.target}";
+        keyBindings = {};
+        imageDisplay = {
+          type = "kitty";
+          heightCut = 2;
+          scaleX = 9;
+          scaleY = 9;
+        };
+        theme = {
+          useCustomTheme = false;
+        };
+      };
     };
     
   };
