@@ -104,6 +104,9 @@ in {
         tree-sitter-python
         tree-sitter-kdl
         tree-sitter-lua
+        tree-sitter-css
+        tree-sitter-latex
+        tree-sitter-elisp
       ]))
     ];
   };
