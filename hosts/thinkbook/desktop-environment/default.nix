@@ -11,6 +11,7 @@
   ];
 
   services.desktopManager.gnome.enable = false;
+  services.gnome.gnome-keyring.enable = lib.mkForce false;
 
   programs.niri.enable = true;
   
