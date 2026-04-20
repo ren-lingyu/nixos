@@ -17,6 +17,9 @@ in {
 
   config = lib.mkIf niriEnable {
 
+    programs.emacs.package = lib.mkForce pkgs.emacs-pgtk;
+    services.emacs.package = lib.mkForce pkgs.emacs-pgtk;
+
     home.packages = with pkgs; [
       adwaita-icon-theme
     ];
