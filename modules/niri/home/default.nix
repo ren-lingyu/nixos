@@ -17,6 +17,10 @@ in {
 
   config = lib.mkIf niriEnable {
 
+    home.packages = with pkgs; [
+      adwaita-icon-theme
+    ];
+
     xdg.portal = {
       enable = true;
       xdgOpenUsePortal = true;

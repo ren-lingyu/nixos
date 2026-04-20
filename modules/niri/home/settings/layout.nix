@@ -13,7 +13,7 @@
         width = 4;
       };
       shadow = {
-        enable = false; # 原配置中是注释状态 (off)，故禁用
+        enable = false;
         softness = 30;
         spread = 5;
         offset = {
@@ -28,7 +28,7 @@
         { proportion = 0.66667; }
       ];
       default-column-width = {
-        proportion = 0.5;
+        proportion = 1.0;
       };
       tab-indicator = {
         enable = true;
