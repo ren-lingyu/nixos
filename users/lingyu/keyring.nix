@@ -67,6 +67,11 @@ in {
     grabKeyboardAndMouse = true;
     enableSshSupport = false;
   };
+
+  services.gnome-keyring = {
+    enable = lib.mkForce false;
+    package = pkgs.gnome-keyring;
+  };
   
   programs.keepassxc = {
     enable = true;
