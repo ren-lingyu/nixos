@@ -3,16 +3,16 @@
   imports = [
     ./gnome.nix
     ./hyprland.nix
-    ./niri.nix
+  ];
+
+  environment.systemPackages = with pkgs; [
+    xwayland-satellite
+    libnotify
   ];
 
   services.desktopManager.gnome.enable = false;
 
-  programs.niri = {
-    enable = true;
-    package = pkgs.niri;
-    useNautilus = true;
-  };
+  programs.niri.enable = true;
   
   programs.hyprland = {
     enable = false;
@@ -22,6 +22,16 @@
     xwayland = {
       enable = true;
     };
+  };
+
+  services.displayManager.gdm = {
+    enable = true;
+    wayland = true;
+  };
+
+  security.polkit = {
+    enable = true;
+    package = pkgs.polkit;
   };
 
 }

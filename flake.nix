@@ -41,13 +41,17 @@
       url = "git+https://github.com/nix-community/nixos-vscode-server.git?ref=master&shallow=1";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+    niri-flake = {
+      url = "git+https://github.com/sodiboo/niri-flake.git?ref=main&shallow=1";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
     nix-flatpak = {
       url = "git+https://github.com/gmodena/nix-flatpak.git?ref=refs/tags/latest&shallow=1";
     };
 
   };
   
-  outputs = { self, nixpkgs, arcc-nixpkgs, home-manager, nixvim, nixos-wsl, vscode-server, nix-flatpak, ... }@inputs : let
+  outputs = { self, nixpkgs, arcc-nixpkgs, home-manager, nixvim, nixos-wsl, vscode-server, niri-flake, nix-flatpak, ... }@inputs : let
 
     globalConfGenerate = { overlays ? [], unfreePackages ? [], ... } : { pkgs, lib, ... } : let
 
@@ -56,7 +60,10 @@
         arcc = inputs.arcc-nixpkgs.packages."${prev.system}";
       };
       allOverlays = concat [
-        [ arccNixpkgsOverlay ]
+        [
+          arccNixpkgsOverlay
+          inputs.niri-flake.overlays.niri
+        ]
         overlays
       ];
       allUnfreePackages = concat [ [ "github-copilot-cli" ] unfreePackages ];
@@ -73,6 +80,7 @@
         overlays = allOverlays;
         config.allowUnfreePredicate = pkg : builtins.elem (lib.getName pkg) allUnfreePackages;
       };
+      
       environment.systemPackages = with pkgs; [
         git
         vim
@@ -108,11 +116,12 @@
               users.lingyu = {
                 imports = [
                   ./users/lingyu
-                  ./modules/niri/home.nix
+                  ./modules/niri/home
                 ];
               };
               extraSpecialArgs = {
                 nixvim = inputs.nixvim;
+                niri-flake = inputs.niri-flake;
                 # inherit inputs;
               };
             };

@@ -1,12 +1,36 @@
-{ config, lib, pkgs, osConfig, ... } : let
+{ config, lib, pkgs, osConfig, niri-flake, ... } : let
 
-  niriAdditionEnable = ( osConfig.programs.niri.enable && !osConfig.services.desktopManager.gnome.enable );
+  niriEnable = ( osConfig.programs.niri.enable && !osConfig.services.desktopManager.gnome.enable );
   
 in {
 
-  config = lib.mkIf niriAdditionEnable {
+  imports = [
+    niri-flake.homeModules.niri
+    ./settings/top-level.nix
+    ./settings/input.nix
+    ./settings/outputs.nix
+    ./settings/layout.nix
+    ./settings/animations.nix
+    ./settings/window-rules.nix
+    ./settings/binds.nix
+  ];
+
+  config = lib.mkIf niriEnable {
+
+    xdg.portal = {
+      enable = true;
+      xdgOpenUsePortal = true;
+      extraPortals = [
+        # pkgs.xdg-desktop-portal-gtk
+        pkgs.xdg-desktop-portal-gnome
+      ];
+    };
 
     programs = {
+      niri = {
+        enable = osConfig.programs.niri.enable;
+        package = pkgs.niri;
+      };
       fuzzel = {
         enable = true; # app launcher
         package = pkgs.fuzzel;
@@ -58,6 +82,7 @@ in {
         enable = true;
         package = pkgs.polkit_gnome;
       };
+      gnome-keyring.enable = false;
     };
     
   };
