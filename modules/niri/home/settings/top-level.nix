@@ -13,7 +13,7 @@
       spawn-at-startup = builtins.concatLists [
         (lib.optionals config.programs.noctalia-shell.enable [
           {
-            argv = [ "qs" "-c" "noctalia-shell" ];
+            argv = [ "noctalia-shell" ];
           }
         ])
       ];
