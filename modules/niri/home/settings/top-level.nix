@@ -7,13 +7,18 @@
     ];
 
     programs.niri.settings = {
+      environment = {
+        QT_QPA_PLATFORM = "wayland";
+      };
       spawn-at-startup = builtins.concatLists [
-        # (lib.optionals config.services.mako.enable [
-        #   { argv = [ "${lib.getExe config.services.mako.package}" ]; }
-        # ])
+        (lib.optionals config.programs.noctalia-shell.enable [
+          {
+            argv = [ "qs" "-c" "noctalia-shell" ];
+          }
+        ])
       ];
       prefer-no-csd = false;
-      screenshot-path = "~/Pictures/Screenshots/Screenshot from %Y-%m-%d %H-%M-%S.png";
+      screenshot-path = "~/Pictures/Screenshots/%Y-%m-%d-%H-%M-%S.png";
       cursor = {
         theme = "Adwaita";
         size = 48;

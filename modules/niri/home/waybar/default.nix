@@ -1,10 +1,14 @@
-{ config, lib, pkgs, osConfig, niri-flake, ... } : {
+{ config, lib, pkgs, osConfig, niri-flake, noctalia-shell, ... } : let
+
+  waybarEnable = (config.programs.niri.enable && !config.programs.noctalia-shell.enable);
+
+in {
 
   imports = [
     ./settings.nix
   ];
 
-  config = lib.mkIf config.programs.niri.enable {
+  config = lib.mkIf waybarEnable {
     programs.waybar = {
         enable = true;
         package = pkgs.waybar;

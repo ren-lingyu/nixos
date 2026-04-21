@@ -1,4 +1,4 @@
-{ config, lib, pkgs, osConfig, niri-flake, ... } : let
+{ config, lib, pkgs, osConfig, niri-flake, noctalia-shel, ... } : let
 
   niriEnable = ( osConfig.programs.niri.enable && !osConfig.services.desktopManager.gnome.enable );
   
@@ -8,6 +8,7 @@ in {
     niri-flake.homeModules.niri
     ./settings
     ./waybar
+    ./noctalia
   ];
 
   config = lib.mkIf niriEnable {
@@ -113,7 +114,7 @@ in {
       };
     };
 
-    services.mako = {
+    services.mako = lib.mkIf (!config.programs.noctalia-shell.enable) {
       enable = true; # notification daemon
       package = pkgs.mako;
       settings = {
