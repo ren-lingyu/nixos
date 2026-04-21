@@ -13,6 +13,12 @@
       "cache.nixos.org-1:6NCHdD59X431o0gWypbMrAURkbJ16ZPMQFGspcDShjY="
       "nix-community.cachix.org-1:mB9FSh9qf2dCimDSUo8Zy7bkq5CX+/rkCWyvRCYg3Fs="
     ];
+    extra-substituters = [
+      "https://noctalia.cachix.org"
+    ];
+    extra-trusted-public-keys = [
+      "noctalia.cachix.org-1:pCOR47nnMEo5thcxNDtzWpOxNFQsBRglJzxWPp3dkU4="
+    ];
   };
   
   inputs = {
@@ -43,6 +49,10 @@
     };
     niri-flake = {
       url = "git+https://github.com/sodiboo/niri-flake.git?ref=main&shallow=1";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+    noctalia-shell = {
+      url = "git+https://github.com/noctalia-dev/noctalia-shell.git?ref=refs/heads/main&shallow=1";
       inputs.nixpkgs.follows = "nixpkgs";
     };
     nix-flatpak = {
@@ -122,6 +132,7 @@
               extraSpecialArgs = {
                 nixvim = inputs.nixvim;
                 niri-flake = inputs.niri-flake;
+                noctalia-shell = inputs.noctalia-shell;
                 # inherit inputs;
               };
             };
