@@ -63,12 +63,26 @@ in {
               }
               {
                 id = "Clock";
+                clockColor = "none";
+                useCustomFont = false;
+                customFont = null;
+                formatHorizontal = "HH:mm:ss";
+                formatVertical = "HH mm - dd MM";
+                tooltipFormat = "yyyy-MM-dd, dddd, HH:mm:ss, tt";
               }
               {
                 id = "SystemMonitor";
               }
               {
                 id = "ActiveWindow";
+                textColor = "none";
+                showText = true;
+                showIcon = true;
+                hideMode = "hidden";
+                scrollingMode = "always";
+                maxWidth = 300;
+                useFixedWidth = false;
+                colorizeIcons = true;
               }
               {
                 id = "MediaMini";
@@ -82,12 +96,24 @@ in {
             right = [
               {
                 id = "Tray";
+                blacklist = [];
+                colorizeIcons = true;
+                chevronColor = "none";
+                pinned = [];
+                drawerEnabled = true;
+                hidePassive = false;
               }
               {
                 id = "NotificationHistory";
               }
               {
                 id = "Battery";
+                displayMode = "icon-always";
+                alwaysShowPercentage = true;
+                showPowerProfiles = true;
+                showNoctaliaPerformance = true;
+                hideIfNotDetected = true;
+                hideIfIdle = false;
               }
               {
                 id = "Volume";
@@ -135,7 +161,7 @@ in {
           shadowDirection = "bottom_right";
           shadowOffsetX = 2;
           shadowOffsetY = 3;
-          language = "";
+          language = "en";
           allowPanelsOnScreenWithoutBar = true;
           showChangelogOnStartup = true;
           telemetryEnabled = false;
@@ -378,7 +404,7 @@ in {
           diskCriticalThreshold = 90;
           diskAvailWarningThreshold = 20;
           diskAvailCriticalThreshold = 10;
-          batteryWarningThreshold = 20;
+          batteryWarningThreshold = 10;
           batteryCriticalThreshold = 5;
           enableDgpuMonitoring = false;
           useCustomColors = false;
@@ -398,7 +424,7 @@ in {
           onlySameOutput = true;
           monitors = [ ];
           pinnedApps = [ ];
-          colorizeIcons = false;
+          colorizeIcons = true;
           showLauncherIcon = false;
           launcherPosition = "end";
           launcherUseDistroLogo = false;
