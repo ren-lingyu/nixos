@@ -107,6 +107,10 @@ in {
         tree-sitter-css
         tree-sitter-latex
         tree-sitter-elisp
+        tree-sitter-json
+        tree-sitter-yaml
+        tree-sitter-toml
+        tree-sitter-markdown
       ]))
     ];
   };
