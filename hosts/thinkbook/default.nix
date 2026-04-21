@@ -187,6 +187,22 @@
     blueman = {
       enable = true;
     };
+    upower = {
+      enable = true;
+      package = pkgs.upower;
+      usePercentageForPolicy = true;
+      percentageAction = 2;
+      percentageCritical = 3;
+      percentageLow = 10;
+      timeAction = 120;
+      timeCritical = 300;
+      timeLow = 1200;
+      criticalPowerAction = "HybridSleep"; # "PowerOff", "Hibernate", "HybridSleep"
+      allowRiskyCriticalPowerAction = false;
+      enableWattsUpPro = false;
+      ignoreLid = false;
+      noPollBatteries = false;
+    };
     openssh = {
       enable = true;
     };
