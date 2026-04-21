@@ -67,7 +67,7 @@ in {
 
         scaling = "fill";
         timestr = "%H:%M:%S";
-        datestr = "%A %Y-%m-%d";
+        datestr = "%Y-%m-%d %a";
         font-size = 128;
         
         screenshots = true;
