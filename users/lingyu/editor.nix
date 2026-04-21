@@ -111,6 +111,7 @@ in {
         tree-sitter-yaml
         tree-sitter-toml
         tree-sitter-markdown
+        tree-sitter-javascript
       ]))
     ];
   };
