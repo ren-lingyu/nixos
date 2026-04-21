@@ -7,8 +7,10 @@
     ];
 
     programs.niri.settings = {
-      spawn-at-startup = [
-        # { argv = [ "waybar" ]; }
+      spawn-at-startup = builtins.concatLists [
+        # (lib.optionals config.services.mako.enable [
+        #   { argv = [ "${lib.getExe config.services.mako.package}" ]; }
+        # ])
       ];
       prefer-no-csd = false;
       screenshot-path = "~/Pictures/Screenshots/Screenshot from %Y-%m-%d %H-%M-%S.png";
