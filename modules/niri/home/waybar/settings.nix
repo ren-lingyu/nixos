@@ -22,6 +22,7 @@
         ];
 
         modules-right = [
+          "idle_inhibitor"
           "pulseaudio"
           "keyboard-state"
           "network"
@@ -34,7 +35,6 @@
           "battery#bat2"
           "clock"
           "tray"
-          "idle_inhibitor"
           "custom/power"
         ];
 
@@ -72,8 +72,6 @@
         
         "idle_inhibitor" = {
           format = "{icon}";
-          margin-left = 0;
-          margin-right = 0;
           format-icons = {
             activated = "";
             deactivated = "";
@@ -88,8 +86,6 @@
           format = "{:%H:%M:%S}";
           tooltip-format = "{:%A}\n{calendar}";
           format-alt = "{:%Y-%m-%d %H:%M:%S %Z}";
-          margin-left = 0;
-          margin-right = 0;
           interval = 1;
         };
 
@@ -171,8 +167,8 @@
         };
 
         "custom/power" = {
-          format = "⏻ ";
-          tooltip = false;
+          format = ( " " + "⏻ " + " " );
+          tooltip = false; 
           menu = "on-click";
           menu-file = "${config.xdg.configHome}/waybar/power-menu.xml";
           menu-actions = {
