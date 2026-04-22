@@ -1,6 +1,10 @@
-{ config, lib, pkgs, nixvim, ... } : let
+{ config, lib, pkgs, nixvim, ... } : {
 
-  lspServerPackages = with pkgs; [
+  imports = [
+    nixvim.homeModules.nixvim
+  ];
+
+  home.packages = with pkgs; [
     nixd # Nix
     bash-language-server # Shell
     clang-tools # C / C++
@@ -14,16 +18,6 @@
     yaml-language-server # YAML
     vscode-langservers-extracted # JSON
     taplo # TOML
-  ];
-  
-in {
-
-  imports = [
-    nixvim.homeModules.nixvim
-  ];
-
-  home.packages = builtins.concatLists [
-    lspServerPackages
   ];
   
   programs.nixvim = {
@@ -112,6 +106,7 @@ in {
         tree-sitter-toml
         tree-sitter-markdown
         tree-sitter-javascript
+        tree-sitter-qmljs
       ]))
     ];
   };
