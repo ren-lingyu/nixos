@@ -81,7 +81,7 @@ in {
                 id = "ActiveWindow";
                 textColor = "none";
                 showText = true;
-                showIcon = true;
+                showIcon = false; # 如果启用显示 icon 会在没有程序运行于当前 window 时显示 debug 图标(左上角右下角黑色, 左下角右上角紫色).
                 hideMode = "hidden";
                 scrollingMode = "always";
                 maxWidth = 300;
@@ -136,7 +136,7 @@ in {
               }
               {
                 id = "Network";
-                displayMode = "always-show";
+                displayMode = "alwaysShow";
                 iconColor = "none";
                 textColor = "none";
               }
@@ -155,7 +155,7 @@ in {
               }
               {
                 id = "Brightness";
-                displayMode = "always-show";
+                displayMode = "alwaysShow";
                 iconColor = "none";
                 textColor = "none";
                 applyToAllMonitors = false;
