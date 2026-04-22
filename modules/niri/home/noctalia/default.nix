@@ -148,7 +148,7 @@ in {
               }
               {
                 id = "Volume";
-                displayMode = "onhover";
+                displayMode = "alwaysShow";
                 middleClickCommand = "pwvucontrol || pavucontrol";
                 iconColor = "none";
                 textColor = "none";
@@ -614,7 +614,7 @@ in {
         };
         
         audio = {
-          volumeStep = 5;
+          volumeStep = 2;
           volumeOverdrive = false;
           spectrumFrameRate = 30;
           visualizerType = "linear";
@@ -626,7 +626,7 @@ in {
         };
         
         brightness = {
-          brightnessStep = 5;
+          brightnessStep = 2;
           enforceMinimum = true;
           enableDdcSupport = false;
           backlightDeviceMappings = [ ];
