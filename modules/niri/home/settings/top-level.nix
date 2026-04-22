@@ -18,7 +18,7 @@
         # ])
       ];
       prefer-no-csd = true;
-      screenshot-path = "~/Pictures/Screenshots/%Y-%m-%d-%H-%M-%S.png";
+      screenshot-path = "~/Pictures/Screenshots/ScreenShot_%Y-%m-%d_%H%M%S.png";
       cursor = {
         theme = "Adwaita";
         size = 48;
