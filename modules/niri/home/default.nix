@@ -68,7 +68,7 @@ in {
         scaling = "fill";
         timestr = "%H:%M:%S";
         datestr = "%Y-%m-%d %a";
-        font-size = 128;
+        # font-size = 128;
         
         screenshots = true;
         effect-blur = "10x5";
