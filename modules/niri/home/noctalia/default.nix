@@ -59,7 +59,24 @@ in {
           widgets = {
             left = [
               {
-                id = "Launcher";
+                id = "NotificationHistory";
+                showUnreadBadge = true;
+                hideWhenZero = false;
+                hideWhenZeroUnread = false;
+                unreadBadgeColor = "primary";
+                iconColor = "none";
+              }
+              # {
+              #   id = "Launcher"; # appLauncher 由 niri "Mod+D" 启动, 不置于 bar.
+              # }
+              {
+                id = "Tray";
+                blacklist = [];
+                colorizeIcons = false; # 是否用主题色彩覆盖 icons 色彩
+                chevronColor = "none";
+                pinned = [];
+                drawerEnabled = true;
+                hidePassive = false;
               }
               {
                 id = "Workspace";
@@ -94,6 +111,15 @@ in {
             ];
             center = [
               {
+                id = "Clock";
+                clockColor = "none";
+                useCustomFont = false;
+                customFont = "";
+                formatHorizontal = "yyyy-MM-dd, dddd, HH:mm:ss";
+                formatVertical = "HH mm - dd MM";
+                tooltipFormat = "yyyy-MM-dd, dddd, HH:mm:ss, tt";
+              }
+              {
                 id = "SystemMonitor";
                 compactMode = true;
                 iconColor = "none";
@@ -118,31 +144,14 @@ in {
             ];
             right = [
               {
-                id = "Tray";
-                blacklist = [];
-                colorizeIcons = false; # 是否用主题色彩覆盖 icons 色彩
-                chevronColor = "none";
-                pinned = [];
-                drawerEnabled = true;
-                hidePassive = false;
-              }
-              {
-                id = "NotificationHistory";
-                showUnreadBadge = true;
-                hideWhenZero = false;
-                hideWhenZeroUnread = false;
-                unreadBadgeColor = "primary";
-                iconColor = "none";
-              }
-              {
-                id = "Network";
+                id = "Bluetooth";
                 displayMode = "alwaysShow";
                 iconColor = "none";
                 textColor = "none";
               }
               {
-                id = "Bluetooth";
-                displayMode = "onhover";
+                id = "Network";
+                displayMode = "alwaysShow";
                 iconColor = "none";
                 textColor = "none";
               }
@@ -168,15 +177,6 @@ in {
                 showNoctaliaPerformance = true;
                 hideIfNotDetected = true;
                 hideIfIdle = false;
-              }
-              {
-                id = "Clock";
-                clockColor = "none";
-                useCustomFont = false;
-                customFont = "";
-                formatHorizontal = "HH:mm:ss";
-                formatVertical = "HH mm - dd MM";
-                tooltipFormat = "yyyy-MM-dd, dddd, HH:mm:ss, tt";
               }
               {
                 id = "ControlCenter";

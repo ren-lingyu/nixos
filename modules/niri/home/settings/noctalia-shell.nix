@@ -16,19 +16,7 @@ in {
       ];
       
       binds = {
-        
-        "Mod+Space" = lib.mkForce {
-          action.spawn = builtins.concatLists [
-            noctaliaShellCommand
-            [ "ipc" "call" "launcher" "toggle"]
-          ];
-        };
-        "Mod+S" = lib.mkForce {
-          action.spawn = builtins.concatLists [
-            noctaliaShellCommand
-            [ "ipc" "call" "controlCenter" "toggle" ]
-          ];
-        };
+
         "Mod+D" = lib.mkForce {
           hotkey-overlay = { title = "Run an Application: Noctalia appLauncher"; };
           action.spawn = builtins.concatLists [
@@ -36,7 +24,15 @@ in {
             [ "ipc" "call" "launcher" "toggle" ]
           ];
         };
-        "Mod+Comma" = lib.mkForce {
+        "Mod+C" = lib.mkForce {
+          hotkey-overlay = { title = "Open Noctalia Control Center"; };
+          action.spawn = builtins.concatLists [
+            noctaliaShellCommand
+            [ "ipc" "call" "controlCenter" "toggle" ]
+          ];
+        };
+        "Mod+S" = lib.mkForce {
+          hotkey-overlay = { title = "Open Noctalia Settings"; };
           action.spawn = builtins.concatLists [
             noctaliaShellCommand
             [ "ipc" "call" "settings" "toggle"]
