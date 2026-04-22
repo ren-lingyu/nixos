@@ -11,11 +11,11 @@
         QT_QPA_PLATFORM = "wayland";
       };
       spawn-at-startup = builtins.concatLists [
-        (lib.optionals config.programs.noctalia-shell.enable [
-          {
-            argv = [ "noctalia-shell" ];
-          }
-        ])
+        # (lib.optionals config.programs.noctalia-shell.enable [
+        #   {
+        #     argv = [ "noctalia-shell" ];
+        #   }
+        # ])
       ];
       prefer-no-csd = true;
       screenshot-path = "~/Pictures/Screenshots/%Y-%m-%d-%H-%M-%S.png";

@@ -19,7 +19,7 @@ in {
   ];
 
   config = lib.mkIf noctaliaEnable {
-
+    
     programs.noctalia-shell = {
       enable = true;
       settings = {
@@ -62,16 +62,20 @@ in {
                 id = "Launcher";
               }
               {
-                id = "Clock";
-                clockColor = "none";
-                useCustomFont = false;
-                customFont = null;
-                formatHorizontal = "HH:mm:ss";
-                formatVertical = "HH mm - dd MM";
-                tooltipFormat = "yyyy-MM-dd, dddd, HH:mm:ss, tt";
+                id = "Workspace";
               }
               {
-                id = "SystemMonitor";
+                id = "Taskbar";
+                onlySameOutput = true;
+                onlyActiveWorkspaces = true;
+                hideMode = "hidden";
+                colorizeIcons = false;
+                showTitle = false;
+                titleWidth = 120;
+                showPinnedApps = true;
+                smartWidth = true;
+                maxTaskbarWidth = 40;
+                iconScale = 0.8;
               }
               {
                 id = "ActiveWindow";
@@ -82,7 +86,7 @@ in {
                 scrollingMode = "always";
                 maxWidth = 300;
                 useFixedWidth = false;
-                colorizeIcons = true;
+                colorizeIcons = false; # 是否用主题色彩覆盖 icons 色彩
               }
               {
                 id = "MediaMini";
@@ -90,14 +94,33 @@ in {
             ];
             center = [
               {
-                id = "Workspace";
+                id = "SystemMonitor";
+                compactMode = true;
+                iconColor = "none";
+                textColor = "none";
+                useMonospaceFont = true;
+                usePadding = false;
+                showCpuUsage = true;
+                showCpuCores = false;
+                showCpuFreq = false;
+                showCpuTemp = true;
+                showGpuTemp = true;
+                showLoadAverage = true;
+                showMemoryUsage = true;
+                showMemoryAsPercent = true;
+                showSwapUsage = true;
+                showNetworkStats = true;
+                showDiskUsage = true;
+                showDiskUsageAsPercent = true;
+                showDiskAvailable = true;
+                diskPath = "/";
               }
             ];
             right = [
               {
                 id = "Tray";
                 blacklist = [];
-                colorizeIcons = true;
+                colorizeIcons = false; # 是否用主题色彩覆盖 icons 色彩
                 chevronColor = "none";
                 pinned = [];
                 drawerEnabled = true;
@@ -105,6 +128,37 @@ in {
               }
               {
                 id = "NotificationHistory";
+                showUnreadBadge = true;
+                hideWhenZero = false;
+                hideWhenZeroUnread = false;
+                unreadBadgeColor = "primary";
+                iconColor = "none";
+              }
+              {
+                id = "Network";
+                displayMode = "always-show";
+                iconColor = "none";
+                textColor = "none";
+              }
+              {
+                id = "Bluetooth";
+                displayMode = "onhover";
+                iconColor = "none";
+                textColor = "none";
+              }
+              {
+                id = "Volume";
+                displayMode = "onhover";
+                middleClickCommand = "pwvucontrol || pavucontrol";
+                iconColor = "none";
+                textColor = "none";
+              }
+              {
+                id = "Brightness";
+                displayMode = "always-show";
+                iconColor = "none";
+                textColor = "none";
+                applyToAllMonitors = false;
               }
               {
                 id = "Battery";
@@ -116,13 +170,23 @@ in {
                 hideIfIdle = false;
               }
               {
-                id = "Volume";
-              }
-              {
-                id = "Brightness";
+                id = "Clock";
+                clockColor = "none";
+                useCustomFont = false;
+                customFont = "";
+                formatHorizontal = "HH:mm:ss";
+                formatVertical = "HH mm - dd MM";
+                tooltipFormat = "yyyy-MM-dd, dddd, HH:mm:ss, tt";
               }
               {
                 id = "ControlCenter";
+                useDistroLogo = true;
+                icon = "niri"; # "noctalia";
+                customIconPath = "";
+                colorizeDistroLogo = false;
+                colorizeSystemIcon = "none";
+                colorizeSystemText = "none";
+                enableColorization = true;
               }
             ];
           };
@@ -301,8 +365,8 @@ in {
         };
         
         appLauncher = {
-          enableClipboardHistory = false;
-          autoPasteClipboard = false;
+          enableClipboardHistory = true;
+          autoPasteClipboard = true;
           enableClipPreview = true;
           clipboardWrapText = true;
           enableClipboardSmartIcons = true;
@@ -312,7 +376,7 @@ in {
           position = "center";
           pinnedApps = [ ];
           sortByMostUsed = true;
-          terminalCommand = "alacritty -e";
+          terminalCommand = "${lib.getExe config.programs.kitty.package} -e";
           customLaunchPrefixEnabled = false;
           customLaunchPrefix = "";
           viewMode = "list";
@@ -375,7 +439,7 @@ in {
               id = "audio-card";
             }
             {
-              enabled = false;
+              enabled = true;
               id = "brightness-card";
             }
             {
@@ -629,7 +693,7 @@ in {
         };
         
         desktopWidgets = {
-          enabled = false;
+          enabled = true;
           overviewEnabled = true;
           gridSnap = false;
           gridSnapScale = false;

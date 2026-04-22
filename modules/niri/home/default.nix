@@ -133,7 +133,7 @@ in {
       };
     };
     
-    services.swayidle = {
+    services.swayidle = lib.mkIf (!config.programs.noctalia-shell.enable) {
       enable = true; # idle management daemon
       package = pkgs.swayidle;
       systemdTargets = [
