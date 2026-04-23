@@ -56,6 +56,7 @@
         Context = {
           filesystems = [
             "xdg-documents/TencentMeeting:create"
+            "xdg-pictures"
             "xdg-download"
           ];
         };
@@ -64,6 +65,7 @@
         Context = {
           filesystems = [
             "xdg-documents/xwechat_files:create"
+            "xdg-pictures"
             "xdg-download"
           ];
         };
@@ -72,6 +74,7 @@
         Context = {
           filesystems = [
             "xdg-documents/Tensent Files:create"
+            "xdg-pictures"
             "xdg-download"
           ];
         };
