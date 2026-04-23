@@ -54,7 +54,7 @@ in {
         
         clock = true;
         daemonize = true;
-        ignore-empty-password = true;
+        ignore-empty-password = false;
         show-failed-attempts = true;
         show-keyboard-layout = true;
         hide-keyboard-layout = false;

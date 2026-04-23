@@ -105,6 +105,7 @@
   
   environment = {
     systemPackages = with pkgs; [
+      usbutils
       microsoft-edge
       feishu
       zotero
@@ -132,6 +133,19 @@
       GTK_IM_MODULE = "ibus";
       XMODIFIERS = "@im=ibus";
       QT_IM_MODULE = "ibus";
+    };
+  };
+
+  security.pam = {
+    package = pkgs.pam;
+    services = {
+      swaylock = {
+        fprintAuth = true;
+        rules.auth = {
+          unix.order = 10;
+          fprintd.order = 20;
+        };
+      };
     };
   };
 
@@ -180,6 +194,9 @@
   };
 
   services = {
+    fprintd = {
+      enable = true;
+    };
     power-profiles-daemon = {
       enable = true;
       package = pkgs.power-profiles-daemon;
