@@ -5,26 +5,33 @@
       "Mod+Shift+Slash" = {
         action.show-hotkey-overlay = [];
       };
-      "Mod+E" = {
+      "Mod+E" = lib.mkIf config.programs.emacs.enable {
         hotkey-overlay = { title = "Run an Editor: Emacs"; };
-        action.spawn = [ "emacs" ];
+        action.spawn = [ "${lib.getExe config.programs.emacs.package}" ];
       };
-      "Mod+T" = {
+      "Mod+T" = lib.mkIf config.programs.kitty.enable {
         hotkey-overlay = { title = "Open a Terminal: kitty"; };
-        action.spawn = [ "kitty" ];
+        action.spawn = [ "${lib.getExe config.programs.kitty.package}" ];
       };
-      "Mod+D" = {
+      "Mod+D" = lib.mkIf config.programs.fuzzel.enable {
         hotkey-overlay = { title = "Run an Application: fuzzel"; };
-        action.spawn = [ "fuzzel" ];
+        action.spawn = [ "${lib.getExe config.programs.fuzzel.package}" ];
       };
-      "Super+Alt+L" = {
+      "Mod+Z" = lib.mkIf config.programs.zathura.enable {
+        hotkey-overlay = { title = "Open PDF Viewer: zathura"; };
+        action.spawn = [ "${lib.getExe config.programs.zathura.package}" ];
+      };
+      "Super+Alt+L" = lib.mkIf config.programs.swaylock.enable {
         hotkey-overlay = { title = "Lock the Screen: swaylock"; };
-        action.spawn = [ "swaylock" ];
+        action.spawn = [ "${lib.getExe config.programs.swaylock.package}" "-f" ];
       };
-      "Super+Alt+S" = {
-        allow-when-locked = true;
-        hotkey-overlay = { hidden = true; };
-        action.spawn = [ "pkill" "orca" "||" "exec" "orca" ];
+      "Super+Alt+S" = lib.mkIf config.programs.swaylock.enable {
+        hotkey-overlay = { title = "Lock the Screen and Suspend"; };
+        action.spawn-sh = builtins.concatStringsSep " && " [
+          "${lib.getExe config.programs.swaylock.package} -f"
+          "${lib.getExe config.programs.niri.package} msg action power-off-monitors"
+          "${pkgs.systemd}/bin/systemctl suspend"
+        ];
       };
       "XF86AudioRaiseVolume" = {
         allow-when-locked = true;

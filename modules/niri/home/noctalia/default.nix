@@ -144,8 +144,34 @@ in {
             ];
             right = [
               {
+                id = "LockKeys";
+                showCapsLock = true;
+                showNumLock = false;
+                showScrollLock = false;
+                capsLockIcon = "letter-c";
+                numLockIcon = "letter-n";
+                scrollLockIcon = "letter-s";
+                hideWhenOff = false;
+              }
+              {
+                id = "DarkMode";
+                iconColor = "none";
+              }
+              {
+                id = "KeepAwake";
+                iconColor = "none";
+                textColor = "none";
+              }
+              {
+                id = "KeyboardLayout";
+                displayMode = "forceOpen";
+                showIcon = false;
+                iconColor = "none";
+                textColor = "none";
+              }
+              {
                 id = "Bluetooth";
-                displayMode = "alwaysShow";
+                displayMode = "onhover";
                 iconColor = "none";
                 textColor = "none";
               }
@@ -206,18 +232,18 @@ in {
           avatarImage = "";
           dimmerOpacity = 0.2;
           showScreenCorners = false;
-          forceBlackScreenCorners = false;
+          forceBlackScreenCorners = true;
           scaleRatio = 1;
           radiusRatio = 1;
           iRadiusRatio = 1;
           boxRadiusRatio = 1;
           screenRadiusRatio = 1;
           animationSpeed = 1;
-          animationDisabled = false;
-          compactLockScreen = false;
+          animationDisabled = true;
+          compactLockScreen = true;
           lockScreenAnimations = false;
           lockOnSuspend = true;
-          showSessionButtonsOnLockScreen = true;
+          showSessionButtonsOnLockScreen = false;
           showHibernateOnLockScreen = false;
           enableLockScreenMediaControls = false;
           enableShadows = true;
@@ -232,13 +258,13 @@ in {
           enableLockScreenCountdown = true;
           lockScreenCountdownDuration = 10000;
           autoStartAuth = false;
-          allowPasswordWithFprintd = false;
+          allowPasswordWithFprintd = osConfig.services.fprintd.enable;
           clockStyle = "custom";
-          clockFormat = "hh\nmm";
+          clockFormat = "hh\nmm\nss";
           passwordChars = false;
           lockScreenMonitors = [ ];
-          lockScreenBlur = 0;
-          lockScreenTint = 0;
+          lockScreenBlur = 0.8;
+          lockScreenTint = 0.8;
           keybinds = {
             keyUp = [
               "Up"
@@ -328,8 +354,8 @@ in {
           linkLightAndDarkWallpapers = true;
           fillMode = "crop";
           fillColor = "#000000";
-          useSolidColor = false;
-          solidColor = "#1a1a2e";
+          useSolidColor = true;
+          solidColor = "#000000";
           automationEnabled = false;
           wallpaperChangeMode = "random";
           randomIntervalSec = 300;
@@ -633,8 +659,8 @@ in {
         };
         
         colorSchemes = {
-          useWallpaperColors = false;
-          predefinedScheme = "Noctalia (default)";
+          useWallpaperColors = true;
+          predefinedScheme = "Ayu"; # ""Noctalia (default)";
           darkMode = true;
           schedulingMode = "off";
           manualSunrise = "06:30";
@@ -679,16 +705,28 @@ in {
         
         idle = {
           enabled = false;
+          lockTimeout = 300;
           screenOffTimeout = 600;
-          lockTimeout = 660;
           suspendTimeout = 1800;
           fadeDuration = 5;
-          screenOffCommand = "";
-          lockCommand = "";
-          suspendCommand = "";
-          resumeScreenOffCommand = "";
-          resumeLockCommand = "";
-          resumeSuspendCommand = "";
+          screenOffCommand = builtins.concatStringsSep " && " [
+            "${lib.getExe config.programs.niri.package} msg action power-off-monitors"
+          ];
+          lockCommand = builtins.concatStringsSep " && " [
+            "${lib.getExe config.programs.swaylock.package} -f"
+          ];
+          suspendCommand = builtins.concatStringsSep " && " [
+            "${pkgs.systemd}/bin/systemctl suspend"
+          ];
+          resumeScreenOffCommand = builtins.concatStringsSep " && " [
+            "${lib.getExe config.programs.niri.package} msg action power-on-monitors"
+          ];
+          resumeLockCommand = builtins.concatStringsSep " && " [
+            "${lib.getExe config.programs.swaylock.package} -f"
+          ];
+          resumeSuspendCommand = builtins.concatStringsSep " && " [
+            "${lib.getExe config.programs.niri.package} msg action power-on-monitors"
+          ];
           customCommands = "[]";
         };
         
