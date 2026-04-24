@@ -97,6 +97,7 @@
         curl
         wget
         gnutar
+        gzip
       ];
 
     };
