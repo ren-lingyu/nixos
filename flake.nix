@@ -117,6 +117,7 @@
           ./modules/shell.nix
           ./modules/texlive.nix
           ./modules/font.nix
+          ./modules/media.nix
           ./hosts/thinkbook
           nix-flatpak.nixosModules.nix-flatpak
           home-manager.nixosModules.home-manager {
