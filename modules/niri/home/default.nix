@@ -35,7 +35,7 @@ in {
       package = pkgs.niri;
     };
     
-    programs.fuzzel = {
+    programs.fuzzel = lib.mkIf (!config.programs.noctalia-shell.enable) {
       enable = true;
       package = pkgs.fuzzel;
       settings = {
