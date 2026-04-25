@@ -30,9 +30,4 @@
     wayland = true;
   };
 
-  security.polkit = {
-    enable = true;
-    package = pkgs.polkit;
-  };
-
 }

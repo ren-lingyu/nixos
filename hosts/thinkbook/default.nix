@@ -136,16 +136,22 @@
     };
   };
 
-  security.pam = {
-    package = pkgs.pam;
-    services = {
-      swaylock = {
-        fprintAuth = true;
-        rules.auth = {
-          unix.order = 10;
-          fprintd.order = 20;
+  security = {
+    pam = {
+      package = pkgs.pam;
+      services = {
+        swaylock = {
+          fprintAuth = true;
+          rules.auth = {
+            unix.order = 10;
+            fprintd.order = 20;
+          };
         };
       };
+    };
+    polkit = {
+      enable = true;
+      package = pkgs.polkit;
     };
   };
 
