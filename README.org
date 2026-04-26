@@ -13,31 +13,65 @@ nixos/
 ├── flake.lock
 ├── LICENSE
 ├── README.org
+├── .gitignore
 ├── hosts
 │   ├── thinkbook
 │   │   ├── boot-manager.nix
 │   │   ├── default.nix
-│   │   ├── desktop-environment.nix
+│   │   ├── desktop-environment
+│   │   ├── flatpak.nix
 │   │   ├── hardware-configuration.nix
 │   │   ├── mount-windows-directory.nix
 │   │   └── virtual-terminal.nix
 │   └── wsl
 │       └── default.nix
 ├── modules
-│   ├── binary-cache.nix
+│   ├── desktop-environment
+│   │   ├── default.nix
+│   │   ├── gnome.nix
+│   │   └── hyprland.nix
 │   ├── font.nix
-│   ├── llm.nix
+│   ├── media.nix
+│   ├── niri
+│   │   ├── conf
+│   │   │   ├── default.nix
+│   │   │   └── greeter.nix
+│   │   └── home
+│   │       ├── default.nix
+│   │       ├── noctalia
+│   │       │   ├── default.nix
+│   │       │   └── settings
+│   │       ├── settings
+│   │       │   ├── animations.nix
+│   │       │   ├── binds.nix
+│   │       │   ├── default.nix
+│   │       │   ├── input.nix
+│   │       │   ├── layout.nix
+│   │       │   ├── noctalia-shell.nix
+│   │       │   ├── outputs.nix
+│   │       │   ├── top-level.nix
+│   │       │   └── window-rules.nix
+│   │       └── waybar
+│   │           ├── default.nix
+│   │           ├── power-menu.xml
+│   │           ├── settings.nix
+│   │           └── style.css
 │   ├── shell.nix
-│   ├── storage.nix
 │   └── texlive.nix
-└── users/
-    └── lingyu/
+└── users
+    └── lingyu
+        ├── ai.nix
         ├── default.nix
-        └── .local/
-            └── bin/
-                ├── nutstore.sh (disabled)
-                ├── org.sh
-                └── ssha.sh
+        ├── editor.nix
+        ├── git.nix
+        ├── keyring.nix
+        ├── .local
+        │   └── bin
+        │       ├── nut.sh
+        │       ├── org.sh
+        │       └── ssha.sh
+        ├── shell.nix
+        └── terminal.nix
 #+end_example
 
 * 关键点
@@ -62,6 +96,7 @@ nix flake update
 * 脚本
 - =org=: 快捷调用有关脚本, 同步 =~/org= 到 nutstore 等.
 - =ssha=: 启动 =ssh-agent= 加载默认私钥.
+- =nut=: 用于到 nutstore 的双向同步.
 
 * 许可
 MIT License (见 [[file:LICENSE][LICENSE]]).
