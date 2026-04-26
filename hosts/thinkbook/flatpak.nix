@@ -51,13 +51,31 @@
     overrides = {
       global = {
         Environment = config.environment.sessionVariables;
+        Context = {
+          sockets = [
+            "x11"
+            "wayland"
+            # "fallback-x11"
+          ];
+          shared = [
+            "network"
+          ];
+          devices = [
+            "all"
+          ];
+          features = [
+            "bluetooth"
+          ];
+          filesystems = [
+            "xdg-pictures"
+            "xdg-download"
+          ];
+        };
       };
       "${flatpakPackages.wemeet.appId}" = {
         Context = {
           filesystems = [
             "xdg-documents/TencentMeeting:create"
-            "xdg-pictures"
-            "xdg-download"
           ];
         };
       };
@@ -65,8 +83,6 @@
         Context = {
           filesystems = [
             "xdg-documents/xwechat_files:create"
-            "xdg-pictures"
-            "xdg-download"
           ];
         };
       };
@@ -74,8 +90,6 @@
         Context = {
           filesystems = [
             "xdg-documents/Tensent Files:create"
-            "xdg-pictures"
-            "xdg-download"
           ];
         };
       };
