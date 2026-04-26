@@ -100,6 +100,7 @@
         tree-sitter-lua
         tree-sitter-css
         tree-sitter-latex
+        tree-sitter-commonlisp
         tree-sitter-elisp
         tree-sitter-json
         tree-sitter-yaml
@@ -107,6 +108,19 @@
         tree-sitter-markdown
         tree-sitter-javascript
         tree-sitter-qmljs
+        tree-sitter-lean
+        tree-sitter-julia
+        tree-sitter-haskell
+        tree-sitter-typescript
+        tree-sitter-html
+        tree-sitter-xml
+        tree-sitter-css
+        tree-sitter-scss
+        tree-sitter-sql
+        tree-sitter-regex
+        tree-sitter-comment
+        tree-sitter-dockerfile
+        tree-sitter-make
       ]))
     ];
   };
