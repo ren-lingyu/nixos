@@ -15,7 +15,7 @@ in {
 
     programs.emacs.package = lib.mkForce pkgs.emacs-pgtk;
     services.emacs.package = lib.mkForce pkgs.emacs-pgtk;
-
+    
     home.packages = with pkgs; [
       adwaita-icon-theme
       nautilus
@@ -169,7 +169,7 @@ in {
     };
     
     services.polkit-gnome = {
-      enable = true;
+      enable = false;
       package = pkgs.polkit_gnome;
     };
     
