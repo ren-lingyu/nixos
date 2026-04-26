@@ -244,12 +244,6 @@
     printing = {
       enable = true;
     };
-    pipewire = {
-      enable = true;
-      pulse = {
-        enable = true;
-      };
-    };
     libinput = {
       enable = true;
       touchpad = {
