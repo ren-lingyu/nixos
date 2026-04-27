@@ -3,22 +3,6 @@
   imports = [
     nixvim.homeModules.nixvim
   ];
-
-  home.packages = with pkgs; [
-    nixd # Nix
-    bash-language-server # Shell
-    clang-tools # C / C++
-    gopls # Go
-    jdt-language-server # Java
-    typescript-language-server # JavaScript / TypeScript
-    typescript # JavaScript / TypeScript
-    pyright # Python
-    lua-language-server # Lua
-    marksman # Markdown
-    yaml-language-server # YAML
-    vscode-langservers-extracted # JSON
-    taplo # TOML
-  ];
   
   programs.nixvim = {
     enable = true;
