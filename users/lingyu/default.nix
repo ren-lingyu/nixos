@@ -7,6 +7,7 @@
     ./keyring.nix
     ./ai.nix
     ./git.nix
+    ./langs.nix
   ];
   
   home = {
@@ -16,7 +17,6 @@
       [ jq ripgrep unzip trash-cli tree ]
       [ htop pciutils tcpdump mtr nmap netcat socat dnsutils ]
       [ xclock xeyes xclip ]
-      [ python3 lean4 ]
       [ gnumake ]
       [ rclone ]
       [ chafa ]
