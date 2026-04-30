@@ -159,23 +159,25 @@
       enableFHS = true;
       # nodejsPackage = pkgs.nodejs_22; # 强制指定该选项可能会导致问题, 建议保持默认.
     };
-    # 用来提供远程访问. 
-    # 本意是在 Remote-WSL 失效后的替代, 但现在似乎没用了. 
     openssh = {
-      enable = false;
-      ports = [2222];
+      enable = true;
+      hostKeys = [
+        {
+          bits = 4096;
+          path = "/etc/ssh/ssh_host_rsa_key";
+          type = "rsa";
+        }
+        {
+          path = "/etc/ssh/ssh_host_ed25519_key";
+          type = "ed25519";
+        }
+      ];
       settings = {
         PasswordAuthentication = false;
         KbdInteractiveAuthentication = false;
         PermitRootLogin = "no";
         UseDns = false;
       };
-      listenAddresses = [ 
-        { 
-          addr = "127.0.0.1"; 
-          port = 2222; 
-        }
-      ];
     };
     ollama = {
       enable = true;
