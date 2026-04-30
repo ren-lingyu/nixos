@@ -30,7 +30,7 @@
 
     shfmt                             # shell formatter
     stylua                            # Lua formatter
-    nixfmt-rfc-style                  # Nix formatter
+    nixfmt                            # Nix formatter
   ];
 
 }
