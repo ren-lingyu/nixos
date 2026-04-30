@@ -119,13 +119,8 @@
               "feishu"
             ];
           })
-          ./modules/hosts/thinkbook
-          ./modules/shell.nix
-          ./modules/texlive.nix
-          ./modules/font.nix
-          ./modules/media.nix
-          ./modules/niri/conf
           inputs.nix-flatpak.nixosModules.nix-flatpak
+          ./modules/hosts/thinkbook
           inputs.home-manager.nixosModules.home-manager {
             home-manager = {
               useGlobalPkgs = true;
@@ -146,6 +141,11 @@
               };
             };
           }
+          ./modules/shell.nix
+          ./modules/texlive.nix
+          ./modules/font.nix
+          ./modules/media.nix
+          ./modules/niri/conf
         ];
       };
 
@@ -153,12 +153,9 @@
         system = "x86_64-linux";
         modules = [
           (globalConfGenerate {})
-          ./modules/shell.nix
-          ./modules/texlive.nix
-          ./modules/font.nix
-          ./modules/hosts/wsl
           inputs.nixos-wsl.nixosModules.default
           inputs.vscode-server.nixosModules.default
+          ./modules/hosts/wsl
           inputs.home-manager.nixosModules.home-manager {
             home-manager = {
               useGlobalPkgs = true;
@@ -176,6 +173,9 @@
               };
             };
           }
+          ./modules/shell.nix
+          ./modules/texlive.nix
+          ./modules/font.nix
         ];
       };
 
