@@ -23,32 +23,37 @@
   
   inputs = {
     nixpkgs = {
-      url = "git+https://mirrors.tuna.tsinghua.edu.cn/git/nixpkgs.git?ref=nixos-unstable&shallow=1";
       # url = "github:NixOS/nixpkgs/nixos-unstable";
+      url = "git+https://github.com/NixOS/nixpkgs?ref=refs/heads/nixos-unstable&rev=025c852a89be820b3117f604c8ace42e9b4caa08&shallow=1";
+      # url = "git+https://mirrors.tuna.tsinghua.edu.cn/git/nixpkgs.git?ref=refs/heads/nixos-unstable&shallow=1";
     };
     arcc-nixpkgs = {
-      url = "git+https://github.com/ren-lingyu/nixpkgs.git?ref=main&shallow=1";
+      url = "git+https://github.com/ren-lingyu/nixpkgs.git?ref=refs/heads/main&shallow=1";
       inputs.nixpkgs.follows = "nixpkgs";
     };
     home-manager = {
-      url = "git+https://github.com/nix-community/home-manager.git?ref=master&shallow=1";
+      url = "git+https://github.com/nix-community/home-manager.git?ref=refs/heads/master&shallow=1";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+    sops-nix = {
+      url = "git+https://github.com/Mic92/sops-nix.git?ref=refs/heads/master&shallow=1";
       inputs.nixpkgs.follows = "nixpkgs";
     };
     nixvim = {
       # the main branch of nixvim must be use in nixos-unstable
-      url = "git+https://github.com/nix-community/nixvim.git?ref=main&shallow=1";
+      url = "git+https://github.com/nix-community/nixvim.git?ref=refs/heads/main&shallow=1";
       inputs.nixpkgs.follows = "nixpkgs";
     };
     nixos-wsl = {
-      url = "git+https://github.com/nix-community/NixOS-WSL.git?ref=main&shallow=1";
+      url = "git+https://github.com/nix-community/NixOS-WSL.git?ref=refs/heads/main&shallow=1";
       inputs.nixpkgs.follows = "nixpkgs";
     };
     vscode-server = {
-      url = "git+https://github.com/nix-community/nixos-vscode-server.git?ref=master&shallow=1";
+      url = "git+https://github.com/nix-community/nixos-vscode-server.git?ref=refs/heads/master&shallow=1";
       inputs.nixpkgs.follows = "nixpkgs";
     };
     niri-flake = {
-      url = "git+https://github.com/sodiboo/niri-flake.git?ref=main&shallow=1";
+      url = "git+https://github.com/sodiboo/niri-flake.git?ref=refs/heads/main&shallow=1";
       inputs.nixpkgs.follows = "nixpkgs";
     };
     noctalia-shell = {
