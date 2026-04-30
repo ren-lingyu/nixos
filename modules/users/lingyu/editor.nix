@@ -70,39 +70,6 @@
   programs.emacs = {
     enable = true;
     package = pkgs.emacs-gtk;
-    extraPackages = epkgs: with epkgs; [
-      tree-sitter-langs
-      (treesit-grammars.with-grammars (grammars: with grammars; [
-        tree-sitter-bash
-        tree-sitter-nix
-        tree-sitter-python
-        tree-sitter-kdl
-        tree-sitter-lua
-        tree-sitter-css
-        tree-sitter-latex
-        tree-sitter-commonlisp
-        tree-sitter-elisp
-        tree-sitter-json
-        tree-sitter-yaml
-        tree-sitter-toml
-        tree-sitter-markdown
-        tree-sitter-javascript
-        tree-sitter-qmljs
-        tree-sitter-lean
-        tree-sitter-julia
-        tree-sitter-haskell
-        tree-sitter-typescript
-        tree-sitter-html
-        tree-sitter-xml
-        tree-sitter-css
-        tree-sitter-scss
-        tree-sitter-sql
-        tree-sitter-regex
-        tree-sitter-comment
-        tree-sitter-dockerfile
-        tree-sitter-make
-      ]))
-    ];
   };
 
   services.emacs = {
