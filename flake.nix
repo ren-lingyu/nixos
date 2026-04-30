@@ -115,12 +115,12 @@
               "feishu"
             ];
           })
+          ./modules/hosts/thinkbook
           ./modules/shell.nix
           ./modules/texlive.nix
           ./modules/font.nix
           ./modules/media.nix
           ./modules/niri/conf
-          ./hosts/thinkbook
           nix-flatpak.nixosModules.nix-flatpak
           home-manager.nixosModules.home-manager {
             home-manager = {
@@ -128,7 +128,7 @@
               useUserPackages = true;
               users.lingyu = {
                 imports = [
-                  ./users/lingyu
+                  ./modules/users/lingyu
                   ./modules/niri/home
                 ];
               };
@@ -150,7 +150,7 @@
           ./modules/shell.nix
           ./modules/texlive.nix
           ./modules/font.nix
-          ./hosts/wsl
+          ./modules/hosts/wsl
           nixos-wsl.nixosModules.default
           vscode-server.nixosModules.default
           home-manager.nixosModules.home-manager {
@@ -159,7 +159,7 @@
               useUserPackages = true;
               users.lingyu = {
                 imports = [
-                  ./users/lingyu
+                  ./modules/users/lingyu
                 ];
               };
               extraSpecialArgs = {
