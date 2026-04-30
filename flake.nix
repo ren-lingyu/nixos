@@ -137,11 +137,13 @@
                   ./modules/niri/home
                 ];
               };
+              sharedModules = [
+                inputs.nixvim.homeModules.nixvim
+                inputs.niri-flake.homeModules.niri
+                inputs.noctalia-shell.homeModules.default
+              ];
               extraSpecialArgs = {
-                nixvim = inputs.nixvim;
-                niri-flake = inputs.niri-flake;
-                noctalia-shell = inputs.noctalia-shell;
-                # inherit inputs;
+                inherit inputs;
               };
             };
           }
@@ -167,9 +169,11 @@
                   ./modules/users/lingyu
                 ];
               };
+              sharedModules = [
+                inputs.nixvim.homeModules.nixvim
+              ];
               extraSpecialArgs = {
-                nixvim = inputs.nixvim;
-                # inherit inputs;
+                inherit inputs;
               };
             };
           }

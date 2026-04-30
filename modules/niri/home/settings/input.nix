@@ -1,4 +1,4 @@
-{ config, lib, pkgs, osConfig, niri-flake, ... } : {
+{ config, lib, pkgs, osConfig, ... } : {
 
   config = lib.mkIf config.programs.niri.enable {
 

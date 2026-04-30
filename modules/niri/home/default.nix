@@ -1,11 +1,10 @@
-{ config, lib, pkgs, osConfig, niri-flake, noctalia-shel, ... } : let
+{ config, lib, pkgs, osConfig, ... } : let
 
   niriEnable = ( osConfig.programs.niri.enable && !osConfig.services.desktopManager.gnome.enable );
   
 in {
 
   imports = [
-    niri-flake.homeModules.niri
     ./settings
     ./waybar
     ./noctalia

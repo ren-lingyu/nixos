@@ -1,4 +1,4 @@
-{ config, lib, pkgs, osConfig, niri-flake, noctalia-shell, ... } : let
+{ config, lib, pkgs, osConfig, ... } : let
 
   noctaliaEnable = (
     osConfig.networking.networkmanager.enable
@@ -13,10 +13,6 @@
   );
   
 in {
-
-  imports = [
-    noctalia-shell.homeModules.default
-  ];
 
   config = lib.mkIf noctaliaEnable {
     

@@ -1,4 +1,4 @@
-{ config, lib, pkgs, osConfig, niri-flake, ... } :  {
+{ config, lib, pkgs, osConfig, ... } :  {
   
   imports = [
     ./top-level.nix

@@ -1,4 +1,4 @@
-{ config, lib, pkgs, osConfig, niri-flake, noctalia-shell, ... } : let
+{ config, lib, pkgs, osConfig, ... } : let
 
   noctaliaNiriSettingsEnable = config.programs.niri.enable && config.programs.noctalia-shell.enable;
   
