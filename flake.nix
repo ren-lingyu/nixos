@@ -63,10 +63,9 @@
     nix-flatpak = {
       url = "git+https://github.com/gmodena/nix-flatpak.git?ref=refs/tags/latest&shallow=1";
     };
-
   };
   
-  outputs = { self, nixpkgs, arcc-nixpkgs, home-manager, nixvim, nixos-wsl, vscode-server, niri-flake, nix-flatpak, ... }@inputs : let
+  outputs = { self, ... }@inputs : let
 
     globalConfGenerate = { overlays ? [], unfreePackages ? [], ... } : { pkgs, lib, ... } : let
 
@@ -111,7 +110,7 @@
     
     nixosConfigurations = {
 
-      nixos = nixpkgs.lib.nixosSystem {
+      nixos = inputs.nixpkgs.lib.nixosSystem {
         system = "x86_64-linux";
         modules = [
           (globalConfGenerate {
@@ -126,8 +125,8 @@
           ./modules/font.nix
           ./modules/media.nix
           ./modules/niri/conf
-          nix-flatpak.nixosModules.nix-flatpak
-          home-manager.nixosModules.home-manager {
+          inputs.nix-flatpak.nixosModules.nix-flatpak
+          inputs.home-manager.nixosModules.home-manager {
             home-manager = {
               useGlobalPkgs = true;
               useUserPackages = true;
@@ -150,7 +149,7 @@
         ];
       };
 
-      nixos-wsl = nixpkgs.lib.nixosSystem {
+      nixos-wsl = inputs.nixpkgs.lib.nixosSystem {
         system = "x86_64-linux";
         modules = [
           (globalConfGenerate {})
@@ -158,9 +157,9 @@
           ./modules/texlive.nix
           ./modules/font.nix
           ./modules/hosts/wsl
-          nixos-wsl.nixosModules.default
-          vscode-server.nixosModules.default
-          home-manager.nixosModules.home-manager {
+          inputs.nixos-wsl.nixosModules.default
+          inputs.vscode-server.nixosModules.default
+          inputs.home-manager.nixosModules.home-manager {
             home-manager = {
               useGlobalPkgs = true;
               useUserPackages = true;
