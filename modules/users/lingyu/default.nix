@@ -8,6 +8,7 @@
     ./ai.nix
     ./git.nix
     ./langs.nix
+    ./cloud.nix
   ];
   
   home = {
@@ -18,7 +19,6 @@
       [ htop pciutils tcpdump mtr nmap netcat socat dnsutils ]
       [ xclock xeyes xclip ]
       [ gnumake ]
-      [ rclone ]
       [ chafa ]
       [ vulkan-tools ]
       [ adwaita-icon-theme xcursor-themes ]
