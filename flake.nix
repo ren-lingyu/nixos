@@ -129,9 +129,11 @@
                 imports = [
                   ./modules/users/lingyu
                   ./modules/niri/home
+                  ./modules/secret/home.nix
                 ];
               };
               sharedModules = [
+                inputs.sops-nix.homeManagerModules.sops
                 inputs.nixvim.homeModules.nixvim
                 inputs.niri-flake.homeModules.niri
                 inputs.noctalia-shell.homeModules.default
@@ -165,9 +167,11 @@
               users.lingyu = {
                 imports = [
                   ./modules/users/lingyu
+                  ./modules/secret/home.nix
                 ];
               };
               sharedModules = [
+                inputs.sops-nix.homeManagerModules.sops
                 inputs.nixvim.homeModules.nixvim
               ];
               extraSpecialArgs = {
