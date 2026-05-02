@@ -199,6 +199,9 @@
       serviceMode = true;
       tunMode = true;
     };
+    thunderbird = {
+      enable = true;
+    };
   };
 
   services = {

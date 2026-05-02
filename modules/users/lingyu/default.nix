@@ -9,6 +9,7 @@
     ./git.nix
     ./langs.nix
     ./cloud.nix
+    ./email.nix
   ];
   
   home = {
