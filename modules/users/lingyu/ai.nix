@@ -26,4 +26,14 @@
     };
   };
 
+  programs.opencode = {
+    enable = true;
+    package = pkgs.opencode;
+    web = {
+      enable = false;
+      extraArgs = [];
+      environmentFile = null;
+    };
+  };
+
 }
