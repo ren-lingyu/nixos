@@ -14,64 +14,73 @@ nixos/
 ├── LICENSE
 ├── README.org
 ├── .gitignore
-├── hosts
-│   ├── thinkbook
-│   │   ├── boot-manager.nix
-│   │   ├── default.nix
-│   │   ├── desktop-environment
-│   │   ├── flatpak.nix
-│   │   ├── hardware-configuration.nix
-│   │   ├── mount-windows-directory.nix
-│   │   └── virtual-terminal.nix
-│   └── wsl
-│       └── default.nix
-├── modules
-│   ├── desktop-environment
-│   │   ├── default.nix
-│   │   ├── gnome.nix
-│   │   └── hyprland.nix
-│   ├── font.nix
-│   ├── media.nix
-│   ├── niri
-│   │   ├── conf
-│   │   │   ├── default.nix
-│   │   │   └── greeter.nix
-│   │   └── home
-│   │       ├── default.nix
-│   │       ├── noctalia
-│   │       │   ├── default.nix
-│   │       │   └── settings
-│   │       ├── settings
-│   │       │   ├── animations.nix
-│   │       │   ├── binds.nix
-│   │       │   ├── default.nix
-│   │       │   ├── input.nix
-│   │       │   ├── layout.nix
-│   │       │   ├── noctalia-shell.nix
-│   │       │   ├── outputs.nix
-│   │       │   ├── top-level.nix
-│   │       │   └── window-rules.nix
-│   │       └── waybar
-│   │           ├── default.nix
-│   │           ├── power-menu.xml
-│   │           ├── settings.nix
-│   │           └── style.css
-│   ├── shell.nix
-│   └── texlive.nix
-└── users
-    └── lingyu
-        ├── ai.nix
-        ├── default.nix
-        ├── editor.nix
-        ├── git.nix
-        ├── keyring.nix
-        ├── .local
-        │   └── bin
-        │       ├── nut.sh
-        │       ├── org.sh
-        │       └── ssha.sh
-        ├── shell.nix
-        └── terminal.nix
+└── modules
+    ├── desktop-environment
+    │   ├── default.nix
+    │   ├── gnome.nix
+    │   └── hyprland.nix
+    ├── font.nix
+    ├── hosts
+    │   ├── thinkbook
+    │   │   ├── boot-manager.nix
+    │   │   ├── default.nix
+    │   │   ├── desktop-environment
+    │   │   ├── flatpak.nix
+    │   │   ├── hardware-configuration.nix
+    │   │   ├── mount-windows-directory.nix
+    │   │   └── virtual-terminal.nix
+    │   └── wsl
+    │       └── default.nix
+    ├── media.nix
+    ├── niri
+    │   ├── conf
+    │   │   ├── default.nix
+    │   │   └── greeter.nix
+    │   └── home
+    │       ├── default.nix
+    │       ├── noctalia
+    │       │   ├── default.nix
+    │       │   └── settings
+    │       ├── settings
+    │       │   ├── animations.nix
+    │       │   ├── binds.nix
+    │       │   ├── default.nix
+    │       │   ├── input.nix
+    │       │   ├── layout.nix
+    │       │   ├── noctalia-shell.nix
+    │       │   ├── outputs.nix
+    │       │   ├── top-level.nix
+    │       │   └── window-rules.nix
+    │       └── waybar
+    │           ├── default.nix
+    │           ├── power-menu.xml
+    │           ├── settings.nix
+    │           └── style.css
+    ├── secret
+    │   ├── default.nix
+    │   ├── home.nix
+    │   ├── lib.nix
+    │   ├── sops
+    │   │   └── default.yaml
+    │   └── .sops.yaml
+    ├── shell.nix
+    ├── texlive.nix
+    └── users
+        └── lingyu
+            ├── ai.nix
+            ├── cloud.nix
+            ├── default.nix
+            ├── editor.nix
+            ├── git.nix
+            ├── keyring.nix
+            ├── langs.nix
+            ├── .local
+            │   └── bin
+            │       ├── nut.sh
+            │       ├── org.sh
+            │       └── ssha.sh
+            ├── shell.nix
+            └── terminal.nix
 #+end_example
 
 * 关键点
@@ -80,7 +89,8 @@ nixos/
 - [[file:modules][modules]] 放置便于模块化的系统级配置. 
 - =nixpkgs= 使用 =nixos-unstable= (清华镜像). 
 - 启用 =nix-command= 与 =flakes=. 
-- Home Manager 管理 zsh/git/ssh/emacs/aichat 等开发环境. 
+- Home Manager 管理 zsh/git/ssh/emacs/aichat 等开发环境.
+- 使用 sops-nix 作为 secret manager.
 
 * 使用
 应用系统配置：
