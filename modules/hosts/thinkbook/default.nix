@@ -84,7 +84,7 @@
           [ "wheel" "video" "render" "input" ]
           (lib.optionals config.services.seatd.enable [ config.services.seatd.group ])
         ];
-	      home = "/home/lingyu";
+        home = "/home/lingyu";
         uid = 1000;
       };
     };
@@ -275,7 +275,7 @@
       host = "127.0.0.1";
       port = 11434; 
       loadModels = [
-	      "qwen3-coder-next:cloud"
+        "qwen3-coder-next:cloud"
         "qwen3.5:cloud"
         "deepseek-v3.2:cloud"
         "gemini-3-flash-preview:cloud"
