@@ -105,7 +105,7 @@
       ];
 
     };
-      
+    
   in {
     
     nixosConfigurations = {
@@ -141,6 +141,8 @@
               };
             };
           }
+          inputs.sops-nix.nixosModules.sops
+          ./modules/secret
           ./modules/shell.nix
           ./modules/texlive.nix
           ./modules/font.nix
@@ -173,6 +175,8 @@
               };
             };
           }
+          inputs.sops-nix.nixosModules.sops
+          ./modules/secret
           ./modules/shell.nix
           ./modules/texlive.nix
           ./modules/font.nix
