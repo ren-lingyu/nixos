@@ -24,7 +24,6 @@ nixos/
     │   ├── thinkbook
     │   │   ├── boot-manager.nix
     │   │   ├── default.nix
-    │   │   ├── desktop-environment
     │   │   ├── flatpak.nix
     │   │   ├── hardware-configuration.nix
     │   │   ├── mount-windows-directory.nix
@@ -67,10 +66,12 @@ nixos/
     ├── texlive.nix
     └── users
         └── lingyu
-            ├── ai.nix
+            ├── ai
+            │   └── default.nix
             ├── cloud.nix
             ├── default.nix
             ├── editor.nix
+            ├── email.nix
             ├── git.nix
             ├── keyring.nix
             ├── langs.nix
