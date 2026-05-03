@@ -35,6 +35,17 @@ in {
             "onedrive" = [ "token" "drive_id" ];
           };
         }
+        {
+          template = "user";
+          structure = {
+            "deepseek" = {
+              "apiKey" = [ "opencode" ];
+            };
+            "ollama" = {
+              "apiKey" = [ "opencode" ];
+            };
+          };
+        }
       ];
       
     };
