@@ -15,21 +15,15 @@ nixos/
 ├── README.org
 ├── .gitignore
 └── modules
+    ├── agent
+    │   ├── commands
+    │   │   └── commit-message.md
+    │   └── default.nix
     ├── desktop-environment
     │   ├── default.nix
     │   ├── gnome.nix
     │   └── hyprland.nix
     ├── font.nix
-    ├── hosts
-    │   ├── thinkbook
-    │   │   ├── boot-manager.nix
-    │   │   ├── default.nix
-    │   │   ├── flatpak.nix
-    │   │   ├── hardware-configuration.nix
-    │   │   ├── mount-windows-directory.nix
-    │   │   └── virtual-terminal.nix
-    │   └── wsl
-    │       └── default.nix
     ├── media.nix
     ├── niri
     │   ├── conf
@@ -38,8 +32,7 @@ nixos/
     │   └── home
     │       ├── default.nix
     │       ├── noctalia
-    │       │   ├── default.nix
-    │       │   └── settings
+    │       │   └── default.nix
     │       ├── settings
     │       │   ├── animations.nix
     │       │   ├── binds.nix
@@ -64,31 +57,39 @@ nixos/
     │   └── .sops.yaml
     ├── shell.nix
     ├── texlive.nix
+    ├── hosts
+    │   ├── thinkbook
+    │   │   ├── boot-manager.nix
+    │   │   ├── default.nix
+    │   │   ├── flatpak.nix
+    │   │   ├── hardware-configuration.nix
+    │   │   ├── mount-windows-directory.nix
+    │   │   └── virtual-terminal.nix
+    │   └── wsl
+    │       └── default.nix
     └── users
         └── lingyu
-            ├── ai
-            │   └── default.nix
-            ├── cloud.nix
             ├── default.nix
+            ├── cloud.nix
             ├── editor.nix
             ├── email.nix
             ├── git.nix
             ├── keyring.nix
             ├── langs.nix
-            ├── .local
-            │   └── bin
-            │       ├── nut.sh
-            │       ├── org.sh
-            │       └── ssha.sh
             ├── shell.nix
-            └── terminal.nix
+            ├── terminal.nix
+            └── .local
+                └── bin
+                    ├── org.sh
+                    ├── rc.sh
+                    └── ssha.sh
 #+end_example
 
 * 关键点
 - [[file:hosts][hosts]] 放置设备相关的系统级配置.
 - [[file:users][users]] 放置用户级配置.
 - [[file:modules][modules]] 放置便于模块化的系统级配置. 
-- =nixpkgs= 使用 =nixos-unstable= (清华镜像). 
+- =nixpkgs= 使用 =nixos-unstable=. 
 - 启用 =nix-command= 与 =flakes=. 
 - Home Manager 管理 zsh/git/ssh/emacs/aichat 等开发环境.
 - 使用 sops-nix 作为 secret manager.
@@ -105,9 +106,9 @@ nix flake update
 #+end_src
 
 * 脚本
-- =org=: 快捷调用有关脚本, 同步 =~/org= 到 nutstore 等.
+- =org=: 调用有关 =~/org= 功能的脚本.
+- =rc=: 用于方便调用 rclone 进行同步的脚本.
 - =ssha=: 启动 =ssh-agent= 加载默认私钥.
-- =nut=: 用于到 nutstore 的双向同步.
 
 * 许可
 MIT License (见 [[file:LICENSE][LICENSE]]).
