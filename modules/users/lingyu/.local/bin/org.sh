@@ -5,9 +5,7 @@ show_help() {
 Usage: $(basename "$0") [OPTION]...
 
 Options:
-  -m, --make      Run make with custom Makefile (~/org/config/Makefile)
-  -p, --push      Sync ~/org to nutstore:WSL/org via rclone
-  -c, --clone     Sync nutstore:WSL/org to ~/org via rclone
+  -m, --make      Set a function to run make with custom Makefile (~/org/config/Makefile)
   -h, --help      Show this help message
 
 If no option is given, the script defaults to entering ~/org and
@@ -26,30 +24,6 @@ case "$1" in
     "-t"|"--texlive")
 	shift
 	~/org/config/texlive.sh "$@"
-	;;
-    "-p"|"--push")
-	rclone sync "$HOME/org" "nutstore:org" \
-               --create-empty-src-dirs \
-               --exclude ".git/**" \
-               --exclude ".git" \
-               --transfers 2 \
-               --checkers 4 \
-               --low-level-retries 10 \
-               --retries 10 \
-               --retries-sleep 10s \
-               --progress
-	;;
-    "-c"|"--clone")
-	rclone sync "nutstore:org" "$HOME/org" \
-               --create-empty-src-dirs \
-               --exclude ".git/**" \
-               --exclude ".git" \
-               --transfers 2 \
-               --checkers 4 \
-               --low-level-retries 10 \
-               --retries 10 \
-               --retries-sleep 10s \
-               --progress
 	;;
     *)
 	cd ~/org
