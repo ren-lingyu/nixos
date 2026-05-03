@@ -37,10 +37,10 @@
       "${config.xdg.binHome}"
     ];
     file = {
-      ".local/bin/nut" = {
+      ".local/bin/rc" = {
         enable = true;
-        source = ./.local/bin/nut.sh;
-        target = ".local/bin/nut";
+        source = ./.local/bin/rc.sh;
+        target = ".local/bin/rc";
         executable = true;
       };
       ".local/bin/org" = {
