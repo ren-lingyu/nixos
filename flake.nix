@@ -138,6 +138,7 @@
                   ./modules/users/lingyu
                   ./modules/niri/home
                   ./modules/secret/home.nix
+                  ./modules/agent
                 ];
               };
               sharedModules = [
@@ -176,6 +177,7 @@
                 imports = [
                   ./modules/users/lingyu
                   ./modules/secret/home.nix
+                  ./modules/agent
                 ];
               };
               sharedModules = [
