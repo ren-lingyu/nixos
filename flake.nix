@@ -24,8 +24,12 @@
   inputs = {
     nixpkgs = {
       # url = "github:NixOS/nixpkgs/nixos-unstable";
-      url = "git+https://github.com/NixOS/nixpkgs?ref=refs/heads/nixos-unstable&rev=025c852a89be820b3117f604c8ace42e9b4caa08&shallow=1";
+      url = "git+https://github.com/NixOS/nixpkgs?ref=refs/heads/nixos-unstable&shallow=1";
+      # url = "git+https://github.com/NixOS/nixpkgs?ref=refs/heads/nixos-unstable&rev=025c852a89be820b3117f604c8ace42e9b4caa08&shallow=1";
       # url = "git+https://mirrors.tuna.tsinghua.edu.cn/git/nixpkgs.git?ref=refs/heads/nixos-unstable&shallow=1";
+    };
+    efitools-pr = {
+      url = "github:NixOS/nixpkgs/refs/pull/514576/head";
     };
     arcc-nixpkgs = {
       url = "git+https://github.com/ren-lingyu/nixpkgs.git?ref=refs/heads/main&shallow=1";
@@ -73,10 +77,14 @@
       arccNixpkgsOverlay = final: prev: {
         arcc = inputs.arcc-nixpkgs.packages."${prev.system}";
       };
+      efitoolsOverlay =  final: prev: {
+        efitools = inputs.efitools-pr.legacyPackages."${prev.system}".efitools;
+      };
       allOverlays = concat [
         [
           arccNixpkgsOverlay
           inputs.niri-flake.overlays.niri
+          efitoolsOverlay
         ]
         overlays
       ];
