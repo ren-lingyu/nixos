@@ -42,11 +42,22 @@
         autoupdate = false;
         
         enabled_providers = builtins.concatLists [
-          [ "deepseek" ]
-          (lib.optionals osConfig.services.ollama.enable [ "ollama_local" "ollama_cloud" ])
+          [ "deepseek" "modelscope" ]
+          (lib.optionals osConfig.services.ollama.enable [ "ollama" "ollama_cloud" ])
         ];
         
-        provider = {
+        provider = let
+          
+          fromList = list : builtins.listToAttrs (
+            map (x: {
+              name = builtins.toString x;
+              value = {
+                name = builtins.toString x;
+              };
+            }) list
+          );
+            
+        in {
           
           deepseek = {
             name = "DeepSeek";
@@ -65,28 +76,34 @@
             };
           };
 
-          ollama_local = {
-            name = "Ollama (Local)";
+          ollama = {
+            name = "Ollama";
             options = {
               baseURL = "http://${osConfig.services.ollama.host}:${builtins.toString osConfig.services.ollama.port}/v1";
             };
-            models = (
-              builtins.listToAttrs (
-                map (x: {
-                  name = builtins.toString x;
-                  value = {
-                    name = builtins.toString x;
-                  };
-                }) osConfig.services.ollama.loadModels
-              )
-            );
+            models = fromList osConfig.services.ollama.loadModels;
           };
 
           ollama_cloud = {
             name = "Ollama (Cloud)";
             options = {
+              baseURL = "https://ollama.com/v1";
               apiKey = "{file:${config.sops.secrets."ollama.apiKey.opencode".path}}";
             };
+            models = fromList (builtins.filter (x: builtins.match ".*:cloud$" x != null) osConfig.services.ollama.loadModels);
+          };
+
+          modelscope = {
+            name = "ModelScope";
+            options = {
+              baseURL = "https://api-inference.modelscope.cn/v1";
+              apiKey = "{file:${config.sops.secrets."modelscope.apiKey.opencode".path}}";
+            };
+            models = fromList [
+              "Qwen/Qwen3.5-397B-A17B"
+              "ZhipuAI/GLM-4.7-Flash"
+              "ZhipuAI/GLM-5.1"
+            ];
           };
           
         };
