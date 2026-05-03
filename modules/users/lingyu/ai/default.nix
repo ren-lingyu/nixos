@@ -37,8 +37,10 @@
       
       settings = {
         
+        permission = "ask";
         model = "deepseek/deepseek-v4-pro";
         autoupdate = false;
+        
         enabled_providers = builtins.concatLists [
           [ "deepseek" ]
           (lib.optionals osConfig.services.ollama.enable [ "ollama_local" "ollama_cloud" ])
@@ -93,7 +95,9 @@
       
       agents = {};
       tools = {};
-      commands = {};
+      commands = {
+        commit-message = builtins.readFile ./commands/commit-message.md;
+      };
       skills = {};
       themes = {};
       tui = {};
