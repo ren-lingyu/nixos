@@ -10,14 +10,14 @@ esac
 show_help_info() {
     cat << EOF
 Usage:
-  $(basename "$0") --push LOCAL_PATH REMOTE_SUBPATH [RCLONE_OPTIONS...]
-  $(basename "$0") --pull REMOTE_SUBPATH LOCAL_PATH [RCLONE_OPTIONS...]
+  $(basename "$0") --push LOCAL_PATH REMOTE_PATH [RCLONE_OPTIONS...]
+  $(basename "$0") --pull REMOTE_PATH LOCAL_PATH [RCLONE_OPTIONS...]
   $(basename "$0") -h | --help
 
 Options:
   -h, --help                Show this help message
-  push                      Sync from LOCAL_PATH to nutstore:REMOTE_SUBPATH
-  pull                      Sync from nutstore:REMOTE_SUBPATH to LOCAL_PATH
+  push                      Sync from LOCAL_PATH to REMOTE_PATH
+  pull                      Sync from REMOTE_PATH to LOCAL_PATH
 
 Examples:
   $(basename "$0") --push /home/user/data data
@@ -26,7 +26,7 @@ Examples:
   $(basename "$0") --pull data /home/user/data --exclude '*.tmp' --dry-run
 
 Notes:
-  - REMOTE_SUBPATH is relative to the root of nutstore remote (no leading / or ./)
+  - REMOTE_PATH is relative to the root of rclone remote (no leading / or ./)
   - LOCAL_PATH can be absolute or relative
   - Any additional arguments after the first three are passed directly to 'rclone sync'.
     This allows you to use any rclone flags (e.g., --exclude, --dry-run, --bwlimit).
@@ -85,9 +85,9 @@ case "${1:-}" in
 	                    ;;
                     *)
                         local_path="$2"
-                        remote_subpath="$3"
+                        remote_path="$3"
                         shift 3
-                        rclone_sync "$local_path" "nutstore:$remote_subpath" "$@"
+                        rclone_sync "$local_path" "$remote_path" "$@"
 	                    ;;
                 esac
 	            ;;
@@ -110,10 +110,10 @@ case "${1:-}" in
 	                    exit 1
 	                    ;;
                     *)
-                        remote_subpath="$2"
+                        remote_path="$2"
                         local_path="$3"
                         shift 3
-	                    rclone_sync "nutstore:$remote_subpath" "$local_path" "$@"
+	                    rclone_sync "$remote_path" "$local_path" "$@"
 	                    ;;
                 esac
 	            ;;
