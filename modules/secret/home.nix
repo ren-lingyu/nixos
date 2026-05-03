@@ -44,6 +44,9 @@ in {
             "ollama" = {
               "apiKey" = [ "opencode" ];
             };
+            "modelscope" = {
+              "apiKey" = [ "opencode" ];
+            };
           };
         }
       ];
