@@ -50,6 +50,23 @@
 - 仅输出 commit message 内容, 不要输出任何额外解释或对话.
 - 确保每行不超过 100 个字符.
 
+## 实例
+``` git
+feat(ai): add modelscope and refactor ollama
+
+- 在 `enabled_providers` 中新增 `"modelscope"`.
+- 将 `"ollama_local"` 重命名为 `"ollama"`.
+```
+``` git
+refactor(api): remove deprecated onHashChange method
+
+The onHashChange method has been replaced by onUrlChange.
+
+BREAKING CHANGE: onHashChange is removed. Use onUrlChange instead.
+
+Closes #392
+```
+
 ## 执行步骤
 1. 主动执行 `git diff --cached` 检查暂存区.
 2. 如果暂存区为空, 执行 `git diff HEAD` 检查工作区.
