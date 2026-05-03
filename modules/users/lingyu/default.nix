@@ -5,7 +5,7 @@
     ./shell.nix
     ./terminal.nix
     ./keyring.nix
-    ./ai.nix
+    ./ai
     ./git.nix
     ./langs.nix
     ./cloud.nix
