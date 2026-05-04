@@ -39,6 +39,7 @@
         
         permission = "ask";
         model = "deepseek/deepseek-v4-pro";
+        small_model = "deepseek/deepseek-v4-flash";
         autoupdate = false;
         
         enabled_providers = builtins.concatLists [
@@ -69,8 +70,15 @@
               deepseek-v4-pro = {
                 name = "DeepSeek-V4-Pro";
                 limit = {
-                  context = 840000;
-                  output = 128000;
+                  context = 1000000;
+                  output = 384000;
+                };
+              };
+              deepseek-v4-flash = {
+                name = "DeepSeek-V4-Flash";
+                limit = {
+                  context = 1000000;
+                  output = 384000;
                 };
               };
             };
