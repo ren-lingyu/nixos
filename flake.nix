@@ -139,7 +139,7 @@
                   ./modules/users/lingyu
                   ./modules/niri/hm
                   ./modules/secret/hm
-                  ./modules/agent
+                  ./modules/agent/hm
                 ];
               };
               sharedModules = [
@@ -155,10 +155,10 @@
           }
           inputs.sops-nix.nixosModules.sops
           ./modules/secret/os
-          ./modules/shell.nix
-          ./modules/texlive.nix
-          ./modules/font.nix
-          ./modules/media.nix
+          ./modules/shell/os
+          ./modules/texlive/os
+          ./modules/font/os
+          ./modules/media/os
           ./modules/niri/os
         ];
       };
@@ -179,7 +179,7 @@
                 imports = [
                   ./modules/users/lingyu
                   ./modules/secret/hm
-                  ./modules/agent
+                  ./modules/agent/hm
                 ];
               };
               sharedModules = [
@@ -193,9 +193,9 @@
           }
           inputs.sops-nix.nixosModules.sops
           ./modules/secret/os
-          ./modules/shell.nix
-          ./modules/texlive.nix
-          ./modules/font.nix
+          ./modules/shell/os
+          ./modules/texlive/os
+          ./modules/font/os
         ];
       };
 
