@@ -1,5 +1,5 @@
 { config, pkgs, lib, osConfig, ... } : let
-  llib = import ./lib.nix { inherit config; inherit osConfig; };
+  llib = import ../lib.nix { inherit config; inherit osConfig; };
 in {
 
   config = {
@@ -7,7 +7,7 @@ in {
     sops = {
       
       defaultSopsFormat = "yaml";
-      defaultSopsFile = ./sops/default.yaml;
+      defaultSopsFile = ../sops/default.yaml;
       defaultSopsKey = null;
       keepGenerations = 1;
       validateSopsFiles = true;

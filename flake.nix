@@ -138,7 +138,7 @@
                 imports = [
                   ./modules/users/lingyu
                   ./modules/niri/home
-                  ./modules/secret/home.nix
+                  ./modules/secret/home
                   ./modules/agent
                 ];
               };
@@ -154,7 +154,7 @@
             };
           }
           inputs.sops-nix.nixosModules.sops
-          ./modules/secret
+          ./modules/secret/os
           ./modules/shell.nix
           ./modules/texlive.nix
           ./modules/font.nix
@@ -178,7 +178,7 @@
               users.lingyu = {
                 imports = [
                   ./modules/users/lingyu
-                  ./modules/secret/home.nix
+                  ./modules/secret/home
                   ./modules/agent
                 ];
               };
@@ -192,7 +192,7 @@
             };
           }
           inputs.sops-nix.nixosModules.sops
-          ./modules/secret
+          ./modules/secret/os
           ./modules/shell.nix
           ./modules/texlive.nix
           ./modules/font.nix
