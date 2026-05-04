@@ -14,7 +14,7 @@ in {
     sops = {
       
       defaultSopsFormat = "yaml";
-      defaultSopsFile = ../sops/default.yaml;
+      defaultSopsFile = ../sops/os/default.yaml;
       defaultSopsKey = null;
       keepGenerations = 1;
       validateSopsFiles = true;
