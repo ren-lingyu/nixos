@@ -159,7 +159,7 @@
           ./modules/texlive.nix
           ./modules/font.nix
           ./modules/media.nix
-          ./modules/niri/conf
+          ./modules/niri/os
         ];
       };
 
