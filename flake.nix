@@ -137,8 +137,8 @@
               users.lingyu = {
                 imports = [
                   ./modules/users/lingyu
-                  ./modules/niri/home
-                  ./modules/secret/home
+                  ./modules/niri/hm
+                  ./modules/secret/hm
                   ./modules/agent
                 ];
               };
@@ -178,7 +178,7 @@
               users.lingyu = {
                 imports = [
                   ./modules/users/lingyu
-                  ./modules/secret/home
+                  ./modules/secret/hm
                   ./modules/agent
                 ];
               };
