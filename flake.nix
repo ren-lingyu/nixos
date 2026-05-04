@@ -133,6 +133,7 @@
             home-manager = {
               useGlobalPkgs = true;
               useUserPackages = true;
+              backupFileExtension = "bak";
               users.lingyu = {
                 imports = [
                   ./modules/users/lingyu
@@ -173,6 +174,7 @@
             home-manager = {
               useGlobalPkgs = true;
               useUserPackages = true;
+              backupFileExtension = "bak";
               users.lingyu = {
                 imports = [
                   ./modules/users/lingyu
