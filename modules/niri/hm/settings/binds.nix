@@ -30,6 +30,14 @@
         hotkey-overlay = { title = "Run a Mail Client: Thunderbird"; };
         action.spawn = [ "${lib.getExe config.programs.thunderbird.package}" ];
       };
+      "Mod+N" = lib.mkIf osConfig.programs.clash-verge.enable {
+        hotkey-overlay = { title = "Open VPN: Clash-Verge"; };
+        action.spawn = [ "${lib.getExe osConfig.programs.clash-verge.package}" ];
+      };
+      "Mod+P" = lib.mkIf config.programs.keepassxc.enable {
+        hotkey-overlay = { title = "Open Password Manager: KeePassXC"; };
+        action.spawn = [ "${lib.getExe config.programs.keepassxc.package}" ];
+      };
       "Mod+D" = lib.mkIf config.programs.fuzzel.enable {
         hotkey-overlay = { title = "Run an Application: fuzzel"; };
         action.spawn = [ "${lib.getExe config.programs.fuzzel.package}" ];
