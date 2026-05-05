@@ -1,13 +1,17 @@
 { config, pkgs, lib, osConfig, ... } : let
-  llib = import ../lib.nix { inherit config; inherit osConfig; };
+  llib = import ../lib { inherit config; inherit osConfig; };
 in {
 
   config = {
 
+    home.sessionVariables = {
+      SOPS_AGE_KEY_FILE = osConfig.sops.secrets."age.keyFile".path;
+    };
+
     sops = {
       
       defaultSopsFormat = "yaml";
-      defaultSopsFile = ../sops/hm/default.yaml;
+      defaultSopsFile = ./sops/default.yaml;
       defaultSopsKey = null;
       keepGenerations = 1;
       validateSopsFiles = true;
