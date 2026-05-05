@@ -16,47 +16,63 @@ nixos/
 ├── .gitignore
 └── modules
     ├── agent
-    │   ├── commands
-    │   │   └── commit-message.md
-    │   └── default.nix
+    │   └── hm
+    │       ├── commands
+    │       │   └── commit-message.md
+    │       └── default.nix
     ├── desktop-environment
-    │   ├── default.nix
-    │   ├── gnome.nix
-    │   └── hyprland.nix
-    ├── font.nix
-    ├── media.nix
-    ├── niri
-    │   ├── conf
-    │   │   ├── default.nix
-    │   │   └── greeter.nix
-    │   └── home
+    │   └── os    
     │       ├── default.nix
-    │       ├── noctalia
-    │       │   └── default.nix
-    │       ├── settings
-    │       │   ├── animations.nix
-    │       │   ├── binds.nix
-    │       │   ├── default.nix
-    │       │   ├── input.nix
-    │       │   ├── layout.nix
-    │       │   ├── noctalia-shell.nix
-    │       │   ├── outputs.nix
-    │       │   ├── top-level.nix
-    │       │   └── window-rules.nix
-    │       └── waybar
-    │           ├── default.nix
-    │           ├── power-menu.xml
-    │           ├── settings.nix
-    │           └── style.css
+    │       ├── gnome.nix
+    │       └── hyprland.nix
+    ├── font
+    │   └── os
+    │       └── default.nix
+    ├── media
+    │   └── os
+    │       └── default.nix
+    ├── niri
+    │   ├── hm
+    │   │   ├── default.nix
+    │   │   ├── noctalia
+    │   │   │   └── default.nix
+    │   │   ├── settings
+    │   │   │   ├── animations.nix
+    │   │   │   ├── binds.nix
+    │   │   │   ├── default.nix
+    │   │   │   ├── input.nix
+    │   │   │   ├── layout.nix
+    │   │   │   ├── noctalia-shell.nix
+    │   │   │   ├── outputs.nix
+    │   │   │   ├── top-level.nix
+    │   │   │   └── window-rules.nix
+    │   │   └── waybar
+    │   │       ├── default.nix
+    │   │       ├── power-menu.xml
+    │   │       ├── settings.nix
+    │   │       └── style.css
+    │   └── os
+    │       ├── default.nix
+    │       └── greeter.nix
     ├── secret
-    │   ├── default.nix
-    │   ├── home.nix
-    │   ├── lib.nix
-    │   ├── sops
-    │   │   └── default.yaml
-    │   └── .sops.yaml
-    ├── shell.nix
-    ├── texlive.nix
+    │   ├── lib
+    │   │   └── default.nix
+    │   ├── hm
+    │   │   ├── default.nix
+    │   │   └── sops
+    │   │       ├── default.yaml
+    │   │       └── .sops.yaml
+    │   └── os
+    │       ├── default.nix
+    │       └── sops
+    │           ├── default.yaml
+    │           └── .sops.yaml
+    ├── shell
+    │   └── os
+    │       └── default.nix
+    ├── texlive
+    │   └── os
+    │       └── default.nix
     ├── hosts
     │   ├── thinkbook
     │   │   ├── boot-manager.nix
@@ -86,29 +102,29 @@ nixos/
 #+end_example
 
 * 关键点
-- [[file:hosts][hosts]] 放置设备相关的系统级配置.
-- [[file:users][users]] 放置用户级配置.
-- [[file:modules][modules]] 放置便于模块化的系统级配置. 
-- =nixpkgs= 使用 =nixos-unstable=. 
-- 启用 =nix-command= 与 =flakes=. 
-- Home Manager 管理 zsh/git/ssh/emacs/aichat 等开发环境.
-- 使用 sops-nix 作为 secret manager.
+- [[file:modules][modules]] 放置 NixOS 与 home-manager 模块, 按 =**/os/= (系统级), =**/hm/= (用户级), =**/lib/= (模块内部函数) 组织.
+- [[file:modules/hosts][modules/hosts]] 放置设备相关配置, 含 thinkbook (bare metal NixOS, hostname =nixos=) 和 wsl (NixOS-WSL, hostname =nixos-wsl=).
+- [[file:modules/users][modules/users]] 放置用户 home-manager 配置, 包含 nixvim/emacs/zsh/git/ssh/gpg/keepassxc/rclone/thunderbird/direnv 等.
+- =nixpkgs= 使用 =nixos-unstable=, 另有自行打包的 [[https://github.com/ren-lingyu/nixpkgs][ren-lingyu/nixpkgs]] overlay.
+- 启用 =nix-command= 与 =flakes=.
+- 使用 =sops-nix= 管理密钥, 系统级秘密以 host ssh key 加密, 用户级秘密以独立的 age key 加密.
+- 使用 =niri= 作为窗口管理器, 另有 =desktop-environment= 提供 gnome/hyprland 备选.
 
 * 使用
-应用系统配置：
+重建系统:
 #+begin_src bash
 sudo nixos-rebuild switch --flake .#nixos
 #+end_src
 
-更新依赖锁：
+更新依赖:
 #+begin_src bash
 nix flake update
 #+end_src
 
 * 脚本
-- =org=: 调用有关 =~/org= 功能的脚本.
-- =rc=: 用于方便调用 rclone 进行同步的脚本.
-- =ssha=: 启动 =ssh-agent= 加载默认私钥.
+- =org=: 进入 =~/org= 目录并准备 make 函数, 支持 --texlive 调用 TeX Live 工具.
+- =rc=: rclone 同步包装器, 支持 push/pull 子命令, 限制传输并发并显示进度.
+- =ssha=: 启动 =ssh-agent= 并加载默认 ed25519 私钥.
 
 * 许可
 MIT License (见 [[file:LICENSE][LICENSE]]).
