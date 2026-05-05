@@ -46,7 +46,7 @@
         interface = {
           resolution = "3072x1920";
           helpHidden = false;
-          brandingColor = 7; # 0=black 1=red 2=green 3=yellow 4=blue 5=purple 6=cyan 7=white
+          brandingColor = "#000000";
           branding = "NixOS - Limine Bootloader";
         };
         graphicalTerminal = {
