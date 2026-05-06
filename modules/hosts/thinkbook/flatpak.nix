@@ -69,6 +69,7 @@
           filesystems = [
             "xdg-pictures"
             "xdg-download"
+            "xdg-documents"
           ];
         };
       };
