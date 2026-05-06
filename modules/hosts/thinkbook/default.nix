@@ -98,10 +98,26 @@
     ];
     inputMethod = {
       enable = true;
-      type = "ibus";
-      ibus.engines = with pkgs.ibus-engines; [
-        libpinyin
-      ]; 
+      type = "fcitx5";
+      fcitx5 = {
+        ignoreUserConfig = false;
+        waylandFrontend = true;
+        addons = with pkgs; [
+          fcitx5-gtk
+          (fcitx5-rime.override {
+            rimeDataPkgs = [
+              pkgs.rime-ice
+            ];
+          })
+        ];
+        quickPhrase = {};
+        quickPhraseFiles = {};
+        settings = {
+          addons = {};
+          globalOptions = {};
+          inputMethod = {};
+        };
+      };
     };
   };
   
@@ -132,9 +148,9 @@
     };
     sessionVariables = {
       LIBVA_DRIVER_NAME = "iHD";
-      GTK_IM_MODULE = "ibus";
-      XMODIFIERS = "@im=ibus";
-      QT_IM_MODULE = "ibus";
+      # GTK_IM_MODULE = "fcitx";
+      QT_IM_MODULE = "fcitx";
+      XMODIFIERS = "@im=fcitx";
     };
   };
 
