@@ -3,9 +3,10 @@
   config = lib.mkIf config.programs.niri.enable {
 
     programs.niri.settings.layout = {
-      gaps = 16;
+      gaps = 1;
+      background-color = "#000000";
       focus-ring = {
-        enable = true;
+        enable = false;
         width = 4;
       };
       border = {
@@ -14,6 +15,7 @@
       };
       shadow = {
         enable = false;
+        draw-behind-window = false;
         softness = 30;
         spread = 5;
         offset = {
@@ -34,12 +36,19 @@
         enable = true;
         width = 4;
         gap = 5;
+        corner-radius = 0.0;
         position = "left";
         active = { color = "#7fc8ff"; };
         inactive = { color = "#505050"; };
         urgent = { color = "#9b0000"; };
       };
       center-focused-column = "never";
+      insert-hint = {
+        enable = true;
+        display = {
+          color = "#A0A0A080";
+        };
+      };
     };
 
   };

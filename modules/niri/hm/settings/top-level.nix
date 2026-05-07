@@ -25,6 +25,9 @@
         hide-when-typing = true;
         hide-after-inactive-ms = 1000;
       };
+      overview = {
+        backdrop-color = "#000000";
+      };
     };
 
   };

@@ -28,7 +28,7 @@ in {
         };
         
         bar = {
-          barType = "simple";
+          barType = "framed";
           position = "top";
           monitors = [ ];
           density = "default";
@@ -40,8 +40,8 @@ in {
           contentPadding = 2;
           fontScale = 1;
           enableExclusionZoneInset = true;
-          backgroundOpacity = 0.93;
-          useSeparateOpacity = false;
+          backgroundOpacity = 1.0;
+          useSeparateOpacity = true;
           marginVertical = 4;
           marginHorizontal = 4;
           frameThickness = 8;
