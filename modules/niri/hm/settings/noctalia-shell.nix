@@ -38,6 +38,13 @@ in {
             [ "ipc" "call" "settings" "toggle"]
           ];
         };
+        "Mod+N" = lib.mkForce {
+          hotkey-overlay = { title = "Open Noctalia Settings"; };
+          action.spawn = builtins.concatLists [
+            noctaliaShellCommand
+            [ "ipc" "call" "notifications" "toggleHistory"]
+          ];
+        };
 
         "XF86AudioRaiseVolume" = lib.mkForce {
           action.spawn = builtins.concatLists [
