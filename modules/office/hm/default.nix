@@ -1,9 +1,13 @@
 { config, pkgs, ... } : {
 
   config = {
+
+    home.packages = with pkgs; [
+      libreoffice-qt-fresh
+    ];
     
     programs.onlyoffice = {
-      enable = true;
+      enable = false;
       package = pkgs.onlyoffice-desktopeditors;
       settings = {
         UITheme = "theme-contrast-dark";
