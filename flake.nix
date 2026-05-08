@@ -133,6 +133,7 @@
                   ./modules/niri/hm
                   ./modules/secret/hm
                   ./modules/agent/hm
+                  ./modules/font/hm
                   ./modules/office/hm
                 ];
               };
@@ -174,6 +175,7 @@
                   ./modules/users/lingyu
                   ./modules/secret/hm
                   ./modules/agent/hm
+                  ./modules/font/hm
                 ];
               };
               sharedModules = [

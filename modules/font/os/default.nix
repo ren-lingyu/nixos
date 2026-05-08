@@ -3,6 +3,9 @@
   fonts = {
     packages = with pkgs; [
       lxgw-wenkai
+      lxgw-neoxihei
+      lxgw-wenkai-screen
+      lxgw-wenkai-tc
       adwaita-fonts
       noto-fonts
       noto-fonts-cjk-sans
@@ -36,21 +39,24 @@
         ];
         monospace = [
           "Maple Mono NF CN"
+          "LXGW WenKai Mono"
           "Noto Sans Mono CJK SC"
           "Sarasa Mono SC"
           "DejaVu Sans Mono"
         ];
         sansSerif = [
-          "Maple Mono NF CN"
+          "LXGW WenKai"
           "Noto Sans CJK SC"
           "Source Han Sans SC"
           "DejaVu Sans"
+          "Maple Mono NF CN"
         ];
         serif = [
-          "Maple Mono NF CN"
+          "LXGW WenKai"
           "Noto Serif CJK SC"
           "Source Han Serif SC"
-          "DejaVu Serif"          
+          "DejaVu Serif"
+          "Maple Mono NF CN"
         ];
       };
     };
