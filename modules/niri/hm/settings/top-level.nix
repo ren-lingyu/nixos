@@ -28,6 +28,10 @@
       overview = {
         backdrop-color = "#000000";
       };
+      xwayland-satellite = {
+        enable = true;
+        path = "${lib.getExe pkgs.xwayland-satellite}";
+      };
     };
 
   };
