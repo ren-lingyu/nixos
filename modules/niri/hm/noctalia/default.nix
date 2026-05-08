@@ -290,8 +290,14 @@ in {
         };
         
         ui = {
-          fontDefault = "";
-          fontFixed = "";
+          fontDefault =
+            if builtins.elem pkgs.lxgw-wenkai osConfig.fonts.packages
+            then "LXGW WenKai"
+            else "";
+          fontFixed =
+            if builtins.elem pkgs.maple-mono.NF-CN osConfig.fonts.packages
+            then "Maple Mono NF CN"
+            else "";
           fontDefaultScale = 1;
           fontFixedScale = 1;
           tooltipsEnabled = true;
