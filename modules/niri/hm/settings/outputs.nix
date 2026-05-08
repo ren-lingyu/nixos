@@ -11,7 +11,7 @@
           height = 1920;
           refresh = 60.0;
         };
-        scale = 1.75;
+        scale = 1.6;
         transform = {
           rotation = 0;
           flipped = false;

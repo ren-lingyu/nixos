@@ -242,9 +242,9 @@ in {
           showSessionButtonsOnLockScreen = false;
           showHibernateOnLockScreen = false;
           enableLockScreenMediaControls = false;
-          enableShadows = true;
+          enableShadows = false;
           enableBlurBehind = true;
-          shadowDirection = "bottom_right";
+          shadowDirection = "center";
           shadowOffsetX = 2;
           shadowOffsetY = 3;
           language = "en";

@@ -2,16 +2,31 @@
 
   config = lib.mkIf config.programs.niri.enable {
 
-    programs.niri.settings.layout = {
-      gaps = 1;
+    programs.niri.settings.layout = rec {
+      gaps = 0;
       background-color = "#000000";
       focus-ring = {
         enable = false;
-        width = 4;
+        width = 1;
       };
       border = {
         enable = false;
-        width = 4;
+        width = 1;
+        active = {
+          color = "#000000";
+        };
+        inactive = {
+          color = "#000000";
+        };
+        urgent = {
+          color = "#000000";
+        };
+      };
+      struts = {
+        top = 0;
+        bottom = 0;
+        left = 0;
+        right = 0;
       };
       shadow = {
         enable = false;
