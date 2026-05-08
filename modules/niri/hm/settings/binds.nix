@@ -9,6 +9,10 @@
         hotkey-overlay = { title = "Run an Editor: Emacs"; };
         action.spawn = [ "${lib.getExe config.programs.emacs.package}" ];
       };
+      "Mod+Shift+E" = lib.mkIf config.services.emacs.enable {
+        hotkey-overlay = { title = "Run an Editor: Emacs (Client)"; };
+        action.spawn = [ "${lib.getExe' config.programs.emacs.package "emacsclient"}" "-c" ];
+      };
       "Mod+T" = lib.mkIf config.programs.kitty.enable {
         hotkey-overlay = { title = "Open a Terminal: kitty"; };
         action.spawn = [ "${lib.getExe config.programs.kitty.package}" ];
@@ -224,7 +228,10 @@
         allow-inhibiting = false;
         action.toggle-keyboard-shortcuts-inhibit = [];
       };
-      "Mod+Shift+E" = { action.quit = []; };
+      "Mod+Shift+Q" = {
+        hotkey-overlay = { title = "Quit Niri"; };
+        action.quit = [];
+      };
       "Ctrl+Alt+Delete" = { action.quit = []; };
     };
   };
