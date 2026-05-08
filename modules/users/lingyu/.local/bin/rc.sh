@@ -10,8 +10,8 @@ esac
 show_help_info() {
     cat << EOF
 Usage:
-  $(basename "$0") --push LOCAL_PATH REMOTE_PATH [RCLONE_OPTIONS...]
-  $(basename "$0") --pull REMOTE_PATH LOCAL_PATH [RCLONE_OPTIONS...]
+  $(basename "$0") push LOCAL_PATH REMOTE_PATH [RCLONE_OPTIONS...]
+  $(basename "$0") pull REMOTE_PATH LOCAL_PATH [RCLONE_OPTIONS...]
   $(basename "$0") -h | --help
 
 Options:
@@ -20,10 +20,10 @@ Options:
   pull                      Sync from REMOTE_PATH to LOCAL_PATH
 
 Examples:
-  $(basename "$0") --push /home/user/data data
-  $(basename "$0") --pull data /home/user/data
-  $(basename "$0") --push /home/user/data data --exclude .git --exclude node_modules
-  $(basename "$0") --pull data /home/user/data --exclude '*.tmp' --dry-run
+  $(basename "$0") push /home/user/data data
+  $(basename "$0") pull data /home/user/data
+  $(basename "$0") push /home/user/data data --exclude .git --exclude node_modules
+  $(basename "$0") pull data /home/user/data --exclude '*.tmp' --dry-run
 
 Notes:
   - REMOTE_PATH is relative to the root of rclone remote (no leading / or ./)
