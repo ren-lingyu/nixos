@@ -133,6 +133,7 @@
                   ./modules/niri/hm
                   ./modules/secret/hm
                   ./modules/agent/hm
+                  ./modules/office/hm
                 ];
               };
               sharedModules = [
