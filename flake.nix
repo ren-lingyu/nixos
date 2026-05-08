@@ -64,6 +64,9 @@
     nix-flatpak = {
       url = "git+https://github.com/gmodena/nix-flatpak.git?ref=refs/tags/latest&shallow=1";
     };
+    emarccs = {
+      url = "git+https://github.com/ren-lingyu/emarccs.git?ref=refs/heads/main&shallow=1";
+    };
   };
   
   outputs = { self, ... }@inputs : let
@@ -138,6 +141,7 @@
                 ];
               };
               sharedModules = [
+                inputs.emarccs.homeManagerModules.default
                 inputs.sops-nix.homeManagerModules.sops
                 inputs.nixvim.homeModules.nixvim
                 inputs.niri-flake.homeModules.niri
@@ -179,6 +183,7 @@
                 ];
               };
               sharedModules = [
+                inputs.emarccs.homeManagerModules.default
                 inputs.sops-nix.homeManagerModules.sops
                 inputs.nixvim.homeModules.nixvim
               ];

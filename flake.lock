@@ -22,6 +22,23 @@
         "url": "https://github.com/ren-lingyu/nixpkgs.git"
       }
     },
+    "emarccs": {
+      "locked": {
+        "lastModified": 1778272998,
+        "narHash": "sha256-vd57wVueYa0+xbAl80zanSCvomdeZkiT5V1C8ZubQXE=",
+        "ref": "refs/heads/main",
+        "rev": "916c4e595a25b708745b4a8aca7589b4c0628080",
+        "shallow": true,
+        "type": "git",
+        "url": "https://github.com/ren-lingyu/emarccs.git"
+      },
+      "original": {
+        "ref": "refs/heads/main",
+        "shallow": true,
+        "type": "git",
+        "url": "https://github.com/ren-lingyu/emarccs.git"
+      }
+    },
     "flake-compat": {
       "flake": false,
       "locked": {
@@ -305,6 +322,7 @@
     "root": {
       "inputs": {
         "arcc-nixpkgs": "arcc-nixpkgs",
+        "emarccs": "emarccs",
         "home-manager": "home-manager",
         "niri-flake": "niri-flake",
         "nix-flatpak": "nix-flatpak",
