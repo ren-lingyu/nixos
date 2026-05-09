@@ -140,6 +140,8 @@
     usrbinenv = lib.mkForce "${pkgs.coreutils}/bin/env";
     etc = {
       "libinput/local-overrides.quirks" = {
+        enable = true;
+        target = "libinput/local-overrides.quirks";
         text = builtins.concatStringsSep "\n" [
           "[Lenovo ThinkBook 14 G8+ IPH touchpad]"
           "MatchName=*GXTP5100*"
