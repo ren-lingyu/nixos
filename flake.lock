@@ -24,10 +24,10 @@
     },
     "emarccs": {
       "locked": {
-        "lastModified": 1778272998,
-        "narHash": "sha256-vd57wVueYa0+xbAl80zanSCvomdeZkiT5V1C8ZubQXE=",
+        "lastModified": 1778346746,
+        "narHash": "sha256-MAfUw/TD9LSh2lyWN9GKvor412vPf46zCKvQKTBBp74=",
         "ref": "refs/heads/main",
-        "rev": "916c4e595a25b708745b4a8aca7589b4c0628080",
+        "rev": "f9b84e6595d5533174a055000b89c71da7dd488f",
         "shallow": true,
         "type": "git",
         "url": "https://github.com/ren-lingyu/emarccs.git"
