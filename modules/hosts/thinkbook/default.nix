@@ -22,6 +22,7 @@
     kernelParams = [
       "psmouse.synaptics_intertouch=0"
     ];
+    kernelModules = [ "uinput" ];
   };
 
   hardware = {
@@ -40,6 +41,12 @@
       package = pkgs.bluez;
       powerOnBoot = true;
     };
+    opentabletdriver = {
+      enable = true;
+      package = pkgs.opentabletdriver;
+      daemon.enable = true;
+    };
+    uinput.enable = true;
   };
 
   # Configure network connections interactively with nmcli or nmtui.
