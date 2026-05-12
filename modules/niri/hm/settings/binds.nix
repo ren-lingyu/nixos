@@ -51,6 +51,7 @@
         action.spawn = [ "${lib.getExe config.programs.zathura.package}" ];
       };
       "Super+Alt+L" = lib.mkIf config.programs.swaylock.enable {
+        allow-when-locked = true;
         hotkey-overlay = { title = "Lock the Screen: swaylock"; };
         action.spawn = [ "${lib.getExe config.programs.swaylock.package}" "-f" ];
       };
