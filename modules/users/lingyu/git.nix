@@ -4,7 +4,7 @@
     git-filter-repo
   ];
 
-  programs.ssh.matchBlocks = lib.mkIf ( config.programs.ssh.enable && config.programs.git.enable ) {
+  programs.ssh.settings = lib.mkIf ( config.programs.ssh.enable && config.programs.git.enable ) {
     "github.com" = {
       hostname = "github.com";
       # hostname = "ssh.github.com";
