@@ -69,9 +69,7 @@
   };
   
   environment = {
-    systemPackages = with pkgs; [
-      wslu
-    ];
+    systemPackages = with pkgs; [];
     usrbinenv = lib.mkForce "${pkgs.coreutils}/bin/env";
     # binsh = "${pkgs.bash}/bin/sh";
     variables = {
@@ -79,7 +77,6 @@
       # DISPLAY = "localhost:0.0";
     };
     sessionVariables = {
-      BROWSER = "${pkgs.wslu}/bin/wslview";
       LIBVA_DRIVER_NAME = "iHD";
     };
     extraInit = builtins.concatStringsSep "\n" [
@@ -90,16 +87,7 @@
   xdg = {
     mime = {
       enable = true;
-      defaultApplications = {
-        "x-scheme-handler/https" = "wslview.desktop";
-        "x-scheme-handler/http" = "wslview.desktop";
-        "text/html" = "wslview.desktop";
-        "text/xml" = "wslview.desktop";
-        "application/xhtml+xml" = "wslview.desktop";
-        "application/pdf" = "wslview.desktop";
-        "x-scheme-handler/about" = "wslview.desktop";
-        "x-scheme-handler/unknown" = "wslview.desktop";
-      };
+      defaultApplications = {};
     };
     portal = {
       enable = false;
