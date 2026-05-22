@@ -121,6 +121,10 @@
             unfreePackages = [
               "microsoft-edge"
               "feishu"
+              "libwemeetwrap"
+              "wemeet"
+              "wechat"
+              "qq"
             ];
           })
           inputs.nix-flatpak.nixosModules.nix-flatpak

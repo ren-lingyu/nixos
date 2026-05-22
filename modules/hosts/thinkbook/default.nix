@@ -136,6 +136,9 @@
       zotero
       calibre
       xournalpp
+      wechat
+      wemeet
+      qq
     ];
     usrbinenv = lib.mkForce "${pkgs.coreutils}/bin/env";
     etc = {

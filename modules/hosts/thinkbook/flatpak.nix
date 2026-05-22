@@ -22,7 +22,7 @@
       };
     };
     in {
-    enable = true;
+    enable = false;
     package = pkgs.flatpak;
     uninstallUnmanaged = true;
     update = {
