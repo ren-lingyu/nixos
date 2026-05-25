@@ -9,6 +9,7 @@
     "chgrp-ignore"
   ];
   nixosUserHome = config.users.users.lingyu.home;
+  nixosUserName = config.users.users.lingyu.name;
   windowsUserHome = "/mnt/c/Users/Lingyu";
 
 in {
@@ -21,13 +22,13 @@ in {
     tmpfiles = {
       rules = [
         "d /mnt/c 0700 root root - -"
-        "d ${nixosUserHome}/knowhub 0755 lingyu users - -"
-        "d ${nixosUserHome}/ren 0755 lingyu users - -"
-        "d ${nixosUserHome}/Downloads 0755 lingyu users - -"
-        "d ${nixosUserHome}/Documents 0755 lingyu users - -"
-        "d ${nixosUserHome}/Pictures 0755 lingyu users - -"
-        "d ${nixosUserHome}/Videos 0755 lingyu users - -"
-        "d ${nixosUserHome}/Music 0755 lingyu users - -"
+        "d ${nixosUserHome}/knowhub 0755 ${nixosUserName} users - -"
+        "d ${nixosUserHome}/ren 0755 ${nixosUserName} users - -"
+        "d ${nixosUserHome}/Downloads 0755 ${nixosUserName} users - -"
+        "d ${nixosUserHome}/Documents 0755 ${nixosUserName} users - -"
+        "d ${nixosUserHome}/Pictures 0755 ${nixosUserName} users - -"
+        "d ${nixosUserHome}/Videos 0755 ${nixosUserName} users - -"
+        "d ${nixosUserHome}/Music 0755 ${nixosUserName} users - -"
       ];
     };
     mounts = [
