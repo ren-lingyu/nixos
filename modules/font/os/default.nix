@@ -59,6 +59,13 @@
           "Maple Mono NF CN"
         ];
       };
+      localConf = builtins.concatStringsSep "\n" [
+        "<?xml version=\"1.0\"?>"
+        "<!DOCTYPE fontconfig SYSTEM \"urn:fontconfig:fonts.dtd\">"
+        "<fontconfig>"
+        "<dir>/usr/local/share/fonts</dir>"
+        "</fontconfig>"
+      ];
     };
   };
   
