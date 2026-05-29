@@ -43,7 +43,7 @@
     nixvim = {
       # the main branch of nixvim must be use in nixos-unstable
       url = "git+https://github.com/nix-community/nixvim.git?ref=refs/heads/main&shallow=1";
-      inputs.nixpkgs.follows = "nixpkgs";
+      # inputs.nixpkgs.follows = "nixpkgs";
     };
     nixos-wsl = {
       url = "git+https://github.com/nix-community/NixOS-WSL.git?ref=refs/heads/main&shallow=1";
