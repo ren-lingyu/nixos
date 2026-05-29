@@ -27,7 +27,6 @@ in {
       autoLogin.enable = false;
       gdm = {
         enable = true;
-        wayland = true;
         autoSuspend = true;
         banner = null;
         debug = false;
