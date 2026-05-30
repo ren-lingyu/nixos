@@ -31,7 +31,7 @@ in {
 
     programs.niri = {
       enable = osConfig.programs.niri.enable;
-      package = pkgs.niri;
+      package = osConfig.programs.niri.package;
     };
     
     programs.fuzzel = lib.mkIf (!config.programs.noctalia-shell.enable) {

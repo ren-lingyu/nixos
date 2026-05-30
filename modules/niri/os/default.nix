@@ -10,7 +10,10 @@
       xwayland-satellite
     ];
     
-    programs.niri.enable = true;
+    programs.niri = {
+      enable = true;
+      package = pkgs.niri;
+    };
 
     services.desktopManager.gnome.enable = lib.mkForce false;
     services.gnome.gnome-keyring.enable = lib.mkForce false;
