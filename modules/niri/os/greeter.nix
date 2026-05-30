@@ -10,15 +10,29 @@
     })
   ];
 
+  niriSessionWrapper = let 
+    niriSessionWrapperCommandName = "Niri";
+  in pkgs.runCommand "niri-session-wrapper" {
+    meta.mainProgram = "${niriSessionWrapperCommandName}";
+  } (
+    builtins.concatStringsSep "\n" [
+      "mkdir -p $out/bin"
+      "cat > $out/bin/${niriSessionWrapperCommandName} <<'EOF'"
+      "#!${lib.getExe pkgs.bash}"
+      "export SYSTEMD_LOG_LEVEL=err"
+      "exec ${lib.getExe' config.programs.niri.package "niri-session"}"
+      "EOF"
+      "chmod +x $out/bin/${niriSessionWrapperCommandName}"
+    ]
+  );
+
 in {
 
   config = lib.mkIf config.programs.niri.enable {
 
     environment.systemPackages = builtins.concatLists [
       (lib.optionals config.services.displayManager.sddm.enable sddmThemePackages)
-      (with pkgs; [
-        cage
-      ])
+      (lib.optionals config.services.greetd.enable [ niriSessionWrapper ])
     ];
     
     services.displayManager = {
@@ -26,7 +40,7 @@ in {
       defaultSession = null;
       autoLogin.enable = false;
       gdm = {
-        enable = true;
+        enable = false;
         autoSuspend = true;
         banner = null;
         debug = false;
@@ -76,20 +90,88 @@ in {
       };
     };
 
+    programs.sway = {
+      enable = true;
+      package = pkgs.sway;
+      wrapperFeatures = {
+        base = true;
+        gtk = true;
+      };
+      extraOptions = [ ];
+    };
+    
+    users = {
+      groups.greeter = { };
+      users.greeter = {
+        name = "greeter";
+        isSystemUser = true;
+        group = "greeter";
+        home = "/var/users/greeter";
+        extraGroups = builtins.concatLists [
+          [ "input" ]
+          (lib.optionals config.services.seatd.enable [ config.services.seatd.group ])
+        ];
+        createHome = true;
+      };
+    };
+    
     services.greetd = {
-      enable = false;
+      enable = true;
       settings = {
-        default_session = {
-          command = builtins.concatStringsSep (builtins.fromJSON ''"\u0020"'') [
-            "${lib.getExe pkgs.tuigreet}"
-            "--sessions ${config.services.displayManager.sessionData.desktops}/share/wayland-sessions"
-            "--time"
-            "--time-format '%Y-%m-%d %H:%M:%S'"
-            "--asterisks"
-            "--remember"
-            "--remember-session"
-          ];
+        terminal = {
+          vt = 1;
         };
+        default_session = lib.mkForce (let
+          concatWords = builtins.concatStringsSep (builtins.fromJSON ''"\u0020"'');
+          concatLines = builtins.concatStringsSep "\n";
+          greeterOutput = "eDP-1";
+          swayGreetConfig = let
+            swayGreetCommand = builtins.concatStringsSep ";" [
+              (concatWords [
+                "${lib.getExe' pkgs.coreutils "env"}"
+                "${lib.getExe pkgs.gtkgreet}"
+                "-l -c"
+                "${builtins.baseNameOf (lib.getExe niriSessionWrapper)}"
+              ])
+              (concatWords [
+                "${lib.getExe' config.programs.sway.package "swaymsg"} exit"
+                ">/dev/null 2>&1 || true"
+              ])
+            ];
+          in pkgs.writeText "greetd-sway-config" (concatLines [
+            "output * bg #000000 solid_color"
+            "focus output ${greeterOutput}"
+            "focus_on_window_activation none"
+            "default_border none"
+            "default_floating_border none"
+            "titlebar_border_thickness 0"
+            "titlebar_padding 0"
+            "exec \"${swayGreetCommand}\""
+          ]);
+          greetdCommand = concatWords [
+            "${lib.getExe' pkgs.systemd "systemd-cat"}"
+            "-t"
+            "greetd-sway-gtkgreet"
+            "--"
+            "${lib.getExe' pkgs.dbus "dbus-run-session"}"
+            "--"
+            "${lib.getExe' pkgs.coreutils "env"}"
+            "-u" "DISPLAY"
+            "-u" "WAYLAND_DISPLAY"
+            "-u" "SWAYSOCK"
+            "GTK_USE_PORTAL=0"
+            "GDK_DEBUG=no-portals"
+            "LIBSEAT_BACKEND=logind"
+            "WLR_BACKENDS=drm,libinput"
+            "XDG_SESSION_TYPE=wayland"
+            "${lib.getExe config.programs.sway.package}"
+            "--config"
+            "${swayGreetConfig}"
+          ];
+        in {
+          user = "greeter";
+          command = greetdCommand;
+        });
       };
     };
     
