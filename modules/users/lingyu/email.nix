@@ -57,7 +57,7 @@
           ];
         };
         
-      };
+      };      
 
       "lingyurenmail@gmail.com" = {
 
@@ -109,6 +109,57 @@
         };
         
       };
+
+      "ah.renn.coco@gmail.com" = {
+
+        enable = true;
+        primary = false;
+        address = "ah.renn.coco@gmail.com";
+        flavor = "gmail.com";
+        realName = "Coco Ren";
+        userName = "ah.renn.coco@gmail.com";
+
+        aliases = [];
+        
+        imap = {
+          host = "imap.gmail.com";
+          tls = {
+            enable = true;
+            useStartTls = false;
+          };
+          port = 993;
+          authentication = "xoauth2";
+        };
+        
+        smtp = {
+          host = "smtp.gmail.com";
+          tls = {
+            enable = true;
+            useStartTls = false;
+          };
+          port = 465;
+          authentication = "xoauth2";
+        };
+        
+        signature = {
+          showSignature = "append";
+          command = null;
+          text = builtins.concatStringsSep "\n" [
+            "aRenCoco"
+          ];
+          delimiter = builtins.concatStringsSep "\n" [
+            "--"
+          ];
+        };
+
+        thunderbird = {
+          enable = config.programs.thunderbird.enable;
+          profiles = [
+            "${config.home.username}"
+          ];
+        };
+        
+      };
       
     };
     
@@ -135,7 +186,7 @@
             value = {};
           }) list
         );
-          
+        
       in {
         
         "${config.home.username}" = rec {
@@ -144,6 +195,7 @@
           feedAccounts = fromList [
             "Blog"
             "arXiv"
+            "Git"
           ];
           accountsOrder = builtins.attrNames config.accounts.email.accounts;
           calendarAccountsOrder = accountsOrder;
