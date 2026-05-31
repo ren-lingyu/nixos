@@ -6,10 +6,10 @@
 
   programs.ssh.settings = lib.mkIf ( config.programs.ssh.enable && config.programs.git.enable ) {
     "github.com" = {
-      hostname = "github.com";
-      # hostname = "ssh.github.com";
-      port = 22;
-      # port = 443;
+      # hostname = "github.com";
+      hostname = "ssh.github.com";
+      # port = 22;
+      port = 443;
       user = "git";
       serverAliveInterval = 60;
       serverAliveCountMax = 3;
