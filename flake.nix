@@ -128,7 +128,7 @@
             ];
           })
           inputs.nix-flatpak.nixosModules.nix-flatpak
-          ./modules/hosts/thinkbook
+          ./modules/host/thinkbook
           inputs.home-manager.nixosModules.home-manager {
             home-manager = {
               useGlobalPkgs = true;
@@ -136,7 +136,7 @@
               backupFileExtension = "bak";
               users.lingyu = {
                 imports = [
-                  ./modules/users/lingyu
+                  ./modules/user/lingyu
                   ./modules/niri/hm
                   ./modules/secret/hm
                   ./modules/agent/hm
@@ -173,7 +173,7 @@
           (globalConfGenerate {})
           inputs.nixos-wsl.nixosModules.default
           inputs.vscode-server.nixosModules.default
-          ./modules/hosts/wsl
+          ./modules/host/wsl
           inputs.home-manager.nixosModules.home-manager {
             home-manager = {
               useGlobalPkgs = true;
@@ -181,7 +181,7 @@
               backupFileExtension = "bak";
               users.lingyu = {
                 imports = [
-                  ./modules/users/lingyu
+                  ./modules/user/lingyu
                   ./modules/secret/hm
                   ./modules/agent/hm
                   ./modules/cloud/hm
