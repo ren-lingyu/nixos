@@ -129,6 +129,7 @@ in {
             swayGreetCommand = builtins.concatStringsSep ";" [
               (concatWords [
                 "${lib.getExe' pkgs.coreutils "env"}"
+                "GTK_THEME=Adwaita:dark"
                 "${lib.getExe pkgs.gtkgreet}"
                 "-l -c"
                 "${builtins.baseNameOf (lib.getExe niriSessionWrapper)}"
