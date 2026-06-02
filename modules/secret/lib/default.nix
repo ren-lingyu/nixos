@@ -49,10 +49,8 @@
         gid = 0;
       };
     };
-    user = let
-      uid = osConfig.users.users.${config.home.username}.uid;
-    in origin {
-      pathPrefix = "/run/user/${builtins.toString uid}/secrets";
+    user = origin {
+      pathPrefix = "/run/user/${builtins.toString config.home.uid}/secrets";
     };
   };
 

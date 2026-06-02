@@ -1,6 +1,6 @@
 { config, pkgs, lib, osConfig, ... } : {
 
-  config = {
+  config = lib.mkIf osConfig.modules.font.enable {
 
     fonts.fontconfig = {
       enable = true;

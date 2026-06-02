@@ -1,23 +1,9 @@
-{ config, lib, pkgs, osConfig, ... } : let
-
-  noctaliaEnable = (
-    osConfig.networking.networkmanager.enable
-    &&
-    osConfig.hardware.bluetooth.enable
-    && (
-      osConfig.services.power-profiles-daemon.enable
-      ||
-      osConfig.services.tuned.enable
-    ) &&
-    osConfig.services.upower.enable
-  );
+{ config, lib, pkgs, osConfig, ... } : {
   
-in {
-
-  config = lib.mkIf noctaliaEnable {
+  config = lib.mkIf (osConfig.modules.niri.enable && osConfig.modules.niri.noctalia-shell.enable) {
     
     programs.noctalia-shell = {
-      enable = true;
+      enable = osConfig.modules.niri.noctalia-shell.enable;
       settings = {
         
         settingsVersion = 0;

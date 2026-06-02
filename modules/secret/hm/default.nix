@@ -2,7 +2,7 @@
   llib = import ../lib { inherit config; inherit osConfig; };
 in {
 
-  config = {
+  config = lib.mkIf (osConfig.modules.secret.enable && osConfig.modules.secret.hm.enable) {
 
     home.sessionVariables = {
       SOPS_AGE_KEY_FILE = osConfig.sops.secrets."age.keyFile".path;

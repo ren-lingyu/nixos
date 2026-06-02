@@ -35,7 +35,7 @@
   
   wsl = {
     enable = true;
-    defaultUser = "lingyu";
+    defaultUser = "1000";
     interop = {
       includePath = false;
       register = true;
@@ -53,16 +53,18 @@
   
   users = {
     groups.docker = {};
-    users.lingyu = {
-      isNormalUser = true;
-      linger = true;
-      extraGroups = [ "wheel" "docker" "video" "render" ];
-      home = "/home/lingyu";
-      openssh = {
-        authorizedKeys = {
-          keys = [
-            "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIJGeBOS0SKejDDcOPOWD106pexJwLjsl7PFIuXSyZtYp lingyu@DESKTOP-NIM6ULV"
-          ];
+    users = {
+      "1000"  = {
+        uid = 1000;
+        isNormalUser = true;
+        linger = true;
+        extraGroups = [ "wheel" "docker" "video" "render" ];
+        openssh = {
+          authorizedKeys = {
+            keys = [
+              "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIJGeBOS0SKejDDcOPOWD106pexJwLjsl7PFIuXSyZtYp lingyu@DESKTOP-NIM6ULV"
+            ];
+          };
         };
       };
     };
@@ -242,7 +244,7 @@
     tmpfiles.rules = [
       "L+ %t/wayland-0 - - - - ${config.wsl.wslConf.automount.root}/wslg/runtime-dir/wayland-0"
       "L+ %t/wayland-0.lock - - - - ${config.wsl.wslConf.automount.root}/wslg/runtime-dir/wayland-0.lock"
-      "L+ ${config.users.users.lingyu.home}/ren - - - - ${config.wsl.wslConf.automount.root}/c/Users/Lingyu/Ren"
+      "L+ ${config.users.users."1000".home}/ren - - - - ${config.wsl.wslConf.automount.root}/c/Users/Lingyu/Ren"
     ];
   };
 

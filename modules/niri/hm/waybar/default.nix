@@ -1,16 +1,12 @@
-{ config, lib, pkgs, osConfig, ... } : let
-
-  waybarEnable = (config.programs.niri.enable && !config.programs.noctalia-shell.enable);
-
-in {
+{ config, lib, pkgs, osConfig, ... } : {
 
   imports = [
     ./settings.nix
   ];
 
-  config = lib.mkIf waybarEnable {
+  config = lib.mkIf (osConfig.modules.niri.enable && osConfig.modules.niri.waybar.enable) {
     programs.waybar = {
-        enable = true;
+        enable = osConfig.modules.niri.waybar.enable;
         package = pkgs.waybar;
         systemd = {
           enable = true;

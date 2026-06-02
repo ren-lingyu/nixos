@@ -1,8 +1,8 @@
 { config, pkgs, lib, ... } : let
   llib = import ../lib { inherit config; };
 in {
-
-  config = {
+  
+  config = lib.mkIf (config.modules.secret.enable && config.modules.secret.os.enable) {
     
     environment.systemPackages = with pkgs; [
       age

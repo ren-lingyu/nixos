@@ -1,8 +1,4 @@
-{ config, lib, pkgs, osConfig, ... } : let
-
-  niriEnable = ( osConfig.programs.niri.enable && !osConfig.services.desktopManager.gnome.enable );
-  
-in {
+{ config, lib, pkgs, osConfig, ... } : {
 
   imports = [
     ./settings
@@ -10,7 +6,7 @@ in {
     ./noctalia
   ];
 
-  config = lib.mkIf niriEnable {
+  config = lib.mkIf osConfig.modules.niri.enable {
 
     programs.emacs.package = lib.mkForce pkgs.emacs-pgtk;
     services.emacs.package = lib.mkForce pkgs.emacs-pgtk;
@@ -30,7 +26,7 @@ in {
     };
 
     programs.niri = {
-      enable = osConfig.programs.niri.enable;
+      enable = osConfig.modules.niri.enable;
       package = osConfig.programs.niri.package;
     };
     

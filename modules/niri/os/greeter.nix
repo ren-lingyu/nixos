@@ -5,12 +5,12 @@
       themeConfig = {
         # ScreenWidth = "3072";
         # ScreenHeight = "1920";
-        FontSize = "24";
+        FontSize = 24;
       };
     })
   ];
 
-  niriSessionWrapper = let 
+  niriSessionWrapper = let
     niriSessionWrapperCommandName = "Niri";
   in pkgs.runCommand "niri-session-wrapper" {
     meta.mainProgram = "${niriSessionWrapperCommandName}";
@@ -27,9 +27,9 @@
   );
 
 in {
-
-  config = lib.mkIf config.programs.niri.enable {
-
+  
+  config = lib.mkIf (config.modules.niri.enable && config.modules.niri.greeter.enable) {
+    
     environment.systemPackages = builtins.concatLists [
       (lib.optionals config.services.displayManager.sddm.enable sddmThemePackages)
       (lib.optionals config.services.greetd.enable [ niriSessionWrapper ])
@@ -73,7 +73,7 @@ in {
             CursorSize = "48";
           };
           Wayland = {
-            CompositorCommand = "${config.services.displayManager.sddm.wayland.compositor} --output=eDP-1:3072x1920";
+            CompositorCommand = "${config.services.displayManager.sddm.wayland.compositor} --output=eDP-1:${builtins.toString config.modules.niri.monitor.width}x${builtins.toString config.modules.niri.monitor.height}";
             SessionDir = "${config.services.displayManager.sessionData.desktops}/share/wayland-sessions";
           };
         };
@@ -124,7 +124,7 @@ in {
         default_session = lib.mkForce (let
           concatWords = builtins.concatStringsSep (builtins.fromJSON ''"\u0020"'');
           concatLines = builtins.concatStringsSep "\n";
-          greeterOutput = "eDP-1";
+          greeterOutput = config.modules.niri.monitor.name;
           swayGreetConfig = let
             swayGreetCommand = builtins.concatStringsSep ";" [
               (concatWords [

@@ -82,8 +82,8 @@
         name = "root";
         hashedPassword = "$y$j9T$I75rvRCS.FR8zj/o3ivGb1$lteEgidoSR8AbjTXhxfemLeiXFIQsxUuUmSl1f0Ni10";
       };
-      lingyu = {
-        name = "lingyu";
+      "1000" = {
+        uid = 1000;
         isNormalUser = true;
         hashedPassword = "$y$j9T$HZvnP.0ZR5uBiDAviT9xA.$MSExGgePZwjIDZq2n3fOUGGguWKEgvjuIKImW4uf7p4";
         linger = true;
@@ -91,12 +91,22 @@
           [ "wheel" "video" "render" "input" ]
           (lib.optionals config.services.seatd.enable [ config.services.seatd.group ])
         ];
-        home = "/home/lingyu";
-        uid = 1000;
       };
+      # lingyu = {
+      #   name = "lingyu";
+      #   isNormalUser = true;
+      #   hashedPassword = "$y$j9T$HZvnP.0ZR5uBiDAviT9xA.$MSExGgePZwjIDZq2n3fOUGGguWKEgvjuIKImW4uf7p4";
+      #   linger = true;
+      #   extraGroups = builtins.concatLists [
+      #     [ "wheel" "video" "render" "input" ]
+      #     (lib.optionals config.services.seatd.enable [ config.services.seatd.group ])
+      #   ];
+      #   home = "/home/lingyu";
+      #   uid = 1000;
+      # };
     };
   };
-
+  
   i18n = {
     defaultLocale = "en_US.UTF-8";
     extraLocales = [

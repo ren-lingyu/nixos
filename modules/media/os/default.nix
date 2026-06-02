@@ -1,6 +1,6 @@
 { config, pkgs, lib, ... } : {
   
-  config = {
+  config = lib.mkIf config.modules.media.enable {
 
     # boot = {
     #   extraModulePackages = with config.boot.kernelPackages; [

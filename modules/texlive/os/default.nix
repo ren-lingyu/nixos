@@ -1,4 +1,4 @@
-{ config, pkgs, ... } : let
+{ config, pkgs, lib, ... } : let
 
   luadraw = pkgs.arcc.texlivePackages.luadraw;
   
@@ -14,9 +14,11 @@
   
 in {
   
-  environment.systemPackages = builtins.concatLists [
-    [ tex ]
-    packages
-  ];
+  config = lib.mkIf config.modules.texlive.enable {
+    environment.systemPackages = builtins.concatLists [
+      [ tex ]
+      packages
+    ];
+  };
   
 }
