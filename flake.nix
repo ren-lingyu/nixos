@@ -120,7 +120,7 @@
       niri = { config, pkgs, lib, ... } : {
         imports = [
           inputs.sops-nix.nixosModules.sops
-          ./modules/niri
+          ./modules/features/niri
         ];
         config = {     
           nixpkgs = {
@@ -138,7 +138,7 @@
       secret = { config, pkgs, lib, ... } : {
         imports = [
           inputs.sops-nix.nixosModules.sops
-          ./modules/secret
+          ./modules/features/secret
         ];
         config = {
           home-manager.sharedModules = [
@@ -149,20 +149,20 @@
       
       share = { config, pkgs, lib, ... } : {
         imports = [
-          ./modules/cloud
-          ./modules/texlive
-          ./modules/font
-          ./modules/shell
-          ./modules/media
-          ./modules/office
-          ./modules/agent
+          ./modules/features/cloud
+          ./modules/features/texlive
+          ./modules/features/font
+          ./modules/features/shell
+          ./modules/features/media
+          ./modules/features/office
+          ./modules/features/agent
         ];
       };
       
       user = {
         lingyu = { config, pkgs, lib, ... } : {
           imports = [
-            ./modules/user
+            ./modules/users
           ];
           config = {
             modules = {
@@ -192,7 +192,7 @@
           imports = [
             inputs.nixos-wsl.nixosModules.default
             inputs.vscode-server.nixosModules.default
-            ./modules/host/wsl
+            ./modules/hosts/wsl
           ];
           config = {           
             nixpkgs.config.allowUnfreePredicate = pkg : builtins.elem (lib.getName pkg) [
@@ -203,7 +203,7 @@
         thinkbook = { config, pkgs, lib, ... } : {
           imports = [
             inputs.nix-flatpak.nixosModules.nix-flatpak
-            ./modules/host/thinkbook
+            ./modules/hosts/thinkbook
           ];
           config = {           
             nixpkgs.config.allowUnfreePredicate = pkg : builtins.elem (lib.getName pkg) [
