@@ -11,8 +11,6 @@
   ];
   
   home = {
-    username = "lingyu";
-    homeDirectory = "/home/lingyu";
     packages = with pkgs; (builtins.concatLists [
       [ jq ripgrep unzip trash-cli tree ]
       [ htop pciutils tcpdump mtr nmap netcat socat dnsutils ]

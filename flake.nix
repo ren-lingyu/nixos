@@ -69,145 +69,241 @@
     };
   };
   
-  outputs = { self, ... }@inputs : let
+  outputs = { self, ... }@inputs : {
+    
+    nixosModules = {
 
-    globalConfGenerate = { overlays ? [], unfreePackages ? [], ... } : { pkgs, lib, ... } : let
+      base = { config, pkgs, lib, ... } : {
+        imports = [
+          inputs.home-manager.nixosModules.home-manager
+        ];
+        options = {
+          modules.base = {
+            enable = lib.mkOption {
+              type = lib.types.bool;
+              default = false;
+              example = true;
+            };
+            allowUnfreePredicateList = lib.mkOption {
+              type = lib.types.listOf lib.types.str;
+              default = [];
+              example = [ "github-copilot-cli" ];
+            };
+          };
+        };
+        config = lib.mkIf config.modules.base.enable {
+          nix.gc = {
+            automatic = true;
+            dates = "weekly";
+            options = "--delete-older-than 7d";
+          };
+          nixpkgs = {
+            overlays = [
+              (final: prev: {
+                arcc = inputs.arcc-nixpkgs.packages."${prev.system}";
+              })
+            ];
+            config.allowUnfreePredicate = pkg : builtins.elem (lib.getName pkg) config.modules.base.allowUnfreePredicateList;
+          };
+          environment.systemPackages = with pkgs; [
+            git
+            vim
+            curl
+            wget
+            gnutar
+            gzip
+          ];          
+          home-manager = {
+            useGlobalPkgs = true;
+            useUserPackages = true;
+            backupFileExtension = "bak";
+            extraSpecialArgs = {
+              inherit inputs;
+            };
+          };
+        };
+      };
 
-      concat = builtins.concatLists ;
-      arccNixpkgsOverlay = final: prev: {
-        arcc = inputs.arcc-nixpkgs.packages."${prev.system}";
+      features = {
+        niri = { config, pkgs, lib, ... } : {
+          imports = [
+            inputs.sops-nix.nixosModules.sops
+            ./modules/features/niri
+          ];
+          config = {
+            nixpkgs = {
+              overlays = [
+                inputs.niri-flake.overlays.niri
+              ];
+            };
+            home-manager.sharedModules = [
+              inputs.niri-flake.homeModules.niri
+              inputs.noctalia-shell.homeModules.default
+            ];
+          };
+        };
+        secret = { config, pkgs, lib, ... } : {
+          imports = [
+            inputs.sops-nix.nixosModules.sops
+            ./modules/features/secret
+          ];
+          config = {
+            home-manager.sharedModules = [
+              inputs.sops-nix.homeManagerModules.sops
+            ];
+          };
+        };
+        share = { config, pkgs, lib, ... } : {
+          imports = [
+            ./modules/features/cloud
+            ./modules/features/texlive
+            ./modules/features/font
+            ./modules/features/shell
+            ./modules/features/media
+            ./modules/features/office
+            ./modules/features/agent
+          ];
+        };
       };
-      allOverlays = concat [
-        [
-          arccNixpkgsOverlay
-          inputs.niri-flake.overlays.niri
-        ]
-        overlays
-      ];
-      allUnfreePackages = concat [ [ "github-copilot-cli" ] unfreePackages ];
       
-    in {
-      
-      nix.gc = {
-        automatic = true;
-        dates = "weekly";
-        options = "--delete-older-than 7d";
+      users = {
+        lingyu = { config, pkgs, lib, ... } : {
+          imports = [
+            ./modules/users
+          ];
+          config = {
+            modules = {
+              users = {
+                enable = true;
+                name = "lingyu";
+                home = "/home/lingyu";
+                uid = 1000;
+              };
+            };
+            home-manager = {
+              users."1000" = {
+                imports = [
+                  inputs.emarccs.homeManagerModules.default
+                ];
+              };
+              sharedModules = [
+                inputs.nixvim.homeModules.nixvim
+              ];
+            };
+          };
+        };
       };
       
-      nixpkgs = {
-        overlays = allOverlays;
-        config.allowUnfreePredicate = pkg : builtins.elem (lib.getName pkg) allUnfreePackages;
+      hosts = {
+        wsl = { config, pkgs, lib, ... } : {
+          imports = [
+            inputs.nixos-wsl.nixosModules.default
+            inputs.vscode-server.nixosModules.default
+            ./modules/hosts/wsl
+          ];
+        };
+        thinkbook = { config, pkgs, lib, ... } : {
+          imports = [
+            inputs.nix-flatpak.nixosModules.nix-flatpak
+            ./modules/hosts/thinkbook
+          ];
+        };
       };
       
-      environment.systemPackages = with pkgs; [
-        git
-        vim
-        curl
-        wget
-        gnutar
-        gzip
-      ];
-
     };
     
-  in {
-    
     nixosConfigurations = {
-
       nixos = inputs.nixpkgs.lib.nixosSystem {
         system = "x86_64-linux";
         modules = [
-          (globalConfGenerate {
-            unfreePackages = [
-              "microsoft-edge"
-              "feishu"
-              "libwemeetwrap"
-              "wemeet"
-              "wechat"
-              "qq"
-            ];
-          })
-          inputs.nix-flatpak.nixosModules.nix-flatpak
-          ./modules/hosts/thinkbook
-          inputs.home-manager.nixosModules.home-manager {
-            home-manager = {
-              useGlobalPkgs = true;
-              useUserPackages = true;
-              backupFileExtension = "bak";
-              users.lingyu = {
-                imports = [
-                  ./modules/users/lingyu
-                  ./modules/niri/hm
-                  ./modules/secret/hm
-                  ./modules/agent/hm
-                  ./modules/cloud/hm
-                  ./modules/font/hm
-                  ./modules/office/hm
-                ];
-              };
-              sharedModules = [
-                inputs.emarccs.homeManagerModules.default
-                inputs.sops-nix.homeManagerModules.sops
-                inputs.nixvim.homeModules.nixvim
-                inputs.niri-flake.homeModules.niri
-                inputs.noctalia-shell.homeModules.default
-              ];
-              extraSpecialArgs = {
-                inherit inputs;
+          self.nixosModules.base
+          self.nixosModules.features.share
+          self.nixosModules.features.niri
+          self.nixosModules.features.secret
+          self.nixosModules.hosts.thinkbook
+          self.nixosModules.users.lingyu
+          {
+            config = {
+              modules = {
+                base = {
+                  enable = true;
+                  allowUnfreePredicateList = [
+                    "github-copilot-cli"
+                    "microsoft-edge"
+                    "feishu"
+                    "libwemeetwrap"
+                    "wemeet"
+                    "wechat"
+                    "qq"
+                  ];
+                };
+                features = {
+                  cloud.enable = true;
+                  font.enable = true;
+                  media.enable = true;
+                  office.enable = true;
+                  shell.enable = true;
+                  texlive.enable = true;
+                  agent.enable = true;
+                  secret = {
+                    enable = true;
+                    hm.enable = true;
+                    os.enable = true;
+                  };
+                  niri = {
+                    enable = true;
+                    greeter.enable = true;
+                    monitor = {
+                      name = "eDP-1";
+                      width = 3072;
+                      height = 1920;
+                    };
+                    noctalia-shell.enable = true;
+                    waybar.enable = false;
+                  };
+                };
               };
             };
           }
-          inputs.sops-nix.nixosModules.sops
-          ./modules/secret/os
-          ./modules/shell/os
-          ./modules/texlive/os
-          ./modules/font/os
-          ./modules/media/os
-          ./modules/niri/os
         ];
       };
-
       nixos-wsl = inputs.nixpkgs.lib.nixosSystem {
         system = "x86_64-linux";
         modules = [
-          (globalConfGenerate {})
-          inputs.nixos-wsl.nixosModules.default
-          inputs.vscode-server.nixosModules.default
-          ./modules/hosts/wsl
-          inputs.home-manager.nixosModules.home-manager {
-            home-manager = {
-              useGlobalPkgs = true;
-              useUserPackages = true;
-              backupFileExtension = "bak";
-              users.lingyu = {
-                imports = [
-                  ./modules/users/lingyu
-                  ./modules/secret/hm
-                  ./modules/agent/hm
-                  ./modules/cloud/hm
-                  ./modules/font/hm
-                ];
-              };
-              sharedModules = [
-                inputs.emarccs.homeManagerModules.default
-                inputs.sops-nix.homeManagerModules.sops
-                inputs.nixvim.homeModules.nixvim
-              ];
-              extraSpecialArgs = {
-                inherit inputs;
+          self.nixosModules.base
+          self.nixosModules.features.share
+          self.nixosModules.features.secret
+          self.nixosModules.hosts.wsl
+          self.nixosModules.users.lingyu
+          {
+            config = {
+              modules = {
+                base = {
+                  enable = true;
+                  allowUnfreePredicateList = [
+                    "github-copilot-cli"
+                  ];
+                };
+                features = {
+                  cloud.enable = true;
+                  font.enable = true;
+                  media.enable = false;
+                  office.enable = false;
+                  shell.enable = true;
+                  texlive.enable = true;
+                  secret = {
+                    enable = true;
+                    hm.enable = true;
+                    os.enable = true;
+                  };
+                };
               };
             };
           }
-          inputs.sops-nix.nixosModules.sops
-          ./modules/secret/os
-          ./modules/shell/os
-          ./modules/texlive/os
-          ./modules/font/os
         ];
       };
-
     };
-
+    
   };
   
 }

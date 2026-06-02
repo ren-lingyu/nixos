@@ -15,8 +15,8 @@
     "perms=a=rX"
     "allow_other"
   ];
-  nixosUserName = config.users.users.lingyu.name;
-  nixosUserHome = config.users.users.lingyu.home;
+  nixosUserName = config.users.users."1000".name;
+  nixosUserHome = config.users.users."1000".home;
   nixosRootName = config.users.users.root.name;
   windowsUserHome = "/mnt/c/Users/Lingyu";
   windowsSystemFonts = "/mnt/c/Windows/Fonts";
