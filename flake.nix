@@ -192,7 +192,7 @@
           imports = [
             inputs.nixos-wsl.nixosModules.default
             inputs.vscode-server.nixosModules.default
-            ./modules/host/wsl
+            ./modules/host/wsl/configuration.nix
           ];
           config = {           
             nixpkgs.config.allowUnfreePredicate = pkg : builtins.elem (lib.getName pkg) [
@@ -203,7 +203,7 @@
         thinkbook = { config, pkgs, lib, ... } : {
           imports = [
             inputs.nix-flatpak.nixosModules.nix-flatpak
-            ./modules/host/thinkbook
+            ./modules/host/thinkbook/configuration.nix
           ];
           config = {           
             nixpkgs.config.allowUnfreePredicate = pkg : builtins.elem (lib.getName pkg) [
