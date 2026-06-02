@@ -80,7 +80,7 @@ in {
         }
         {
           assertion = !config.modules.features.niri.noctalia-shell.enable || noctaliaEnable;
-          message = "Noctalia-Shell is depending on some system-level functionalities like bluetooth and power manager.";
+          message = "`modules.features.niri.noctalia-shell.enable = true` requires system-level features (NetworkManager, Bluetooth, power-profiles-daemon/tuned, UPower) to be enabled.";
         }
         {
           assertion = !(config.modules.features.niri.waybar.enable && config.modules.features.niri.noctalia-shell.enable);

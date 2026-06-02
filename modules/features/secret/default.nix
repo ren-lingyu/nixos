@@ -30,11 +30,11 @@
       assertions = [
         {
           assertion = !config.modules.features.secret.os.enable || config.modules.features.secret.enable;
-          message = "The greeter of niri should be used only when niri is enabled.";
+          message = "`modules.features.secret.os.enable = true` requires `modules.features.secret.enable = true;`.";
         }
         {
           assertion = !config.modules.features.secret.hm.enable || config.modules.features.secret.enable;
-          message = "The greeter of niri should be used only when niri is enabled.";
+          message = "`modules.features.secret.hm.enable = true` requires `modules.features.secret.enable = true;`.";
         }
       ];
     }

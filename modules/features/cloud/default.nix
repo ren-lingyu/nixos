@@ -16,7 +16,7 @@
       assertions = [
         {
           assertion = !config.modules.features.cloud.enable || config.modules.features.secret.enable;
-          message = "This modules should be used while the sops-nix is enbaled";
+          message = "`modules.features.cloud.enable = true` requires `modules.features.secret.enable = true;`.";
         }      
       ];
     }
