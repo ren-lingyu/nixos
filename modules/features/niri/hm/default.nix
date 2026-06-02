@@ -6,7 +6,7 @@
     ./noctalia
   ];
 
-  config = lib.mkIf osConfig.modules.niri.enable {
+  config = lib.mkIf osConfig.modules.features.niri.enable {
 
     programs.emacs.package = lib.mkForce pkgs.emacs-pgtk;
     services.emacs.package = lib.mkForce pkgs.emacs-pgtk;
@@ -26,7 +26,7 @@
     };
 
     programs.niri = {
-      enable = osConfig.modules.niri.enable;
+      enable = osConfig.modules.features.niri.enable;
       package = osConfig.programs.niri.package;
     };
     

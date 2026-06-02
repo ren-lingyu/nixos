@@ -1,6 +1,6 @@
 { config, lib, pkgs, osConfig, ... } : {
 
-  config = {
+  config = lib.mkIf osConfig.modules.features.agent.enable {
 
     home.packages = with pkgs; [
       github-copilot-cli

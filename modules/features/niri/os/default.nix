@@ -4,10 +4,10 @@
     ./greeter.nix
   ];
 
-  config = lib.mkIf config.modules.niri.enable {
+  config = lib.mkIf config.modules.features.niri.enable {
 
     programs.niri = {
-      enable = config.modules.niri.enable;
+      enable = config.modules.features.niri.enable;
       package = pkgs.niri;
     };
     

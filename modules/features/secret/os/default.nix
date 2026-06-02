@@ -2,7 +2,7 @@
   llib = import ../lib { inherit config; };
 in {
   
-  config = lib.mkIf (config.modules.secret.enable && config.modules.secret.os.enable) {
+  config = lib.mkIf (config.modules.features.secret.enable && config.modules.features.secret.os.enable) {
     
     environment.systemPackages = with pkgs; [
       age

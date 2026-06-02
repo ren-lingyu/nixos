@@ -1,7 +1,7 @@
 { config, pkgs, lib, ... } : {
 
   options = {
-    modules.office = {
+    modules.features.office = {
       enable = lib.mkOption {
         type = lib.types.bool;
         default = false;
@@ -10,10 +10,10 @@
     };
   };
   
-  config = lib.mkIf config.modules.office.enable {
+  config = lib.mkIf config.modules.features.office.enable {
 
     home-manager.users = {
-      "${builtins.toString config.modules.user.uid}" = {
+      "${builtins.toString config.modules.users.uid}" = {
         home.packages = with pkgs; [
           libreoffice-qt-fresh
         ];

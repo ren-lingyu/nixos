@@ -28,7 +28,7 @@
 
 in {
   
-  config = lib.mkIf (config.modules.niri.enable && config.modules.niri.greeter.enable) {
+  config = lib.mkIf (config.modules.features.niri.enable && config.modules.features.niri.greeter.enable) {
     
     environment.systemPackages = builtins.concatLists [
       (lib.optionals config.services.displayManager.sddm.enable sddmThemePackages)
@@ -73,7 +73,7 @@ in {
             CursorSize = "48";
           };
           Wayland = {
-            CompositorCommand = "${config.services.displayManager.sddm.wayland.compositor} --output=eDP-1:${builtins.toString config.modules.niri.monitor.width}x${builtins.toString config.modules.niri.monitor.height}";
+            CompositorCommand = "${config.services.displayManager.sddm.wayland.compositor} --output=eDP-1:${builtins.toString config.modules.features.niri.monitor.width}x${builtins.toString config.modules.features.niri.monitor.height}";
             SessionDir = "${config.services.displayManager.sessionData.desktops}/share/wayland-sessions";
           };
         };
@@ -124,7 +124,7 @@ in {
         default_session = lib.mkForce (let
           concatWords = builtins.concatStringsSep (builtins.fromJSON ''"\u0020"'');
           concatLines = builtins.concatStringsSep "\n";
-          greeterOutput = config.modules.niri.monitor.name;
+          greeterOutput = config.modules.features.niri.monitor.name;
           swayGreetConfig = let
             swayGreetCommand = builtins.concatStringsSep ";" [
               (concatWords [

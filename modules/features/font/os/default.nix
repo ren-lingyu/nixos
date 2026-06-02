@@ -1,6 +1,6 @@
 { config, pkgs, lib, ... } : {
 
-  config = lib.mkIf config.modules.font.enable {
+  config = lib.mkIf config.modules.features.font.enable {
     fonts = {
       packages = with pkgs; [
         lxgw-wenkai

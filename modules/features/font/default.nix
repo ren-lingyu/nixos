@@ -5,7 +5,7 @@
   ];
   
   options = {
-    modules.font = {
+    modules.features.font = {
       enable = lib.mkOption {
         type = lib.types.bool;
         default = false;
@@ -14,9 +14,9 @@
     };
   };
   
-  config = lib.mkIf config.modules.font.enable {
+  config = lib.mkIf config.modules.features.font.enable {
     home-manager.users = {
-      "${builtins.toString config.modules.user.uid}" = {
+      "${builtins.toString config.modules.users.uid}" = {
         imports = [
           ./hm
         ];

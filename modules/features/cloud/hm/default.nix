@@ -1,6 +1,6 @@
-{ config, lib, pkgs, ... } : {
+{ config, pkgs, lib, osConfig, ... } : {
 
-  config = {
+  config = lib.mkIf osConfig.modules.features.cloud.enable {
 
     programs.rclone = {
       enable = true;

@@ -1,6 +1,6 @@
 { config, pkgs, lib, ... } : {
 
-  config = {
+  config = lib.mkIf osConfig.modules.features.office.enable {
 
     home.packages = with pkgs; [
       libreoffice-qt-fresh

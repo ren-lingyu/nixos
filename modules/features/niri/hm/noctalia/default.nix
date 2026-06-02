@@ -1,9 +1,9 @@
 { config, lib, pkgs, osConfig, ... } : {
   
-  config = lib.mkIf (osConfig.modules.niri.enable && osConfig.modules.niri.noctalia-shell.enable) {
+  config = lib.mkIf (osConfig.modules.features.niri.enable && osConfig.modules.features.niri.noctalia-shell.enable) {
     
     programs.noctalia-shell = {
-      enable = osConfig.modules.niri.noctalia-shell.enable;
+      enable = osConfig.modules.features.niri.noctalia-shell.enable;
       settings = {
         
         settingsVersion = 0;

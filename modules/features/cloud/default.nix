@@ -1,7 +1,7 @@
 { config, lib, pkgs, ... } : {
 
   options = {
-    modules.cloud = {
+    modules.features.cloud = {
       enable = lib.mkOption {
         type = lib.types.bool;
         default = false;
@@ -15,15 +15,15 @@
     {
       assertions = [
         {
-          assertion = !config.modules.cloud.enable || config.modules.secret.enable;
+          assertion = !config.modules.features.cloud.enable || config.modules.features.secret.enable;
           message = "This modules should be used while the sops-nix is enbaled";
         }      
       ];
     }
     
-    (lib.mkIf config.modules.cloud.enable {
+    (lib.mkIf config.modules.features.cloud.enable {
       home-manager.users = {
-        "${builtins.toString config.modules.user.uid}" = {
+        "${builtins.toString config.modules.users.uid}" = {
           imports = [
             ./hm
           ];

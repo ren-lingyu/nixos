@@ -14,7 +14,7 @@
   
 in {
   
-  config = lib.mkIf config.modules.texlive.enable {
+  config = lib.mkIf config.modules.features.texlive.enable {
     environment.systemPackages = builtins.concatLists [
       [ tex ]
       packages

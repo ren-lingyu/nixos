@@ -19,7 +19,7 @@ in {
   ];
 
   options = {
-    modules.niri = {
+    modules.features.niri = {
       enable = lib.mkOption {
         type = lib.types.bool;
         default = false;
@@ -27,18 +27,18 @@ in {
       };
       noctalia-shell.enable = lib.mkOption {
         type = lib.types.bool;
-        default = config.modules.niri.enable;
+        default = config.modules.features.niri.enable;
         example = true;
       };
       waybar.enable = lib.mkOption {
         type = lib.types.bool;
-        default = !config.modules.niri.noctalia-shell.enable && config.modules.niri.enable;
+        default = !config.modules.features.niri.noctalia-shell.enable && config.modules.features.niri.enable;
         example = false;
       };
       greeter = {
         enable = lib.mkOption {
           type = lib.types.bool;
-          default = config.modules.niri.enable;
+          default = config.modules.features.niri.enable;
           example = true;
         };
       };
@@ -67,31 +67,31 @@ in {
     {
       assertions = [
         {
-          assertion = !config.modules.niri.greeter.enable || config.modules.niri.enable;
-          message = "`modules.niri.greeter.enable = true` is only allowed when `modules.niri.enable = true;`.";
+          assertion = !config.modules.features.niri.greeter.enable || config.modules.features.niri.enable;
+          message = "`modules.features.niri.greeter.enable = true` is only allowed when `modules.features.niri.enable = true;`.";
         }
         {
-          assertion = !config.modules.niri.waybar.enable || config.modules.niri.enable;
-          message = "`modules.niri.waybar.enable = true` is only allowed when `modules.niri.enable = true;`.";
+          assertion = !config.modules.features.niri.waybar.enable || config.modules.features.niri.enable;
+          message = "`modules.features.niri.waybar.enable = true` is only allowed when `modules.features.niri.enable = true;`.";
         }
         {
-          assertion = !config.modules.niri.noctalia-shell.enable || config.modules.niri.enable;
-          message = "`modules.niri.noctalia-shell.enable = true` is only allowed when `modules.niri.enable = true;`.";
+          assertion = !config.modules.features.niri.noctalia-shell.enable || config.modules.features.niri.enable;
+          message = "`modules.features.niri.noctalia-shell.enable = true` is only allowed when `modules.features.niri.enable = true;`.";
         }
         {
-          assertion = !config.modules.niri.noctalia-shell.enable || noctaliaEnable;
+          assertion = !config.modules.features.niri.noctalia-shell.enable || noctaliaEnable;
           message = "Noctalia-Shell is depending on some system-level functionalities like bluetooth and power manager.";
         }
         {
-          assertion = !(config.modules.niri.waybar.enable && config.modules.niri.noctalia-shell.enable);
-          message = "`modules.niri.waybar.enable` and `modules.niri.noctalia-shell.enable` cannot be true simultaneously.";
+          assertion = !(config.modules.features.niri.waybar.enable && config.modules.features.niri.noctalia-shell.enable);
+          message = "`modules.features.niri.waybar.enable` and `modules.features.niri.noctalia-shell.enable` cannot be true simultaneously.";
         }
       ];
     }
     
-    (lib.mkIf config.modules.niri.enable {    
+    (lib.mkIf config.modules.features.niri.enable {    
       home-manager.users = {
-        "${builtins.toString config.modules.user.uid}" = {
+        "${builtins.toString config.modules.users.uid}" = {
           imports = [
             ./hm
           ];

@@ -5,7 +5,7 @@
   ];
   
   options = {
-    modules.secret = {
+    modules.features.secret = {
       enable = lib.mkOption {
         type = lib.types.bool;
         default = false;
@@ -13,12 +13,12 @@
       };
       os.enable = lib.mkOption {
         type = lib.types.bool;
-        default = config.modules.secret.enable;
+        default = config.modules.features.secret.enable;
         example = true;
       };
       hm.enable = lib.mkOption {
         type = lib.types.bool;
-        default = config.modules.secret.enable;
+        default = config.modules.features.secret.enable;
         example = true;
       };
     };
@@ -29,19 +29,19 @@
     {
       assertions = [
         {
-          assertion = !config.modules.secret.os.enable || config.modules.secret.enable;
+          assertion = !config.modules.features.secret.os.enable || config.modules.features.secret.enable;
           message = "The greeter of niri should be used only when niri is enabled.";
         }
         {
-          assertion = !config.modules.secret.hm.enable || config.modules.secret.enable;
+          assertion = !config.modules.features.secret.hm.enable || config.modules.features.secret.enable;
           message = "The greeter of niri should be used only when niri is enabled.";
         }
       ];
     }
     
-    (lib.mkIf (config.modules.secret.enable && config.modules.secret.hm.enable) {
+    (lib.mkIf (config.modules.features.secret.enable && config.modules.features.secret.hm.enable) {
       home-manager.users = {
-        "${builtins.toString config.modules.user.uid}" = {
+        "${builtins.toString config.modules.users.uid}" = {
           imports = [
             ./hm
           ];

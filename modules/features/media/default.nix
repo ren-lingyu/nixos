@@ -5,7 +5,7 @@
   ];
   
   options = {
-    modules.media = {
+    modules.features.media = {
       enable = lib.mkOption {
         type = lib.types.bool;
         default = false;

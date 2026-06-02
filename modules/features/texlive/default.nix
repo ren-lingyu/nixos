@@ -5,7 +5,7 @@
   ];
   
   options = {
-    modules.texlive = {
+    modules.features.texlive = {
       enable = lib.mkOption {
         type = lib.types.bool;
         default = false;

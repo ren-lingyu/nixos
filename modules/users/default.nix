@@ -2,7 +2,7 @@
   
   options = {
     modules = {
-      user = {
+      users = {
         enable = lib.mkOption {
           type = lib.types.bool;
           default = false;
@@ -28,40 +28,40 @@
   config = lib.mkMerge [
 
     {
-      assertions = let cfg = config.modules.user; in [
+      assertions = let cfg = config.modules.users; in [
         {
           assertion = !cfg.enable || cfg.name != "";
-          message = "`modules.user.name` must not be empty.";
+          message = "`modules.users.name` must not be empty.";
         }
         {
           assertion = !cfg.enable || cfg.uid >= 1000;
-          message = "`modules.user.uid` must be greater than or equal to 1000 for a normal user.";
+          message = "`modules.users.uid` must be greater than or equal to 1000 for a normal user.";
         }
         {
           assertion = !cfg.enable || lib.hasPrefix "/" cfg.home;
-          message = "`modules.user.home` must be an absolute path.";
+          message = "`modules.users.home` must be an absolute path.";
         }
       ];
     }
     
-    (lib.mkIf config.modules.user.enable {
+    (lib.mkIf config.modules.users.enable {
       
       users.users = {
-        "${builtins.toString config.modules.user.uid}" = {
-          name = lib.mkForce config.modules.user.name;
-          home = lib.mkForce config.modules.user.home;
+        "${builtins.toString config.modules.users.uid}" = {
+          name = lib.mkForce config.modules.users.name;
+          home = lib.mkForce config.modules.users.home;
         };
       };
       
       home-manager.users = {
-        "${builtins.toString config.modules.user.uid}" = {
+        "${builtins.toString config.modules.users.uid}" = {
           imports = [
             ./lingyu
           ];
           home = {
-            uid = config.modules.user.uid;
-            username = config.modules.user.name;
-            homeDirectory = config.modules.user.home;
+            uid = config.modules.users.uid;
+            username = config.modules.users.name;
+            homeDirectory = config.modules.users.home;
           };
         };
       };
