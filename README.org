@@ -15,78 +15,93 @@ nixos/
 ├── README.org
 ├── .gitignore
 └── modules
-    ├── agent
-    │   └── hm
-    │       ├── commands
-    │       │   └── commit-message.md
-    │       └── default.nix
-    ├── desktop-environment
-    │   └── os    
-    │       ├── default.nix
-    │       ├── gnome.nix
-    │       └── hyprland.nix
-    ├── font
-    │   └── os
-    │       └── default.nix
-    ├── media
-    │   └── os
-    │       └── default.nix
-    ├── niri
-    │   ├── hm
+    ├── features
+    │   ├── agent
     │   │   ├── default.nix
-    │   │   ├── noctalia
+    │   │   └── hm
+    │   │       ├── commands
+    │   │       │   └── commit-message.md
+    │   │       └── default.nix
+    │   ├── cloud
+    │   │   ├── default.nix
+    │   │   └── hm
+    │   │       └── default.nix
+    │   ├── font
+    │   │   ├── default.nix
+    │   │   ├── hm
     │   │   │   └── default.nix
-    │   │   ├── settings
-    │   │   │   ├── animations.nix
-    │   │   │   ├── binds.nix
-    │   │   │   ├── default.nix
-    │   │   │   ├── input.nix
-    │   │   │   ├── layout.nix
-    │   │   │   ├── noctalia-shell.nix
-    │   │   │   ├── outputs.nix
-    │   │   │   ├── top-level.nix
-    │   │   │   └── window-rules.nix
-    │   │   └── waybar
-    │   │       ├── default.nix
-    │   │       ├── power-menu.xml
-    │   │       ├── settings.nix
-    │   │       └── style.css
-    │   └── os
-    │       ├── default.nix
-    │       └── greeter.nix
-    ├── secret
-    │   ├── lib
-    │   │   └── default.nix
-    │   ├── hm
+    │   │   └── os
+    │   │       └── default.nix
+    │   ├── media
     │   │   ├── default.nix
-    │   │   └── sops
-    │   │       ├── default.yaml
-    │   │       └── .sops.yaml
-    │   └── os
+    │   │   └── os
+    │   │       └── default.nix
+    │   ├── niri
+    │   │   ├── default.nix
+    │   │   ├── hm
+    │   │   │   ├── default.nix
+    │   │   │   ├── noctalia
+    │   │   │   │   └── default.nix
+    │   │   │   ├── settings
+    │   │   │   │   ├── animations.nix
+    │   │   │   │   ├── binds.nix
+    │   │   │   │   ├── default.nix
+    │   │   │   │   ├── input.nix
+    │   │   │   │   ├── layout.nix
+    │   │   │   │   ├── noctalia-shell.nix
+    │   │   │   │   ├── outputs.nix
+    │   │   │   │   ├── top-level.nix
+    │   │   │   │   └── window-rules.nix
+    │   │   │   └── waybar
+    │   │   │       ├── default.nix
+    │   │   │       ├── power-menu.xml
+    │   │   │       ├── settings.nix
+    │   │   │       └── style.css
+    │   │   └── os
+    │   │       ├── default.nix
+    │   │       └── greeter.nix
+    │   ├── office
+    │   │   ├── default.nix
+    │   │   └── hm
+    │   │       └── default.nix
+    │   ├── secret
+    │   │   ├── default.nix
+    │   │   ├── hm
+    │   │   │   ├── default.nix
+    │   │   │   └── sops
+    │   │   │       ├── default.yaml
+    │   │   │       └── .sops.yaml
+    │   │   ├── lib
+    │   │   │   └── default.nix
+    │   │   └── os
+    │   │       ├── default.nix
+    │   │       └── sops
+    │   │           ├── default.yaml
+    │   │           └── .sops.yaml
+    │   ├── shell
+    │   │   ├── default.nix
+    │   │   └── os
+    │   │       └── default.nix
+    │   └── texlive
     │       ├── default.nix
-    │       └── sops
-    │           ├── default.yaml
-    │           └── .sops.yaml
-    ├── shell
-    │   └── os
-    │       └── default.nix
-    ├── texlive
-    │   └── os
-    │       └── default.nix
+    │       └── os
+    │           └── default.nix
     ├── hosts
     │   ├── thinkbook
     │   │   ├── boot-manager.nix
+    │   │   ├── configuration.nix
     │   │   ├── default.nix
     │   │   ├── flatpak.nix
     │   │   ├── hardware-configuration.nix
     │   │   ├── mount-windows-directory.nix
     │   │   └── virtual-terminal.nix
     │   └── wsl
+    │       ├── configuration.nix
     │       └── default.nix
     └── users
+        ├── default.nix
         └── lingyu
             ├── default.nix
-            ├── cloud.nix
             ├── editor.nix
             ├── email.nix
             ├── git.nix
@@ -102,13 +117,13 @@ nixos/
 #+end_example
 
 * 关键点
-- [[file:modules][modules]] 放置 NixOS 与 home-manager 模块, 按 =**/os/= (系统级), =**/hm/= (用户级), =**/lib/= (模块内部函数) 组织.
+- [[file:modules/features][modules/features]] 按功能领域组织 NixOS 与 home-manager 模块, 每个 feature 含 =default.nix= 作为入口, 并按 =os/= (系统级), =hm/= (用户级), =lib/= (模块内部函数) 分层.
 - [[file:modules/hosts][modules/hosts]] 放置设备相关配置, 含 thinkbook (bare metal NixOS, hostname =nixos=) 和 wsl (NixOS-WSL, hostname =nixos-wsl=).
 - [[file:modules/users][modules/users]] 放置用户 home-manager 配置, 包含 nixvim/emacs/zsh/git/ssh/gpg/keepassxc/rclone/thunderbird/direnv 等.
 - =nixpkgs= 使用 =nixos-unstable=, 另有自行打包的 [[https://github.com/ren-lingyu/nixpkgs][ren-lingyu/nixpkgs]] overlay.
 - 启用 =nix-command= 与 =flakes=.
 - 使用 =sops-nix= 管理密钥, 系统级秘密以 host ssh key 加密, 用户级秘密以独立的 age key 加密.
-- 使用 =niri= 作为窗口管理器, 另有 =desktop-environment= 提供 gnome/hyprland 备选.
+- 使用 =niri= 作为窗口管理器.
 
 * 使用
 重建系统:
