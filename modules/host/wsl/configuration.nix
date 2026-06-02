@@ -6,17 +6,17 @@
 # https://github.com/nix-community/NixOS-WSL
 
 { config, lib, pkgs, ... } : {
-
-  nix.settings = {
-    experimental-features = [ "nix-command" "flakes" ];
-    trusted-users = [ "@wheel" "root" ];
-  };
-
+  
   # imports = [
   #   # include NixOS-WSL modules
   #   <nixos-wsl/modules>
   # ];
-
+  
+  nix.settings = {
+    experimental-features = [ "nix-command" "flakes" ];
+    trusted-users = [ "@wheel" "root" ];
+  };
+  
   networking.hostName = "nixos-wsl";
   
   hardware.graphics = {

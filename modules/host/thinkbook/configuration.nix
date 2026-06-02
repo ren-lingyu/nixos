@@ -9,14 +9,6 @@
     trusted-users = [ "@wheel" "root" ];
   };
   
-  imports = [
-    ./hardware-configuration.nix
-    ./mount-windows-directory.nix
-    ./virtual-terminal.nix
-    ./boot-manager.nix
-    ./flatpak.nix
-  ];
-
   boot = {
     kernelPackages = pkgs.linuxPackages_latest;
     kernelParams = [
