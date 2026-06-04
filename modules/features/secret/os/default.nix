@@ -30,8 +30,8 @@ in {
         keyFile = null;
         plugins = [];
         sshKeyPaths = lib.optionals config.services.openssh.enable (
-          map (hostKeys: hostKeys.path) (
-            lib.filter (hostKeys: hostKeys.type == "ed25519") config.services.openssh.hostKeys
+          builtins.map (hostKeys : hostKeys.path) (
+            lib.filter (hostKeys : hostKeys.type == "ed25519") config.services.openssh.hostKeys
           )
         );
       };

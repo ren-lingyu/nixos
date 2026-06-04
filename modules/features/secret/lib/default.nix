@@ -8,14 +8,14 @@
         then
           [ prefix ]
         else (
-          map (x: prefix ++ [ x ]) value
+          builtins.map (x : prefix ++ [ x ]) value
         )
       )
       else (
         if
           builtins.isAttrs value
         then
-          builtins.concatMap (x: go (prefix ++ [x]) value.${x}) (builtins.attrNames value)
+          builtins.concatMap (x : go (prefix ++ [x]) value.${x}) (builtins.attrNames value)
         else
           []
       )
@@ -25,7 +25,7 @@
   # 这个函数的第一个参数应当是一个列表, 其中每个元素都是一个字符串的列表.
   fromTemplates = let
     # 这里用到了柯里化
-    origin = { pathPrefix, attrs ? {} } : list : { ... }@overlayAttrs : map (x: let
+    origin = { pathPrefix, attrs ? {} } : list : { ... }@overlayAttrs : builtins.map (x : let
         nameString = builtins.concatStringsSep "." x;
         keyString = builtins.concatStringsSep "/" x;
       in {
@@ -60,7 +60,7 @@
   in builtins.listToAttrs (
     builtins.concatLists (
       # 确保列表作为输入参数时, 只有作为属性集的列表元素才有效.
-      map (x: fun x) (builtins.filter builtins.isAttrs attrsList)
+      builtins.map (x : fun x) (builtins.filter builtins.isAttrs attrsList)
     )
   );
 

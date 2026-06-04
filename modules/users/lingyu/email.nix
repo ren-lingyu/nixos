@@ -181,7 +181,7 @@
       profiles = let
         
         fromList = list : builtins.listToAttrs (
-          map (x: {
+          builtins.map (x : {
             name = builtins.toString x;
             value = {};
           }) list
