@@ -3,14 +3,11 @@
   imports = [
     ./os
   ];
-  
-  options = {
-    modules.features.texlive = {
-      enable = lib.mkOption {
-        type = lib.types.bool;
-        default = false;
-        example = true;
-      };
+
+  config = {
+    modules.features.texlive.existModule = {
+      os = true;
+      hm = false;
     };
   };
   

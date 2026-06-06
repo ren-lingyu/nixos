@@ -4,13 +4,10 @@
     ./os
   ];
   
-  options = {
-    modules.features.shell = {
-      enable = lib.mkOption {
-        type = lib.types.bool;
-        default = false;
-        example = true;
-      };
+  config = {
+    modules.features.shell.existModule = {
+      os = true;
+      hm = false;
     };
   };
   

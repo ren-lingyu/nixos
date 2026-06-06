@@ -72,61 +72,28 @@
   outputs = { self, ... }@inputs : {
     
     nixosModules = {
-
+      
       base = { config, pkgs, lib, ... } : {
         imports = [
           inputs.home-manager.nixosModules.home-manager
+          ./modules
         ];
-        options = {
-          modules.base = {
-            enable = lib.mkOption {
-              type = lib.types.bool;
-              default = false;
-              example = true;
-            };
-            allowUnfreePredicateList = lib.mkOption {
-              type = lib.types.listOf lib.types.str;
-              default = [];
-              example = [ "github-copilot-cli" ];
-            };
-          };
-        };
-        config = lib.mkIf config.modules.base.enable {
-          nix.gc = {
-            automatic = true;
-            dates = "weekly";
-            options = "--delete-older-than 7d";
-          };
-          nixpkgs = {
-            overlays = [
-              (final: prev: {
-                arcc = inputs.arcc-nixpkgs.packages."${prev.system}";
-              })
-            ];
-            config.allowUnfreePredicate = pkg : builtins.elem (lib.getName pkg) config.modules.base.allowUnfreePredicateList;
-          };
-          environment.systemPackages = with pkgs; [
-            git
-            vim
-            curl
-            wget
-            gnutar
-            gzip
-          ];          
-          home-manager = {
-            useGlobalPkgs = true;
-            useUserPackages = true;
-            backupFileExtension = "bak";
-            extraSpecialArgs = {
-              inherit inputs;
-            };
+        config = {
+          nixpkgs.overlays = [
+            (final: prev: {
+              arcc = inputs.arcc-nixpkgs.packages."${prev.system}";
+            })
+          ];
+          home-manager.extraSpecialArgs = {
+            inherit inputs;
           };
         };
       };
-
+      
       features = {
         niri = { config, pkgs, lib, ... } : {
           imports = [
+            self.nixosModules.base
             inputs.sops-nix.nixosModules.sops
             ./modules/features/niri
           ];
@@ -144,6 +111,7 @@
         };
         secret = { config, pkgs, lib, ... } : {
           imports = [
+            self.nixosModules.base
             inputs.sops-nix.nixosModules.sops
             ./modules/features/secret
           ];
@@ -155,6 +123,7 @@
         };
         share = { config, pkgs, lib, ... } : {
           imports = [
+            self.nixosModules.base
             ./modules/features/cloud
             ./modules/features/texlive
             ./modules/features/font
@@ -169,15 +138,22 @@
       users = {
         lingyu = { config, pkgs, lib, ... } : {
           imports = [
-            ./modules/users
+            self.nixosModules.base
           ];
           config = {
-            modules = {
-              users = {
+            modules.users = {
+              "1000" = {
                 enable = true;
-                name = "lingyu";
-                home = "/home/lingyu";
                 uid = 1000;
+                username = "lingyu";
+                home = {
+                  enable = true;
+                  directory = "/home/lingyu";
+                  manager = {
+                    enable = true;
+                    source = "./lingyu";
+                  };
+                };
               };
             };
             home-manager = {
@@ -197,6 +173,7 @@
       hosts = {
         wsl = { config, pkgs, lib, ... } : {
           imports = [
+            self.nixosModules.base
             inputs.nixos-wsl.nixosModules.default
             inputs.vscode-server.nixosModules.default
             ./modules/hosts/wsl
@@ -204,6 +181,7 @@
         };
         thinkbook = { config, pkgs, lib, ... } : {
           imports = [
+            self.nixosModules.base
             inputs.nix-flatpak.nixosModules.nix-flatpak
             ./modules/hosts/thinkbook
           ];
@@ -216,7 +194,6 @@
       nixos = inputs.nixpkgs.lib.nixosSystem {
         system = "x86_64-linux";
         modules = [
-          self.nixosModules.base
           self.nixosModules.features.share
           self.nixosModules.features.niri
           self.nixosModules.features.secret
@@ -226,7 +203,6 @@
             config = {
               modules = {
                 base = {
-                  enable = true;
                   allowUnfreePredicateList = [
                     "github-copilot-cli"
                     "microsoft-edge"
@@ -245,11 +221,7 @@
                   shell.enable = true;
                   texlive.enable = true;
                   agent.enable = true;
-                  secret = {
-                    enable = true;
-                    hm.enable = true;
-                    os.enable = true;
-                  };
+                  secret.enable = true;
                   niri = {
                     enable = true;
                     greeter.enable = true;
@@ -270,7 +242,6 @@
       nixos-wsl = inputs.nixpkgs.lib.nixosSystem {
         system = "x86_64-linux";
         modules = [
-          self.nixosModules.base
           self.nixosModules.features.share
           self.nixosModules.features.secret
           self.nixosModules.hosts.wsl
@@ -279,7 +250,6 @@
             config = {
               modules = {
                 base = {
-                  enable = true;
                   allowUnfreePredicateList = [
                     "github-copilot-cli"
                   ];
@@ -291,11 +261,7 @@
                   office.enable = false;
                   shell.enable = true;
                   texlive.enable = true;
-                  secret = {
-                    enable = true;
-                    hm.enable = true;
-                    os.enable = true;
-                  };
+                  secret.enable = true;
                 };
               };
             };

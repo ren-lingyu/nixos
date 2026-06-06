@@ -1,4 +1,4 @@
-{ config, pkgs, lib, ... } : {
+{ config, osConfig, pkgs, lib, ... } : {
 
   config = lib.mkIf osConfig.modules.features.office.enable {
 

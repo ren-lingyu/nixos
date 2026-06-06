@@ -1,0 +1,42 @@
+{ config, pkgs, lib, ... } : {
+  
+  imports = [
+    ./features
+    ./users
+  ];
+  
+  options = {
+    modules.base = {
+      allowUnfreePredicateList = lib.mkOption {
+        type = lib.types.listOf lib.types.str;
+        default = [];
+        example = [ "github-copilot-cli" ];
+      };
+    };
+  };
+  
+  config = {
+    nix.gc = {
+      automatic = true;
+      dates = "weekly";
+      options = "--delete-older-than 7d";
+    };
+    nixpkgs = {
+      config.allowUnfreePredicate = pkg : builtins.elem (lib.getName pkg) config.modules.base.allowUnfreePredicateList;
+    };
+    environment.systemPackages = with pkgs; [
+      git
+      vim
+      curl
+      wget
+      gnutar
+      gzip
+    ];          
+    home-manager = {
+      useGlobalPkgs = true;
+      useUserPackages = true;
+      backupFileExtension = "bak";
+    };
+  };
+  
+}
