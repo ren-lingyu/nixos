@@ -7,7 +7,7 @@
   config = {
     modules.features.shell.existModule = {
       os = true;
-      hm = false;
+      hm = true;
     };
   };
   

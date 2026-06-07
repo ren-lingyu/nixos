@@ -2,7 +2,6 @@
 
   imports = [
     ./editor.nix
-    ./shell.nix
     ./terminal.nix
     ./keyring.nix
     ./git.nix
