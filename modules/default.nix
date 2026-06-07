@@ -16,14 +16,22 @@
   };
   
   config = {
-    nix.gc = {
-      automatic = true;
-      dates = "weekly";
-      options = "--delete-older-than 7d";
+
+    nix = {
+      settings = {
+        experimental-features = [ "nix-command" "flakes" ];
+      };
+      gc = {
+        automatic = true;
+        dates = "weekly";
+        options = "--delete-older-than 7d";
+      };
     };
+    
     nixpkgs = {
       config.allowUnfreePredicate = pkg : builtins.elem (lib.getName pkg) config.modules.base.allowUnfreePredicateList;
     };
+    
     environment.systemPackages = with pkgs; [
       git
       vim
@@ -31,7 +39,8 @@
       wget
       gnutar
       gzip
-    ];          
+    ];
+    
     home-manager = {
       useGlobalPkgs = true;
       useUserPackages = true;
@@ -46,6 +55,7 @@
         })
       ];
     };
+    
   };
   
 }
