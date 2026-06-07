@@ -124,7 +124,7 @@
         share = { config, pkgs, lib, ... } : {
           imports = [
             self.nixosModules.base
-            ./modules/features/cloud
+            ./modules/features/remote
             ./modules/features/texlive
             ./modules/features/font
             ./modules/features/shell
@@ -214,7 +214,7 @@
                   ];
                 };
                 features = {
-                  cloud.enable = true;
+                  remote.enable = true;
                   font.enable = true;
                   media.enable = true;
                   office.enable = true;
@@ -255,7 +255,7 @@
                   ];
                 };
                 features = {
-                  cloud.enable = true;
+                  remote.enable = true;
                   font.enable = true;
                   media.enable = false;
                   office.enable = false;
