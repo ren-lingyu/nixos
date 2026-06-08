@@ -46,7 +46,7 @@
                   description = "Whether to enable Home Manager for this user.";
                 };
                 source = lib.mkOption {
-                  type = lib.types.str;
+                  type = lib.types.nullOr lib.types.str;
                   default = "./${config.username}";
                   example = lib.literalExpression "./jane.doe";
                   description = "Relative path under `modules/users` to this user's Home Manager module source.";
@@ -119,14 +119,18 @@
           message = "`modules.users.${uidKey_}.home.manager.enable = true` requires `modules.users.${uidKey_}.home.enable = true`.";
         }
         {
-          assertion = let
-            basePathString = builtins.unsafeDiscardStringContext (builtins.toString ./.);
-            sourcePathString = builtins.unsafeDiscardStringContext (builtins.toString (./. + "/${user_.home.manager.source}"));
-          in !user_.home.manager.enable || lib.hasPrefix "${basePathString}/" sourcePathString;
-          message = "`modules.users.${uidKey_}.home.manager.source` must resolve under `${builtins.toString ./.}`.";
+          assertion = if (user_.home.manager.source != null)
+                      then (let
+                        basePathString = builtins.unsafeDiscardStringContext (builtins.toString ./.);
+                        sourcePathString = builtins.unsafeDiscardStringContext (builtins.toString (./. + "/${user_.home.manager.source}"));
+                      in !user_.home.manager.enable || lib.hasPrefix "${basePathString}/" sourcePathString)
+                      else !user_.home.manager.enable || (user_.home.manager.source == null);
+            message = "`modules.users.${uidKey_}.home.manager.source` must be `null` or resolve under `${builtins.toString ./.}`.";
         }
         {
-          assertion = !user_.home.manager.enable || builtins.pathExists (./. + "/${builtins.toString user_.home.manager.source}/default.nix");
+          assertion = if (user_.home.manager.source != null)
+                      then !user_.home.manager.enable || builtins.pathExists (./. + "/${builtins.toString user_.home.manager.source}/default.nix")
+                      else !user_.home.manager.enable || (user_.home.manager.source == null);
           message = "`modules.users.${uidKey_}.home.manager.enable = true` requires `${builtins.toString (./. + "/${builtins.toString user_.home.manager.source}/default.nix")}` to exist.";
         }
       ]) config.modules.users ))
@@ -151,7 +155,7 @@
     home-manager.users = builtins.listToAttrs (lib.mapAttrsToList (uidKey_ : user_ : {
       name = builtins.toString uidKey_;
       value = {
-        imports = [
+        imports = lib.optionals (user_.home.manager.source != null) [
           (./. + "/${builtins.toString user_.home.manager.source}")
         ];
         home = {

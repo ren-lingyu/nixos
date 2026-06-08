@@ -47,11 +47,14 @@
       backupFileExtension = "bak";
       sharedModules = [
         ({ config, pkgs, lib, ... } : {
-          config.programs.fastfetch = {
-            enable = lib.mkDefault true;
-            package = lib.mkDefault pkgs.fastfetch;
-            settings = lib.mkDefault {};
-          };  
+          config = {
+            programs.fastfetch = {
+              enable = lib.mkDefault true;
+              package = lib.mkDefault pkgs.fastfetch;
+              settings = lib.mkDefault {};
+            };
+            home.stateVersion = "26.05";
+          };
         })
       ];
     };

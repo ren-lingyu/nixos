@@ -219,6 +219,12 @@
           hostNames = [ "github.com" "ssh.github.com" ];
           publicKey = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIOMqqnkVzrm0SdG6UOoqKLsabgH5C9okWi0dh2l9GKJl";
         };
+        nixos-server = {
+          hostNames = [
+            "39.97.244.246"
+          ];
+          publicKey = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAILI3dfdpwVhrRohWXLm694Y21dS2JeIpWN8CJcwURtl5";
+        };
       };
     };
     clash-verge = {

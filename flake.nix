@@ -67,9 +67,22 @@
     emarccs = {
       url = "git+https://github.com/ren-lingyu/emarccs.git?ref=refs/heads/main&shallow=1";
     };
+    nixos-anywhere = {
+      url = "git+https://github.com/nix-community/nixos-anywhere.git?ref=refs/heads/main&shallow=1";
+    };
+    disko = {
+      # url = "git+https://github.com/nix-community/disko.git?ref=refs/heads/master&shallow=1";
+      follows = "nixos-anywhere/disko";
+    };
   };
   
   outputs = { self, ... }@inputs : {
+
+    packages = {
+      x86_64-linux = {
+        nixos-anywhere = inputs.nixos-anywhere.packages.x86_64-linux.default;
+      };
+    };
     
     nixosModules = {
       
@@ -160,11 +173,33 @@
               users."1000" = {
                 imports = [
                   inputs.emarccs.homeManagerModules.default
-                ];
+                ];                 
               };
               sharedModules = [
                 inputs.nixvim.homeModules.nixvim
               ];
+            };
+          };
+        };
+        lingyu-minimal = { config, pkgs, lib, ... } : {
+          imports = [
+            self.nixosModules.base
+          ];
+          config = {
+            modules.users = {
+              "1000" = {
+                enable = true;
+                uid = 1000;
+                username = "lingyu";
+                home = {
+                  enable = true;
+                  directory = "/home/lingyu";
+                  manager = {
+                    enable = true;
+                    source = null;
+                  };
+                };
+              };
             };
           };
         };
@@ -184,6 +219,13 @@
             self.nixosModules.base
             inputs.nix-flatpak.nixosModules.nix-flatpak
             ./modules/hosts/thinkbook
+          ];
+        };
+        aliyun = { config, pkgs, lib, ... } : {
+          imports = [
+            self.nixosModules.base
+            inputs.disko.nixosModules.disko
+            ./modules/hosts/aliyun
           ];
         };
       };
@@ -233,6 +275,25 @@
                     noctalia-shell.enable = true;
                     waybar.enable = false;
                   };
+                };
+              };
+            };
+          }
+        ];
+      };
+      nixos-server = inputs.nixpkgs.lib.nixosSystem {
+        system = "x86_64-linux";
+        modules = [
+          self.nixosModules.features.share
+          self.nixosModules.features.secret
+          self.nixosModules.hosts.aliyun
+          self.nixosModules.users.lingyu-minimal
+          {
+            config = {
+              modules = {
+                features = {
+                  shell.enable = true;
+                  secret.enable = false;
                 };
               };
             };
