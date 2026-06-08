@@ -32,14 +32,17 @@
       config.allowUnfreePredicate = pkg : builtins.elem (lib.getName pkg) config.modules.base.allowUnfreePredicateList;
     };
     
-    environment.systemPackages = with pkgs; [
-      git
-      vim
-      curl
-      wget
-      gnutar
-      gzip
-    ];
+    environment = {
+      enableAllTerminfo = lib.mkDefault true;
+      systemPackages = with pkgs; [
+        git
+        vim
+        curl
+        wget
+        gnutar
+        gzip
+      ];
+    };
     
     home-manager = {
       useGlobalPkgs = true;
