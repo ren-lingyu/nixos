@@ -52,7 +52,7 @@ in {
         
       } // (lib.optionalAttrs (feature_ == "niri") {
         
-        noctalia-shell.enable = lib.mkOption {
+        noctalia.enable = lib.mkOption {
           type = lib.types.bool;
           default = config.modules.features.${feature_}.enable;
           example = true;
@@ -62,7 +62,7 @@ in {
         waybar.enable = lib.mkOption {
           type = lib.types.bool;
           default =
-            !config.modules.features.${feature_}.noctalia-shell.enable
+            !config.modules.features.${feature_}.noctalia.enable
             && config.modules.features.${feature_}.enable;
           example = false;
           description = "Whether to enable the Waybar status bar for Niri.";

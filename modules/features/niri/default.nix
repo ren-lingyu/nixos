@@ -35,16 +35,16 @@ in {
         message = "`modules.features.niri.waybar.enable = true` is only allowed when `modules.features.niri.enable = true;`.";
       }
       {
-        assertion = !config.modules.features.niri.noctalia-shell.enable || config.modules.features.niri.enable;
-        message = "`modules.features.niri.noctalia-shell.enable = true` is only allowed when `modules.features.niri.enable = true;`.";
+        assertion = !config.modules.features.niri.noctalia.enable || config.modules.features.niri.enable;
+        message = "`modules.features.niri.noctalia.enable = true` is only allowed when `modules.features.niri.enable = true;`.";
       }
       {
-        assertion = !config.modules.features.niri.noctalia-shell.enable || noctaliaEnable;
-        message = "`modules.features.niri.noctalia-shell.enable = true` requires system-level features (NetworkManager, Bluetooth, power-profiles-daemon/tuned, UPower) to be enabled.";
+        assertion = !config.modules.features.niri.noctalia.enable || noctaliaEnable;
+        message = "`modules.features.niri.noctalia.enable = true` requires system-level features (NetworkManager, Bluetooth, power-profiles-daemon/tuned, UPower) to be enabled.";
       }
       {
-        assertion = !(config.modules.features.niri.waybar.enable && config.modules.features.niri.noctalia-shell.enable);
-        message = "`modules.features.niri.waybar.enable` and `modules.features.niri.noctalia-shell.enable` cannot be true simultaneously.";
+        assertion = !(config.modules.features.niri.waybar.enable && config.modules.features.niri.noctalia.enable);
+        message = "`modules.features.niri.waybar.enable` and `modules.features.niri.noctalia.enable` cannot be true simultaneously.";
       }
     ];
     

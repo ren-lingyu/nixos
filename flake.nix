@@ -272,7 +272,7 @@
                       width = 3072;
                       height = 1920;
                     };
-                    noctalia-shell.enable = true;
+                    noctalia.enable = true;
                     waybar.enable = false;
                   };
                 };
