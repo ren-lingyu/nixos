@@ -10,9 +10,7 @@
             hash = "sha256-HjgoB5ZzyUmUvA9HgNXYUoZHY5kgZZhi1J0cLyoZjiU=";
           };
         });
-      })
-      (final: prev: {
-        wechat = final.callPackage "${prev.path}/pkgs/by-name/we/wechat/linux.nix" {
+        wechat = final.callPackage (prev.path + "/pkgs/by-name/we/wechat/linux.nix") {
           pname = "wechat";
           version = "4.1.1.4";
           src = final.fetchurl {
