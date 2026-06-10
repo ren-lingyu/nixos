@@ -17,18 +17,12 @@
         hotkey-overlay = { title = "Open a Terminal: kitty"; };
         action.spawn = [ "${lib.getExe config.programs.kitty.package}" ];
       };
-      "Mod+B" = lib.mkIf (
-        (
-          builtins.elem pkgs.microsoft-edge (
-            builtins.concatLists [
-              osConfig.environment.systemPackages
-              config.home.packages
-            ]
-          )
-        )
-      ) {
-        hotkey-overlay = { title = "Run a Browser: Edge"; };
-        action.spawn = [ "${lib.getExe pkgs.microsoft-edge}" ];
+      "Mod+B" = {
+        hotkey-overlay = { title = "Run a Browser"; };
+        action.spawn = [
+          "${pkgs.xdg-utils}/bin/xdg-open"
+          "https://"
+        ];
       };
       "Mod+M" = lib.mkIf config.programs.thunderbird.enable {
         hotkey-overlay = { title = "Run a Mail Client: Thunderbird"; };
