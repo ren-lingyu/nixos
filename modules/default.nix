@@ -14,6 +14,12 @@
         default = [];
         example = [ "github-copilot-cli" ];
       };
+      createXdgUserDirectories = lib.mkOption {
+        type = lib.types.bool;
+        default = false;
+        example = true;
+        description = "Whether to enable and create xdg user directories.";
+      };
     };
   };
   
@@ -51,12 +57,26 @@
       useUserPackages = true;
       backupFileExtension = "bak";
       sharedModules = [
-        ({ config, pkgs, lib, ... } : {
+        ({ config, osConfig, pkgs, lib, ... } : {
           config = {
             programs.fastfetch = {
               enable = lib.mkDefault true;
               package = lib.mkDefault pkgs.fastfetch;
               settings = lib.mkDefault {};
+            };
+            xdg.userDirs = {
+              enable = lib.mkForce osConfig.modules.base.createXdgUserDirectories;
+              createDirectories = lib.mkForce osConfig.modules.base.createXdgUserDirectories;
+              package = pkgs.xdg-user-dirs;
+              desktop = "${config.home.homeDirectory}/Desktop";
+              download = "${config.home.homeDirectory}/Downloads";
+              documents = "${config.home.homeDirectory}/Documents";
+              pictures = "${config.home.homeDirectory}/Pictures";
+              videos = "${config.home.homeDirectory}/Videos";
+              music = "${config.home.homeDirectory}/Music";
+              templates = "${config.home.homeDirectory}/Templates";
+              projects = "${config.home.homeDirectory}/Projects";
+              publicShare = "${config.home.homeDirectory}/Public";
             };
             home.stateVersion = "26.05";
           };

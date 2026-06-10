@@ -220,6 +220,9 @@
             inputs.nix-flatpak.nixosModules.nix-flatpak
             ./modules/hosts/thinkbook
           ];
+          config.modules.hosts = {
+            packageGroups.tencent.enable = true;
+          };
         };
         aliyun = { config, pkgs, lib, ... } : {
           imports = [
@@ -254,9 +257,7 @@
                     "wechat"
                     "qq"
                   ];
-                };
-                hosts = {
-                  packageGroups.tencent.enable = true;
+                  createXdgUserDirectories = true;
                 };
                 features = {
                   remote.enable = true;
@@ -294,6 +295,9 @@
           {
             config = {
               modules = {
+                base = {
+                  createXdgUserDirectories = false;
+                };
                 features = {
                   shell.enable = true;
                   secret.enable = false;
@@ -317,6 +321,7 @@
                   allowUnfreePredicateList = [
                     "github-copilot-cli"
                   ];
+                  createXdgUserDirectories = false;
                 };
                 features = {
                   remote.enable = true;
