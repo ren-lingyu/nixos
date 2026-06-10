@@ -24,7 +24,7 @@
         (builtins.concatStringsSep "\n\t" [
           "/Windows 11"
           "protocol: efi_chainload"
-          "path: boot():/EFI/Microsoft/Boot/bootmgfw.efi"
+          "image_path: guid(12a55262-6360-11f1-ae85-806e6f6e6963):/EFI/Microsoft/Boot/bootmgfw.efi"
         ])
       ];
       secureBoot = {
