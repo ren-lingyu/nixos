@@ -57,8 +57,8 @@
       url = "git+https://github.com/sodiboo/niri-flake.git?ref=refs/heads/main&shallow=1";
       inputs.nixpkgs.follows = "nixpkgs";
     };
-    noctalia-shell = {
-      url = "git+https://github.com/noctalia-dev/noctalia-shell.git?ref=refs/heads/main&shallow=1";
+    noctalia = {
+      url = "git+https://github.com/noctalia-dev/noctalia.git?ref=refs/tags/v4.7.7&shallow=1";
       inputs.nixpkgs.follows = "nixpkgs";
     };
     nix-flatpak = {
@@ -118,7 +118,7 @@
             };
             home-manager.sharedModules = [
               inputs.niri-flake.homeModules.niri
-              inputs.noctalia-shell.homeModules.default
+              inputs.noctalia.homeModules.default
             ];
           };
         };
