@@ -3,6 +3,7 @@
   imports = [
     ./features
     ./users
+    ./overlays
   ];
   
   options = {
