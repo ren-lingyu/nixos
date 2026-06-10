@@ -83,6 +83,20 @@
           (lib.optionals config.networking.networkmanager.enable [ "networkmanager" ])
           (lib.optionals config.services.seatd.enable [ config.services.seatd.group ])
         ];
+        packages = with pkgs; (builtins.concatLists [
+          [
+            microsoft-edge
+            feishu
+            zotero
+            calibre
+            xournalpp
+          ]
+          (lib.optionals config.modules.hosts.packageGroups.tencent.enable [
+            wechat
+            wemeet
+            qq
+          ])
+        ]);
       };
     };
   };
@@ -121,14 +135,6 @@
   environment = {
     systemPackages = with pkgs; [
       usbutils
-      microsoft-edge
-      feishu
-      zotero
-      calibre
-      xournalpp
-      wechat
-      wemeet
-      qq
     ];
     usrbinenv = lib.mkForce "${pkgs.coreutils}/bin/env";
     etc = {

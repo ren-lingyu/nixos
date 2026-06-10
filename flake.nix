@@ -255,6 +255,9 @@
                     "qq"
                   ];
                 };
+                hosts = {
+                  packageGroups.tencent.enable = true;
+                };
                 features = {
                   remote.enable = true;
                   font.enable = true;

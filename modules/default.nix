@@ -1,8 +1,9 @@
 { config, pkgs, lib, ... } : {
   
   imports = [
-    ./features
+    ./hosts
     ./users
+    ./features
     ./overlays
   ];
   
