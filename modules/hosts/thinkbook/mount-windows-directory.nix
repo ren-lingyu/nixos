@@ -41,6 +41,7 @@ in {
         "d ${nixosSystemFonts}/windows 0555 ${nixosRootName} root - -"
         "d ${nixosUserHome}/knowhub 0755 ${nixosUserName} users - -"
         "d ${nixosUserHome}/ren 0755 ${nixosUserName} users - -"
+        "d ${nixosUserHome}/Desktop 0755 ${nixosUserName} users - -"
         "d ${nixosUserHome}/Downloads 0755 ${nixosUserName} users - -"
         "d ${nixosUserHome}/Documents 0755 ${nixosUserName} users - -"
         "d ${nixosUserHome}/Pictures 0755 ${nixosUserName} users - -"
@@ -48,8 +49,9 @@ in {
         "d ${nixosUserHome}/Music 0755 ${nixosUserName} users - -"
       ];
     };
-    mounts = [
-      {
+    mounts = builtins.concatLists [
+      
+      [{
         what = "${windowsSystemFonts}";
         where = "${nixosSystemFonts}/windows";
         type = "fuse.bindfs";
@@ -57,70 +59,27 @@ in {
         wantedBy = [ "multi-user.target" ];
         after = [ "mnt-c.mount" ];
         requires = [ "mnt-c.mount" ];
-      }
-      {
-        what = "${windowsUserHome}/KnowledgeHub";
-        where = "${nixosUserHome}/knowhub";
+      }]
+      
+      (lib.mapAttrsToList (nixosDirName_ : windowsDirName_ : {
+        what = "${windowsUserHome}/${windowsDirName_}";
+        where = "${nixosUserHome}/${nixosDirName_}";
         type = "fuse.bindfs";
         options = bindfsUserMountOptions;
         wantedBy = [ "multi-user.target" ];
         after = [ "mnt-c.mount" ];
         requires = [ "mnt-c.mount" ];
-      }
-      {
-        what = "${windowsUserHome}/Ren";
-        where = "${nixosUserHome}/ren";
-        type = "fuse.bindfs";
-        options = bindfsUserMountOptions;
-        wantedBy = [ "multi-user.target" ];
-        after = [ "mnt-c.mount" ];
-        requires = [ "mnt-c.mount" ];
-      }
-      {
-        what = "${windowsUserHome}/Downloads";
-        where = "${nixosUserHome}/Downloads";
-        type = "fuse.bindfs";
-        options = bindfsUserMountOptions;
-        wantedBy = [ "multi-user.target" ];
-        after = [ "mnt-c.mount" ];
-        requires = [ "mnt-c.mount" ];
-      }
-      {
-        what = "${windowsUserHome}/Documents";
-        where = "${nixosUserHome}/Documents";
-        type = "fuse.bindfs";
-        options = bindfsUserMountOptions;
-        wantedBy = [ "multi-user.target" ];
-        after = [ "mnt-c.mount" ];
-        requires = [ "mnt-c.mount" ];
-      }
-      {
-        what = "${windowsUserHome}/Pictures";
-        where = "${nixosUserHome}/Pictures";
-        type = "fuse.bindfs";
-        options = bindfsUserMountOptions;
-        wantedBy = [ "multi-user.target" ];
-        after = [ "mnt-c.mount" ];
-        requires = [ "mnt-c.mount" ];
-      }
-      {
-        what = "${windowsUserHome}/Videos";
-        where = "${nixosUserHome}/Videos";
-        type = "fuse.bindfs";
-        options = bindfsUserMountOptions;
-        wantedBy = [ "multi-user.target" ];
-        after = [ "mnt-c.mount" ];
-        requires = [ "mnt-c.mount" ];
-      }
-      {
-        what = "${windowsUserHome}/Music";
-        where = "${nixosUserHome}/Music";
-        type = "fuse.bindfs";
-        options = bindfsUserMountOptions;
-        wantedBy = [ "multi-user.target" ];
-        after = [ "mnt-c.mount" ];
-        requires = [ "mnt-c.mount" ];
-      }
+      }) {
+        ren = "Ren";
+        knowhub = "KnowledgeHub";
+        Desktop = "Desktop";
+        Downloads = "Downloads";
+        Documents = "Documents";
+        Pictures = "Pictures";
+        Music = "Music";
+        Videos = "Videos";
+      })
+      
     ];
   };
   
