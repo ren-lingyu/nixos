@@ -84,13 +84,11 @@
   };
 
   xdg = {
-    enable = true;
-    cacheHome = "${config.home.homeDirectory}/.cache";
-    configHome = "${config.home.homeDirectory}/.config";
-    binHome = "${config.home.homeDirectory}/.local/bin";
-    dataHome = "${config.home.homeDirectory}/.local/share";
-    stateHome = "${config.home.homeDirectory}/.local/state";
-    autostart.enable = true;
+    autostart = {
+      enable = false;
+      readOnly = true;
+      entries = [];
+    };
     mimeApps = {
       enable = true;
       defaultApplications = {
