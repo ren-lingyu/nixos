@@ -15,14 +15,16 @@ nixos/
 ├── README.org
 ├── .gitignore
 └── modules
+    ├── default.nix
     ├── features
+    │   ├── default.nix
     │   ├── agent
     │   │   ├── default.nix
     │   │   └── hm
     │   │       ├── commands
     │   │       │   └── commit-message.md
     │   │       └── default.nix
-    │   ├── cloud
+    │   ├── editor
     │   │   ├── default.nix
     │   │   └── hm
     │   │       └── default.nix
@@ -64,6 +66,10 @@ nixos/
     │   │   ├── default.nix
     │   │   └── hm
     │   │       └── default.nix
+    │   ├── remote
+    │   │   ├── default.nix
+    │   │   └── hm
+    │   │       └── default.nix
     │   ├── secret
     │   │   ├── default.nix
     │   │   ├── hm
@@ -80,6 +86,8 @@ nixos/
     │   │           └── .sops.yaml
     │   ├── shell
     │   │   ├── default.nix
+    │   │   ├── hm
+    │   │   │   └── default.nix
     │   │   └── os
     │   │       └── default.nix
     │   └── texlive
@@ -87,6 +95,12 @@ nixos/
     │       └── os
     │           └── default.nix
     ├── hosts
+    │   ├── default.nix
+    │   ├── aliyun
+    │   │   ├── configuration.nix
+    │   │   ├── default.nix
+    │   │   ├── disk-config.nix
+    │   │   └── hardware-configuration.nix
     │   ├── thinkbook
     │   │   ├── boot-manager.nix
     │   │   ├── configuration.nix
@@ -98,16 +112,19 @@ nixos/
     │   └── wsl
     │       ├── configuration.nix
     │       └── default.nix
+    ├── overlays
+    │   ├── default.nix
+    │   └── tencent.nix
     └── users
         ├── default.nix
         └── lingyu
+            ├── cloud-server.nix
             ├── default.nix
-            ├── editor.nix
             ├── email.nix
             ├── git.nix
+            ├── home.nix
             ├── keyring.nix
             ├── langs.nix
-            ├── shell.nix
             ├── terminal.nix
             └── .local
                 └── bin
@@ -118,23 +135,13 @@ nixos/
 
 * 关键点
 - [[file:modules/features][modules/features]] 按功能领域组织 NixOS 与 home-manager 模块, 每个 feature 含 =default.nix= 作为入口, 并按 =os/= (系统级), =hm/= (用户级), =lib/= (模块内部函数) 分层.
-- [[file:modules/hosts][modules/hosts]] 放置设备相关配置, 含 thinkbook (bare metal NixOS, hostname =nixos=) 和 wsl (NixOS-WSL, hostname =nixos-wsl=).
+- [[file:modules/hosts][modules/hosts]] 放置设备相关配置, 含 thinkbook (bare metal NixOS, hostname =nixos=), wsl (NixOS-WSL, hostname =nixos-wsl=) 和 aliyun (阿里云 ECS, hostname =nixos-aliyun=).
 - [[file:modules/users][modules/users]] 放置用户 home-manager 配置, 包含 nixvim/emacs/zsh/git/ssh/gpg/keepassxc/rclone/thunderbird/direnv 等.
-- =nixpkgs= 使用 =nixos-unstable=, 另有自行打包的 [[https://github.com/ren-lingyu/nixpkgs][ren-lingyu/nixpkgs]] overlay.
+- [[file:modules/overlays][modules/overlays]] 放置自定义 nixpkgs overlay, 覆盖上游 =qq= 和 =wechat= 等 unfree 软件的版本与下载链接, 修复因腾讯官方链接变更导致的构建失败.
+- =nixpkgs= 使用 =nixos-unstable=, 另有自行打包的 [[https://github.com/ren-lingyu/nixpkgs][ren-lingyu/nixpkgs]].
 - 启用 =nix-command= 与 =flakes=.
 - 使用 =sops-nix= 管理密钥, 系统级秘密以 host ssh key 加密, 用户级秘密以独立的 age key 加密.
 - 使用 =niri= 作为窗口管理器.
-
-* 使用
-重建系统:
-#+begin_src bash
-sudo nixos-rebuild switch --flake .#nixos
-#+end_src
-
-更新依赖:
-#+begin_src bash
-nix flake update
-#+end_src
 
 * 脚本
 - =org=: 进入 =~/org= 目录并准备 make 函数, 支持 --texlive 调用 TeX Live 工具.
