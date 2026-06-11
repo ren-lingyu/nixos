@@ -140,7 +140,7 @@ nixos/
 - [[file:modules/overlays][modules/overlays]] 放置自定义 nixpkgs overlay, 覆盖上游 =qq= 和 =wechat= 等 unfree 软件的版本与下载链接, 修复因腾讯官方链接变更导致的构建失败.
 - =nixpkgs= 使用 =nixos-unstable=, 另有自行打包的 [[https://github.com/ren-lingyu/nixpkgs][ren-lingyu/nixpkgs]].
 - 启用 =nix-command= 与 =flakes=.
-- 使用 =sops-nix= 管理密钥, 系统级秘密以 host ssh key 加密, 用户级秘密以独立的 age key 加密.
+- 使用 =sops-nix= 管理密钥, 系统级秘密以 host ssh key 加密; 用户级秘密以独立的 age key 加密, 该 age key 文件本身作为系统级 secret 由 host key 保护.
 - 使用 =niri= 作为窗口管理器.
 
 * 脚本
