@@ -1,7 +1,6 @@
 { config, lib, pkgs, ... } : {
 
   imports = [
-    ./editor.nix
     ./terminal.nix
     ./keyring.nix
     ./git.nix

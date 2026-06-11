@@ -96,6 +96,40 @@ in {
           };
         };
         
+      }) // (lib.optionalAttrs (feature_ == "editor") {
+        
+        defaultEditor = lib.mkOption {
+          type = lib.types.nullOr (lib.types.enum [
+            "vim"
+            "neovim"
+            "emacs"
+          ]);
+          default = null;
+          example = "emacs";
+          description = "Whether to enable vim.";
+        };
+        
+        vim.enable = lib.mkOption {
+          type = lib.types.bool;
+          default = false;
+          example = true;
+          description = "Whether to enable vim.";
+        };
+        
+        neovim.enable = lib.mkOption {
+          type = lib.types.bool;
+          default = false;
+          example = true;
+          description = "Whether to enable the neovim.";
+        };
+        
+        emacs.enable = lib.mkOption {
+          type = lib.types.bool;
+          default = false;
+          example = true;
+          description = "Whether to enable the emacs.";
+        };
+        
       });
       
     }) allowFeatureList));

@@ -137,13 +137,14 @@
         share = { config, pkgs, lib, ... } : {
           imports = [
             self.nixosModules.base
-            ./modules/features/remote
-            ./modules/features/texlive
-            ./modules/features/font
             ./modules/features/shell
+            ./modules/features/font
+            ./modules/features/texlive
             ./modules/features/media
             ./modules/features/office
+            ./modules/features/remote
             ./modules/features/agent
+            ./modules/features/editor
           ];
         };
       };
@@ -236,6 +237,7 @@
     };
     
     nixosConfigurations = {
+      
       nixos = inputs.nixpkgs.lib.nixosSystem {
         system = "x86_64-linux";
         modules = [
@@ -260,14 +262,21 @@
                   createXdgUserDirectories = true;
                 };
                 features = {
-                  remote.enable = true;
-                  font.enable = true;
-                  media.enable = true;
-                  office.enable = true;
                   shell.enable = true;
+                  font.enable = true;
                   texlive.enable = true;
+                  office.enable = true;
+                  media.enable = true;
+                  remote.enable = true;
                   agent.enable = true;
                   secret.enable = true;
+                  editor = {
+                    enable = true;
+                    defaultEditor = "neovim";
+                    vim.enable = false;
+                    neovim.enable = true;
+                    emacs.enable = true;
+                  };
                   niri = {
                     enable = true;
                     greeter.enable = true;
@@ -285,6 +294,7 @@
           }
         ];
       };
+      
       nixos-server = inputs.nixpkgs.lib.nixosSystem {
         system = "x86_64-linux";
         modules = [
@@ -307,6 +317,7 @@
           }
         ];
       };
+      
       nixos-wsl = inputs.nixpkgs.lib.nixosSystem {
         system = "x86_64-linux";
         modules = [
@@ -324,19 +335,28 @@
                   createXdgUserDirectories = false;
                 };
                 features = {
-                  remote.enable = true;
-                  font.enable = true;
-                  media.enable = false;
-                  office.enable = false;
                   shell.enable = true;
+                  font.enable = true;
                   texlive.enable = true;
+                  office.enable = false;
+                  media.enable = false;
+                  remote.enable = true;
+                  agent.enable = true;
                   secret.enable = true;
+                  editor = {
+                    enable = true;
+                    defaultEditor = "neovim";
+                    vim.enable = false;
+                    neovim.enable = true;
+                    emacs.enable = true;
+                  };
                 };
               };
             };
           }
         ];
       };
+      
     };
     
   };
