@@ -13,6 +13,7 @@
     # };
     
     environment.systemPackages = with pkgs; [
+      v4l-utils
       libva-utils
       ffmpeg
     ];
