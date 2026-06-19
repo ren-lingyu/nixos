@@ -258,6 +258,7 @@
                     "wemeet"
                     "wechat"
                     "qq"
+                    "zoom"
                   ];
                   createXdgUserDirectories = true;
                 };

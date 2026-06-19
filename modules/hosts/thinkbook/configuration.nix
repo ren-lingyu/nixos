@@ -86,6 +86,7 @@
         packages = with pkgs; (builtins.concatLists [
           [
             microsoft-edge
+            zoom-us
             feishu
             zotero
             calibre
