@@ -145,6 +145,7 @@
             ./modules/features/remote
             ./modules/features/agent
             ./modules/features/editor
+            ./modules/features/proxy
           ];
         };
       };
@@ -271,6 +272,11 @@
                   remote.enable = true;
                   agent.enable = true;
                   secret.enable = true;
+                  proxy = {
+                    enable = true;
+                    clash.enable = true;
+                    v2raya.enable = true;
+                  };
                   editor = {
                     enable = true;
                     defaultEditor = "neovim";

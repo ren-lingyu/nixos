@@ -130,6 +130,22 @@ in {
           description = "Whether to enable the emacs.";
         };
         
+      }) // (lib.optionalAttrs (feature_ == "proxy") {
+        
+        clash.enable = lib.mkOption {
+          type = lib.types.bool;
+          default = false;
+          example = true;
+          description = "Whether to enable clash.";
+        };
+        
+        v2raya.enable = lib.mkOption {
+          type = lib.types.bool;
+          default = false;
+          example = true;
+          description = "Whether to enable the v2raya.";
+        };
+        
       });
       
     }) allowFeatureList));

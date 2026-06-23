@@ -223,13 +223,6 @@
         };
       };
     };
-    clash-verge = {
-      enable = true;
-      package = pkgs.clash-verge-rev;
-      autoStart = true;
-      serviceMode = true;
-      tunMode = true;
-    };
     thunderbird = {
       enable = true;
     };
