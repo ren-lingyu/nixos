@@ -4,6 +4,9 @@
     
     programs.nixvim = {
       enable = osConfig.modules.features.editor.neovim.enable;
+      nixpkgs = {
+        useGlobalPackages = true;
+      };
       defaultEditor = osConfig.modules.features.editor.defaultEditor == "neovim";
       viAlias = true;
       vimAlias = true;
