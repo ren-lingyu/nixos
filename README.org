@@ -66,6 +66,10 @@ nixos/
     │   │   ├── default.nix
     │   │   └── hm
     │   │       └── default.nix
+    │   ├── proxy
+    │   │   ├── default.nix
+    │   │   └── os
+    │   │       └── default.nix
     │   ├── remote
     │   │   ├── default.nix
     │   │   └── hm
@@ -134,14 +138,16 @@ nixos/
 #+end_example
 
 * 关键点
-- [[file:modules/features][modules/features]] 按功能领域组织 NixOS 与 home-manager 模块, 每个 feature 含 =default.nix= 作为入口, 并按 =os/= (系统级), =hm/= (用户级), =lib/= (模块内部函数) 分层.
-- [[file:modules/hosts][modules/hosts]] 放置设备相关配置, 含 thinkbook (bare metal NixOS, hostname =nixos=), wsl (NixOS-WSL, hostname =nixos-wsl=) 和 aliyun (阿里云 ECS, hostname =nixos-aliyun=).
+- [[file:modules/features][modules/features]] 按功能领域组织 NixOS 与 home-manager 模块, 每个 feature 含 =default.nix= 作为入口, 并按 =os/= (系统级), =hm/= (用户级), =lib/= (模块内部函数) 分层. 其中 =shell=, =font=, =texlive=, =media=, =office=, =remote=, =agent=, =editor=, =proxy= 以 =share= bundle 聚合, 可被多个 host 复用.
+- [[file:modules/hosts][modules/hosts]] 放置设备相关配置, 含 thinkbook (bare metal NixOS, hostname =nixos=), wsl (NixOS-WSL, hostname =nixos-wsl=) 和 aliyun (阿里云 ECS, hostname =nixos-server=).
 - [[file:modules/users][modules/users]] 放置用户 home-manager 配置, 包含 nixvim/emacs/zsh/git/ssh/gpg/keepassxc/rclone/thunderbird/direnv 等.
 - [[file:modules/overlays][modules/overlays]] 放置自定义 nixpkgs overlay, 覆盖上游 =qq= 和 =wechat= 等 unfree 软件的版本与下载链接, 修复因腾讯官方链接变更导致的构建失败.
-- =nixpkgs= 使用 =nixos-unstable=, 另有自行打包的 [[https://github.com/ren-lingyu/nixpkgs][ren-lingyu/nixpkgs]].
+- =nixpkgs= 使用 =nixos-unstable=, 另有自行打包的 [[https://github.com/ren-lingyu/nixpkgs][ren-lingyu/nixpkgs]] (作为 =arcc= overlay 引入).
 - 启用 =nix-command= 与 =flakes=.
 - 使用 =sops-nix= 管理密钥, 系统级秘密以 host ssh key 加密; 用户级秘密以独立的 age key 加密, 该 age key 文件本身作为系统级 secret 由 host key 保护.
-- 使用 =niri= 作为窗口管理器.
+- 使用 =niri= 作为窗口管理器, 通过 =niri-flake= overlay 与 home module 集成, =noctalia= 提供 shell/bar 组件, 可选用 =waybar=.
+- aliyun ECS 通过 =nixos-anywhere= + =disko= 远程部署和分区.
+- thinkbook 通过 =nix-flatpak= 管理 Flatpak 应用.
 
 * 脚本
 - =org=: 进入 =~/org= 目录并准备 make 函数, 支持 --texlive 调用 TeX Live 工具.
