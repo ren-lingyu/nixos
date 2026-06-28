@@ -274,8 +274,9 @@
                   secret.enable = true;
                   proxy = {
                     enable = true;
-                    clash.enable = true;
-                    v2raya.enable = true;
+                    mihomo.enable = false;
+                    v2raya.enable = false;
+                    throne.enable = true;
                   };
                   editor = {
                     enable = true;
