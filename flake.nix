@@ -28,7 +28,7 @@
       # url = "git+https://github.com/NixOS/nixpkgs?ref=refs/heads/nixos-unstable&rev=025c852a89be820b3117f604c8ace42e9b4caa08&shallow=1";
       # url = "git+https://mirrors.tuna.tsinghua.edu.cn/git/nixpkgs.git?ref=refs/heads/nixos-unstable&shallow=1";
     };
-    arcc-nixpkgs = {
+    self-nixpkgs = {
       url = "git+https://github.com/ren-lingyu/nixpkgs.git?ref=refs/heads/main&shallow=1";
       inputs.nixpkgs.follows = "nixpkgs";
     };
@@ -88,15 +88,15 @@
       
       base = { config, pkgs, lib, ... } : {
         imports = [
-          inputs.home-manager.nixosModules.home-manager
+          inputs.home-manager.nixosModules.home-manager          
           ./modules
         ];
         config = {
-          nixpkgs.overlays = [
-            (final: prev: {
-              arcc = inputs.arcc-nixpkgs.packages."${prev.system}";
-            })
-          ];
+          nixpkgs = {
+            overlays = [
+              inputs.self-nixpkgs.overlays.default
+            ];
+          };          
           home-manager.extraSpecialArgs = {
             inherit inputs;
           };

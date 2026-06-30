@@ -1,27 +1,5 @@
 {
   "nodes": {
-    "arcc-nixpkgs": {
-      "inputs": {
-        "nixpkgs": [
-          "nixpkgs"
-        ]
-      },
-      "locked": {
-        "lastModified": 1777260333,
-        "narHash": "sha256-RtOrFUMVrudrrJohABK97UyBY/AfgEXv7CDpyD7W7Jk=",
-        "ref": "refs/heads/main",
-        "rev": "93e649340a81408319be480ad18fec66ad849375",
-        "shallow": true,
-        "type": "git",
-        "url": "https://github.com/ren-lingyu/nixpkgs.git"
-      },
-      "original": {
-        "ref": "refs/heads/main",
-        "shallow": true,
-        "type": "git",
-        "url": "https://github.com/ren-lingyu/nixpkgs.git"
-      }
-    },
     "disko": {
       "inputs": {
         "nixpkgs": [
@@ -460,7 +438,6 @@
     },
     "root": {
       "inputs": {
-        "arcc-nixpkgs": "arcc-nixpkgs",
         "disko": [
           "nixos-anywhere",
           "disko"
@@ -474,8 +451,31 @@
         "nixpkgs": "nixpkgs_2",
         "nixvim": "nixvim",
         "noctalia": "noctalia",
+        "self-nixpkgs": "self-nixpkgs",
         "sops-nix": "sops-nix",
         "vscode-server": "vscode-server"
+      }
+    },
+    "self-nixpkgs": {
+      "inputs": {
+        "nixpkgs": [
+          "nixpkgs"
+        ]
+      },
+      "locked": {
+        "lastModified": 1782813546,
+        "narHash": "sha256-qp3zg2kOUah39xHGAER+gnIBpCLNkl5XnroRQwItI7w=",
+        "ref": "refs/heads/main",
+        "rev": "e9eb13a98665477dd3247bc06d12af8385da8764",
+        "shallow": true,
+        "type": "git",
+        "url": "https://github.com/ren-lingyu/nixpkgs.git"
+      },
+      "original": {
+        "ref": "refs/heads/main",
+        "shallow": true,
+        "type": "git",
+        "url": "https://github.com/ren-lingyu/nixpkgs.git"
       }
     },
     "sops-nix": {
