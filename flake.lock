@@ -463,10 +463,10 @@
         ]
       },
       "locked": {
-        "lastModified": 1782813546,
-        "narHash": "sha256-qp3zg2kOUah39xHGAER+gnIBpCLNkl5XnroRQwItI7w=",
+        "lastModified": 1782829695,
+        "narHash": "sha256-3TzhFzC60kJN6zFLOGh+ySao2+a/UFxz6XZv/m90mRg=",
         "ref": "refs/heads/main",
-        "rev": "e9eb13a98665477dd3247bc06d12af8385da8764",
+        "rev": "f626785d38adc302d52798498fcfe5a07e5d6afd",
         "shallow": true,
         "type": "git",
         "url": "https://github.com/ren-lingyu/nixpkgs.git"

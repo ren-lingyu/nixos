@@ -13,7 +13,6 @@
     
     home.packages = with pkgs; [
       adwaita-icon-theme
-      nautilus
     ];
 
     xdg.portal = {
@@ -28,6 +27,14 @@
     programs.niri = {
       enable = osConfig.modules.features.niri.enable;
       package = osConfig.programs.niri.package;
+    };
+
+    programs.wayfile = {
+      enable = true;
+      package = pkgs.wayfile;
+      mimeTypes = [
+        "inode/directory"
+      ];
     };
     
     programs.fuzzel = lib.mkIf (!config.programs.noctalia-shell.enable) {

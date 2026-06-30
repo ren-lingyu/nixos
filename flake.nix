@@ -88,7 +88,7 @@
       
       base = { config, pkgs, lib, ... } : {
         imports = [
-          inputs.home-manager.nixosModules.home-manager          
+          inputs.home-manager.nixosModules.home-manager
           ./modules
         ];
         config = {
@@ -96,9 +96,14 @@
             overlays = [
               inputs.self-nixpkgs.overlays.default
             ];
-          };          
-          home-manager.extraSpecialArgs = {
-            inherit inputs;
+          };
+          home-manager = {
+            sharedModules = [
+              inputs.self-nixpkgs.homeManagerModules.default
+            ];
+            extraSpecialArgs = {
+              inherit inputs;
+            };
           };
         };
       };
