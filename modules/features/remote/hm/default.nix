@@ -51,6 +51,18 @@
             drive_id = config.sops.secrets."onedrive.drive_id".path;
           };
         };
+        "AliCloudOSS" = {
+          config = {
+            type = "s3";
+            provider = "Alibaba";
+            acl = "private";
+            endpoint = "oss-cn-beijing.aliyuncs.com";
+          };
+          secrets = {
+            access_key_id = config.sops.secrets."alibabacloud.oss.access_key_id".path;
+            secret_access_key = config.sops.secrets."alibabacloud.oss.secret_access_key".path;
+          };
+        };
       };
     };
 
