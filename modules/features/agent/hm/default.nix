@@ -118,13 +118,17 @@
         };
         
       };
-      
-      agents = {};
+
       tools = {};
-      commands = {
-        commit-message = builtins.readFile ./commands/commit-message.md;
+      agents = {
+        git-maintainer = ./git-maintainer/agents/git-maintainer.md;
       };
-      skills = {};
+      commands = {
+        commit-message = ./git-maintainer/commands/commit-message.md;
+      };
+      skills = {
+        git-maintenance = ./git-maintainer/skills/git-maintenance;
+      };
       themes = {};
       tui = {};
       context = "";
