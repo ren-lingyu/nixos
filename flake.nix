@@ -151,6 +151,7 @@
             ./modules/features/agent
             ./modules/features/editor
             ./modules/features/proxy
+            ./modules/features/greeter
           ];
         };
       };
@@ -289,9 +290,9 @@
                     neovim.enable = true;
                     emacs.enable = true;
                   };
+                  greeter.enable = true;
                   niri = {
                     enable = true;
-                    greeter.enable = true;
                     monitor = {
                       name = "eDP-1";
                       width = 3072;

@@ -16,11 +16,13 @@ feature_ : { config, pkgs, lib, ... } : {
     description = "Whether to enable the Waybar status bar for Niri.";
   };
   
-  greeter.enable = lib.mkOption {
-    type = lib.types.bool;
-    default = config.modules.features.${feature_}.enable;
-    example = true;
-    description = "Whether to enable the greeter (display manager) for Niri.";
+  session-wrapper = lib.mkOption {
+    type = lib.types.unique {
+      message = "Only one module may define `modules.features.${feature_}.session-wrapper.package`.";
+    } (lib.types.nullOr lib.types.package);
+    default = null;
+    internal = true;
+    description = "Internal package providing the niri session command for greeters.";
   };
   
   monitor = {
@@ -28,7 +30,7 @@ feature_ : { config, pkgs, lib, ... } : {
       type = lib.types.str;
       default = "eDP-1";
       example = "eDP-1";
-      description = "Name of the primary monitor for Niri output configuration.";
+      description = "Name of the primary monitor.";
     };
     width = lib.mkOption {
       type = lib.types.ints.unsigned;

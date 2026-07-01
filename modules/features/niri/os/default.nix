@@ -1,9 +1,5 @@
 { config, pkgs, lib, ... } : {
-
-  imports = [
-    ./greeter.nix
-  ];
-
+  
   config = lib.mkIf config.modules.features.niri.enable {
 
     programs.niri = {
