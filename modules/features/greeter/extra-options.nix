@@ -5,25 +5,25 @@ feature_ : { config, pkgs, lib, ... } : {
     description = "";
   };
   
-  monitor = {
-    name = lib.mkOption {
-      type = lib.types.str;
-      default = "eDP-1";
-      example = "eDP-1";
-      description = "Name of the primary monitor.";
+  monitor = lib.mkOption {
+    type = lib.types.unique {
+      message = "`modules.features.greater.monitor`";
+    } (lib.types.submodule ({ name, config, ... } : {
+      options = {
+        name = lib.mkOption {
+          type =  lib.types.nullOr lib.types.str;
+          default = null;
+          example = "eDP-1";
+          description = "Name of the default monitor.";
+        };
+      };
+    }));
+    internal = true;
+    default = { };
+    example = {
+      name = "eDP-1";
     };
-    width = lib.mkOption {
-      type = lib.types.ints.unsigned;
-      default = 3072;
-      example = 3072;
-      description = "Width of the primary monitor in pixels.";
-    };
-    height = lib.mkOption {
-      type = lib.types.ints.unsigned;
-      default = 1920;
-      example = 1920;
-      description = "Height of the primary monitor in pixels.";
-    };
+    description = "Metadata of the default monitor.";
   };
   
 }

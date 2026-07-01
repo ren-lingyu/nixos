@@ -1,4 +1,4 @@
-feature_ : { config, pkgs, lib, ... } : {
+feature_ : { options, config, pkgs, lib, ... } : {
   
   noctalia.enable = lib.mkOption {
     type = lib.types.bool;
@@ -25,25 +25,6 @@ feature_ : { config, pkgs, lib, ... } : {
     description = "Internal package providing the niri session command for greeters.";
   };
   
-  monitor = {
-    name = lib.mkOption {
-      type = lib.types.str;
-      default = "eDP-1";
-      example = "eDP-1";
-      description = "Name of the primary monitor.";
-    };
-    width = lib.mkOption {
-      type = lib.types.ints.unsigned;
-      default = 3072;
-      example = 3072;
-      description = "Width of the primary monitor in pixels.";
-    };
-    height = lib.mkOption {
-      type = lib.types.ints.unsigned;
-      default = 1920;
-      example = 1920;
-      description = "Height of the primary monitor in pixels.";
-    };
-  };
+  monitors = options.modules.hosts.monitors;
   
 }

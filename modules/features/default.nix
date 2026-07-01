@@ -1,4 +1,4 @@
-{ config, pkgs, lib, ... } : {
+{ options, config, pkgs, lib, ... } : {
   
   options = {
     
@@ -52,6 +52,7 @@
         
       } // (lib.optionalAttrs (builtins.pathExists possibleExtraOptionsPath_) (
         (import possibleExtraOptionsPath_) feature_ {
+          inherit options;
           inherit config;
           inherit pkgs;
           inherit lib;

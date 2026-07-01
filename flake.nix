@@ -293,11 +293,6 @@
                   greeter.enable = true;
                   niri = {
                     enable = true;
-                    monitor = {
-                      name = "eDP-1";
-                      width = 3072;
-                      height = 1920;
-                    };
                     noctalia.enable = true;
                     waybar.enable = false;
                   };

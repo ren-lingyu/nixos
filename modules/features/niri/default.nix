@@ -27,6 +27,8 @@ in {
         hm = true;
       };
       
+      monitors = config.modules.hosts.monitors;
+      
       session-wrapper = lib.mkIf config.programs.niri.enable (let
         commandName_ = "Niri";
       in pkgs.runCommand "niri-session-wrapper" {
