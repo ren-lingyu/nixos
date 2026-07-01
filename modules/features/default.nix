@@ -1,16 +1,16 @@
-{ config, pkgs, lib, ... } : let
-  
-  allowFeatureList = builtins.attrNames (lib.filterAttrs (name: type: type == "directory") (builtins.readDir ./.));
-  
-in {
+{ config, pkgs, lib, ... } : {
   
   options = {
     
-    modules.features = (builtins.listToAttrs (builtins.map (feature_: {
+    modules.features = (builtins.listToAttrs (builtins.map (feature_ : {
       
       name = feature_;
       
-      value = {
+      value = let
+      
+        possibleExtraOptionsPath_ = ./. + "/${builtins.toString feature_}/extra-options.nix";
+      
+      in {
         
         enable = lib.mkOption {
           type = lib.types.bool;
@@ -50,119 +50,17 @@ in {
           };
         };
         
-      } // (lib.optionalAttrs (feature_ == "niri") {
-        
-        noctalia.enable = lib.mkOption {
-          type = lib.types.bool;
-          default = config.modules.features.${feature_}.enable;
-          example = true;
-          description = "Whether to enable the Noctalia shell configuration for Niri.";
-        };
-
-        waybar.enable = lib.mkOption {
-          type = lib.types.bool;
-          default =
-            !config.modules.features.${feature_}.noctalia.enable
-            && config.modules.features.${feature_}.enable;
-          example = false;
-          description = "Whether to enable the Waybar status bar for Niri.";
-        };
-
-        greeter.enable = lib.mkOption {
-          type = lib.types.bool;
-          default = config.modules.features.${feature_}.enable;
-          example = true;
-          description = "Whether to enable the greeter (display manager) for Niri.";
-        };
-
-        monitor = {
-          name = lib.mkOption {
-            type = lib.types.str;
-            default = "eDP-1";
-            example = "eDP-1";
-            description = "Name of the primary monitor for Niri output configuration.";
-          };
-          width = lib.mkOption {
-            type = lib.types.ints.unsigned;
-            default = 3072;
-            example = 3072;
-            description = "Width of the primary monitor in pixels.";
-          };
-          height = lib.mkOption {
-            type = lib.types.ints.unsigned;
-            default = 1920;
-            example = 1920;
-            description = "Height of the primary monitor in pixels.";
-          };
-        };
-        
-      }) // (lib.optionalAttrs (feature_ == "editor") {
-        
-        defaultEditor = lib.mkOption {
-          type = lib.types.nullOr (lib.types.enum [
-            "vim"
-            "neovim"
-            "emacs"
-          ]);
-          default = null;
-          example = "emacs";
-          description = "Whether to enable vim.";
-        };
-        
-        vim.enable = lib.mkOption {
-          type = lib.types.bool;
-          default = false;
-          example = true;
-          description = "Whether to enable vim.";
-        };
-        
-        neovim.enable = lib.mkOption {
-          type = lib.types.bool;
-          default = false;
-          example = true;
-          description = "Whether to enable the neovim.";
-        };
-        
-        emacs.enable = lib.mkOption {
-          type = lib.types.bool;
-          default = false;
-          example = true;
-          description = "Whether to enable the emacs.";
-        };
-        
-      }) // (lib.optionalAttrs (feature_ == "proxy") {
-        
-        clash-verge.enable = lib.mkOption {
-          type = lib.types.bool;
-          default = false;
-          example = true;
-          description = "Whether to enable clash-verge.";
-        };
-        
-        throne.enable = lib.mkOption {
-          type = lib.types.bool;
-          default = false;
-          example = true;
-          description = "Whether to enable the throne.";
-        };
-        
-        mihomo.enable = lib.mkOption {
-          type = lib.types.bool;
-          default = false;
-          example = true;
-          description = "Whether to enable the mihomo service.";
-        };
-        
-        v2raya.enable = lib.mkOption {
-          type = lib.types.bool;
-          default = false;
-          example = true;
-          description = "Whether to enable the v2raya service.";
-        };
-        
-      });
+      } // (lib.optionalAttrs (builtins.pathExists possibleExtraOptionsPath_) (
+        (import possibleExtraOptionsPath_) feature_ {
+          inherit config;
+          inherit pkgs;
+          inherit lib;
+        }
+      ));
       
-    }) allowFeatureList));
+    }) (
+      builtins.attrNames (lib.filterAttrs (name: type: type == "directory") (builtins.readDir ./.))
+    )));
     
   };
   
