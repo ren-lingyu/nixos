@@ -22,18 +22,14 @@ in {
     };
     
     environment = {
-      sessionVariables = {
-        PATH = builtins.concatStringsSep ":" (builtins.map (
-          x_ : builtins.dirOf (lib.getExe x_)
-        ) cfg.sessionPackages);
-      };
+      systemPackages = cfg.sessionPackages;
       etc = {
         "greetd/environments" = {
           enable = true;
           target = "greetd/environments";
-          text = builtins.concatStringsSep "\n" ((builtins.map (
+          text = (builtins.concatStringsSep "\n" (builtins.map (
             x_ : "${builtins.baseNameOf (lib.getExe x_)}"
-          ) cfg.sessionPackages) ++ [ "\n" ]);
+          ) cfg.sessionPackages)) + "\n";
         };
       };
     };
