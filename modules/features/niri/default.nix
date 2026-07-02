@@ -27,7 +27,15 @@ in {
         hm = true;
       };
       
-      monitors = config.modules.hosts.monitors;
+      monitors = let
+        enabledHosts_ = builtins.attrValues (lib.filterAttrs (unused_name_ : host_ : (
+          host_.enable
+        )) config.modules.hosts);
+      in (
+        if (builtins.length enabledHosts_) == 1
+        then (builtins.head enabledHosts_).monitors
+        else {}
+      );
       
       session-wrapper = lib.mkIf config.programs.niri.enable (let
         commandName_ = "Niri";
@@ -48,11 +56,19 @@ in {
     assertions = [
       {
         assertion = let
+          enabledHosts_ = builtins.attrValues (lib.filterAttrs (unused_name_ : host_ : (
+            host_.enable
+          )) config.modules.hosts);
+        in (!config.modules.features.niri.enable || (builtins.length enabledHosts_) == 1);
+        message = "`modules.features.niri.enable = true` requires exactly one host in `modules.hosts` to set `enable = true`.";
+      }
+      {
+        assertion = let
           defaultMonitors_ = builtins.attrValues (lib.filterAttrs (unused_name_ : monitor_ : (
             monitor_.role == "default"
-          )) config.modules.hosts.monitors);
+          )) config.modules.features.niri.monitors);
         in (!config.modules.features.niri.enable || (builtins.length defaultMonitors_) == 1);
-        message = "`modules.features.niri.enable = true` requires exactly one monitor in `modules.hosts.monitors` to set `role = \"default\"`.";
+        message = "`modules.features.niri.enable = true` requires exactly one monitor in the enabled host's `monitors` to set `role = \"default\"`.";
       }
       {
         assertion = !config.modules.features.niri.waybar.enable || config.modules.features.niri.enable;

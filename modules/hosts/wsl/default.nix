@@ -4,4 +4,8 @@
     ./configuration.nix
   ];
   
+  config = {
+    modules.hosts.wsl.enable = true;
+  };
+  
 }

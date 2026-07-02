@@ -3,7 +3,7 @@
 # https://search.nixos.org/options and in the NixOS manual (`nixos-help`).
 { config, lib, pkgs, ... } : {
   
-  config = {
+  config = lib.mkIf config.modules.hosts.thinkbook.enable {
     
     nix.settings = {
       trusted-users = [ "@wheel" "root" ];
@@ -93,7 +93,7 @@
               calibre
               xournalpp
             ]
-            (lib.optionals config.modules.hosts.packageGroups.tencent.enable [
+            (lib.optionals config.modules.hosts.thinkbook.packageGroups.tencent.enable [
               wechat
               wemeet
               qq

@@ -228,7 +228,7 @@
             inputs.nix-flatpak.nixosModules.nix-flatpak
             ./modules/hosts/thinkbook
           ];
-          config.modules.hosts = {
+          config.modules.hosts.thinkbook = {
             packageGroups.tencent.enable = true;
           };
         };

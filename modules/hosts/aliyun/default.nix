@@ -6,4 +6,8 @@
     ./disk-config.nix
   ];
   
+  config = {
+    modules.hosts.aliyun.enable = true;
+  };
+  
 }

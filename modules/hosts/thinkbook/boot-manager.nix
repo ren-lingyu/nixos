@@ -1,6 +1,6 @@
 { config, lib, pkgs, ... } : {
   
-  config = {
+  config = lib.mkIf config.modules.hosts.thinkbook.enable {
     
     environment.systemPackages = with pkgs; [
       sbctl

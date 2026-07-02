@@ -10,7 +10,8 @@
   ];
   
   config = {
-    modules.hosts = {
+    modules.hosts.thinkbook = {
+      enable = true;
       monitors = {
         "eDP-1" = {
           name = "eDP-1";

@@ -1,6 +1,6 @@
 { config, pkgs, lib, ... } : {
 
-  config = {
+  config = lib.mkIf config.modules.hosts.aliyun.enable {
     
     disko.devices.disk = {
       system = {

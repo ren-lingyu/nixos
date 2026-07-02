@@ -7,7 +7,7 @@
     (modulesPath + "/profiles/qemu-guest.nix")
   ];
 
-  config = {
+  config = lib.mkIf config.modules.hosts.aliyun.enable {
     
     boot.initrd.availableKernelModules = [ "ata_piix" "uhci_hcd" "virtio_pci" "virtio_blk" ];
     boot.initrd.kernelModules = [ ];

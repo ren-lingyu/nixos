@@ -24,7 +24,7 @@
   
 in {
   
-  config = {
+  config = lib.mkIf config.modules.hosts.thinkbook.enable {
     
     environment.systemPackages = with pkgs; [
       bindfs

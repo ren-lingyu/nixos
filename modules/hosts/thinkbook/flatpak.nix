@@ -1,6 +1,6 @@
 { config, lib, pkgs, ... } : {
   
-  config = {
+  config = lib.mkIf config.modules.hosts.thinkbook.enable {
     
     xdg.portal.enable = lib.mkIf config.services.flatpak.enable (lib.mkForce true);
     

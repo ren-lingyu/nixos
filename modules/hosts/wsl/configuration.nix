@@ -12,7 +12,7 @@
   #   <nixos-wsl/modules>
   # ];
 
-  config = {
+  config = lib.mkIf config.modules.hosts.wsl.enable {
     
     nix.settings = {
       trusted-users = [ "@wheel" "root" ];

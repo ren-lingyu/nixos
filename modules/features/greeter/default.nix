@@ -14,9 +14,16 @@
       };
       
       monitor = let
+        enabledHosts_ = builtins.attrValues (lib.filterAttrs (unused_name_ : host_ : (
+          host_.enable
+        )) config.modules.hosts);
+        activeMonitors_ =
+          if (builtins.length enabledHosts_) == 1
+          then (builtins.head enabledHosts_).monitors
+          else {};
         defaultMonitors_ = builtins.attrValues (lib.filterAttrs (unused_name_ : monitor_ : (
           monitor_.role == "default"
-        )) config.modules.hosts.monitors);
+        )) activeMonitors_);
       in {
         name =
           if (builtins.length defaultMonitors_) == 1
@@ -37,11 +44,27 @@
     assertions = [
       {
         assertion = let
+          enabledHosts_ = builtins.attrValues (lib.filterAttrs (unused_name_ : host_ : (
+            host_.enable
+          )) config.modules.hosts);
+        in (!config.modules.features.greeter.enable || (builtins.length enabledHosts_) == 1);
+        message = "`modules.features.greeter.enable = true` requires exactly one host in `modules.hosts` to set `enable = true`.";
+      }
+      {
+        assertion = let
+          enabledHosts_ = builtins.attrValues (lib.filterAttrs (unused_name_ : host_ : (
+            host_.enable
+          )) config.modules.hosts);
+          activeMonitors_ = (
+            if (builtins.length enabledHosts_) == 1
+            then (builtins.head enabledHosts_).monitors
+            else {}
+          );
           defaultMonitors_ = builtins.attrValues (lib.filterAttrs (unused_name_ : monitor_ : (
             monitor_.role == "default"
-          )) config.modules.hosts.monitors);
+          )) activeMonitors_);
         in (!config.modules.features.greeter.enable || (builtins.length defaultMonitors_) == 1);
-        message = "`modules.features.greeter.enable = true` requires exactly one monitor in `modules.hosts.monitors` to set `role = \"default\"`.";
+        message = "`modules.features.greeter.enable = true` requires exactly one monitor in the enabled host's `monitors` to set `role = \"default\"`.";
       }
     ];
     
