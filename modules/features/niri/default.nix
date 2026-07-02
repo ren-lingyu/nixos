@@ -47,6 +47,14 @@ in {
     
     assertions = [
       {
+        assertion = let
+          defaultMonitors_ = builtins.attrValues (lib.filterAttrs (unused_name_ : monitor_ : (
+            monitor_.role == "default"
+          )) config.modules.hosts.monitors);
+        in (!config.modules.features.niri.enable || (builtins.length defaultMonitors_) == 1);
+        message = "`modules.features.niri.enable = true` requires exactly one monitor in `modules.hosts.monitors` to set `role = \"default\"`.";
+      }
+      {
         assertion = !config.modules.features.niri.waybar.enable || config.modules.features.niri.enable;
         message = "`modules.features.niri.waybar.enable = true` is only allowed when `modules.features.niri.enable = true;`.";
       }

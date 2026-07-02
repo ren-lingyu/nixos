@@ -14,13 +14,14 @@
       };
       
       monitor = let
-        defaultMonitors_ = builtins.head (
-          builtins.attrValues (lib.filterAttrs (unused_name_ : monitor_ : (
-            monitor_.role == "default"
-          )) config.modules.hosts.monitors)
-        );
+        defaultMonitors_ = builtins.attrValues (lib.filterAttrs (unused_name_ : monitor_ : (
+          monitor_.role == "default"
+        )) config.modules.hosts.monitors);
       in {
-        name = defaultMonitors_.name;
+        name =
+          if (builtins.length defaultMonitors_) == 1
+          then (builtins.head defaultMonitors_).name
+          else null;
       };
       
       sessionPackages = builtins.concatLists (builtins.map (
@@ -32,6 +33,17 @@
       ]);
       
     };
+    
+    assertions = [
+      {
+        assertion = let
+          defaultMonitors_ = builtins.attrValues (lib.filterAttrs (unused_name_ : monitor_ : (
+            monitor_.role == "default"
+          )) config.modules.hosts.monitors);
+        in (!config.modules.features.greeter.enable || (builtins.length defaultMonitors_) == 1);
+        message = "`modules.features.greeter.enable = true` requires exactly one monitor in `modules.hosts.monitors` to set `role = \"default\"`.";
+      }
+    ];
     
   };
   
