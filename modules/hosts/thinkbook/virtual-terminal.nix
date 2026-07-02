@@ -15,43 +15,46 @@
   ];
 
 in {
-
-  environment.systemPackages = with pkgs; [
-    fbset
-  ];
-
-  systemd.services = {
-    fbset-before-display-manager = {
-      description = "Force fb0 mode to 3072x1920 before display-manager (greeter)";
-      wantedBy = [ "display-manager.service" ];
-      before = [ "display-manager.service" ];
-      serviceConfig = {
-        Type = "oneshot";
-        RemainAfterExit = true;
-        ExecStart = forceFb0;
+  
+  config = {
+    
+    environment.systemPackages = with pkgs; [
+      fbset
+    ];
+    
+    systemd.services = {
+      fbset-before-display-manager = {
+        description = "Force fb0 mode to 3072x1920 before display-manager (greeter)";
+        wantedBy = [ "display-manager.service" ];
+        before = [ "display-manager.service" ];
+        serviceConfig = {
+          Type = "oneshot";
+          RemainAfterExit = true;
+          ExecStart = forceFb0;
+        };
+      };
+      fbset-on-drm-change = {
+        description = "Force fb0 mode to 3072x1920 on drm card0 change";
+        serviceConfig = {
+          Type = "oneshot";
+          ExecStart = forceFb0;
+        };
       };
     };
-    fbset-on-drm-change = {
-      description = "Force fb0 mode to 3072x1920 on drm card0 change";
-      serviceConfig = {
-        Type = "oneshot";
-        ExecStart = forceFb0;
-      };
+    
+    services.udev = {
+      enable = true;
+      extraRules = udevRule;
     };
+    
+    console = {
+      enable = true;
+      font = "latarcyrheb-sun32";
+      # font = "Lat2-Terminus16";
+      # keyMap = "us";
+      useXkbConfig = true; # use xkb.options in tty.
+    };
+    
   };
-
-  services.udev = {
-    enable = true;
-    extraRules = udevRule;
-  };
-
-  console = {
-    enable = true;
-    font = "latarcyrheb-sun32";
-    # font = "Lat2-Terminus16";
-    # keyMap = "us";
-    useXkbConfig = true; # use xkb.options in tty.
-  };
-
-
+  
 }

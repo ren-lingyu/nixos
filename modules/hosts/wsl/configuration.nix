@@ -11,296 +11,301 @@
   #   # include NixOS-WSL modules
   #   <nixos-wsl/modules>
   # ];
-  
-  nix.settings = {
-    trusted-users = [ "@wheel" "root" ];
-  };
-  
-  networking.hostName = "nixos-wsl";
-  
-  hardware.graphics = {
-    enable = true;
-    extraPackages = with pkgs; [
-      intel-media-driver
-      intel-vaapi-driver
-      vpl-gpu-rt
-      intel-compute-runtime
-    ];
-  };
 
-  time = {
-    timeZone = "Asia/Shanghai";
-  };
-  
-  wsl = {
-    enable = true;
-    defaultUser = "1000";
-    interop = {
-      includePath = false;
-      register = true;
+  config = {
+    
+    nix.settings = {
+      trusted-users = [ "@wheel" "root" ];
     };
-    wslConf = {
-      automount = {
-        enabled = true;
-        root = "/mnt";
+    
+    networking.hostName = "nixos-wsl";
+    
+    hardware.graphics = {
+      enable = true;
+      extraPackages = with pkgs; [
+        intel-media-driver
+        intel-vaapi-driver
+        vpl-gpu-rt
+        intel-compute-runtime
+      ];
+    };
+
+    time = {
+      timeZone = "Asia/Shanghai";
+    };
+    
+    wsl = {
+      enable = true;
+      defaultUser = "1000";
+      interop = {
+        includePath = false;
+        register = true;
+      };
+      wslConf = {
+        automount = {
+          enabled = true;
+          root = "/mnt";
+        };
+      };
+      startMenuLaunchers = true;
+      docker-desktop.enable = true;
+      useWindowsDriver = true;
+    };
+    
+    users = {
+      groups.docker = {};
+      users = {
+        "1000"  = {
+          uid = 1000;
+          isNormalUser = true;
+          linger = true;
+          extraGroups = [ "wheel" "docker" "video" "render" ];
+          openssh = {
+            authorizedKeys = {
+              keys = [
+                "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIJGeBOS0SKejDDcOPOWD106pexJwLjsl7PFIuXSyZtYp lingyu@DESKTOP-NIM6ULV"
+              ];
+            };
+          };
+        };
       };
     };
-    startMenuLaunchers = true;
-    docker-desktop.enable = true;
-    useWindowsDriver = true;
-  };
-  
-  users = {
-    groups.docker = {};
-    users = {
-      "1000"  = {
-        uid = 1000;
-        isNormalUser = true;
-        linger = true;
-        extraGroups = [ "wheel" "docker" "video" "render" ];
-        openssh = {
-          authorizedKeys = {
-            keys = [
-              "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIJGeBOS0SKejDDcOPOWD106pexJwLjsl7PFIuXSyZtYp lingyu@DESKTOP-NIM6ULV"
+    
+    environment = {
+      systemPackages = with pkgs; [];
+      usrbinenv = lib.mkForce "${pkgs.coreutils}/bin/env";
+      # binsh = "${pkgs.bash}/bin/sh";
+      variables = {
+        EDITOR = "vim";
+        # DISPLAY = "localhost:0.0";
+      };
+      sessionVariables = {
+        LIBVA_DRIVER_NAME = "iHD";
+      };
+      extraInit = builtins.concatStringsSep "\n" [
+        "export PATH=\"${config.wsl.wslConf.automount.root}/c/Users/Lingyu/AppData/Local/Programs/Microsoft VS Code/bin\":\$PATH" 
+      ];
+    };
+
+    xdg = {
+      mime = {
+        enable = true;
+        defaultApplications = {};
+      };
+      portal = {
+        enable = false;
+        xdgOpenUsePortal = true;
+        extraPortals = [
+          pkgs.xdg-desktop-portal-gtk
+        ];
+        config = {
+          common = {
+            default = [
+              "gtk"
             ];
           };
         };
       };
     };
-  };
-  
-  environment = {
-    systemPackages = with pkgs; [];
-    usrbinenv = lib.mkForce "${pkgs.coreutils}/bin/env";
-    # binsh = "${pkgs.bash}/bin/sh";
-    variables = {
-      EDITOR = "vim";
-      # DISPLAY = "localhost:0.0";
-    };
-    sessionVariables = {
-      LIBVA_DRIVER_NAME = "iHD";
-    };
-    extraInit = builtins.concatStringsSep "\n" [
-      "export PATH=\"${config.wsl.wslConf.automount.root}/c/Users/Lingyu/AppData/Local/Programs/Microsoft VS Code/bin\":\$PATH" 
-    ];
-  };
 
-  xdg = {
-    mime = {
-      enable = true;
-      defaultApplications = {};
-    };
-    portal = {
-      enable = false;
-      xdgOpenUsePortal = true;
-      extraPortals = [
-        pkgs.xdg-desktop-portal-gtk
-      ];
-      config = {
-        common = {
-          default = [
-            "gtk"
-          ];
-        };
-      };
-    };
-  };
-
-  programs = {
-    nix-ld = {
-      enable = true;
-    };
-    dconf = {
-      enable = true;
-    };
-    ssh = {
-      package = pkgs.openssh;
-      pubkeyAcceptedKeyTypes = [
-        "ssh-ed25519"
-      ];
-      knownHosts = {
-        "github.com" = {
-          hostNames = [ "github.com" "ssh.github.com" ];
-          publicKey = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIOMqqnkVzrm0SdG6UOoqKLsabgH5C9okWi0dh2l9GKJl";
-        };
-      };
-    };
-    gnupg = {
-      package = pkgs.gnupg;
-      agent = {
+    programs = {
+      nix-ld = {
         enable = true;
-        enableSSHSupport = true;
-        pinentryPackage = pkgs.pinentry-tty;
       };
-    };
-  };
-  
-  services = {
-    xserver = {
-      videoDrivers = [ "intel" "modesetting" ];
-    };
-    dbus = {
-      enable = true;
-      implementation = "broker";
-    };
-    vscode-server = {
-      enable = true;
-      enableFHS = true;
-      # nodejsPackage = pkgs.nodejs_22; # 强制指定该选项可能会导致问题, 建议保持默认.
-    };
-    openssh = {
-      enable = true;
-      hostKeys = [
-        {
-          bits = 4096;
-          path = "/etc/ssh/ssh_host_rsa_key";
-          type = "rsa";
-        }
-        {
-          path = "/etc/ssh/ssh_host_ed25519_key";
-          type = "ed25519";
-        }
-      ];
-      settings = {
-        PasswordAuthentication = false;
-        KbdInteractiveAuthentication = false;
-        PermitRootLogin = "no";
-        UseDns = false;
-      };
-    };
-    ollama = {
-      enable = true;
-      package = pkgs.ollama;
-      host = "127.0.0.1";
-      port = 11434; 
-      loadModels = [
-        "qwen3.5:0.8b"
-        "qwen3.5:2b"
-        "qwen2.5:7b"
-        "gemma4:e2b"
-        "gemma4:e4b"
-        "phi4-mini:3.8b"
-        "phi4-mini-reasoning:3.8b"
-        "qwen3-coder-next:cloud"
-        "qwen3.5:cloud"
-        "deepseek-v3.2:cloud"
-        "gemini-3-flash-preview:cloud"
-      ];
-      syncModels = true;
-    };
-  };
-  
-  systemd = {
-    services = {
-      "user@" = {
+      dconf = {
         enable = true;
-        overrideStrategy = "asDropin";
-        serviceConfig = {
-          # 不要全局设置 Delegate = "no". 
-          Delegate = "pids memory cpu";
-          DelegateSubgroup = "init.scope";
-        };
       };
-    };
-    user = {
-      services = {
-        auto-fix-vscode-server = {
-          enable = false;
-          serviceConfig = {
-            # 保证 vscode-server 正常运行.
-            # 有默认选项: Restart = "always". 不要在这里修改. 
-            Delegate = "no"; 
+      ssh = {
+        package = pkgs.openssh;
+        pubkeyAcceptedKeyTypes = [
+          "ssh-ed25519"
+        ];
+        knownHosts = {
+          "github.com" = {
+            hostNames = [ "github.com" "ssh.github.com" ];
+            publicKey = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIOMqqnkVzrm0SdG6UOoqKLsabgH5C9okWi0dh2l9GKJl";
           };
         };
-        emacs = {
+      };
+      gnupg = {
+        package = pkgs.gnupg;
+        agent = {
+          enable = true;
+          enableSSHSupport = true;
+          pinentryPackage = pkgs.pinentry-tty;
+        };
+      };
+    };
+    
+    services = {
+      xserver = {
+        videoDrivers = [ "intel" "modesetting" ];
+      };
+      dbus = {
+        enable = true;
+        implementation = "broker";
+      };
+      vscode-server = {
+        enable = true;
+        enableFHS = true;
+        # nodejsPackage = pkgs.nodejs_22; # 强制指定该选项可能会导致问题, 建议保持默认.
+      };
+      openssh = {
+        enable = true;
+        hostKeys = [
+          {
+            bits = 4096;
+            path = "/etc/ssh/ssh_host_rsa_key";
+            type = "rsa";
+          }
+          {
+            path = "/etc/ssh/ssh_host_ed25519_key";
+            type = "ed25519";
+          }
+        ];
+        settings = {
+          PasswordAuthentication = false;
+          KbdInteractiveAuthentication = false;
+          PermitRootLogin = "no";
+          UseDns = false;
+        };
+      };
+      ollama = {
+        enable = true;
+        package = pkgs.ollama;
+        host = "127.0.0.1";
+        port = 11434; 
+        loadModels = [
+          "qwen3.5:0.8b"
+          "qwen3.5:2b"
+          "qwen2.5:7b"
+          "gemma4:e2b"
+          "gemma4:e4b"
+          "phi4-mini:3.8b"
+          "phi4-mini-reasoning:3.8b"
+          "qwen3-coder-next:cloud"
+          "qwen3.5:cloud"
+          "deepseek-v3.2:cloud"
+          "gemini-3-flash-preview:cloud"
+        ];
+        syncModels = true;
+      };
+    };
+    
+    systemd = {
+      services = {
+        "user@" = {
           enable = true;
           overrideStrategy = "asDropin";
-          path = [
-            "/usr"
-            "/Docker/host"
-          ];
           serviceConfig = {
-            Restart = "on-failure";
-            Delegate = "yes";
-          };
-        };
-        # 采用 x410 作为 X server
-        x410-bridge = {
-          enable = false;
-          description = "X410 bridge via socat";
-          wantedBy = [ "default.target" ];
-          after = [ "default.target" ];
-          serviceConfig = {
-            Type = "simple";
-            Restart = "on-failure";
-            KillMode = "control-group";
-            ExecStartPre = "${pkgs.coreutils}/bin/mkdir -p %t/.x410";
-            ExecStart = "${pkgs.socat}/bin/socat UNIX-LISTEN:%t/.x410/X0,fork,unlink-early TCP:localhost:6000";
+            # 不要全局设置 Delegate = "no". 
+            Delegate = "pids memory cpu";
+            DelegateSubgroup = "init.scope";
           };
         };
       };
-    };
-    tmpfiles.rules = [
-      "L+ %t/wayland-0 - - - - ${config.wsl.wslConf.automount.root}/wslg/runtime-dir/wayland-0"
-      "L+ %t/wayland-0.lock - - - - ${config.wsl.wslConf.automount.root}/wslg/runtime-dir/wayland-0.lock"
-      "L+ ${config.users.users."1000".home}/ren - - - - ${config.wsl.wslConf.automount.root}/c/Users/Lingyu/Ren"
-    ];
-  };
-
-  i18n.inputMethod = {
-    enable = false;
-    type = "fcitx5";
-    fcitx5 = {
-      addons = with pkgs; [
-        qt6Packages.fcitx5-chinese-addons
-        fcitx5-rime
+      user = {
+        services = {
+          auto-fix-vscode-server = {
+            enable = false;
+            serviceConfig = {
+              # 保证 vscode-server 正常运行.
+              # 有默认选项: Restart = "always". 不要在这里修改. 
+              Delegate = "no"; 
+            };
+          };
+          emacs = {
+            enable = true;
+            overrideStrategy = "asDropin";
+            path = [
+              "/usr"
+              "/Docker/host"
+            ];
+            serviceConfig = {
+              Restart = "on-failure";
+              Delegate = "yes";
+            };
+          };
+          # 采用 x410 作为 X server
+          x410-bridge = {
+            enable = false;
+            description = "X410 bridge via socat";
+            wantedBy = [ "default.target" ];
+            after = [ "default.target" ];
+            serviceConfig = {
+              Type = "simple";
+              Restart = "on-failure";
+              KillMode = "control-group";
+              ExecStartPre = "${pkgs.coreutils}/bin/mkdir -p %t/.x410";
+              ExecStart = "${pkgs.socat}/bin/socat UNIX-LISTEN:%t/.x410/X0,fork,unlink-early TCP:localhost:6000";
+            };
+          };
+        };
+      };
+      tmpfiles.rules = [
+        "L+ %t/wayland-0 - - - - ${config.wsl.wslConf.automount.root}/wslg/runtime-dir/wayland-0"
+        "L+ %t/wayland-0.lock - - - - ${config.wsl.wslConf.automount.root}/wslg/runtime-dir/wayland-0.lock"
+        "L+ ${config.users.users."1000".home}/ren - - - - ${config.wsl.wslConf.automount.root}/c/Users/Lingyu/Ren"
       ];
-      settings = {
-        inputMethod = {
-          "Groups/0" = {
-            Name = "Default";
-            "Default Layout" = "us";
-            DefaultIM = "pinyin";
+    };
+
+    i18n.inputMethod = {
+      enable = false;
+      type = "fcitx5";
+      fcitx5 = {
+        addons = with pkgs; [
+          qt6Packages.fcitx5-chinese-addons
+          fcitx5-rime
+        ];
+        settings = {
+          inputMethod = {
+            "Groups/0" = {
+              Name = "Default";
+              "Default Layout" = "us";
+              DefaultIM = "pinyin";
+            };
+            "Groups/0/Items/0" = {
+              Name = "keyboard-us";
+            };
+            "Groups/0/Items/1" = {
+              Name = "pinyin";
+            };
+            "GroupOrder" = {
+              "0" = "Default";
+            };
           };
-          "Groups/0/Items/0" = {
-            Name = "keyboard-us";
-          };
-          "Groups/0/Items/1" = {
-            Name = "pinyin";
-          };
-          "GroupOrder" = {
-            "0" = "Default";
-          };
+          globalOptions = {
+            "Hotkey/TriggerKeys" = {
+              "0" = "Control+Control_L";
+              "1" = "Control+Control_R";
+            };
+            "Behavior" = {
+              ActiveByDefault = false;
+              resetStateWhenFocusIn = "No";
+              ShareInputState = "No";
+              PreeditEnabledByDefault = true;
+              ShowInputMethodInformation = true;
+              showInputMethodInformationWhenFocusIn = false;
+              CompactInputMethodInformation = true;
+              ShowFirstInputMethodInformation = true;
+              PreloadInputMethod = true;
+              AllowInputMethodForPassword = false;
+              ShowPreeditForPassword = false;
+              AutoSavePeriod = 30;
+            };
+          }; 
         };
-        globalOptions = {
-          "Hotkey/TriggerKeys" = {
-            "0" = "Control+Control_L";
-            "1" = "Control+Control_R";
-          };
-          "Behavior" = {
-            ActiveByDefault = false;
-            resetStateWhenFocusIn = "No";
-            ShareInputState = "No";
-            PreeditEnabledByDefault = true;
-            ShowInputMethodInformation = true;
-            showInputMethodInformationWhenFocusIn = false;
-            CompactInputMethodInformation = true;
-            ShowFirstInputMethodInformation = true;
-            PreloadInputMethod = true;
-            AllowInputMethodForPassword = false;
-            ShowPreeditForPassword = false;
-            AutoSavePeriod = 30;
-          };
-        }; 
       };
     };
+    
+    # This value determines the NixOS release from which the default
+    # settings for stateful data, like file locations and database versions
+    # on your system were taken. It's perfectly fine and recommended to leave
+    # this value at the release version of the first install of this system.
+    # Before changing this value read the documentation for this option
+    # (e.g. man configuration.nix or on https://nixos.org/nixos/options.html).
+    system.stateVersion = "25.11"; # Did you read the comment?
+    
   };
   
-  # This value determines the NixOS release from which the default
-  # settings for stateful data, like file locations and database versions
-  # on your system were taken. It's perfectly fine and recommended to leave
-  # this value at the release version of the first install of this system.
-  # Before changing this value read the documentation for this option
-  # (e.g. man configuration.nix or on https://nixos.org/nixos/options.html).
-  system.stateVersion = "25.11"; # Did you read the comment?
 }
