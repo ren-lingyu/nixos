@@ -21,12 +21,12 @@ in {
             flipped = false;
           };
         }
-        (lib.optionalAttrs (hostMonitor_.width != null && hostMonitor_.height != null) {
+        (lib.optionalAttrs (hostMonitor_.mode != null) {
           mode = {
-            width = hostMonitor_.width;
-            height = hostMonitor_.height;
-          } // lib.optionalAttrs (hostMonitor_.refresh != null) {
-            refresh = hostMonitor_.refresh;
+            width = hostMonitor_.mode.width;
+            height = hostMonitor_.mode.height;
+          } // lib.optionalAttrs (hostMonitor_.mode.refresh != null) {
+            refresh = hostMonitor_.mode.refresh;
           };
         })
         (lib.optionalAttrs (hostMonitor_.scale != null) {

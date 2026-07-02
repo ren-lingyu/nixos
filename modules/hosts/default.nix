@@ -21,23 +21,34 @@
                 default = null;
                 description = "The roles of the monitor.";
               };
-              width = lib.mkOption {
-                type = lib.types.nullOr lib.types.ints.unsigned;
+              mode = lib.mkOption {
+                type = lib.types.nullOr (lib.types.submodule {
+                  options = {
+                    width = lib.mkOption {
+                      type = lib.types.ints.unsigned;
+                      example = 3072;
+                      description = "Width of the monitor mode in pixels.";
+                    };
+                    height = lib.mkOption {
+                      type = lib.types.ints.unsigned;
+                      example = 1920;
+                      description = "Height of the monitor mode in pixels.";
+                    };
+                    refresh = lib.mkOption {
+                      type = lib.types.nullOr lib.types.float;
+                      default = null;
+                      example = 60.0;
+                      description = "Refresh rate of the monitor mode in Hz.";
+                    };
+                  };
+                });
                 default = null;
-                example = 3072;
-                description = "Width of the monitor in pixels.";
-              };
-              height = lib.mkOption {
-                type = lib.types.nullOr lib.types.ints.unsigned;
-                default = null;
-                example = 1920;
-                description = "Height of the monitor in pixels.";
-              };
-              refresh = lib.mkOption {
-                type = lib.types.nullOr lib.types.float;
-                default = null;
-                example = 60.0;
-                description = "Refresh value of the monitor in pixels.";
+                example = {
+                  width = 3072;
+                  height = 1920;
+                  refresh = 60.0;
+                };
+                description = "Preferred monitor mode.";
               };
               scale = lib.mkOption {
                 type = lib.types.nullOr lib.types.float;
@@ -54,8 +65,10 @@
           "eDP-1" = {
             name = "eDP-1";
             role = "default";
-            width = 3072;
-            height = 1920;
+            mode = {
+              width = 3072;
+              height = 1920;
+            };
             scale = 1.6;
           };
         };

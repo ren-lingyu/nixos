@@ -15,17 +15,17 @@
         "eDP-1" = {
           name = "eDP-1";
           role = "default";
-          width = 3072;
-          height = 1920;
-          refresh = 60.0;
+          mode = {
+            width = 3072;
+            height = 1920;
+            refresh = 60.0;
+          };
           scale = 1.6;
         };
         "HDMI-A-1" = {
           name = "HDMI-A-1";
           role = null;
-          width = null;
-          height = null;
-          refresh = null;
+          mode = null;
           scale = 1.0;
         };
       };
