@@ -37,6 +37,7 @@
         ) [ config.modules.features.${x_}.session-wrapper ]
       ) [
         "niri"
+        "x11-session"
       ]);
       
     };

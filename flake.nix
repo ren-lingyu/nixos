@@ -152,6 +152,7 @@
             ./modules/features/editor
             ./modules/features/proxy
             ./modules/features/greeter
+            ./modules/features/x11-session
           ];
         };
       };
@@ -296,6 +297,7 @@
                     noctalia.enable = true;
                     waybar.enable = false;
                   };
+                  x11-session.enable = true;
                 };
               };
             };
