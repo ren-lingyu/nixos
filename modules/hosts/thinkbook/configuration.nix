@@ -92,6 +92,7 @@
               zotero
               calibre
               xournalpp
+              rnote
             ]
             (lib.optionals config.modules.hosts.thinkbook.packageGroups.tencent.enable [
               wechat
