@@ -10,7 +10,7 @@
       
       existModule = {
         os = true;
-        hm = false;
+        hm = true;
       };
       
       session-wrapper = lib.mkIf config.modules.features.x11-session.enable (let
@@ -23,19 +23,19 @@
         "#!${lib.getExe pkgs.bash}"
         "export SYSTEMD_LOG_LEVEL=err"
         "export XDG_SESSION_TYPE=x11"
-        "export XDG_SESSION_DESKTOP=xfce"
-        "export XDG_CURRENT_DESKTOP=XFCE"
-        "export DESKTOP_SESSION=xfce"
-        "exec ${lib.getExe' pkgs.dbus "dbus-run-session"} -- ${lib.getExe' pkgs.xfce4-session "xfce4-session"}"
+        "export XDG_SESSION_DESKTOP=icewm"
+        "export XDG_CURRENT_DESKTOP=icewm"
+        "export DESKTOP_SESSION=icewm"
+        "exec ${lib.getExe' pkgs.dbus "dbus-run-session"} -- ${lib.getExe' pkgs.icewm "icewm-session"}"
         "EOF"
         "chmod +x $out/libexec/x11-session-client"
         "cat > $out/bin/${commandName_} <<EOF"
         "#!${lib.getExe pkgs.bash}"
         "export SYSTEMD_LOG_LEVEL=err"
         "export XDG_SESSION_TYPE=x11"
-        "export XDG_SESSION_DESKTOP=xfce"
-        "export XDG_CURRENT_DESKTOP=XFCE"
-        "export DESKTOP_SESSION=xfce"
+        "export XDG_SESSION_DESKTOP=icewm"
+        "export XDG_CURRENT_DESKTOP=icewm"
+        "export DESKTOP_SESSION=icewm"
         "unset DISPLAY"
         "unset WAYLAND_DISPLAY"
         "unset SWAYSOCK"

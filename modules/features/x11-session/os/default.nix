@@ -13,16 +13,16 @@ in {
         startx.enable = true;
       };
       
-      desktopManager.xfce = {
+      windowManager.icewm = {
         enable = true;
-        enableScreensaver = true;
-        enableWaylandSession = true;
-        waylandSessionCompositor = "";
-        enableXfwm = true;
-        noDesktop = false;
       };
       
     };
+    
+    environment.systemPackages = with pkgs; [
+      xdg-utils
+      xrandr
+    ];
     
   };
   
