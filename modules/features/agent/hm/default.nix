@@ -1,15 +1,10 @@
 { config, lib, pkgs, osConfig, ... } : let
-
+  
   cfg = osConfig.modules.features.agent;
-
+  
 in {
-
+  
   config = lib.mkIf cfg.enable {
-
-    home.packages = with pkgs; [
-      github-copilot-cli
-      codex
-    ];
     
     programs.aichat = {
       enable = osConfig.services.ollama.enable;
@@ -32,7 +27,7 @@ in {
         ];
       };
     };
-
+    
     programs.opencode = {
       
       enable = true;
@@ -62,7 +57,7 @@ in {
               };
             }) list
           );
-            
+          
         in {
           
           deepseek = {
@@ -88,7 +83,7 @@ in {
               };
             };
           };
-
+          
           ollama = {
             name = "Ollama";
             options = {
@@ -96,7 +91,7 @@ in {
             };
             models = fromList osConfig.services.ollama.loadModels;
           };
-
+          
           ollama_cloud = {
             name = "Ollama (Cloud)";
             options = {
@@ -105,7 +100,7 @@ in {
             };
             models = fromList (builtins.filter (x: builtins.match ".*:cloud$" x != null) osConfig.services.ollama.loadModels);
           };
-
+          
           modelscope = {
             name = "ModelScope";
             options = {
@@ -122,7 +117,7 @@ in {
         };
         
       };
-
+      
       tools = {};
       agents = {
         git-maintainer = ./git-maintainer/agents/git-maintainer.md;
@@ -144,7 +139,17 @@ in {
       };
       
     };
-
+    
+    programs.codex = {
+      enable = true;
+      package = pkgs.codex;
+    };
+    
+    programs.github-copilot-cli = {
+      enable = true;
+      package = pkgs.github-copilot-cli;
+    };
+    
   };
   
 }
