@@ -1,8 +1,9 @@
 { config, pkgs, lib, ... } : let
+  cfg = config.modules.features.secret;
   llib = import ../lib { inherit config; };
 in {
   
-  config = lib.mkIf config.modules.features.secret.enable {
+  config = lib.mkIf cfg.enable {
     
     environment.systemPackages = with pkgs; [
       age

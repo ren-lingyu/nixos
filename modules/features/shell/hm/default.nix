@@ -1,6 +1,10 @@
-{ config, osConfig, lib, pkgs, ... } : {
+{ config, osConfig, lib, pkgs, ... } : let
 
-  config = lib.mkIf osConfig.modules.features.shell.enable {
+  cfg = osConfig.modules.features.shell;
+
+in {
+
+  config = lib.mkIf cfg.enable {
     
     programs.bash = {
       enable = false;

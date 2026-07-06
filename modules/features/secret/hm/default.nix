@@ -1,8 +1,9 @@
 { config, pkgs, lib, osConfig, ... } : let
+  cfg = osConfig.modules.features.secret;
   llib = import ../lib { inherit config; inherit osConfig; };
 in {
 
-  config = lib.mkIf osConfig.modules.features.secret.enable {
+  config = lib.mkIf cfg.enable {
 
     home.sessionVariables = {
       SOPS_AGE_KEY_FILE = osConfig.sops.secrets."age.keyFile".path;

@@ -1,4 +1,8 @@
-{ config, lib, pkgs, osConfig, ... } : {
+{ config, lib, pkgs, osConfig, ... } : let
+
+  cfg = osConfig.modules.features.niri;
+
+in {
 
   imports = [
     ./settings
@@ -6,7 +10,7 @@
     ./noctalia
   ];
 
-  config = lib.mkIf osConfig.modules.features.niri.enable {
+  config = lib.mkIf cfg.enable {
 
     programs.emacs.package = lib.mkForce pkgs.emacs-pgtk;
     services.emacs.package = lib.mkForce pkgs.emacs-pgtk;
@@ -25,7 +29,7 @@
     };
 
     programs.niri = {
-      enable = osConfig.modules.features.niri.enable;
+      enable = cfg.enable;
       package = osConfig.programs.niri.package;
     };
 

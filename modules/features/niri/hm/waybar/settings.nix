@@ -1,6 +1,10 @@
-{ config, lib, pkgs, osConfig, ... } : {
+{ config, lib, pkgs, osConfig, ... } : let
 
-  config = lib.mkIf osConfig.modules.features.niri.waybar.enable {
+  cfg = osConfig.modules.features.niri;
+
+in {
+
+  config = lib.mkIf cfg.waybar.enable {
     
     programs.waybar.settings = [
       {

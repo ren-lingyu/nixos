@@ -1,6 +1,10 @@
-{ config, pkgs, lib, osConfig, ... } : {
+{ config, pkgs, lib, osConfig, ... } : let
 
-  config = lib.mkIf osConfig.modules.features.font.enable {
+  cfg = osConfig.modules.features.font;
+
+in {
+
+  config = lib.mkIf cfg.enable {
 
     fonts.fontconfig = {
       enable = true;

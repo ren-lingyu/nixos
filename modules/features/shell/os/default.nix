@@ -1,6 +1,10 @@
-{ config, lib, pkgs, ... } : {
+{ config, lib, pkgs, ... } : let
 
-  config = lib.mkIf config.modules.features.shell.enable {
+  cfg = config.modules.features.shell;
+
+in {
+
+  config = lib.mkIf cfg.enable {
 
     users = {
       defaultUserShell = pkgs.zsh;

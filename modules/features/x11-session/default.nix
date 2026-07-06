@@ -1,4 +1,8 @@
-{ config, pkgs, lib, ... } : {
+{ config, pkgs, lib, ... } : let
+
+  cfg = config.modules.features.x11-session;
+
+in {
   
   imports = [
     ./os
@@ -13,7 +17,7 @@
         hm = true;
       };
       
-      session-wrapper = lib.mkIf config.modules.features.x11-session.enable (let
+      session-wrapper = lib.mkIf cfg.enable (let
         commandName_ = "X11-Session";
       in (pkgs.runCommand "x11-session-wrapper" {
         meta.mainProgram = commandName_;
@@ -50,16 +54,16 @@
     assertions = [
       {
         assertion = (
-          if config.modules.features.x11-session.enable
+          if cfg.enable
           then
-            if config.modules.features.x11-session.session-wrapper == null
+            if cfg.session-wrapper == null
             then false
             else builtins.all (condition_ : condition_) [
-              (config.modules.features.x11-session.session-wrapper ? meta)
-              (config.modules.features.x11-session.session-wrapper.meta ? mainProgram)
-              (config.modules.features.x11-session.session-wrapper.meta.mainProgram != "")
+              (cfg.session-wrapper ? meta)
+              (cfg.session-wrapper.meta ? mainProgram)
+              (cfg.session-wrapper.meta.mainProgram != "")
             ]
-          else config.modules.features.x11-session.session-wrapper == null
+          else cfg.session-wrapper == null
         );
         
         message = builtins.concatStringsSep "\n" [

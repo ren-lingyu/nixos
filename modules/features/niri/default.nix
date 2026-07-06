@@ -1,5 +1,7 @@
 { config, pkgs, lib, ... } : let
 
+  cfg = config.modules.features.niri;
+
   noctaliaEnable = (
     config.networking.networkmanager.enable
     &&
@@ -59,38 +61,38 @@ in {
           enabledHosts_ = builtins.attrValues (lib.filterAttrs (unused_name_ : host_ : (
             host_.enable
           )) config.modules.hosts);
-        in (!config.modules.features.niri.enable || (builtins.length enabledHosts_) == 1);
+        in (!cfg.enable || (builtins.length enabledHosts_) == 1);
         message = "`modules.features.niri.enable = true` requires exactly one host in `modules.hosts` to set `enable = true`.";
       }
       {
         assertion = let
           defaultMonitors_ = builtins.attrValues (lib.filterAttrs (unused_name_ : monitor_ : (
             monitor_.role == "default"
-          )) config.modules.features.niri.monitors);
-        in (!config.modules.features.niri.enable || (builtins.length defaultMonitors_) == 1);
+          )) cfg.monitors);
+        in (!cfg.enable || (builtins.length defaultMonitors_) == 1);
         message = "`modules.features.niri.enable = true` requires exactly one monitor in the enabled host's `monitors` to set `role = \"default\"`.";
       }
       {
-        assertion = !config.modules.features.niri.waybar.enable || config.modules.features.niri.enable;
+        assertion = !cfg.waybar.enable || cfg.enable;
         message = "`modules.features.niri.waybar.enable = true` is only allowed when `modules.features.niri.enable = true;`.";
       }
       {
-        assertion = !config.modules.features.niri.noctalia.enable || config.modules.features.niri.enable;
+        assertion = !cfg.noctalia.enable || cfg.enable;
         message = "`modules.features.niri.noctalia.enable = true` is only allowed when `modules.features.niri.enable = true;`.";
       }
       {
-        assertion = !config.modules.features.niri.noctalia.enable || noctaliaEnable;
+        assertion = !cfg.noctalia.enable || noctaliaEnable;
         message = "`modules.features.niri.noctalia.enable = true` requires system-level features (NetworkManager, Bluetooth, power-profiles-daemon/tuned, UPower) to be enabled.";
       }
       {
-        assertion = !(config.modules.features.niri.waybar.enable && config.modules.features.niri.noctalia.enable);
+        assertion = !(cfg.waybar.enable && cfg.noctalia.enable);
         message = "`modules.features.niri.waybar.enable` and `modules.features.niri.noctalia.enable` cannot be true simultaneously.";
       }
       {
         assertion = let
-          wrapper_ = config.modules.features.niri.session-wrapper;
+          wrapper_ = cfg.session-wrapper;
         in (
-          if config.modules.features.niri.enable
+          if cfg.enable
           then (builtins.all (condition_ : condition_) [
             (wrapper_ ? meta)
             (wrapper_.meta ? mainProgram)

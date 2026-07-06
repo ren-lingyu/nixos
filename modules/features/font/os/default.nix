@@ -1,6 +1,10 @@
-{ config, pkgs, lib, ... } : {
+{ config, pkgs, lib, ... } : let
 
-  config = lib.mkIf config.modules.features.font.enable {
+  cfg = config.modules.features.font;
+
+in {
+
+  config = lib.mkIf cfg.enable {
     fonts = {
       packages = with pkgs; [
         lxgw-wenkai

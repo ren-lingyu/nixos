@@ -1,6 +1,10 @@
-{ config, pkgs, lib, ... } : {
+{ config, pkgs, lib, ... } : let
+
+  cfg = config.modules.features.texlive;
+
+in {
   
-  config = lib.mkIf config.modules.features.texlive.enable {
+  config = lib.mkIf cfg.enable {
     environment.systemPackages = with pkgs; [
       (texlive.combined.scheme-full.withPackages (ps_ : with ps_; [
         dvisvgm

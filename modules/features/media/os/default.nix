@@ -1,6 +1,10 @@
-{ config, pkgs, lib, ... } : {
+{ config, pkgs, lib, ... } : let
+
+  cfg = config.modules.features.media;
+
+in {
   
-  config = lib.mkIf config.modules.features.media.enable {
+  config = lib.mkIf cfg.enable {
 
     # boot = {
     #   extraModulePackages = with config.boot.kernelPackages; [

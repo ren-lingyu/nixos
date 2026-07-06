@@ -1,6 +1,10 @@
-{ config, pkgs, lib, osConfig, ... } : {
+{ config, pkgs, lib, osConfig, ... } : let
 
-  config = lib.mkIf osConfig.modules.features.remote.enable {
+  cfg = osConfig.modules.features.remote;
+
+in {
+
+  config = lib.mkIf cfg.enable {
 
     programs.rclone = {
       enable = true;

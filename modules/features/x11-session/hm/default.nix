@@ -1,6 +1,10 @@
-{ config, osConfig, pkgs, lib, ... } : {
+{ config, osConfig, pkgs, lib, ... } : let
   
-  config = lib.mkIf osConfig.modules.features.x11-session.enable {
+  cfg = osConfig.modules.features.x11-session;
+
+in {
+
+  config = lib.mkIf cfg.enable {
     
     programs.rofi = {
       enable = true;

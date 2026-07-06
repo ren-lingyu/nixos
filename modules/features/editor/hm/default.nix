@@ -1,13 +1,17 @@
-{ config, osConfig, pkgs, lib, ... } : {
+{ config, osConfig, pkgs, lib, ... } : let
 
-  config = lib.mkIf osConfig.modules.features.editor.enable {
+  cfg = osConfig.modules.features.editor;
+
+in {
+
+  config = lib.mkIf cfg.enable {
     
     programs.nixvim = {
-      enable = osConfig.modules.features.editor.neovim.enable;
+      enable = cfg.neovim.enable;
       nixpkgs = {
         useGlobalPackages = true;
       };
-      defaultEditor = osConfig.modules.features.editor.defaultEditor == "neovim";
+      defaultEditor = cfg.defaultEditor == "neovim";
       viAlias = true;
       vimAlias = true;
       vimdiffAlias = true;
@@ -69,13 +73,13 @@
     };
 
     programs.vim = {
-      enable = osConfig.modules.features.editor.vim.enable;
+      enable = cfg.vim.enable;
       package = pkgs.vim;
-      defaultEditor = osConfig.modules.features.editor.defaultEditor == "vim";
+      defaultEditor = cfg.defaultEditor == "vim";
     };
 
     programs.emacs = {
-      enable = osConfig.modules.features.editor.emacs.enable;
+      enable = cfg.emacs.enable;
       package = pkgs.emacs-gtk;
     };
 
@@ -83,7 +87,7 @@
       enable = config.programs.emacs.enable;
       package = pkgs.emacs-gtk;
       extraOptions = [ "--debug-init" ];
-      defaultEditor = osConfig.modules.features.editor.defaultEditor == "emacs";
+      defaultEditor = cfg.defaultEditor == "emacs";
       socketActivation = {
         enable = true;
       };

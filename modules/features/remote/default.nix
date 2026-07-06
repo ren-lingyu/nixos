@@ -1,4 +1,8 @@
-{ config, lib, pkgs, ... } : {
+{ config, lib, pkgs, ... } : let
+
+  cfg = config.modules.features.remote;
+
+in {
 
   config = {
     
@@ -9,7 +13,7 @@
     
     assertions = [
       {
-        assertion = !config.modules.features.remote.enable || config.modules.features.secret.enable;
+        assertion = !cfg.enable || config.modules.features.secret.enable;
         message = "`modules.features.remote.enable = true` requires `modules.features.secret.enable = true`.";
       }
     ];

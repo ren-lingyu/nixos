@@ -1,9 +1,13 @@
-{ config, pkgs, lib, ... } : {
+{ config, pkgs, lib, ... } : let
+
+  cfg = config.modules.features.niri;
+
+in {
   
-  config = lib.mkIf config.modules.features.niri.enable {
+  config = lib.mkIf cfg.enable {
 
     programs.niri = {
-      enable = config.modules.features.niri.enable;
+      enable = cfg.enable;
       package = pkgs.niri;
     };
     
