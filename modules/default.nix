@@ -86,7 +86,10 @@
                 publicShare = "${config.home.homeDirectory}/Public";
               };
             };
-            home.stateVersion = "26.05";
+            home = {
+              stateVersion = "26.05";
+              preferXdgDirectories = config.xdg.userDirs.enable;
+            };
           };
         })
       ];
