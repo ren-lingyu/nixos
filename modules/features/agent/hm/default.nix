@@ -118,7 +118,7 @@ in {
         
       };
       
-      tools = {};
+      context = ./context.md;
       agents = {
         git-maintainer = ./git-maintainer/agents/git-maintainer.md;
       };
@@ -128,9 +128,9 @@ in {
       skills = {
         git-maintenance = ./git-maintainer/skills/git-maintenance;
       };
+      tools = {};
       themes = {};
       tui = {};
-      context = "";
       
       web = {
         enable = false;
@@ -143,11 +143,13 @@ in {
     programs.codex = {
       enable = true;
       package = pkgs.codex;
+      context = ./context.md;
     };
     
     programs.github-copilot-cli = {
       enable = true;
       package = pkgs.github-copilot-cli;
+      context = ./context.md;
     };
     
   };
