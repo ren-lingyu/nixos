@@ -1,9 +1,13 @@
 # Edit this configuration file to define what should be installed on
 # your system. Help is available in the configuration.nix(5) man page, on
 # https://search.nixos.org/options and in the NixOS manual (`nixos-help`).
-{ config, lib, pkgs, ... } : {
+{ config, lib, pkgs, ... } : let
+
+  cfg = config.modules.hosts.thinkbook;
+
+in {
   
-  config = lib.mkIf config.modules.hosts.thinkbook.enable {
+  config = lib.mkIf cfg.enable {
     
     nix.settings = {
       trusted-users = [ "@wheel" "root" ];
@@ -94,7 +98,7 @@
               xournalpp
               rnote
             ]
-            (lib.optionals config.modules.hosts.thinkbook.packageGroups.tencent.enable [
+            (lib.optionals cfg.packageGroups.tencent.enable [
               wechat
               wemeet
               qq

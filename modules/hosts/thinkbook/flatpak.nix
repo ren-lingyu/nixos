@@ -1,6 +1,10 @@
-{ config, lib, pkgs, ... } : {
+{ config, lib, pkgs, ... } : let
+
+  cfg = config.modules.hosts.thinkbook;
+
+in {
   
-  config = lib.mkIf config.modules.hosts.thinkbook.enable {
+  config = lib.mkIf cfg.enable {
     
     xdg.portal.enable = lib.mkIf config.services.flatpak.enable (lib.mkForce true);
     

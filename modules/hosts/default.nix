@@ -1,4 +1,8 @@
-{ config, pkgs, lib, ... } : {
+{ config, pkgs, lib, ... } : let
+
+  cfg = config.modules.hosts;
+
+in {
   
   options = {
     modules.hosts = lib.mkOption {
@@ -108,7 +112,7 @@
   config = {
     
     assertions = let
-      enabledHosts_ = lib.filterAttrs (unused_name_ : host_ : host_.enable) config.modules.hosts;
+      enabledHosts_ = lib.filterAttrs (unused_name_ : host_ : host_.enable) cfg;
       enabledHostNames_ = builtins.attrNames enabledHosts_;
     in (builtins.concatLists [
       [
@@ -120,7 +124,7 @@
       (lib.mapAttrsToList (hostName_ : host_ : {
         assertion = !host_.enable || builtins.pathExists (./. + "/${hostName_}/default.nix");
         message = "`modules.hosts.${hostName_}.enable = true` requires `${builtins.toString (./. + "/${hostName_}/default.nix")}` to exist.";
-      }) config.modules.hosts)
+      }) cfg)
       (builtins.concatLists (lib.mapAttrsToList (hostName_ : host_ : let
         monitors_ = builtins.attrValues host_.monitors;
         defaultMonitors_ = builtins.filter (monitor_ : monitor_.role == "default") monitors_;
@@ -137,7 +141,7 @@
       ] ++ (lib.mapAttrsToList (monitorName_ : monitor_ : {
         assertion = monitor_.name != "";
         message = "`modules.hosts.${hostName_}.monitors.${monitorName_}.name` must not be empty.";
-      }) host_.monitors)) config.modules.hosts))
+      }) host_.monitors)) cfg))
     ]);
     
   };

@@ -1,4 +1,6 @@
 { config, lib, pkgs, ... } : let
+
+  cfg = config.modules.hosts.thinkbook;
   
   forceFb0 = pkgs.writeShellScript "force-fb0-3072x1920" (builtins.concatStringsSep "\n" [
     "set -eu"
@@ -16,7 +18,7 @@
 
 in {
   
-  config = lib.mkIf config.modules.hosts.thinkbook.enable {
+  config = lib.mkIf cfg.enable {
     
     environment.systemPackages = with pkgs; [
       fbset

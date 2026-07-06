@@ -1,6 +1,10 @@
-{ config, pkgs, lib, ... } : {
+{ config, pkgs, lib, ... } : let
+
+  cfg = config.modules.hosts.aliyun;
+
+in {
   
-  config = lib.mkIf config.modules.hosts.aliyun.enable {
+  config = lib.mkIf cfg.enable {
     
     nix.settings = {
       trusted-users = [ "@wheel" "root" ];
