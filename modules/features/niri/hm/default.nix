@@ -198,15 +198,17 @@ in {
     services.clipse = {
       enable = false;
       package = pkgs.clipse;
-      historySize = 100;
-      allowDuplicates = true;
       systemdTarget = "${config.wayland.systemd.target}";
-      keyBindings = {};
-      imageDisplay = {
-        type = "kitty";
-        heightCut = 2;
-        scaleX = 9;
-        scaleY = 9;
+      settings = {
+        allowDuplicates = true;
+        maxHistory = 100;
+        imageDisplay = {
+          type = "kitty";
+          heightCut = 2;
+          scaleX = 9;
+          scaleY = 9;
+        };
+        keyBindings = {};
       };
       theme = {
         useCustomTheme = false;
