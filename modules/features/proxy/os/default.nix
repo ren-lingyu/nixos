@@ -9,7 +9,7 @@ in {
     programs.clash-verge = lib.mkIf cfg.clash-verge.enable {
       enable = cfg.clash-verge.enable;
       package = pkgs.clash-verge-rev;
-      autoStart = true;
+      autoStart = false;
       serviceMode = true;
       tunMode = true;
     };
