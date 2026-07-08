@@ -88,7 +88,7 @@
             };
             home = {
               stateVersion = "26.05";
-              preferXdgDirectories = config.xdg.userDirs.enable;
+              preferXdgDirectories = config.xdg.enable;
             };
           };
         })
