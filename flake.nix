@@ -79,297 +79,308 @@
     };
   };
   
-  outputs = { self, ... }@inputs : {
-
-    packages = {
-      x86_64-linux = {
-        nixos-anywhere = inputs.nixos-anywhere.packages.x86_64-linux.default;
-      };
-    };
+  outputs = { self, ... }@inputs : inputs.flake-parts.lib.mkFlake { inherit inputs; } {
     
-    nixosModules = {
+    systems = [
+      "x86_64-linux"
+    ];
+    
+    flake = {
       
-      base = { config, pkgs, lib, ... } : {
-        imports = [
-          inputs.home-manager.nixosModules.home-manager
-          ./modules
-        ];
-        config = {
-          nixpkgs = {
-            overlays = [
-              inputs.self-nixpkgs.overlays.default
-            ];
-          };
-          home-manager = {
-            sharedModules = [
-              inputs.self-nixpkgs.homeManagerModules.default
-            ];
-            extraSpecialArgs = {
-              inherit inputs;
-            };
-          };
-        };
-      };
-      
-      features = {
-        niri = { config, pkgs, lib, ... } : {
+      modules = {
+        
+        base = { config, pkgs, lib, ... } : {
           imports = [
-            self.nixosModules.base
-            inputs.sops-nix.nixosModules.sops
-            ./modules/features/niri
+            inputs.home-manager.nixosModules.home-manager
+            ./modules
           ];
           config = {
             nixpkgs = {
               overlays = [
-                inputs.niri-flake.overlays.niri
+                inputs.self-nixpkgs.overlays.default
               ];
-            };
-            home-manager.sharedModules = [
-              inputs.niri-flake.homeModules.niri
-              inputs.noctalia.homeModules.default
-            ];
-          };
-        };
-        secret = { config, pkgs, lib, ... } : {
-          imports = [
-            self.nixosModules.base
-            inputs.sops-nix.nixosModules.sops
-            ./modules/features/secret
-          ];
-          config = {
-            home-manager.sharedModules = [
-              inputs.sops-nix.homeManagerModules.sops
-            ];
-          };
-        };
-        share = { config, pkgs, lib, ... } : {
-          imports = [
-            self.nixosModules.base
-            ./modules/features/shell
-            ./modules/features/font
-            ./modules/features/texlive
-            ./modules/features/media
-            ./modules/features/office
-            ./modules/features/remote
-            ./modules/features/agent
-            ./modules/features/editor
-            ./modules/features/proxy
-            ./modules/features/greeter
-            ./modules/features/x11-session
-          ];
-        };
-      };
-      
-      users = {
-        lingyu = { config, pkgs, lib, ... } : {
-          imports = [
-            self.nixosModules.base
-          ];
-          config = {
-            modules.users = {
-              "1000" = {
-                enable = true;
-                uid = 1000;
-                username = "lingyu";
-                home = {
-                  enable = true;
-                  directory = "/home/lingyu";
-                  manager = {
-                    enable = true;
-                    source = "./lingyu";
-                  };
-                };
-              };
             };
             home-manager = {
-              users."1000" = {
-                imports = [
-                  inputs.emarccs.homeManagerModules.default
-                ];                 
-              };
               sharedModules = [
-                inputs.nixvim.homeModules.nixvim
+                inputs.self-nixpkgs.homeManagerModules.default
               ];
+              extraSpecialArgs = {
+                inherit inputs;
+              };
             };
           };
         };
-        lingyu-minimal = { config, pkgs, lib, ... } : {
-          imports = [
-            self.nixosModules.base
-          ];
-          config = {
-            modules.users = {
-              "1000" = {
-                enable = true;
-                uid = 1000;
-                username = "lingyu";
-                home = {
+        
+        features = {
+          niri = { config, pkgs, lib, ... } : {
+            imports = [
+              self.modules.base
+              inputs.sops-nix.nixosModules.sops
+              ./modules/features/niri
+            ];
+            config = {
+              nixpkgs = {
+                overlays = [
+                  inputs.niri-flake.overlays.niri
+                ];
+              };
+              home-manager.sharedModules = [
+                inputs.niri-flake.homeModules.niri
+                inputs.noctalia.homeModules.default
+              ];
+            };
+          };
+          secret = { config, pkgs, lib, ... } : {
+            imports = [
+              self.modules.base
+              inputs.sops-nix.nixosModules.sops
+              ./modules/features/secret
+            ];
+            config = {
+              home-manager.sharedModules = [
+                inputs.sops-nix.homeManagerModules.sops
+              ];
+            };
+          };
+          share = { config, pkgs, lib, ... } : {
+            imports = [
+              self.modules.base
+              ./modules/features/shell
+              ./modules/features/font
+              ./modules/features/texlive
+              ./modules/features/media
+              ./modules/features/office
+              ./modules/features/remote
+              ./modules/features/agent
+              ./modules/features/editor
+              ./modules/features/proxy
+              ./modules/features/greeter
+              ./modules/features/x11-session
+            ];
+          };
+        };
+        
+        users = {
+          lingyu = { config, pkgs, lib, ... } : {
+            imports = [
+              self.modules.base
+            ];
+            config = {
+              modules.users = {
+                "1000" = {
                   enable = true;
-                  directory = "/home/lingyu";
-                  manager = {
+                  uid = 1000;
+                  username = "lingyu";
+                  home = {
                     enable = true;
-                    source = null;
+                    directory = "/home/lingyu";
+                    manager = {
+                      enable = true;
+                      source = "./lingyu";
+                    };
+                  };
+                };
+              };
+              home-manager = {
+                users."1000" = {
+                  imports = [
+                    inputs.emarccs.homeManagerModules.default
+                  ];                 
+                };
+                sharedModules = [
+                  inputs.nixvim.homeModules.nixvim
+                ];
+              };
+            };
+          };
+          lingyu-minimal = { config, pkgs, lib, ... } : {
+            imports = [
+              self.modules.base
+            ];
+            config = {
+              modules.users = {
+                "1000" = {
+                  enable = true;
+                  uid = 1000;
+                  username = "lingyu";
+                  home = {
+                    enable = true;
+                    directory = "/home/lingyu";
+                    manager = {
+                      enable = true;
+                      source = null;
+                    };
                   };
                 };
               };
             };
           };
         };
-      };
-      
-      hosts = {
-        wsl = { config, pkgs, lib, ... } : {
-          imports = [
-            self.nixosModules.base
-            inputs.nixos-wsl.nixosModules.default
-            inputs.vscode-server.nixosModules.default
-            ./modules/hosts/wsl
-          ];
-        };
-        thinkbook = { config, pkgs, lib, ... } : {
-          imports = [
-            self.nixosModules.base
-            inputs.nix-flatpak.nixosModules.nix-flatpak
-            ./modules/hosts/thinkbook
-          ];
-          config.modules.hosts.thinkbook = {
-            packageGroups.tencent.enable = true;
+        
+        hosts = {
+          wsl = { config, pkgs, lib, ... } : {
+            imports = [
+              self.modules.base
+              inputs.nixos-wsl.nixosModules.default
+              inputs.vscode-server.nixosModules.default
+              ./modules/hosts/wsl
+            ];
+          };
+          thinkbook = { config, pkgs, lib, ... } : {
+            imports = [
+              self.modules.base
+              inputs.nix-flatpak.nixosModules.nix-flatpak
+              ./modules/hosts/thinkbook
+            ];
+            config.modules.hosts.thinkbook = {
+              packageGroups.tencent.enable = true;
+            };
+          };
+          aliyun = { config, pkgs, lib, ... } : {
+            imports = [
+              self.modules.base
+              inputs.disko.nixosModules.disko
+              ./modules/hosts/aliyun
+            ];
           };
         };
-        aliyun = { config, pkgs, lib, ... } : {
-          imports = [
-            self.nixosModules.base
-            inputs.disko.nixosModules.disko
-            ./modules/hosts/aliyun
+        
+      };
+      
+      nixosConfigurations = {
+        
+        nixos = inputs.nixpkgs.lib.nixosSystem {
+          system = "x86_64-linux";
+          modules = [
+            self.modules.features.share
+            self.modules.features.niri
+            self.modules.features.secret
+            self.modules.hosts.thinkbook
+            self.modules.users.lingyu
+            {
+              config = {
+                modules = {
+                  base = {
+                    allowUnfreePredicateList = [
+                      "github-copilot-cli"
+                      "microsoft-edge"
+                      "feishu"
+                      "libwemeetwrap"
+                      "wemeet"
+                      "wechat"
+                      "qq"
+                      "zoom"
+                    ];
+                    createXdgUserDirectories = true;
+                  };
+                  features = {
+                    shell.enable = true;
+                    font.enable = true;
+                    texlive.enable = true;
+                    office.enable = true;
+                    media.enable = true;
+                    remote.enable = true;
+                    agent.enable = true;
+                    secret.enable = true;
+                    proxy = {
+                      enable = true;
+                      clash-verge.enable = true;
+                      throne.enable = true;
+                    };
+                    editor = {
+                      enable = true;
+                      defaultEditor = "neovim";
+                      vim.enable = false;
+                      neovim.enable = true;
+                      emacs.enable = true;
+                    };
+                    greeter.enable = true;
+                    niri = {
+                      enable = true;
+                      noctalia.enable = true;
+                      waybar.enable = false;
+                    };
+                    x11-session.enable = true;
+                  };
+                };
+              };
+            }
           ];
         };
+        
+        nixos-server = inputs.nixpkgs.lib.nixosSystem {
+          system = "x86_64-linux";
+          modules = [
+            self.modules.features.share
+            self.modules.features.secret
+            self.modules.hosts.aliyun
+            self.modules.users.lingyu-minimal
+            {
+              config = {
+                modules = {
+                  base = {
+                    createXdgUserDirectories = false;
+                  };
+                  features = {
+                    shell.enable = true;
+                    secret.enable = false;
+                  };
+                };
+              };
+            }
+          ];
+        };
+        
+        nixos-wsl = inputs.nixpkgs.lib.nixosSystem {
+          system = "x86_64-linux";
+          modules = [
+            self.modules.features.share
+            self.modules.features.secret
+            self.modules.hosts.wsl
+            self.modules.users.lingyu
+            {
+              config = {
+                modules = {
+                  base = {
+                    allowUnfreePredicateList = [
+                      "github-copilot-cli"
+                    ];
+                    createXdgUserDirectories = false;
+                  };
+                  features = {
+                    shell.enable = true;
+                    font.enable = true;
+                    texlive.enable = true;
+                    office.enable = false;
+                    media.enable = false;
+                    remote.enable = true;
+                    agent.enable = true;
+                    secret.enable = true;
+                    editor = {
+                      enable = true;
+                      defaultEditor = "neovim";
+                      vim.enable = false;
+                      neovim.enable = true;
+                      emacs.enable = true;
+                    };
+                  };
+                };
+              };
+            }
+          ];
+        };
+        
       };
       
     };
     
-    nixosConfigurations = {
-      
-      nixos = inputs.nixpkgs.lib.nixosSystem {
-        system = "x86_64-linux";
-        modules = [
-          self.nixosModules.features.share
-          self.nixosModules.features.niri
-          self.nixosModules.features.secret
-          self.nixosModules.hosts.thinkbook
-          self.nixosModules.users.lingyu
-          {
-            config = {
-              modules = {
-                base = {
-                  allowUnfreePredicateList = [
-                    "github-copilot-cli"
-                    "microsoft-edge"
-                    "feishu"
-                    "libwemeetwrap"
-                    "wemeet"
-                    "wechat"
-                    "qq"
-                    "zoom"
-                  ];
-                  createXdgUserDirectories = true;
-                };
-                features = {
-                  shell.enable = true;
-                  font.enable = true;
-                  texlive.enable = true;
-                  office.enable = true;
-                  media.enable = true;
-                  remote.enable = true;
-                  agent.enable = true;
-                  secret.enable = true;
-                  proxy = {
-                    enable = true;
-                    clash-verge.enable = true;
-                    throne.enable = true;
-                  };
-                  editor = {
-                    enable = true;
-                    defaultEditor = "neovim";
-                    vim.enable = false;
-                    neovim.enable = true;
-                    emacs.enable = true;
-                  };
-                  greeter.enable = true;
-                  niri = {
-                    enable = true;
-                    noctalia.enable = true;
-                    waybar.enable = false;
-                  };
-                  x11-session.enable = true;
-                };
-              };
-            };
-          }
-        ];
+    perSystem = { inputs', pkgs, ... } : {
+      apps = {
+        nixos-anywhere = {
+          type = "app";
+          program = (pkgs.lib.getExe' inputs'.nixos-anywhere.packages.default "nixos-anywhere");
+        };
       };
-      
-      nixos-server = inputs.nixpkgs.lib.nixosSystem {
-        system = "x86_64-linux";
-        modules = [
-          self.nixosModules.features.share
-          self.nixosModules.features.secret
-          self.nixosModules.hosts.aliyun
-          self.nixosModules.users.lingyu-minimal
-          {
-            config = {
-              modules = {
-                base = {
-                  createXdgUserDirectories = false;
-                };
-                features = {
-                  shell.enable = true;
-                  secret.enable = false;
-                };
-              };
-            };
-          }
-        ];
-      };
-      
-      nixos-wsl = inputs.nixpkgs.lib.nixosSystem {
-        system = "x86_64-linux";
-        modules = [
-          self.nixosModules.features.share
-          self.nixosModules.features.secret
-          self.nixosModules.hosts.wsl
-          self.nixosModules.users.lingyu
-          {
-            config = {
-              modules = {
-                base = {
-                  allowUnfreePredicateList = [
-                    "github-copilot-cli"
-                  ];
-                  createXdgUserDirectories = false;
-                };
-                features = {
-                  shell.enable = true;
-                  font.enable = true;
-                  texlive.enable = true;
-                  office.enable = false;
-                  media.enable = false;
-                  remote.enable = true;
-                  agent.enable = true;
-                  secret.enable = true;
-                  editor = {
-                    enable = true;
-                    defaultEditor = "neovim";
-                    vim.enable = false;
-                    neovim.enable = true;
-                    emacs.enable = true;
-                  };
-                };
-              };
-            };
-          }
-        ];
-      };
-      
     };
     
   };
