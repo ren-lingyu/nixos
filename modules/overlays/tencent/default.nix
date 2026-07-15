@@ -1,6 +1,10 @@
-{ config, pkgs, lib, ... } : {
+{ config, pkgs, lib, ... } : let
+  
+  cfg = config.modules.overlays.tencent;
 
-  config = {
+in {
+
+  config = lib.mkIf cfg.enable {
     nixpkgs.overlays = [
       (final: prev: {
         qq = prev.qq.overrideAttrs (_old: {

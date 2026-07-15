@@ -234,8 +234,13 @@
               inputs.nix-flatpak.nixosModules.nix-flatpak
               ./modules/hosts/thinkbook
             ];
-            config.modules.hosts.thinkbook = {
-              packageGroups.tencent.enable = true;
+            config.modules = {
+              hosts.thinkbook = {
+                packageGroups.tencent.enable = true;
+              };
+              overlays = {
+                tencent.enable = true;
+              };
             };
           };
           aliyun = { config, pkgs, lib, ... } : {
