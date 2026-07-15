@@ -80,12 +80,12 @@ in {
 
     programs.emacs = {
       enable = cfg.emacs.enable;
-      package = pkgs.emacs-gtk;
+      package = cfg.emacs.programs.package;
     };
 
     services.emacs = {
-      enable = config.programs.emacs.enable;
-      package = pkgs.emacs-gtk;
+      enable = cfg.emacs.enable;
+      package = cfg.emacs.services.package;
       extraOptions = [ "--debug-init" ];
       defaultEditor = cfg.defaultEditor == "emacs";
       socketActivation = {

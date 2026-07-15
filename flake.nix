@@ -142,6 +142,16 @@
               ];
             };
           };
+          editor = { config, pkgs, lib, ... } : {
+            imports = [
+              ./modules/features/editor
+            ];
+            config = {
+              home-manager.sharedModules = [
+                inputs.nixvim.homeModules.nixvim
+              ];
+            };
+          };
           share = { config, pkgs, lib, ... } : {
             imports = [
               self.modules.base
@@ -152,7 +162,6 @@
               ./modules/features/office
               ./modules/features/remote
               ./modules/features/agent
-              ./modules/features/editor
               ./modules/features/proxy
               ./modules/features/greeter
               ./modules/features/x11-session
@@ -187,9 +196,6 @@
                     inputs.emarccs.homeManagerModules.default
                   ];                 
                 };
-                sharedModules = [
-                  inputs.nixvim.homeModules.nixvim
-                ];
               };
             };
           };
@@ -253,11 +259,12 @@
           system = "x86_64-linux";
           modules = [
             self.modules.features.share
+            self.modules.features.editor
             self.modules.features.niri
             self.modules.features.secret
             self.modules.hosts.thinkbook
             self.modules.users.lingyu
-            {
+            ({ config, pkgs, lib, ... } : {
               config = {
                 modules = {
                   base = {
@@ -292,7 +299,11 @@
                       defaultEditor = "neovim";
                       vim.enable = false;
                       neovim.enable = true;
-                      emacs.enable = true;
+                      emacs = {
+                        enable = true;
+                        programs.package = pkgs.emacs-pgtk;
+                        services.package = pkgs.emacs-pgtk;
+                      };
                     };
                     greeter.enable = true;
                     niri = {
@@ -304,7 +315,7 @@
                   };
                 };
               };
-            }
+            })
           ];
         };
         
@@ -312,6 +323,7 @@
           system = "x86_64-linux";
           modules = [
             self.modules.features.share
+            self.modules.features.editor
             self.modules.features.secret
             self.modules.hosts.aliyun
             self.modules.users.lingyu-minimal
@@ -335,6 +347,7 @@
           system = "x86_64-linux";
           modules = [
             self.modules.features.share
+            self.modules.features.editor
             self.modules.features.secret
             self.modules.hosts.wsl
             self.modules.users.lingyu

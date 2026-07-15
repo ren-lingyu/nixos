@@ -25,11 +25,25 @@ feature_ : { config, pkgs, lib, ... } : {
     description = "Whether to enable the neovim.";
   };
   
-  emacs.enable = lib.mkOption {
-    type = lib.types.bool;
-    default = false;
-    example = true;
-    description = "Whether to enable the emacs.";
+  emacs = {
+    enable = lib.mkOption {
+      type = lib.types.bool;
+      default = false;
+      example = true;
+      description = "Whether to enable the emacs.";
+    };
+    programs.package = lib.mkOption {
+      type = lib.types.package;
+      default = pkgs.emacs-gtk;
+      example = lib.literalExpression "pkgs.emacs-pgtk";
+      description = "The Emacs package used by `programs.emacs`";
+    };
+    services.package = lib.mkOption {
+      type = lib.types.package;
+      default = pkgs.emacs-gtk;
+      example = lib.literalExpression "pkgs.emacs-pgtk";
+      description = "The Emacs package used by `services.emacs`";
+    };
   };
   
 }
