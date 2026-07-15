@@ -388,6 +388,7 @@
         nixos-anywhere = {
           type = "app";
           program = (pkgs.lib.getExe' inputs'.nixos-anywhere.packages.default "nixos-anywhere");
+          meta.description = "Run nixos-anywhere from this flake";
         };
       };
     };
