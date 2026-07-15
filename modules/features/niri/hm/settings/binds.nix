@@ -7,11 +7,11 @@
       };
       "Mod+E" = lib.mkIf config.programs.emacs.enable {
         hotkey-overlay = { title = "Run an Editor: Emacs"; };
-        action.spawn = [ "${lib.getExe config.programs.emacs.package}" ];
+        action.spawn = [ "${lib.getExe' config.programs.emacs.package "emacs"}" ];
       };
       "Mod+Shift+E" = lib.mkIf config.services.emacs.enable {
         hotkey-overlay = { title = "Run an Editor: Emacs (Client)"; };
-        action.spawn = [ "${lib.getExe' config.programs.emacs.package "emacsclient"}" "-c" ];
+        action.spawn = [ "${lib.getExe' config.services.emacs.package "emacsclient"}" "-c" ];
       };
       "Mod+T" = lib.mkIf config.programs.kitty.enable {
         hotkey-overlay = { title = "Open a Terminal: kitty"; };
