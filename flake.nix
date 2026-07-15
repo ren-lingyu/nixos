@@ -69,6 +69,8 @@
     };
     emarccs = {
       url = "git+https://github.com/ren-lingyu/emarccs.git?ref=refs/heads/main&shallow=1";
+      inputs.nixpkgs.follows = "nixpkgs";
+      inputs.flake-parts.follows = "flake-parts";
     };
     nixos-anywhere = {
       url = "git+https://github.com/nix-community/nixos-anywhere.git?ref=refs/heads/main&shallow=1";
@@ -98,6 +100,7 @@
             nixpkgs = {
               overlays = [
                 inputs.self-nixpkgs.overlays.default
+                inputs.emarccs.overlays.default
               ];
             };
             home-manager = {
@@ -188,13 +191,6 @@
                       source = "./lingyu";
                     };
                   };
-                };
-              };
-              home-manager = {
-                users."1000" = {
-                  imports = [
-                    inputs.emarccs.homeManagerModules.default
-                  ];                 
                 };
               };
             };
@@ -301,8 +297,8 @@
                       neovim.enable = true;
                       emacs = {
                         enable = true;
-                        programs.package = pkgs.emacs-pgtk;
-                        services.package = pkgs.emacs-pgtk;
+                        programs.package = pkgs.emacs31-pgtk;
+                        services.package = pkgs.emacs-pgtk-twist;
                       };
                     };
                     greeter.enable = true;
