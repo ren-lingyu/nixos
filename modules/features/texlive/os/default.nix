@@ -6,7 +6,7 @@ in {
   
   config = lib.mkIf cfg.enable {
     environment.systemPackages = with pkgs; [
-      (texlive.combined.scheme-full.withPackages (ps_ : with ps_; [
+      (texliveFull.withPackages (ps_ : with ps_; [
         dvisvgm
         luadraw
       ]))
