@@ -1,120 +1,125 @@
-{ config, pkgs, lib, ... } : let
+{ options, config, pkgs, lib, ... } : let
 
   cfg = config.modules.hosts;
+  hostsList_ = builtins.attrNames (lib.filterAttrs (name_ : type_ : ((type_ == "directory") && (builtins.pathExists (./. + "/${name_}/default.nix")))) (builtins.readDir ./.));
 
 in {
   
   options = {
-    modules.hosts = lib.mkOption {
-      type = lib.types.attrsOf (lib.types.submodule (
-        { name, config, ... } : {
-          options = {
-            enable = lib.mkOption {
-              type = lib.types.bool;
-              default = false;
-              example = true;
-              description = "Whether to enable this host profile.";
-            };
-            monitors = lib.mkOption {
-              type = lib.types.attrsOf (lib.types.unique {
-                message = "Each `modules.hosts.${name}.monitors.<name>` can only be defined once.";
-              } (lib.types.submodule (
-                { name, config, ... } : {
-                  options = {
-                    name = lib.mkOption {
-                      type = lib.types.str;
-                      default = name;
-                      example = "eDP-1";
-                      description = "Name of the monitor.";
-                    };
-                    role = lib.mkOption {
-                      type = lib.types.nullOr (lib.types.enum [
-                        "default"
-                      ]);
-                      default = null;
-                      description = "The roles of the monitor.";
-                    };
-                    mode = let
-                      positiveInt_ = lib.types.addCheck lib.types.ints.unsigned (x_ : x_ > 0);
-                      positiveFloat_ = lib.types.addCheck lib.types.float (x_ : x_ > 0);
-                    in lib.mkOption {
-                      type = lib.types.nullOr (lib.types.submodule {
-                        options = {
-                          width = lib.mkOption {
-                            type = positiveInt_;
-                            example = 3072;
-                            description = "Width of the monitor mode in pixels.";
-                          };
-                          height = lib.mkOption {
-                            type = positiveInt_;
-                            example = 1920;
-                            description = "Height of the monitor mode in pixels.";
-                          };
-                          refresh = lib.mkOption {
-                            type = lib.types.nullOr positiveFloat_;
-                            default = null;
-                            example = 60.0;
-                            description = "Refresh rate of the monitor mode in Hz.";
-                          };
-                        };
-                      });
-                      default = null;
-                      example = {
-                        width = 3072;
-                        height = 1920;
-                        refresh = 60.0;
+    modules.hosts = (builtins.listToAttrs (builtins.map (host_ : {
+      name = host_;
+      value = let
+        possibleExtraOptionsPath_ = ./. + "/${builtins.toString host_}/extra-options.nix";
+      in {
+        enable = lib.mkOption {
+          type = lib.types.bool;
+          default = false;
+          example = true;
+          description = "Whether to enable this host profile.";
+        };
+        monitors = lib.mkOption {
+          type = lib.types.attrsOf (lib.types.unique {
+            message = "Each `modules.hosts.${host_}.monitors.<name>` can only be defined once.";
+          } (lib.types.submodule (
+            { name, config, ... } : {
+              options = {
+                name = lib.mkOption {
+                  type = lib.types.str;
+                  default = name;
+                  example = "eDP-1";
+                  description = "Name of the monitor.";
+                };
+                role = lib.mkOption {
+                  type = lib.types.nullOr (lib.types.enum [
+                    "default"
+                  ]);
+                  default = null;
+                  description = "The roles of the monitor.";
+                };
+                mode = let
+                  positiveInt_ = lib.types.addCheck lib.types.ints.unsigned (x_ : x_ > 0);
+                  positiveFloat_ = lib.types.addCheck lib.types.float (x_ : x_ > 0);
+                in lib.mkOption {
+                  type = lib.types.nullOr (lib.types.submodule {
+                    options = {
+                      width = lib.mkOption {
+                        type = positiveInt_;
+                        example = 3072;
+                        description = "Width of the monitor mode in pixels.";
                       };
-                      description = "Preferred monitor mode.";
+                      height = lib.mkOption {
+                        type = positiveInt_;
+                        example = 1920;
+                        description = "Height of the monitor mode in pixels.";
+                      };
+                      refresh = lib.mkOption {
+                        type = lib.types.nullOr positiveFloat_;
+                        default = null;
+                        example = 60.0;
+                        description = "Refresh rate of the monitor mode in Hz.";
+                      };
                     };
-                    scale = let
-                      positiveFloat_ = lib.types.addCheck lib.types.float (x_ : x_ > 0);
-                    in lib.mkOption {
-                      type = lib.types.nullOr positiveFloat_;
-                      default = null;
-                      example = 1.6;
-                      description = "Scale of the monitor in pixels.";
-                    };
-                  };
-                }
-              )));
-              internal = true;
-              default = {};
-              example = {
-                "eDP-1" = {
-                  name = "eDP-1";
-                  role = "default";
-                  mode = {
+                  });
+                  default = null;
+                  example = {
                     width = 3072;
                     height = 1920;
                     refresh = 60.0;
                   };
-                  scale = 1.6;
+                  description = "Preferred monitor mode.";
+                };
+                scale = let
+                  positiveFloat_ = lib.types.addCheck lib.types.float (x_ : x_ > 0);
+                in lib.mkOption {
+                  type = lib.types.nullOr positiveFloat_;
+                  default = null;
+                  example = 1.6;
+                  description = "Scale of the monitor in pixels.";
                 };
               };
-              description = "Monitor declarations for this host.";
-            };
-            packageGroups = {
-              tencent.enable = lib.mkOption {
-                type = lib.types.bool;
-                default = false;
-                example = true;
-                description = "Whether to install Tencent package group on this host.";
+            }
+          )));
+          internal = true;
+          default = {};
+          example = {
+            "eDP-1" = {
+              name = "eDP-1";
+              role = "default";
+              mode = {
+                width = 3072;
+                height = 1920;
+                refresh = 60.0;
               };
-            };
-            flatpak = {
-              enable = lib.mkOption {
-                type = lib.types.bool;
-                default = false;
-                example = true;
-                description = "Whether to enable flatpak.";
-              };
+              scale = 1.6;
             };
           };
+          description = "Monitor declarations for this host.";
+        };
+        packageGroups = {
+          tencent.enable = lib.mkOption {
+            type = lib.types.bool;
+            default = false;
+            example = true;
+            description = "Whether to install Tencent package group on this host.";
+          };
+        };
+        flatpak = {
+          enable = lib.mkOption {
+            type = lib.types.bool;
+            default = false;
+            example = true;
+            description = "Whether to enable flatpak.";
+          };
+        };
+      } // (lib.optionalAttrs (builtins.pathExists possibleExtraOptionsPath_) (
+        (import possibleExtraOptionsPath_) host_ {
+          inherit options;
+          inherit config;
+          inherit pkgs;
+          inherit lib;
         }
       ));
-      default = {};
-      description = "Host profile configurations.";
-    };
+    }) hostsList_));
   };
   
   config = {
