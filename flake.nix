@@ -52,10 +52,6 @@
       url = "git+https://github.com/nix-community/NixOS-WSL.git?ref=refs/heads/main&shallow=1";
       inputs.nixpkgs.follows = "nixpkgs";
     };
-    vscode-server = {
-      url = "git+https://github.com/nix-community/nixos-vscode-server.git?ref=refs/heads/master&shallow=1";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
     niri-flake = {
       url = "git+https://github.com/sodiboo/niri-flake.git?ref=refs/heads/main&shallow=1";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -224,7 +220,6 @@
             imports = [
               self.modules.base
               inputs.nixos-wsl.nixosModules.default
-              inputs.vscode-server.nixosModules.default
               ./modules/hosts/wsl
             ];
           };

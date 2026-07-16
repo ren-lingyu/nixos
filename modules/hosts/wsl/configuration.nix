@@ -90,7 +90,7 @@ in {
         "export PATH=\"${config.wsl.wslConf.automount.root}/c/Users/Lingyu/AppData/Local/Programs/Microsoft VS Code/bin\":\$PATH" 
       ];
     };
-
+    
     xdg = {
       mime = {
         enable = true;
@@ -149,11 +149,6 @@ in {
         enable = true;
         implementation = "broker";
       };
-      vscode-server = {
-        enable = true;
-        enableFHS = true;
-        # nodejsPackage = pkgs.nodejs_22; # 强制指定该选项可能会导致问题, 建议保持默认.
-      };
       openssh = {
         enable = true;
         hostKeys = [
@@ -210,14 +205,6 @@ in {
       };
       user = {
         services = {
-          auto-fix-vscode-server = {
-            enable = false;
-            serviceConfig = {
-              # 保证 vscode-server 正常运行.
-              # 有默认选项: Restart = "always". 不要在这里修改. 
-              Delegate = "no"; 
-            };
-          };
           emacs = {
             enable = true;
             overrideStrategy = "asDropin";
