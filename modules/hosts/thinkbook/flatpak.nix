@@ -4,7 +4,7 @@
 
 in {
   
-  config = lib.mkIf cfg.enable {
+  config = lib.mkIf (cfg.enable && cfg.flatpak.enable) {
     
     xdg.portal.enable = lib.mkIf config.services.flatpak.enable (lib.mkForce true);
     
@@ -28,7 +28,7 @@ in {
         };
       };
     in {
-      enable = false;
+      enable = cfg.flatpak.enable;
       package = pkgs.flatpak;
       uninstallUnmanaged = true;
       update = {
@@ -56,7 +56,7 @@ in {
       ];
       overrides = {
         global = {
-          Environment = config.environment.sessionVariables;
+          Environment = {};
           Context = {
             sockets = [
               "x11"
@@ -96,7 +96,7 @@ in {
         "${flatpakPackages.qq.appId}" = {
           Context = {
             filesystems = [
-              "xdg-documents/Tensent Files:create"
+              "xdg-documents/Tencent Files:create"
             ];
           };
         };

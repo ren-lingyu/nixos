@@ -236,10 +236,11 @@
             ];
             config.modules = {
               hosts.thinkbook = {
-                packageGroups.tencent.enable = true;
+                packageGroups.tencent.enable = false;
+                flatpak.enable = true;
               };
               overlays = {
-                tencent.enable = true;
+                tencent.enable = false;
               };
             };
           };

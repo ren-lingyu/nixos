@@ -101,6 +101,14 @@ in {
                 description = "Whether to install Tencent package group on this host.";
               };
             };
+            flatpak = {
+              enable = lib.mkOption {
+                type = lib.types.bool;
+                default = false;
+                example = true;
+                description = "Whether to enable flatpak.";
+              };
+            };
           };
         }
       ));
@@ -121,10 +129,16 @@ in {
           message = "At most one host in `modules.hosts` may set `enable = true`. Enabled hosts: ${builtins.concatStringsSep ", " enabledHostNames_}.";
         }
       ]
-      (lib.mapAttrsToList (hostName_ : host_ : {
-        assertion = !host_.enable || builtins.pathExists (./. + "/${hostName_}/default.nix");
-        message = "`modules.hosts.${hostName_}.enable = true` requires `${builtins.toString (./. + "/${hostName_}/default.nix")}` to exist.";
-      }) cfg)
+      (builtins.concatLists (lib.mapAttrsToList (hostName_ : host_ : [
+        {
+          assertion = !host_.enable || builtins.pathExists (./. + "/${hostName_}/default.nix");
+          message = "`modules.hosts.${hostName_}.enable = true` requires `${builtins.toString (./. + "/${hostName_}/default.nix")}` to exist.";
+        }
+        {
+          assertion = !host_.flatpak.enable || host_.enable;
+          message = "`modules.hosts.${hostName_}.flatpak.enable = true` requires `modules.hosts.${hostName_}.enable = true` to exist.";
+        }
+      ]) cfg))
       (builtins.concatLists (lib.mapAttrsToList (hostName_ : host_ : let
         monitors_ = builtins.attrValues host_.monitors;
         defaultMonitors_ = builtins.filter (monitor_ : monitor_.role == "default") monitors_;
