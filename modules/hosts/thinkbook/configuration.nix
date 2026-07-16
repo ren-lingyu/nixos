@@ -300,7 +300,7 @@ in {
         };
       };
       ollama = {
-        enable = true;
+        enable = false;
         package = pkgs.ollama;
         host = "127.0.0.1";
         port = 11434; 

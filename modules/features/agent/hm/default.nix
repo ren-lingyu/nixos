@@ -84,6 +84,21 @@ in {
             };
           };
           
+          modelscope = {
+            name = "ModelScope";
+            options = {
+              baseURL = "https://api-inference.modelscope.cn/v1";
+              apiKey = "{file:${config.sops.secrets."modelscope.apiKey.opencode".path}}";
+            };
+            models = fromList [
+              "Qwen/Qwen3.5-397B-A17B"
+              "ZhipuAI/GLM-4.7-Flash"
+              "ZhipuAI/GLM-5.1"
+            ];
+          };
+          
+        } // lib.optionalAttrs osConfig.services.ollama.enable {
+          
           ollama = {
             name = "Ollama";
             options = {
@@ -99,20 +114,7 @@ in {
               apiKey = "{file:${config.sops.secrets."ollama.apiKey.opencode".path}}";
             };
             models = fromList (builtins.filter (x: builtins.match ".*:cloud$" x != null) osConfig.services.ollama.loadModels);
-          };
-          
-          modelscope = {
-            name = "ModelScope";
-            options = {
-              baseURL = "https://api-inference.modelscope.cn/v1";
-              apiKey = "{file:${config.sops.secrets."modelscope.apiKey.opencode".path}}";
-            };
-            models = fromList [
-              "Qwen/Qwen3.5-397B-A17B"
-              "ZhipuAI/GLM-4.7-Flash"
-              "ZhipuAI/GLM-5.1"
-            ];
-          };
+          };          
           
         };
         
