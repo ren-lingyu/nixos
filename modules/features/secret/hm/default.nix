@@ -47,7 +47,7 @@ in {
           template = "user";
           structure = {
             "deepseek" = {
-              "apiKey" = [ "opencode" ];
+              "apiKey" = [ "opencode" "pi" ];
             };
             "ollama" = {
               "apiKey" = [ "opencode" ];
