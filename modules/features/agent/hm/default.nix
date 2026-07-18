@@ -142,6 +142,65 @@ in {
 
     };
 
+    programs.pi-coding-agent = let
+
+      final_ = (prev_ : let
+
+        prevExeOutput_ = lib.getBin prev_;
+        prevExeOutputVar_ = "$" + (prevExeOutput_.outputName or "out");
+        prevExePath_ = lib.getExe prev_;
+        prevExeRelPath_ = (
+          if lib.hasPrefix "${prevExeOutput_}" prevExePath_
+          then lib.removePrefix "${prevExeOutput_}" prevExePath_
+          else throw "pi-coding-agent executable path ${prevExePath_} is not under ${prevExeOutput_}"
+        );
+
+      in prev_.overrideAttrs (oldAttrs: {
+
+        nativeBuildInputs = (oldAttrs.nativeBuildInputs or []) ++ [
+          pkgs.makeWrapper
+        ];
+        postFixup = builtins.concatStringsSep "\n" [
+          (oldAttrs.postFixup or "")
+          ''wrapProgram "${prevExeOutputVar_}${prevExeRelPath_}" --set PI_OFFLINE 1''
+        ];
+
+      })) pkgs.pi-coding-agent;
+
+    in {
+
+      enable = true;
+      package = final_;
+
+      extraPackages = with pkgs; [
+        fd
+        ripgrep
+      ];
+
+      context = ./context.md;
+
+      models = let
+        cat_ = x_ : "!${lib.getExe' pkgs.coreutils "cat"} ${lib.escapeShellArg x_}";
+      in {
+        providers = {
+          deepseek = {
+            api = "openai-completions";
+            baseUrl = "https://api.deepseek.com";
+            apiKey = cat_ config.sops.secrets."deepseek.apiKey.pi".path;
+          };
+        };
+      };
+
+      settings = {
+        defaultProjectTrust = "ask";
+        enableInstallTelemetry = false;
+        skills = [
+          "${./git-maintainer/skills}"
+        ];
+      };
+
+    };
+
     programs.codex = {
       enable = true;
       package = pkgs.codex;
