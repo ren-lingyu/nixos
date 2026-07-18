@@ -7,7 +7,7 @@
     ];
 
     systemd.user.sessionVariables = (builtins.mapAttrs (x: y: (lib.mkForce y)) config.programs.niri.settings.environment);
-    
+
     programs.niri.settings = {
       environment = {
         QT_QPA_PLATFORM = "wayland";

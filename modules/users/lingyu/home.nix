@@ -1,5 +1,5 @@
 { config, lib, pkgs, ... } : {
-  
+
   home = {
     packages = with pkgs; (builtins.concatLists [
       [ jq ripgrep unzip trash-cli tree ]
@@ -96,5 +96,5 @@
       };
     };
   };
-  
+
 }

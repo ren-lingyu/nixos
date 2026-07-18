@@ -39,7 +39,7 @@ in {
         antialias = true;
         defaultFonts = {
           emoji = [
-            "Noto Color Emoji" 
+            "Noto Color Emoji"
             "Maple Mono NF CN"
           ];
           monospace = [
@@ -74,5 +74,5 @@ in {
       };
     };
   };
-  
+
 }

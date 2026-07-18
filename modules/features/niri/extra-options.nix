@@ -1,12 +1,12 @@
 feature_ : { options, config, pkgs, lib, ... } : {
-  
+
   noctalia.enable = lib.mkOption {
     type = lib.types.bool;
     default = config.modules.features.${feature_}.enable;
     example = true;
     description = "Whether to enable the Noctalia shell configuration for Niri.";
   };
-  
+
   waybar.enable = lib.mkOption {
     type = lib.types.bool;
     default =
@@ -15,7 +15,7 @@ feature_ : { options, config, pkgs, lib, ... } : {
     example = false;
     description = "Whether to enable the Waybar status bar for Niri.";
   };
-  
+
   session-wrapper = lib.mkOption {
     type = lib.types.unique {
       message = "Only one module may define `modules.features.${feature_}.session-wrapper.package`.";
@@ -24,7 +24,7 @@ feature_ : { options, config, pkgs, lib, ... } : {
     internal = true;
     description = "Internal package providing the niri session command for greeters.";
   };
-  
+
   monitors = let
     positiveInt_ = lib.types.addCheck lib.types.ints.unsigned (x_ : x_ > 0);
     positiveFloat_ = lib.types.addCheck lib.types.float (x_ : x_ > 0);
@@ -87,5 +87,5 @@ feature_ : { options, config, pkgs, lib, ... } : {
     default = {};
     description = "Monitor declarations used by Niri.";
   };
-  
+
 }

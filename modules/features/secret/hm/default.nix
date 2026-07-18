@@ -10,7 +10,7 @@ in {
     };
 
     sops = {
-      
+
       defaultSopsFormat = "yaml";
       defaultSopsFile = ./sops/default.yaml;
       defaultSopsKey = null;
@@ -22,14 +22,14 @@ in {
         "keyImport"
         "secretChanges"
       ];
-      
+
       age = {
         generateKey = false;
         keyFile = osConfig.sops.secrets."age.keyFile".path;
         plugins = [];
         sshKeyPaths = [];
       };
-      
+
       secrets = llib.mkSopsSecrets [
         {
           template = "user";
@@ -58,9 +58,9 @@ in {
           };
         }
       ];
-      
+
     };
-    
+
   };
-  
+
 }

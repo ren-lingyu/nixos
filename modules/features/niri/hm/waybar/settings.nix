@@ -5,10 +5,10 @@
 in {
 
   config = lib.mkIf cfg.waybar.enable {
-    
+
     programs.waybar.settings = [
       {
-        
+
         height = 30;
         spacing = 4;
         margin-top = 0;
@@ -16,7 +16,7 @@ in {
         margin-left = 0;
         margin-right = 0;
         fixed-center = false;
-        
+
         modules-left = [
           "niri/workspaces"
         ];
@@ -73,7 +73,7 @@ in {
             unlocked = "";
           };
         };
-        
+
         "idle_inhibitor" = {
           format = "{icon}";
           format-icons = {
@@ -172,7 +172,7 @@ in {
 
         "custom/power" = {
           format = ( " " + "⏻ " + " " );
-          tooltip = false; 
+          tooltip = false;
           menu = "on-click";
           menu-file = "${config.xdg.configHome}/waybar/power-menu.xml";
           menu-actions = {
@@ -182,7 +182,7 @@ in {
             hibernate = "systemctl hibernate";
           };
         };
-        
+
       }
     ];
 
@@ -192,7 +192,7 @@ in {
       target = "./waybar/power-menu.xml";
       executable = true;
     };
-    
+
   };
 
 }

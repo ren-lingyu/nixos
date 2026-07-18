@@ -1,5 +1,5 @@
 { config, lib, pkgs, osConfig, ... } :  {
-  
+
   imports = [
     ./top-level.nix
     ./input.nix

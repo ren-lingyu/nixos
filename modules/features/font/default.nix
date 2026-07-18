@@ -1,5 +1,5 @@
 { config, pkgs, lib, ... } : {
-  
+
   imports = [
     ./os
   ];
@@ -10,5 +10,5 @@
       hm = true;
     };
   };
-  
+
 }

@@ -1,11 +1,11 @@
 { config, lib, pkgs, ... } : let
-  
+
   cfg = config.modules.features.greeter;
-  
+
 in {
-  
+
   config = lib.mkIf cfg.enable {
-    
+
     users = {
       groups.greeter = { };
       users.greeter = {
@@ -20,7 +20,7 @@ in {
         createHome = true;
       };
     };
-    
+
     environment = {
       systemPackages = cfg.sessionPackages;
       etc = {
@@ -33,7 +33,7 @@ in {
         };
       };
     };
-    
+
     programs.sway = {
       enable = true;
       package = pkgs.sway;
@@ -43,7 +43,7 @@ in {
       };
       extraOptions = [ ];
     };
-    
+
     services.greetd = {
       enable = cfg.enable;
       settings = {
@@ -103,7 +103,7 @@ in {
         });
       };
     };
-    
+
   };
 
 }

@@ -3,21 +3,21 @@
   config = {
 
     accounts.email.accounts = {
-      
+
       "Ren_Lingyu@outlook.com" = {
         # https://support.microsoft.com/office/pop-imap-and-smtp-settings-for-outlook-com-d088b986-291d-42b8-9564-9c414e2aa040
-        
+
         enable = true;
         primary = true;
         address = "Ren_Lingyu@outlook.com";
         flavor = "outlook.office365.com";
         realName = "Lingyu Ren";
         userName = "Ren_Lingyu@outlook.com";
-        
+
         aliases = [
           "aRen_Coco@outlook.com"
         ];
-        
+
         imap = lib.mkForce {
           host = "outlook.office365.com";
           tls = {
@@ -27,7 +27,7 @@
           port = 993;
           authentication = "xoauth2";
         };
-        
+
         smtp = lib.mkForce {
           host = "smtp-mail.outlook.com"; # "smtp.outlook.com";
           tls = {
@@ -37,7 +37,7 @@
           port = 587;
           authentication = "xoauth2";
         };
-        
+
         signature = {
           showSignature = "append";
           command = null;
@@ -48,7 +48,7 @@
             "--"
           ];
         };
-        
+
         thunderbird = {
           # https://support.microsoft.com/en-us/topic/set-up-email-in-mozilla-thunderbird-8-0-f4726a9e-64d3-4494-9260-5762597fd1a6
           enable = config.programs.thunderbird.enable;
@@ -56,8 +56,8 @@
             "${config.home.username}"
           ];
         };
-        
-      };      
+
+      };
 
       "lingyurenmail@gmail.com" = {
 
@@ -69,7 +69,7 @@
         userName = "lingyurenmail@gmail.com";
 
         aliases = [];
-        
+
         imap = {
           host = "imap.gmail.com";
           tls = {
@@ -79,7 +79,7 @@
           port = 993;
           authentication = "xoauth2";
         };
-        
+
         smtp = {
           host = "smtp.gmail.com";
           tls = {
@@ -89,7 +89,7 @@
           port = 465;
           authentication = "xoauth2";
         };
-        
+
         signature = {
           showSignature = "append";
           command = null;
@@ -107,7 +107,7 @@
             "${config.home.username}"
           ];
         };
-        
+
       };
 
       "ah.renn.coco@gmail.com" = {
@@ -120,7 +120,7 @@
         userName = "ah.renn.coco@gmail.com";
 
         aliases = [];
-        
+
         imap = {
           host = "imap.gmail.com";
           tls = {
@@ -130,7 +130,7 @@
           port = 993;
           authentication = "xoauth2";
         };
-        
+
         smtp = {
           host = "smtp.gmail.com";
           tls = {
@@ -140,7 +140,7 @@
           port = 465;
           authentication = "xoauth2";
         };
-        
+
         signature = {
           showSignature = "append";
           command = null;
@@ -158,13 +158,13 @@
             "${config.home.username}"
           ];
         };
-        
+
       };
-      
+
     };
-    
+
     programs.thunderbird = {
-      
+
       enable = osConfig.programs.thunderbird.enable;
       package = pkgs.thunderbird;
       nativeMessagingHosts = [];
@@ -173,22 +173,22 @@
         "en-US"
         "en-GB"
       ];
-      
+
       settings = {
         "mail.shell.checkDefaultClient" = false;
       };
-      
+
       profiles = let
-        
+
         fromList = list : builtins.listToAttrs (
           builtins.map (x : {
             name = builtins.toString x;
             value = {};
           }) list
         );
-        
+
       in {
-        
+
         "${config.home.username}" = rec {
           isDefault = true;
           withExternalGnupg = true;
@@ -245,11 +245,11 @@
           userChrome = "";
           userContent = "";
         };
-        
+
       };
-      
+
     };
-    
+
   };
 
 }

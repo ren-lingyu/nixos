@@ -9,7 +9,7 @@
     julia
     lean4
     typescript
-    
+
     nixd                              # Nix
     bash-language-server              # Shell
     clang-tools                       # C / C++ (clangd)

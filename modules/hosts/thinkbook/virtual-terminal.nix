@@ -1,13 +1,13 @@
 { config, lib, pkgs, ... } : let
 
   cfg = config.modules.hosts.thinkbook;
-  
+
   forceFb0 = pkgs.writeShellScript "force-fb0-3072x1920" (builtins.concatStringsSep "\n" [
     "set -eu"
     "[ -e /dev/fb0 ] || exit 0"
     "exec ${pkgs.fbset}/bin/fbset -fb /dev/fb0 -g 3072 1920 3072 1920 32"
   ]);
-  
+
   udevRule = builtins.concatStringsSep "," [
     "ACTION==\"change\""
     "SUBSYSTEM==\"drm\""
@@ -17,13 +17,13 @@
   ];
 
 in {
-  
+
   config = lib.mkIf cfg.enable {
-    
+
     environment.systemPackages = with pkgs; [
       fbset
     ];
-    
+
     systemd.services = {
       fbset-before-display-manager = {
         description = "Force fb0 mode to 3072x1920 before display-manager (greeter)";
@@ -43,12 +43,12 @@ in {
         };
       };
     };
-    
+
     services.udev = {
       enable = true;
       extraRules = udevRule;
     };
-    
+
     console = {
       enable = true;
       font = "latarcyrheb-sun32";
@@ -56,7 +56,7 @@ in {
       # keyMap = "us";
       useXkbConfig = true; # use xkb.options in tty.
     };
-    
+
   };
-  
+
 }

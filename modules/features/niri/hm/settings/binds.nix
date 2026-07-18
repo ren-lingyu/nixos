@@ -1,5 +1,5 @@
 { config, lib, pkgs, osConfig, ... } : {
-  
+
   config = lib.mkIf config.programs.niri.enable {
     programs.niri.settings.binds = {
       "Mod+Shift+Slash" = {
@@ -230,5 +230,5 @@
       "Ctrl+Alt+Delete" = { action.quit = []; };
     };
   };
-  
+
 }

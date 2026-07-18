@@ -1,5 +1,5 @@
 feature_ : { config, pkgs, lib, ... } : {
-  
+
   defaultEditor = lib.mkOption {
     type = lib.types.nullOr (lib.types.enum [
       "vim"
@@ -10,21 +10,21 @@ feature_ : { config, pkgs, lib, ... } : {
     example = "emacs";
     description = "Choose the default editor from vim, neovim and emacs.";
   };
-  
+
   vim.enable = lib.mkOption {
     type = lib.types.bool;
     default = false;
     example = true;
     description = "Whether to enable vim.";
   };
-  
+
   neovim.enable = lib.mkOption {
     type = lib.types.bool;
     default = false;
     example = true;
     description = "Whether to enable the neovim.";
   };
-  
+
   emacs = {
     enable = lib.mkOption {
       type = lib.types.bool;
@@ -45,5 +45,5 @@ feature_ : { config, pkgs, lib, ... } : {
       description = "The Emacs package used by `services.emacs`";
     };
   };
-  
+
 }

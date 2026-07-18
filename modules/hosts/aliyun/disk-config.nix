@@ -5,7 +5,7 @@
 in {
 
   config = lib.mkIf cfg.enable {
-    
+
     disko.devices.disk = {
       system = {
         type = "disk";
@@ -34,12 +34,12 @@ in {
                 format = "ext4";
                 mountpoint = "/";
               };
-            };          
+            };
           };
         };
       };
     };
-    
+
   };
 
 }

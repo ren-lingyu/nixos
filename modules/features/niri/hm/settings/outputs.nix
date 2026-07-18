@@ -1,15 +1,15 @@
 { config, lib, pkgs, osConfig, ... } : let
-  
+
   cfg = osConfig.modules.features.niri;
 
   monitorRoleToOutputList_ = {
     "default" = [ "default" ];
   };
-  
+
 in {
 
   config = lib.mkIf config.programs.niri.enable {
-    
+
     programs.niri.settings.outputs = lib.foldlAttrs (x_ : hostMonitorName_ : hostMonitor_ : (builtins.foldl' (y_ : niriOutput_ : (y_ // {
       "${niriOutput_}" = lib.foldl' lib.recursiveUpdate { } [
         {
@@ -41,7 +41,7 @@ in {
         })
       ];
     })) x_ ( [ hostMonitor_.name ] ))) { } cfg.monitors;
-    
+
   };
 
 }

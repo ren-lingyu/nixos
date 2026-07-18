@@ -3,20 +3,20 @@
   cfg = config.modules.features.x11-session;
 
 in {
-  
+
   imports = [
     ./os
   ];
-  
+
   config = {
-    
+
     modules.features.x11-session = {
-      
+
       existModule = {
         os = true;
         hm = true;
       };
-      
+
       session-wrapper = lib.mkIf cfg.enable (let
         commandName_ = "X11-Session";
       in (pkgs.runCommand "x11-session-wrapper" {
@@ -48,9 +48,9 @@ in {
         "EOF"
         "chmod +x $out/bin/${commandName_}"
       ])));
-      
+
     };
-    
+
     assertions = [
       {
         assertion = (
@@ -65,7 +65,7 @@ in {
             ]
           else cfg.session-wrapper == null
         );
-        
+
         message = builtins.concatStringsSep "\n" [
           "`modules.features.x11-session.session-wrapper` has an invalid state."
           "Expected:"
@@ -74,7 +74,7 @@ in {
         ];
       }
     ];
-    
+
   };
-  
+
 }

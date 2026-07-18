@@ -3,14 +3,14 @@
   cfg = config.modules.hosts.thinkbook;
 
 in {
-  
+
   config = lib.mkIf cfg.enable {
-    
+
     environment.systemPackages = with pkgs; [
       sbctl
       efitools
     ];
-    
+
     boot.loader = {
       systemd-boot = {
         enable = false;
@@ -63,7 +63,7 @@ in {
             brightForeground = "FFFF55";
             brightBackground = "0000AA";
             margin = 0;
-            marginGradient = 0; 
+            marginGradient = 0;
             font = {
               spacing = 0;
               scale = null;
@@ -72,7 +72,7 @@ in {
         };
       };
     };
-    
+
   };
-  
+
 }

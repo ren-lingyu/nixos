@@ -2,9 +2,9 @@
   cfg = config.modules.features.secret;
   llib = import ../lib { inherit config; };
 in {
-  
+
   config = lib.mkIf cfg.enable {
-    
+
     environment.systemPackages = with pkgs; [
       age
       sops
@@ -13,7 +13,7 @@ in {
     ];
 
     sops = {
-      
+
       defaultSopsFormat = "yaml";
       defaultSopsFile = ./sops/default.yaml;
       defaultSopsKey = null;
@@ -25,7 +25,7 @@ in {
         "keyImport"
         "secretChanges"
       ];
-      
+
       age = {
         generateKey = false;
         keyFile = null;
@@ -36,7 +36,7 @@ in {
           )
         );
       };
-      
+
       secrets = llib.mkSopsSecrets [
         {
           template = "system";
@@ -49,9 +49,9 @@ in {
           };
         }
       ];
-      
+
     };
-    
+
   };
-  
+
 }

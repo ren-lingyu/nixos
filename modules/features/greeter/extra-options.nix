@@ -4,7 +4,7 @@ feature_ : { config, pkgs, lib, ... } : {
     type = lib.types.listOf lib.types.package;
     description = "";
   };
-  
+
   monitor = lib.mkOption {
     type = lib.types.unique {
       message = "`modules.features.greater.monitor`";
@@ -25,5 +25,5 @@ feature_ : { config, pkgs, lib, ... } : {
     };
     description = "Metadata of the default monitor.";
   };
-  
+
 }

@@ -7,16 +7,16 @@ in {
   imports = [
     ./os
   ];
-  
+
   config = {
-    
+
     modules.features.greeter = {
-      
+
       existModule = {
         os = true;
         hm = false;
       };
-      
+
       monitor = let
         enabledHosts_ = builtins.attrValues (lib.filterAttrs (unused_name_ : host_ : (
           host_.enable
@@ -34,7 +34,7 @@ in {
           then (builtins.head defaultMonitors_).name
           else null;
       };
-      
+
       sessionPackages = builtins.concatLists (builtins.map (
         x_ : lib.optionals (
           (lib.attrByPath [ x_ "session-wrapper" ] null options.modules.features) != null
@@ -43,9 +43,9 @@ in {
         "niri"
         "x11-session"
       ]);
-      
+
     };
-    
+
     assertions = [
       {
         assertion = let
@@ -72,7 +72,7 @@ in {
         message = "`modules.features.greeter.enable = true` requires exactly one monitor in the enabled host's `monitors` to set `role = \"default\"`.";
       }
     ];
-    
+
   };
-  
+
 }

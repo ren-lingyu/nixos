@@ -5,7 +5,7 @@
 in {
 
   config = lib.mkIf cfg.enable {
-    
+
     programs.nixvim = {
       enable = cfg.neovim.enable;
       nixpkgs = {
@@ -97,7 +97,7 @@ in {
         arguments = ["-c"];
       };
     };
-    
+
   };
-  
+
 }

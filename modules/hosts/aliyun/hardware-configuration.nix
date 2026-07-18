@@ -6,13 +6,13 @@
   cfg = config.modules.hosts.aliyun;
 
 in {
-  
+
   imports = [
     (modulesPath + "/profiles/qemu-guest.nix")
   ];
 
   config = lib.mkIf cfg.enable {
-    
+
     boot.initrd.availableKernelModules = [ "ata_piix" "uhci_hcd" "virtio_pci" "virtio_blk" ];
     boot.initrd.kernelModules = [ ];
     boot.kernelModules = [ ];
@@ -21,5 +21,5 @@ in {
     nixpkgs.hostPlatform = lib.mkDefault "x86_64-linux";
 
   };
-  
+
 }

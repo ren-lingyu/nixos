@@ -1,5 +1,5 @@
 { config, pkgs, lib, ... } : {
-  
+
   imports = [
     ./configuration.nix
     ./hardware-configuration.nix
@@ -8,7 +8,7 @@
     ./boot-manager.nix
     ./flatpak.nix
   ];
-  
+
   config = {
     modules.hosts.thinkbook = {
       enable = true;
@@ -32,5 +32,5 @@
       };
     };
   };
-  
+
 }

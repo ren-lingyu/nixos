@@ -17,5 +17,5 @@
     enable = true;
     package = pkgs.kitty;
   };
-  
+
 }

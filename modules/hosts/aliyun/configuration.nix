@@ -3,13 +3,13 @@
   cfg = config.modules.hosts.aliyun;
 
 in {
-  
+
   config = lib.mkIf cfg.enable {
-    
+
     nix.settings = {
       trusted-users = [ "@wheel" "root" ];
     };
-    
+
     networking = {
       hostName = "nixos-server";
       useDHCP = lib.mkDefault true;
@@ -33,7 +33,7 @@ in {
         ];
       };
     };
-    
+
     users = {
       mutableUsers = false;
       users = {
@@ -65,11 +65,11 @@ in {
         PermitRootLogin = "prohibit-password";
       };
     };
-    
+
     security.sudo.wheelNeedsPassword = false;
-    
+
     system.stateVersion = "26.11";
 
   };
-  
+
 }

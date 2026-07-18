@@ -1,5 +1,5 @@
 {
-  
+
   description = "NixOS configuration";
 
   nixConfig = {
@@ -20,7 +20,7 @@
       "noctalia.cachix.org-1:pCOR47nnMEo5thcxNDtzWpOxNFQsBRglJzxWPp3dkU4="
     ];
   };
-  
+
   inputs = {
     nixpkgs = {
       # url = "github:NixOS/nixpkgs/nixos-unstable";
@@ -76,17 +76,17 @@
       follows = "nixos-anywhere/disko";
     };
   };
-  
+
   outputs = { self, ... }@inputs : inputs.flake-parts.lib.mkFlake { inherit inputs; } {
-    
+
     systems = [
       "x86_64-linux"
     ];
-    
+
     flake = {
-      
+
       modules = {
-        
+
         base = { config, pkgs, lib, ... } : {
           imports = [
             inputs.home-manager.nixosModules.home-manager
@@ -109,7 +109,7 @@
             };
           };
         };
-        
+
         features = {
           niri = { config, pkgs, lib, ... } : {
             imports = [
@@ -167,7 +167,7 @@
             ];
           };
         };
-        
+
         users = {
           lingyu = { config, pkgs, lib, ... } : {
             imports = [
@@ -214,7 +214,7 @@
             };
           };
         };
-        
+
         hosts = {
           wsl = { config, pkgs, lib, ... } : {
             imports = [
@@ -247,11 +247,11 @@
             ];
           };
         };
-        
+
       };
-      
+
       nixosConfigurations = {
-        
+
         nixos = inputs.nixpkgs.lib.nixosSystem {
           system = "x86_64-linux";
           modules = [
@@ -315,7 +315,7 @@
             })
           ];
         };
-        
+
         nixos-server = inputs.nixpkgs.lib.nixosSystem {
           system = "x86_64-linux";
           modules = [
@@ -339,7 +339,7 @@
             }
           ];
         };
-        
+
         nixos-wsl = inputs.nixpkgs.lib.nixosSystem {
           system = "x86_64-linux";
           modules = [
@@ -379,11 +379,11 @@
             }
           ];
         };
-        
+
       };
-      
+
     };
-    
+
     perSystem = { inputs', pkgs, ... } : {
       apps = {
         nixos-anywhere = {
@@ -393,7 +393,7 @@
         };
       };
     };
-    
+
   };
-  
+
 }

@@ -10,20 +10,20 @@
   cfg = config.modules.hosts.wsl;
 
 in {
-  
+
   # imports = [
   #   # include NixOS-WSL modules
   #   <nixos-wsl/modules>
   # ];
 
   config = lib.mkIf cfg.enable {
-    
+
     nix.settings = {
       trusted-users = [ "@wheel" "root" ];
     };
-    
+
     networking.hostName = "nixos-wsl";
-    
+
     hardware.graphics = {
       enable = true;
       extraPackages = with pkgs; [
@@ -37,7 +37,7 @@ in {
     time = {
       timeZone = "Asia/Shanghai";
     };
-    
+
     wsl = {
       enable = true;
       defaultUser = "1000";
@@ -55,7 +55,7 @@ in {
       docker-desktop.enable = true;
       useWindowsDriver = true;
     };
-    
+
     users = {
       groups.docker = {};
       users = {
@@ -74,7 +74,7 @@ in {
         };
       };
     };
-    
+
     environment = {
       systemPackages = with pkgs; [];
       usrbinenv = lib.mkForce "${pkgs.coreutils}/bin/env";
@@ -87,10 +87,10 @@ in {
         LIBVA_DRIVER_NAME = "iHD";
       };
       extraInit = builtins.concatStringsSep "\n" [
-        "export PATH=\"${config.wsl.wslConf.automount.root}/c/Users/Lingyu/AppData/Local/Programs/Microsoft VS Code/bin\":\$PATH" 
+        "export PATH=\"${config.wsl.wslConf.automount.root}/c/Users/Lingyu/AppData/Local/Programs/Microsoft VS Code/bin\":\$PATH"
       ];
     };
-    
+
     xdg = {
       mime = {
         enable = true;
@@ -140,7 +140,7 @@ in {
         };
       };
     };
-    
+
     services = {
       xserver = {
         videoDrivers = [ "intel" "modesetting" ];
@@ -173,7 +173,7 @@ in {
         enable = false;
         package = pkgs.ollama;
         host = "127.0.0.1";
-        port = 11434; 
+        port = 11434;
         loadModels = [
           "qwen3.5:0.8b"
           "qwen3.5:2b"
@@ -190,14 +190,14 @@ in {
         syncModels = true;
       };
     };
-    
+
     systemd = {
       services = {
         "user@" = {
           enable = true;
           overrideStrategy = "asDropin";
           serviceConfig = {
-            # 不要全局设置 Delegate = "no". 
+            # 不要全局设置 Delegate = "no".
             Delegate = "pids memory cpu";
             DelegateSubgroup = "init.scope";
           };
@@ -284,11 +284,11 @@ in {
               ShowPreeditForPassword = false;
               AutoSavePeriod = 30;
             };
-          }; 
+          };
         };
       };
     };
-    
+
     # This value determines the NixOS release from which the default
     # settings for stateful data, like file locations and database versions
     # on your system were taken. It's perfectly fine and recommended to leave
@@ -296,7 +296,7 @@ in {
     # Before changing this value read the documentation for this option
     # (e.g. man configuration.nix or on https://nixos.org/nixos/options.html).
     system.stateVersion = "25.11"; # Did you read the comment?
-    
+
   };
-  
+
 }

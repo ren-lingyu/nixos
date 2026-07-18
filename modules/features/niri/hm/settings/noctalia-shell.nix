@@ -1,9 +1,9 @@
 { config, lib, pkgs, osConfig, ... } : let
 
   noctaliaNiriSettingsEnable = config.programs.niri.enable && config.programs.noctalia-shell.enable;
-  
+
   noctaliaShellCommand = [ "noctalia-shell" ];
-  
+
 in {
 
   config = lib.mkIf noctaliaNiriSettingsEnable {
@@ -14,7 +14,7 @@ in {
           argv = noctaliaShellCommand;
         }
       ];
-      
+
       binds = {
 
         "Mod+D" = lib.mkForce {
@@ -76,7 +76,7 @@ in {
             [ "ipc" "call" "brightness" "decrease" ]
           ];
         };
-        
+
       };
     };
 

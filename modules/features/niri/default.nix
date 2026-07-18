@@ -13,7 +13,7 @@
     ) &&
     config.services.upower.enable
   );
-  
+
 in {
 
   imports = [
@@ -21,14 +21,14 @@ in {
   ];
 
   config = {
-    
+
     modules.features.niri = {
-      
+
       existModule = {
         os = true;
         hm = true;
       };
-      
+
       monitors = let
         enabledHosts_ = builtins.attrValues (lib.filterAttrs (unused_name_ : host_ : (
           host_.enable
@@ -38,7 +38,7 @@ in {
         then (builtins.head enabledHosts_).monitors
         else {}
       );
-      
+
       session-wrapper = lib.mkIf config.programs.niri.enable (let
         commandName_ = "Niri";
       in pkgs.runCommand "niri-session-wrapper" {
@@ -52,9 +52,9 @@ in {
         "EOF"
         "chmod +x $out/bin/${commandName_}"
       ]));
-      
+
     };
-    
+
     assertions = [
       {
         assertion = let
@@ -108,7 +108,7 @@ in {
         ];
       }
     ];
-    
+
   };
-  
+
 }

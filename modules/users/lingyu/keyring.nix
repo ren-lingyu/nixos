@@ -59,7 +59,7 @@ in {
     enable = true;
     package = pkgs.gnupg;
   };
-  
+
   services.gpg-agent = {
     enable = true;
     pinentry.package = pkgs.pinentry-tty;
@@ -72,7 +72,7 @@ in {
     enable = lib.mkForce false;
     package = pkgs.gnome-keyring;
   };
-  
+
   programs.keepassxc = {
     enable = true;
     package = pkgs.keepassxc;

@@ -6,13 +6,13 @@
   cfg = config.modules.hosts.thinkbook;
 
 in {
-  
+
   config = lib.mkIf cfg.enable {
-    
+
     nix.settings = {
       trusted-users = [ "@wheel" "root" ];
     };
-    
+
     boot = {
       kernelPackages = pkgs.linuxPackages_latest;
       kernelParams = [
@@ -20,7 +20,7 @@ in {
       ];
       kernelModules = [ "uinput" ];
     };
-    
+
     hardware = {
       graphics = {
         enable = true;
@@ -44,7 +44,7 @@ in {
       };
       uinput.enable = true;
     };
-    
+
     # Configure network connections interactively with nmcli or nmtui.
     networking = {
       hostName = "nixos";
@@ -61,16 +61,16 @@ in {
         noProxy = ""; #"127.0.0.1,localhost,internal.domain";
       };
     };
-    
+
     time = {
       timeZone = "Asia/Shanghai";
     };
-    
+
     services.seatd = {
       enable = true;
       group = "seat";
     };
-    
+
     users = {
       mutableUsers = false;
       users = {
@@ -107,7 +107,7 @@ in {
         };
       };
     };
-    
+
     i18n = {
       defaultLocale = "en_US.UTF-8";
       extraLocales = [
@@ -138,7 +138,7 @@ in {
         };
       };
     };
-    
+
     environment = {
       systemPackages = with pkgs; [
         usbutils
@@ -168,7 +168,7 @@ in {
         XMODIFIERS = "@im=fcitx";
       };
     };
-    
+
     security = {
       pam = {
         package = pkgs.pam;
@@ -187,7 +187,7 @@ in {
         package = pkgs.polkit;
       };
     };
-    
+
     xdg.mime = {
       enable = true;
       defaultApplications = let
@@ -203,7 +203,7 @@ in {
         "x-scheme-handler/unknown" = defaultBrowser;
       };
     };
-    
+
     programs = {
       nix-ld = {
         enable = true;
@@ -233,7 +233,7 @@ in {
         enable = true;
       };
     };
-    
+
     services = {
       fprintd = {
         enable = true;
@@ -303,7 +303,7 @@ in {
         enable = false;
         package = pkgs.ollama;
         host = "127.0.0.1";
-        port = 11434; 
+        port = 11434;
         loadModels = [
           "qwen3-coder-next:cloud"
           "qwen3.5:cloud"
@@ -313,7 +313,7 @@ in {
         syncModels = true;
       };
     };
-    
+
     # This option defines the first version of NixOS you have installed on this particular machine,
     # and is used to maintain compatibility with application data (e.g. databases) created on older NixOS versions.
     #
@@ -332,7 +332,7 @@ in {
     #
     # For more information, see `man configuration.nix` or https://nixos.org/manual/nixos/stable/options#opt-system.stateVersion .
     system.stateVersion = "25.11"; # Did you read the comment?
-    
+
   };
-  
+
 }

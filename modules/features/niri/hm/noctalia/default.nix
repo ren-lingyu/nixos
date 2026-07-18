@@ -3,20 +3,20 @@
   cfg = osConfig.modules.features.niri;
 
 in {
-  
+
   config = lib.mkIf (cfg.enable && cfg.noctalia.enable) {
-    
+
     programs.noctalia-shell = {
       enable = cfg.noctalia.enable;
       settings = {
-        
+
         settingsVersion = 0;
 
         noctaliaPerformance = {
           disableWallpaper = true;
           disableDesktopWidgets = true;
         };
-        
+
         bar = {
           barType = "framed";
           position = "top";
@@ -213,7 +213,7 @@ in {
           rightClickCommand = "";
           screenOverrides = [ ];
         };
-        
+
         general = {
           avatarImage = "";
           dimmerOpacity = 0.2;
@@ -278,7 +278,7 @@ in {
           reverseScroll = false;
           smoothScrollEnabled = true;
         };
-        
+
         ui = {
           fontDefault =
             if builtins.elem pkgs.lxgw-wenkai osConfig.fonts.packages
@@ -299,7 +299,7 @@ in {
           settingsPanelMode = "attached";
           settingsPanelSideBarCardStyle = false;
         };
-        
+
         location = {
           name = "";
           weatherEnabled = true;
@@ -316,7 +316,7 @@ in {
           hideWeatherCityName = false;
           autoLocate = true;
         };
-        
+
         calendar = {
           cards = [
             {
@@ -333,7 +333,7 @@ in {
             }
           ];
         };
-        
+
         wallpaper = {
           enabled = true;
           overviewEnabled = false;
@@ -381,7 +381,7 @@ in {
           sortOrder = "name";
           favorites = [ ];
         };
-        
+
         appLauncher = {
           enableClipboardHistory = true;
           autoPasteClipboard = true;
@@ -409,7 +409,7 @@ in {
           overviewLayer = false;
           density = "default";
         };
-        
+
         controlCenter = {
           position = "close_to_bar_button";
           diskPath = "/";
@@ -470,7 +470,7 @@ in {
             }
           ];
         };
-        
+
         systemMonitor = {
           cpuWarningThreshold = 80;
           cpuCriticalThreshold = 90;
@@ -494,7 +494,7 @@ in {
           criticalColor = "";
           externalMonitor = "resources || missioncenter || jdsystemmonitor || corestats || system-monitoring-center || gnome-system-monitor || plasma-systemmonitor || mate-system-monitor || ukui-system-monitor || deepin-system-monitor || pantheon-system-monitor";
         };
-        
+
         dock = {
           enabled = true;
           position = "bottom";
@@ -526,7 +526,7 @@ in {
           indicatorColor = "primary";
           indicatorOpacity = 0.6;
         };
-        
+
         network = {
           bluetoothRssiPollingEnabled = false;
           bluetoothRssiPollIntervalMs = 60000;
@@ -537,7 +537,7 @@ in {
           disableDiscoverability = false;
           bluetoothAutoConnect = true;
         };
-        
+
         sessionMenu = {
           enableCountdown = true;
           countdownDuration = 10000;
@@ -584,7 +584,7 @@ in {
             }
           ];
         };
-        
+
         notifications = {
           enabled = true;
           enableMarkdown = true;
@@ -616,7 +616,7 @@ in {
           enableKeyboardLayoutToast = true;
           enableBatteryToast = true;
         };
-        
+
         osd = {
           enabled = true;
           location = "top_right";
@@ -630,7 +630,7 @@ in {
           ];
           monitors = [ ];
         };
-        
+
         audio = {
           volumeStep = 2;
           volumeOverdrive = false;
@@ -642,14 +642,14 @@ in {
           volumeFeedback = false;
           volumeFeedbackSoundFile = "";
         };
-        
+
         brightness = {
           brightnessStep = 2;
           enforceMinimum = true;
           enableDdcSupport = false;
           backlightDeviceMappings = [ ];
         };
-        
+
         colorSchemes = {
           useWallpaperColors = true;
           predefinedScheme = "Ayu"; # ""Noctalia (default)";
@@ -661,12 +661,12 @@ in {
           monitorForColors = "";
           syncGsettings = true;
         };
-        
+
         templates = {
           activeTemplates = [ ];
           enableUserTheming = false;
         };
-        
+
         nightLight = {
           enabled = false;
           forced = false;
@@ -676,7 +676,7 @@ in {
           manualSunrise = "06:30";
           manualSunset = "18:30";
         };
-        
+
         hooks = {
           enabled = false;
           wallpaperChange = "";
@@ -689,12 +689,12 @@ in {
           session = "";
           colorGeneration = "";
         };
-        
+
         plugins = {
           autoUpdate = false;
           notifyUpdates = true;
         };
-        
+
         idle = {
           enabled = false;
           lockTimeout = 300;
@@ -721,7 +721,7 @@ in {
           ];
           customCommands = "[]";
         };
-        
+
         desktopWidgets = {
           enabled = true;
           overviewEnabled = true;
@@ -729,10 +729,10 @@ in {
           gridSnapScale = false;
           monitorWidgets = [ ];
         };
-        
+
       };
     };
-    
+
   };
 
 }

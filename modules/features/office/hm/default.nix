@@ -9,7 +9,7 @@ in {
     home.packages = with pkgs; [
       libreoffice-qt-fresh
     ];
-    
+
     programs.onlyoffice = {
       enable = false;
       package = pkgs.onlyoffice-desktopeditors;
@@ -20,7 +20,7 @@ in {
         titlebar = "custom";
       };
     };
-    
+
   };
 
 }

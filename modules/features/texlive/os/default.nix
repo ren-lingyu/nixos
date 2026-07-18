@@ -3,7 +3,7 @@
   cfg = config.modules.features.texlive;
 
 in {
-  
+
   config = lib.mkIf cfg.enable {
     environment.systemPackages = with pkgs; [
       (texliveFull.withPackages (ps_ : with ps_; [
@@ -14,5 +14,5 @@ in {
       mupdf
     ];
   };
-  
+
 }

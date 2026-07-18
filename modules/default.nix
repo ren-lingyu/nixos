@@ -1,12 +1,12 @@
 { config, pkgs, lib, ... } : {
-  
+
   imports = [
     ./hosts
     ./users
     ./features
     ./overlays
   ];
-  
+
   options = {
     modules.base = {
       allowUnfreePredicateList = lib.mkOption {
@@ -22,7 +22,7 @@
       };
     };
   };
-  
+
   config = {
 
     nix = {
@@ -35,11 +35,11 @@
         options = "--delete-older-than 7d";
       };
     };
-    
+
     nixpkgs = {
       config.allowUnfreePredicate = pkg : builtins.elem (lib.getName pkg) config.modules.base.allowUnfreePredicateList;
     };
-    
+
     environment = {
       enableAllTerminfo = lib.mkDefault true;
       systemPackages = with pkgs; [
@@ -51,7 +51,7 @@
         gzip
       ];
     };
-    
+
     home-manager = {
       useGlobalPkgs = true;
       useUserPackages = true;
@@ -94,7 +94,7 @@
         })
       ];
     };
-    
+
   };
-  
+
 }

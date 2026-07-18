@@ -3,7 +3,7 @@
   cfg = config.modules.features.media;
 
 in {
-  
+
   config = lib.mkIf cfg.enable {
 
     # boot = {
@@ -15,7 +15,7 @@ in {
     #   ];
     #   extraModprobeConfig = "options v4l2loopback devices=1 video_nr=1 card_label=\"OBS Cam\" exclusive_caps=1";
     # };
-    
+
     environment.systemPackages = with pkgs; [
       v4l-utils
       libva-utils
@@ -36,7 +36,7 @@ in {
         package = pkgs.wireplumber;
       };
     };
-    
+
     programs.obs-studio = {
       enable = true;
       package = pkgs.obs-studio;
@@ -45,7 +45,7 @@ in {
         obs-composite-blur
       ];
     };
-    
+
   };
-  
+
 }

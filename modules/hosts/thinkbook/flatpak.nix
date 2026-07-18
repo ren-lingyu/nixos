@@ -3,11 +3,11 @@
   cfg = config.modules.hosts.thinkbook;
 
 in {
-  
+
   config = lib.mkIf (cfg.enable && cfg.flatpak.enable) {
-    
+
     xdg.portal.enable = lib.mkIf config.services.flatpak.enable (lib.mkForce true);
-    
+
     services.flatpak = let
       flatpakPackages = {
         flatseal = {
@@ -102,7 +102,7 @@ in {
         };
       };
     };
-    
+
   };
-  
+
 }

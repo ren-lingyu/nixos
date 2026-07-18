@@ -1,11 +1,11 @@
 { config, lib, pkgs, osConfig, ... } : let
-  
+
   cfg = osConfig.modules.features.agent;
-  
+
 in {
-  
+
   config = lib.mkIf cfg.enable {
-    
+
     programs.aichat = {
       enable = osConfig.services.ollama.enable;
       package = pkgs.aichat;
@@ -27,28 +27,28 @@ in {
         ];
       };
     };
-    
+
     programs.opencode = {
-      
+
       enable = true;
       package = pkgs.opencode;
       enableMcpIntegration = false;
       extraPackages = [];
-      
+
       settings = {
-        
+
         permission = "ask";
         model = "deepseek/deepseek-v4-pro";
         small_model = "deepseek/deepseek-v4-flash";
         autoupdate = false;
-        
+
         enabled_providers = builtins.concatLists [
           [ "deepseek" "modelscope" ]
           (lib.optionals osConfig.services.ollama.enable [ "ollama" "ollama_cloud" ])
         ];
-        
+
         provider = let
-          
+
           fromList = list : builtins.listToAttrs (
             builtins.map (x : {
               name = builtins.toString x;
@@ -57,9 +57,9 @@ in {
               };
             }) list
           );
-          
+
         in {
-          
+
           deepseek = {
             name = "DeepSeek";
             options = {
@@ -83,7 +83,7 @@ in {
               };
             };
           };
-          
+
           modelscope = {
             name = "ModelScope";
             options = {
@@ -96,9 +96,9 @@ in {
               "ZhipuAI/GLM-5.1"
             ];
           };
-          
+
         } // lib.optionalAttrs osConfig.services.ollama.enable {
-          
+
           ollama = {
             name = "Ollama";
             options = {
@@ -106,7 +106,7 @@ in {
             };
             models = fromList osConfig.services.ollama.loadModels;
           };
-          
+
           ollama_cloud = {
             name = "Ollama (Cloud)";
             options = {
@@ -114,12 +114,12 @@ in {
               apiKey = "{file:${config.sops.secrets."ollama.apiKey.opencode".path}}";
             };
             models = fromList (builtins.filter (x: builtins.match ".*:cloud$" x != null) osConfig.services.ollama.loadModels);
-          };          
-          
+          };
+
         };
-        
+
       };
-      
+
       context = ./context.md;
       agents = {
         git-maintainer = ./git-maintainer/agents/git-maintainer.md;
@@ -133,27 +133,27 @@ in {
       tools = {};
       themes = {};
       tui = {};
-      
+
       web = {
         enable = false;
         extraArgs = [];
         environmentFile = null;
       };
-      
+
     };
-    
+
     programs.codex = {
       enable = true;
       package = pkgs.codex;
       context = ./context.md;
     };
-    
+
     programs.github-copilot-cli = {
       enable = true;
       package = pkgs.github-copilot-cli;
       context = ./context.md;
     };
-    
+
   };
-  
+
 }

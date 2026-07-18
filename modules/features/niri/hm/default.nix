@@ -37,7 +37,7 @@ in {
         "inode/directory"
       ];
     };
-    
+
     programs.fuzzel = lib.mkIf (!config.programs.noctalia-shell.enable) {
       enable = true;
       package = pkgs.fuzzel;
@@ -49,19 +49,19 @@ in {
         };
       };
     };
-    
+
     programs.swaylock = {
       enable = true;
       package = pkgs.swaylock-effects;
       settings = {
-        
+
         clock = true;
         daemonize = true;
         ignore-empty-password = false;
         show-failed-attempts = true;
         show-keyboard-layout = true;
         hide-keyboard-layout = false;
-        
+
         indicator = true;
         indicator-caps-lock = true;
         indicator-idle-visible = true;
@@ -72,13 +72,13 @@ in {
         timestr = "%H:%M:%S";
         datestr = "%Y-%m-%d %a";
         # font-size = 128;
-        
+
         screenshots = true;
         effect-blur = "10x5";
         effect-vignette = "0.5:0.5";
         grace = 0;
         fade-in = 0;
-        
+
         text-color = "ffffff";
         inside-color = "00000049";
         ring-color = "ffffff";
@@ -135,7 +135,7 @@ in {
         group-by = "app-name";
       };
     };
-    
+
     services.swayidle = lib.mkIf (!config.programs.noctalia-shell.settings.idle.enabled) {
       enable = true; # idle management daemon
       package = pkgs.swayidle;
@@ -170,14 +170,14 @@ in {
         }
       ];
     };
-    
+
     services.polkit-gnome = {
       enable = false;
       package = pkgs.polkit_gnome;
     };
-    
+
     services.gnome-keyring.enable = false;
-    
+
     services.cliphist = {
       enable = true;
       package = pkgs.cliphist;
@@ -191,7 +191,7 @@ in {
         "100"
       ];
     };
-    
+
     services.clipse = {
       enable = false;
       package = pkgs.clipse;
@@ -211,7 +211,7 @@ in {
         useCustomTheme = false;
       };
     };
-    
+
   };
 
 }

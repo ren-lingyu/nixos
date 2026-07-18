@@ -1,7 +1,7 @@
 { config, lib, pkgs, ... } : let
 
   cfg = config.modules.hosts.thinkbook;
-  
+
   bindfsUserMountOptions = builtins.concatStringsSep "," [
     "force-user=${nixosUserName}"
     "force-group=users"
@@ -23,20 +23,20 @@
   windowsUserHome = "/mnt/c/Users/Lingyu";
   windowsSystemFonts = "/mnt/c/Windows/Fonts";
   nixosSystemFonts = "/usr/local/share/fonts";
-  
+
 in {
-  
+
   config = lib.mkIf cfg.enable {
-    
+
     environment.systemPackages = with pkgs; [
       bindfs
     ];
-    
+
     programs.fuse = {
       enable = true;
       userAllowOther = true;
     };
-    
+
     systemd = {
       tmpfiles = {
         rules = [
@@ -53,7 +53,7 @@ in {
         ];
       };
       mounts = builtins.concatLists [
-        
+
         [{
           what = "${windowsSystemFonts}";
           where = "${nixosSystemFonts}/windows";
@@ -63,7 +63,7 @@ in {
           after = [ "mnt-c.mount" ];
           requires = [ "mnt-c.mount" ];
         }]
-        
+
         (lib.mapAttrsToList (nixosDirName_ : windowsDirName_ : {
           what = "${windowsUserHome}/${windowsDirName_}";
           where = "${nixosUserHome}/${nixosDirName_}";
@@ -82,10 +82,10 @@ in {
           Music = "Music";
           Videos = "Videos";
         })
-        
+
       ];
     };
-    
+
   };
-  
+
 }

@@ -4,7 +4,7 @@
   hostsList_ = builtins.attrNames (lib.filterAttrs (name_ : type_ : ((type_ == "directory") && (builtins.pathExists (./. + "/${name_}/default.nix")))) (builtins.readDir ./.));
 
 in {
-  
+
   options = {
     modules.hosts = (builtins.listToAttrs (builtins.map (host_ : {
       name = host_;
@@ -121,9 +121,9 @@ in {
       ));
     }) hostsList_));
   };
-  
+
   config = {
-    
+
     assertions = let
       enabledHosts_ = lib.filterAttrs (unused_name_ : host_ : host_.enable) cfg;
       enabledHostNames_ = builtins.attrNames enabledHosts_;
@@ -162,7 +162,7 @@ in {
         message = "`modules.hosts.${hostName_}.monitors.${monitorName_}.name` must not be empty.";
       }) host_.monitors)) cfg))
     ]);
-    
+
   };
-  
+
 }

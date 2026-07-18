@@ -1,5 +1,5 @@
 { config, pkgs, lib, ... } : {
-  
+
   options = {
     modules.users = lib.mkOption {
       type = lib.types.attrsOf (lib.types.submodule (
@@ -75,11 +75,11 @@
       description = "UID-keyed attribute set of user configurations.";
     };
   };
-  
+
   config = {
-    
+
     assertions = builtins.concatLists [
-      
+
       [
         {
           assertion = let
@@ -88,8 +88,8 @@
           message = "Enabled users in `modules.users` must have unique login names.";
         }
       ]
-      
-      (builtins.concatLists (lib.mapAttrsToList (uidKey_ : user_ : [          
+
+      (builtins.concatLists (lib.mapAttrsToList (uidKey_ : user_ : [
         {
           assertion = builtins.match "^[0-9]+$" uidKey_ != null;
           message = "`modules.users.${uidKey_}` must use a numeric UID string as its attribute name, like `modules.users.\"1000\"`.";
@@ -134,9 +134,9 @@
           message = "`modules.users.${uidKey_}.home.manager.enable = true` requires `${builtins.toString (./. + "/${builtins.toString user_.home.manager.source}/default.nix")}` to exist.";
         }
       ]) config.modules.users ))
-      
+
     ];
-    
+
     users.users = builtins.listToAttrs (lib.mapAttrsToList (uidKey_ : user_ : {
       name = builtins.toString uidKey_;
       value = lib.mkMerge [
@@ -165,7 +165,7 @@
         };
       };
     }) (lib.filterAttrs (x_ : y_ : (y_.enable && y_.home.enable && y_.home.manager.enable)) config.modules.users));
-    
+
   };
-  
+
 }

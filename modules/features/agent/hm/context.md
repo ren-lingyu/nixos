@@ -38,7 +38,7 @@ git rev-parse --show-toplevel
 | 当前目录在 Git worktree 中             | 以最近的 Git worktree root 作为默认项目边界.                    |
 | 当前目录在 submodule 或嵌套 Git 仓库中 | 只处理最近的内层 worktree. 不默认越界到外层仓库或 superproject. |
 | 需要读取项目边界外路径                 | 必须获得用户明确授权.                                           |
-    
+
 不要使用外层仓库探测结果扩大默认工作区. 在项目边界内, 也只读取与当前任务相关的内容.
 
 ## 2. 读取权限

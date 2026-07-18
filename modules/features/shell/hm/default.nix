@@ -5,13 +5,13 @@
 in {
 
   config = lib.mkIf cfg.enable {
-    
+
     programs.bash = {
       enable = false;
       enableCompletion = true;
       shellAliases = {};
     };
-    
+
     programs.zsh = {
       enable = osConfig.programs.zsh.enable;
       package = pkgs.zsh;
@@ -29,7 +29,7 @@ in {
         share = true;
         path = "$HOME/.zsh_history";
         append = true;
-        extended = true; 
+        extended = true;
         ignoreDups = true;
         ignoreAllDups = true;
         findNoDups = true;
@@ -87,7 +87,7 @@ in {
         line_break.disabled = true;
       };
     };
-    
+
   };
 
 }

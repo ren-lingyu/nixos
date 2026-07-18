@@ -7,7 +7,7 @@ in {
   imports = [
     ./os
   ];
-  
+
   config = {
     modules.features.proxy.existModule = {
       os = true;
@@ -39,5 +39,5 @@ in {
       }
     ];
   };
-  
+
 }

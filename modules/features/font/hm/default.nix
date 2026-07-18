@@ -10,7 +10,7 @@ in {
       enable = true;
       defaultFonts = osConfig.fonts.fontconfig.defaultFonts;
     };
-    
+
   };
-  
+
 }
