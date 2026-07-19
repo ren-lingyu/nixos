@@ -205,12 +205,14 @@ in {
       enable = true;
       package = pkgs.codex;
       context = ./context.md;
+      skills = ./skills;
     };
 
     programs.github-copilot-cli = {
       enable = true;
       package = pkgs.github-copilot-cli;
       context = ./context.md;
+      skills = ./skills;
     };
 
   };
