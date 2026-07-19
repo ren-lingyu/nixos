@@ -196,6 +196,7 @@
             "Blog"
             "arXiv"
             "Git"
+            "Maillist"
           ];
           accountsOrder = builtins.attrNames config.accounts.email.accounts;
           calendarAccountsOrder = accountsOrder;
