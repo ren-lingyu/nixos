@@ -127,15 +127,9 @@ in {
       };
 
       context = ./context.md;
-      agents = {
-        git-maintainer = ./git-maintainer/agents/git-maintainer.md;
-      };
-      commands = {
-        commit-message = ./git-maintainer/commands/commit-message.md;
-      };
-      skills = {
-        git-maintenance = ./git-maintainer/skills/git-maintenance;
-      };
+      agents = {};
+      commands = {};
+      skills = ./skills;
       tools = {};
       themes = {};
       tui = {};
@@ -156,9 +150,9 @@ in {
         prevExeOutputVar_ = "$" + (prevExeOutput_.outputName or "out");
         prevExePath_ = lib.getExe prev_;
         prevExeRelPath_ = (
-          if lib.hasPrefix "${prevExeOutput_}" prevExePath_
+          if lib.hasPrefix "${prevExeOutput_}/" prevExePath_
           then lib.removePrefix "${prevExeOutput_}" prevExePath_
-          else throw "pi-coding-agent executable path ${prevExePath_} is not under ${prevExeOutput_}"
+          else builtins.throw "pi-coding-agent executable path ${prevExePath_} is not under ${prevExeOutput_}"
         );
 
       in prev_.overrideAttrs (oldAttrs: {
@@ -201,7 +195,7 @@ in {
         defaultProjectTrust = "ask";
         enableInstallTelemetry = false;
         skills = [
-          "${./git-maintainer/skills}"
+          "${./skills}"
         ];
       };
 

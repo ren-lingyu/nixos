@@ -2,7 +2,6 @@
 name: git-maintenance
 description: Maintain Git repositories by generating Conventional Commits messages from staged changes, auditing repository-facing documentation, updating README files conservatively, and avoiding Git state-changing commands.
 license: MIT
-compatibility: opencode
 metadata:
     domain: git
     workflow: repository-maintenance
@@ -12,7 +11,7 @@ metadata:
 
 Use this skill for conservative Git repository maintenance tasks.
 
-This skill is repository-generic. It is managed by the user's OpenCode configuration, but it must not assume that the current repository is the user's NixOS configuration repository.
+This skill is repository-generic. It must not assume that the current repository is the user's NixOS configuration repository.
 
 ## Supported workflows
 
