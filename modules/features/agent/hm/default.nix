@@ -175,6 +175,7 @@ in {
       extraPackages = with pkgs; [
         fd
         ripgrep
+        convco
       ];
 
       context = ./context.md;
