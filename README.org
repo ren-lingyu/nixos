@@ -4,155 +4,327 @@
 * 简介
 这是一个基于 Flake 的 NixOS 配置仓库.
 
-我自己打包的 nixos packages 仓库见 [[https://github.com/ren-lingyu/nixpkgs]].
+* 结构
 
-* 目录结构
+** [[file:./][/]]
 #+begin_example
-nixos/
-├── flake.nix
-├── flake.lock
+/
+├── .gitignore
 ├── LICENSE
 ├── README.org
-├── .gitignore
-└── modules
-    ├── default.nix
-    ├── features
-    │   ├── default.nix
-    │   ├── agent
-    │   │   ├── default.nix
-    │   │   └── hm
-    │   │       ├── commands
-    │   │       │   └── commit-message.md
-    │   │       └── default.nix
-    │   ├── editor
-    │   │   ├── default.nix
-    │   │   └── hm
-    │   │       └── default.nix
-    │   ├── font
-    │   │   ├── default.nix
-    │   │   ├── hm
-    │   │   │   └── default.nix
-    │   │   └── os
-    │   │       └── default.nix
-    │   ├── media
-    │   │   ├── default.nix
-    │   │   └── os
-    │   │       └── default.nix
-    │   ├── niri
-    │   │   ├── default.nix
-    │   │   ├── hm
-    │   │   │   ├── default.nix
-    │   │   │   ├── noctalia
-    │   │   │   │   └── default.nix
-    │   │   │   ├── settings
-    │   │   │   │   ├── animations.nix
-    │   │   │   │   ├── binds.nix
-    │   │   │   │   ├── default.nix
-    │   │   │   │   ├── input.nix
-    │   │   │   │   ├── layout.nix
-    │   │   │   │   ├── noctalia-shell.nix
-    │   │   │   │   ├── outputs.nix
-    │   │   │   │   ├── top-level.nix
-    │   │   │   │   └── window-rules.nix
-    │   │   │   └── waybar
-    │   │   │       ├── default.nix
-    │   │   │       ├── power-menu.xml
-    │   │   │       ├── settings.nix
-    │   │   │       └── style.css
-    │   │   └── os
-    │   │       ├── default.nix
-    │   │       └── greeter.nix
-    │   ├── office
-    │   │   ├── default.nix
-    │   │   └── hm
-    │   │       └── default.nix
-    │   ├── proxy
-    │   │   ├── default.nix
-    │   │   └── os
-    │   │       └── default.nix
-    │   ├── remote
-    │   │   ├── default.nix
-    │   │   └── hm
-    │   │       └── default.nix
-    │   ├── secret
-    │   │   ├── default.nix
-    │   │   ├── hm
-    │   │   │   ├── default.nix
-    │   │   │   └── sops
-    │   │   │       ├── default.yaml
-    │   │   │       └── .sops.yaml
-    │   │   ├── lib
-    │   │   │   └── default.nix
-    │   │   └── os
-    │   │       ├── default.nix
-    │   │       └── sops
-    │   │           ├── default.yaml
-    │   │           └── .sops.yaml
-    │   ├── shell
-    │   │   ├── default.nix
-    │   │   ├── hm
-    │   │   │   └── default.nix
-    │   │   └── os
-    │   │       └── default.nix
-    │   └── texlive
-    │       ├── default.nix
-    │       └── os
-    │           └── default.nix
-    ├── hosts
-    │   ├── default.nix
-    │   ├── aliyun
-    │   │   ├── configuration.nix
-    │   │   ├── default.nix
-    │   │   ├── disk-config.nix
-    │   │   └── hardware-configuration.nix
-    │   ├── thinkbook
-    │   │   ├── boot-manager.nix
-    │   │   ├── configuration.nix
-    │   │   ├── default.nix
-    │   │   ├── flatpak.nix
-    │   │   ├── hardware-configuration.nix
-    │   │   ├── mount-windows-directory.nix
-    │   │   └── virtual-terminal.nix
-    │   └── wsl
-    │       ├── configuration.nix
-    │       └── default.nix
-    ├── overlays
-    │   ├── default.nix
-    │   └── tencent.nix
-    └── users
-        ├── default.nix
-        └── lingyu
-            ├── cloud-server.nix
-            ├── default.nix
-            ├── email.nix
-            ├── git.nix
-            ├── home.nix
-            ├── keyring.nix
-            ├── langs.nix
-            ├── terminal.nix
-            └── .local
-                └── bin
-                    ├── org.sh
-                    ├── rc.sh
-                    └── ssha.sh
+├── flake.lock
+├── flake.nix
+└── modules/
 #+end_example
 
-* 关键点
-- [[file:modules/features][modules/features]] 按功能领域组织 NixOS 与 home-manager 模块, 每个 feature 含 =default.nix= 作为入口, 并按 =os/= (系统级), =hm/= (用户级), =lib/= (模块内部函数) 分层. 其中 =shell=, =font=, =texlive=, =media=, =office=, =remote=, =agent=, =editor=, =proxy= 以 =share= bundle 聚合, 可被多个 host 复用.
-- [[file:modules/hosts][modules/hosts]] 放置设备相关配置, 含 thinkbook (bare metal NixOS, hostname =nixos=), wsl (NixOS-WSL, hostname =nixos-wsl=) 和 aliyun (阿里云 ECS, hostname =nixos-server=).
-- [[file:modules/users][modules/users]] 放置用户 home-manager 配置, 包含 nixvim/emacs/zsh/git/ssh/gpg/keepassxc/rclone/thunderbird/direnv 等.
-- [[file:modules/overlays][modules/overlays]] 放置自定义 nixpkgs overlay, 覆盖上游 =qq= 和 =wechat= 等 unfree 软件的版本与下载链接, 修复因腾讯官方链接变更导致的构建失败.
-- =nixpkgs= 使用 =nixos-unstable=, 另有自行打包的 [[https://github.com/ren-lingyu/nixpkgs][ren-lingyu/nixpkgs]] (作为 =arcc= overlay 引入).
-- 启用 =nix-command= 与 =flakes=.
-- 使用 =sops-nix= 管理密钥, 系统级秘密以 host ssh key 加密; 用户级秘密以独立的 age key 加密, 该 age key 文件本身作为系统级 secret 由 host key 保护.
-- 使用 =niri= 作为窗口管理器, 通过 =niri-flake= overlay 与 home module 集成, =noctalia= 提供 shell/bar 组件, 可选用 =waybar=.
-- aliyun ECS 通过 =nixos-anywhere= + =disko= 远程部署和分区.
-- thinkbook 通过 =nix-flatpak= 管理 Flatpak 应用.
+仓库根目录放置 flake 入口, lock 文件, README 和模块目录. =flake.nix= 使用 =flake-parts= 组织输出, 定义 =nixosConfigurations= 和 =nixos-anywhere= flake app. =nixpkgs= 使用 =nixos-unstable=, 并启用 =nix-command= 与 =flakes=.
 
-* 脚本
+*** [[file:./modules/][/modules]]
+#+begin_example
+/modules/
+├── default.nix
+├── features/
+├── hosts/
+├── overlays/
+└── users/
+#+end_example
+
+[[file:./modules/default.nix][modules/default.nix]] 是仓库模块入口, 汇总 features, hosts, overlays 和 users, 并定义通用 Nix/NixOS 与 home-manager 基础配置.
+
+**** [[file:./modules/features/][/modules/features]]
+#+begin_example
+/modules/features/
+├── default.nix
+├── agent/
+├── editor/
+├── font/
+├── greeter/
+├── media/
+├── niri/
+├── office/
+├── proxy/
+├── remote/
+├── secret/
+├── shell/
+├── texlive/
+└── x11-session/
+#+end_example
+
+[[file:./modules/features/default.nix][modules/features/default.nix]] 按功能领域组织 NixOS 与 home-manager 模块, 自动发现含 =default.nix= 的 feature 目录, 定义 =modules.features.*= option, 并把启用的 HM feature 导入到对应用户.
+
+所有 feature 都由 [[file:./modules/features/default.nix][modules/features/default.nix]] 自动发现, 并以 =modules.features.<name>= option 暴露. 各 host 通过 =modules.features.<name>.enable= 按需启用 feature; 含 HM 模块的 feature 会按 =allowUidList= 导入到对应用户.
+
+每个 feature 以 =default.nix= 作为入口, 并按 =os/= (系统级), =hm/= (用户级), =lib/= (模块内部函数) 分层. 下列 feature 小节会把这些内部子目录放在各自代码块与说明中, 不再单独展开为 headline.
+
+***** [[file:./modules/features/agent/][/modules/features/agent]]
+#+begin_example
+/modules/features/agent/
+├── default.nix
+└── hm/
+    ├── default.nix
+    ├── context.md
+    └── skills/
+        └── git-maintenance/
+            └── SKILL.md
+#+end_example
+
+声明 agent feature 的 HM 模块入口, 并要求启用 agent 时同时启用 secret feature. =hm/default.nix= 配置用户级 AI/agent 工具, 包括 =aichat=, =opencode=, =pi-coding-agent= 及其 context, skills 和密钥引用.
+
+***** [[file:./modules/features/editor/][/modules/features/editor]]
+#+begin_example
+/modules/features/editor/
+├── default.nix
+├── extra-options.nix
+└── hm/
+    └── default.nix
+#+end_example
+
+声明 editor feature 的 HM 模块入口, 并通过 =extra-options.nix= 定义默认编辑器, vim, neovim 和 emacs 相关 option. =hm/default.nix= 配置 nixvim, vim, Emacs program 和 Emacs service.
+
+***** [[file:./modules/features/font/][/modules/features/font]]
+#+begin_example
+/modules/features/font/
+├── default.nix
+├── hm/
+│   └── default.nix
+└── os/
+    └── default.nix
+#+end_example
+
+声明 font feature 同时包含 OS 与 HM 模块. =hm/default.nix= 预留用户级字体配置入口; =os/default.nix= 配置系统字体包, fontconfig 默认字体族和本地字体目录.
+
+***** [[file:./modules/features/greeter/][/modules/features/greeter]]
+#+begin_example
+/modules/features/greeter/
+├── default.nix
+├── extra-options.nix
+└── os/
+    └── default.nix
+#+end_example
+
+声明 greeter feature 的 OS 模块入口, 根据启用的 host 推导默认显示器, 并收集可用 session wrapper. =os/default.nix= 配置系统级 greeter 相关服务和 session 列表.
+
+***** [[file:./modules/features/media/][/modules/features/media]]
+#+begin_example
+/modules/features/media/
+├── default.nix
+└── os/
+    └── default.nix
+#+end_example
+
+声明 media feature 的 OS 模块入口. =os/default.nix= 配置系统级媒体能力, 包括 PipeWire, OBS Studio, ffmpeg 和 VA-API 工具.
+
+***** [[file:./modules/features/niri/][/modules/features/niri]]
+#+begin_example
+/modules/features/niri/
+├── default.nix
+├── extra-options.nix
+├── hm/
+│   ├── default.nix
+│   ├── noctalia/
+│   │   └── default.nix
+│   ├── settings/
+│   │   ├── default.nix
+│   │   ├── animations.nix
+│   │   ├── binds.nix
+│   │   ├── input.nix
+│   │   ├── layout.nix
+│   │   ├── noctalia-shell.nix
+│   │   ├── outputs.nix
+│   │   ├── top-level.nix
+│   │   └── window-rules.nix
+│   └── waybar/
+│       ├── default.nix
+│       ├── power-menu.xml
+│       ├── settings.nix
+│       └── style.css
+└── os/
+    └── default.nix
+#+end_example
+
+声明 niri feature 的 OS 与 HM 模块入口, 通过 =niri-flake= 集成窗口管理器, 从 host 读取显示器信息, 并生成 Niri session wrapper. =hm/default.nix= 导入用户级 Niri 配置; =hm/settings/default.nix= 汇总输入, 布局, 输出, 绑定, 动画和窗口规则; =hm/noctalia/default.nix= 配置 Noctalia shell/bar; =hm/waybar/default.nix= 配置 Waybar; =os/default.nix= 配置系统级 Niri 支持.
+
+***** [[file:./modules/features/office/][/modules/features/office]]
+#+begin_example
+/modules/features/office/
+├── default.nix
+└── hm/
+    └── default.nix
+#+end_example
+
+声明 office feature 的 HM 模块入口. =hm/default.nix= 配置用户级办公软件, 包括 LibreOffice 和预留的 OnlyOffice 配置.
+
+***** [[file:./modules/features/proxy/][/modules/features/proxy]]
+#+begin_example
+/modules/features/proxy/
+├── default.nix
+├── extra-options.nix
+└── os/
+    └── default.nix
+#+end_example
+
+声明 proxy feature 的 OS 模块入口和 clash-verge, throne, mihomo, v2raya 等子选项约束. =os/default.nix= 配置系统级代理组件的 package 与运行模式.
+
+***** [[file:./modules/features/remote/][/modules/features/remote]]
+#+begin_example
+/modules/features/remote/
+├── default.nix
+└── hm/
+    └── default.nix
+#+end_example
+
+声明 remote feature 的 HM 模块入口, 并要求启用 remote 时同时启用 secret feature. =hm/default.nix= 配置 rclone remotes, 包括 WebDAV, S3 和 OneDrive 等远程存储, 密钥由 sops 提供.
+
+***** [[file:./modules/features/secret/][/modules/features/secret]]
+#+begin_example
+/modules/features/secret/
+├── default.nix
+├── hm/
+│   ├── default.nix
+│   └── sops/
+│       ├── .sops.yaml
+│       └── default.yaml
+├── lib/
+│   └── default.nix
+└── os/
+    ├── default.nix
+    └── sops/
+        ├── .sops.yaml
+        └── default.yaml
+#+end_example
+
+声明 secret feature 的 OS, HM 和 lib 模块入口. =secret= 通过 =sops-nix= 管理密钥; 系统级秘密以 host ssh key 加密; 用户级秘密以独立的 age key 加密, 该 age key 文件本身作为系统级 secret 由 host key 保护. =hm/default.nix= 声明用户级 secrets; =os/default.nix= 声明系统级 secrets; =lib/default.nix= 提供模块内部复用的辅助函数.
+
+***** [[file:./modules/features/shell/][/modules/features/shell]]
+#+begin_example
+/modules/features/shell/
+├── default.nix
+├── hm/
+│   └── default.nix
+└── os/
+    └── default.nix
+#+end_example
+
+声明 shell feature 的 OS 与 HM 模块入口. =hm/default.nix= 配置 zsh, starship 和 shell 行为; =os/default.nix= 配置系统级 shell 支持.
+
+***** [[file:./modules/features/texlive/][/modules/features/texlive]]
+#+begin_example
+/modules/features/texlive/
+├── default.nix
+└── os/
+    └── default.nix
+#+end_example
+
+声明 texlive feature 的 OS 模块入口. =os/default.nix= 配置系统级 TeX Live 环境.
+
+***** [[file:./modules/features/x11-session/][/modules/features/x11-session]]
+#+begin_example
+/modules/features/x11-session/
+├── default.nix
+├── extra-options.nix
+├── hm/
+│   └── default.nix
+└── os/
+    └── default.nix
+#+end_example
+
+声明 x11-session feature 的 OS 与 HM 模块入口, 并生成 IceWM/X11 session wrapper. =hm/default.nix= 预留用户级 X11 session 配置入口; =os/default.nix= 配置系统级 X11 session 支持.
+
+**** [[file:./modules/hosts/][/modules/hosts]]
+#+begin_example
+/modules/hosts/
+├── default.nix
+├── aliyun/
+├── thinkbook/
+└── wsl/
+#+end_example
+
+[[file:./modules/hosts/default.nix][modules/hosts/default.nix]] 定义 host profile option, 监视器声明, package group 和 flatpak 开关, 并确保最多只启用一个 host.
+
+***** [[file:./modules/hosts/aliyun/][/modules/hosts/aliyun]]
+#+begin_example
+/modules/hosts/aliyun/
+├── default.nix
+├── configuration.nix
+├── disk-config.nix
+└── hardware-configuration.nix
+#+end_example
+
+阿里云 ECS host, hostname =nixos-server=, 通过 =nixos-anywhere= + =disko= 远程部署和分区.
+
+***** [[file:./modules/hosts/thinkbook/][/modules/hosts/thinkbook]]
+#+begin_example
+/modules/hosts/thinkbook/
+├── default.nix
+├── boot-manager.nix
+├── configuration.nix
+├── flatpak.nix
+├── hardware-configuration.nix
+├── mount-windows-directory.nix
+└── virtual-terminal.nix
+#+end_example
+
+ThinkBook bare metal NixOS host, hostname =nixos=, 配置本机硬件, 启动, Flatpak, Windows 分区挂载和虚拟终端.
+
+***** [[file:./modules/hosts/wsl/][/modules/hosts/wsl]]
+#+begin_example
+/modules/hosts/wsl/
+├── default.nix
+└── configuration.nix
+#+end_example
+
+NixOS-WSL host, hostname =nixos-wsl=.
+
+**** [[file:./modules/overlays/][/modules/overlays]]
+#+begin_example
+/modules/overlays/
+├── default.nix
+└── tencent/
+#+end_example
+
+[[file:./modules/overlays/default.nix][modules/overlays/default.nix]] 自动发现含 =default.nix= 的 overlay 目录, 定义 =modules.overlays.*.enable= option 并导入 overlay 模块.
+
+***** [[file:./modules/overlays/tencent/][/modules/overlays/tencent]]
+#+begin_example
+/modules/overlays/tencent/
+└── default.nix
+#+end_example
+
+=tencent= overlay 用于覆盖上游 =qq= 和 =wechat= 等 unfree 软件的版本与下载链接, 修复因腾讯官方链接变更导致的构建失败, 当前已弃用.
+
+**** [[file:./modules/users/][/modules/users]]
+#+begin_example
+/modules/users/
+├── default.nix
+└── lingyu/
+#+end_example
+
+[[file:./modules/users/default.nix][modules/users/default.nix]] 定义 UID-keyed 用户配置, 创建 NixOS user, 并把对应用户 home-manager source 导入到 =home-manager.users=.
+
+***** [[file:./modules/users/lingyu/][/modules/users/lingyu]]
+#+begin_example
+/modules/users/lingyu/
+├── default.nix
+├── cloud-server.nix
+├── email.nix
+├── git.nix
+├── home.nix
+├── keyring.nix
+├── langs.nix
+├── terminal.nix
+└── .local/
+    └── bin/
+        ├── org.sh
+        ├── rc.sh
+        └── ssha.sh
+#+end_example
+
+配置 lingyu 用户的个人 home-manager 模块, 包含 email, git, keyring, langs, terminal 等用户级配置.
+
+=modules/users/lingyu/.local/bin/= 放置个人脚本:
 - =org=: 进入 =~/org= 目录并准备 make 函数, 支持 --texlive 调用 TeX Live 工具.
 - =rc=: rclone 同步包装器, 支持 push/pull 子命令, 限制传输并发并显示进度.
 - =ssha=: 启动 =ssh-agent= 并加载默认 ed25519 私钥.
 
 * 许可
-MIT License (见 [[file:LICENSE][LICENSE]]).
+MIT License (见 [[file:./LICENSE][LICENSE]]).
