@@ -8,7 +8,10 @@ in {
 
     programs.clash-verge = lib.mkIf cfg.clash-verge.enable {
       enable = cfg.clash-verge.enable;
-      package = pkgs.clash-verge-rev;
+      package = pkgs.clash-verge-rev.override {
+        v2ray-domain-list-community = pkgs.v2ray-rules-dat;
+        v2ray-geoip = pkgs.v2ray-rules-dat;
+      };
       autoStart = false;
       serviceMode = true;
       tunMode = true;
