@@ -22,14 +22,17 @@
       user = {
         name = "ren-lingyu";
         email = "Ren_Lingyu@outlook.com";
-	      signingkey = "65F85A2624D239F0";
+	    signingkey = "65F85A2624D239F0";
       };
       core.editor = "vim";
       init.defaultBranch = "main";
       commit.gpgSign = true;
       signing.signByDefault = true;
       gpg.program = "${pkgs.gnupg}/bin/gpg";
-    };
+    } // (lib.optionalAttrs config.programs.difftastic.git.enable {
+      difftool.prompt = false;
+      pager.difftool = true;
+    });
     ignores = [
       "NUL"
       "*~"
@@ -64,6 +67,22 @@
       aliases = {
         co = "pr checkout";
       };
+    };
+  };
+
+  programs.difftastic = {
+    enable = true;
+    package = pkgs.difftastic;
+    git = {
+      enable = true;
+      mode = "difftool";
+    };
+    options = {
+      background = "dark";
+      color = "always";
+      display = "side-by-side";
+      context = 3;
+      tab-width = 4;
     };
   };
 
