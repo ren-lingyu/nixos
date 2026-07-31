@@ -154,17 +154,17 @@
           share = { config, pkgs, lib, ... } : {
             imports = [
               self.modules.base
-              ./modules/features/shell
+              ./modules/features/agent
+              ./modules/features/diagnostics
               ./modules/features/font
-              ./modules/features/texlive
+              ./modules/features/greeter
               ./modules/features/media
               ./modules/features/office
-              ./modules/features/remote
-              ./modules/features/agent
               ./modules/features/proxy
-              ./modules/features/greeter
+              ./modules/features/remote
+              ./modules/features/shell
+              ./modules/features/texlive
               ./modules/features/x11-session
-              ./modules/features/diagnostics
             ];
           };
         };
@@ -279,20 +279,8 @@
                     createXdgUserDirectories = true;
                   };
                   features = {
-                    shell.enable = true;
-                    font.enable = true;
-                    texlive.enable = true;
-                    office.enable = true;
-                    media.enable = true;
-                    remote.enable = true;
                     agent.enable = true;
-                    secret.enable = true;
                     diagnostics.enable = true;
-                    proxy = {
-                      enable = true;
-                      clash-verge.enable = true;
-                      throne.enable = true;
-                    };
                     editor = {
                       enable = true;
                       defaultEditor = "neovim";
@@ -304,12 +292,24 @@
                         services.package = pkgs.emacs-pgtk-twist;
                       };
                     };
+                    font.enable = true;
                     greeter.enable = true;
+                    media.enable = true;
                     niri = {
                       enable = true;
                       noctalia.enable = true;
                       waybar.enable = false;
                     };
+                    office.enable = true;
+                    proxy = {
+                      enable = true;
+                      clash-verge.enable = true;
+                      throne.enable = true;
+                    };
+                    remote.enable = true;
+                    secret.enable = true;
+                    shell.enable = true;
+                    texlive.enable = true;
                     x11-session.enable = true;
                   };
                 };
@@ -333,8 +333,8 @@
                     createXdgUserDirectories = false;
                   };
                   features = {
-                    shell.enable = true;
                     secret.enable = false;
+                    shell.enable = true;
                   };
                 };
               };
@@ -360,14 +360,7 @@
                     createXdgUserDirectories = false;
                   };
                   features = {
-                    shell.enable = true;
-                    font.enable = true;
-                    texlive.enable = true;
-                    office.enable = false;
-                    media.enable = false;
-                    remote.enable = true;
                     agent.enable = true;
-                    secret.enable = true;
                     diagnostics.enable = true;
                     editor = {
                       enable = true;
@@ -376,6 +369,13 @@
                       neovim.enable = true;
                       emacs.enable = true;
                     };
+                    font.enable = true;
+                    media.enable = false;
+                    office.enable = false;
+                    remote.enable = true;
+                    secret.enable = true;
+                    shell.enable = true;
+                    texlive.enable = true;
                   };
                 };
               };
