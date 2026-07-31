@@ -1,15 +1,29 @@
 { config, lib, pkgs, ... } : {
 
   home = {
-    packages = with pkgs; (builtins.concatLists [
-      [ jq ripgrep unzip trash-cli tree ]
-      [ htop pciutils tcpdump mtr nmap netcat socat dnsutils ]
-      [ xclock xeyes xclip ]
-      [ gnumake ]
-      [ chafa ]
-      [ vulkan-tools ]
-      [ adwaita-icon-theme xcursor-themes ]
-    ]);
+    packages = with pkgs; [
+      chafa
+      gnumake
+      vulkan-tools
+      adwaita-icon-theme
+      dnsutils
+      htop
+      jq
+      mtr
+      netcat
+      nmap
+      pciutils
+      ripgrep
+      socat
+      tcpdump
+      trash-cli
+      tree
+      unzip
+      xclip
+      xclock
+      xcursor-themes
+      xeyes
+    ];
     sessionVariables = {
       QT_QPA_PLATFORM = "xcb";
       XCURSOR_THEME = "Adwaita";
