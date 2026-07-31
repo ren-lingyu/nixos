@@ -164,6 +164,7 @@
               ./modules/features/proxy
               ./modules/features/greeter
               ./modules/features/x11-session
+              ./modules/features/diagnostics
             ];
           };
         };
@@ -286,6 +287,7 @@
                     remote.enable = true;
                     agent.enable = true;
                     secret.enable = true;
+                    diagnostics.enable = true;
                     proxy = {
                       enable = true;
                       clash-verge.enable = true;
@@ -366,6 +368,7 @@
                     remote.enable = true;
                     agent.enable = true;
                     secret.enable = true;
+                    diagnostics.enable = true;
                     editor = {
                       enable = true;
                       defaultEditor = "neovim";

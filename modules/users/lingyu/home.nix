@@ -2,23 +2,15 @@
 
   home = {
     packages = with pkgs; [
+      adwaita-icon-theme
       chafa
       gnumake
-      vulkan-tools
-      adwaita-icon-theme
-      dnsutils
-      htop
       jq
-      mtr
-      netcat
-      nmap
-      pciutils
       ripgrep
-      socat
-      tcpdump
       trash-cli
       tree
       unzip
+      vulkan-tools
       xclip
       xclock
       xcursor-themes
