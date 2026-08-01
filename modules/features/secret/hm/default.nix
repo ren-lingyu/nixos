@@ -11,8 +11,8 @@ in {
 
     sops = {
 
-      defaultSopsFormat = "yaml";
-      defaultSopsFile = ./sops/default.yaml;
+      defaultSopsFormat = config.moduleInterfaces.features.secret.defaultSopsFormat;
+      defaultSopsFile = config.moduleInterfaces.features.secret.defaultSopsFile;
       defaultSopsKey = null;
       keepGenerations = 1;
       validateSopsFiles = true;
@@ -30,34 +30,7 @@ in {
         sshKeyPaths = [];
       };
 
-      secrets = llib.mkSopsSecrets [
-        {
-          template = "user";
-          structure = {
-            "nutstore" = [ "user" "pass" ];
-            "123cloud" = [ "user" "pass" ];
-            "cloudflare" = [ "access_key_id" "secret_access_key" "endpoint" ];
-            "onedrive" = [ "token" "drive_id" ];
-            "alibabacloud" = {
-              "oss" = [ "access_key_id" "secret_access_key" ];
-            };
-          };
-        }
-        {
-          template = "user";
-          structure = {
-            "deepseek" = {
-              "apiKey" = [ "opencode" "pi" ];
-            };
-            "ollama" = {
-              "apiKey" = [ "opencode" ];
-            };
-            "modelscope" = {
-              "apiKey" = [ "opencode" ];
-            };
-          };
-        }
-      ];
+      secrets = llib.mkSopsSecrets config.moduleInterfaces.features.secret.sopsSecretsInput;
 
     };
 
