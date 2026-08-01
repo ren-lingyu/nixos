@@ -69,6 +69,27 @@ in {
 
   config = {
 
+    home-manager.sharedModules = [
+      ({ options, config, osConfig, pkgs, lib, ... } : {
+        options = {
+          moduleInterfaces.features = (builtins.listToAttrs (builtins.map (feature_ : {
+            name = feature_;
+            value = let
+              possibleInterfaceOptionsPath_ = ./. + "/${builtins.toString feature_}/hm/interface-options.nix";
+            in (lib.optionalAttrs (builtins.pathExists possibleInterfaceOptionsPath_) (
+              (import possibleInterfaceOptionsPath_) feature_ {
+                inherit options;
+                inherit config;
+                inherit osConfig;
+                inherit pkgs;
+                inherit lib;
+              }
+            ));
+          }) featuresList_));
+        };
+      })
+    ];
+
     assertions = builtins.concatLists (lib.mapAttrsToList (featureName_ : feature_ : (builtins.concatLists [
       [
         {
