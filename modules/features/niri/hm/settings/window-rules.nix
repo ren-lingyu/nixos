@@ -5,7 +5,7 @@
     programs.niri.settings.window-rules = [
       {
         matches = [
-          { app-id = "Enacs"; }
+          { app-id = "Emacs"; }
         ];
         open-floating = false;
         open-maximized = true;
