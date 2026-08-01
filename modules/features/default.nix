@@ -111,6 +111,10 @@ in {
       ]
       (lib.optionals (feature_.enable && (feature_.existModule.hm == true)) [
         {
+          assertion = (builtins.length feature_.allowUidList) == (builtins.length (lib.unique feature_.allowUidList));
+          message = "`modules.features.${featureName_}.allowUidList` must not contain duplicate UIDs.";
+        }
+        {
           assertion = builtins.all (uid_ : let
             uidKey_ = builtins.toString uid_;
           in (

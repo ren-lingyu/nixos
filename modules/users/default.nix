@@ -95,8 +95,8 @@
           message = "`modules.users.${uidKey_}` must use a numeric UID string as its attribute name, like `modules.users.\"1000\"`.";
         }
         {
-          assertion = (builtins.match "^[0-9]+$" uidKey_ != null) && (user_.uid == lib.toInt uidKey_);
-          message = "`modules.users.${uidKey_}.uid` must equal ${uidKey_}.";
+          assertion = (builtins.match "^[0-9]+$" uidKey_ != null) && (uidKey_ == builtins.toString user_.uid);
+          message = "`modules.users.${uidKey_}` must use the canonical decimal representation of UID ${builtins.toString user_.uid}.";
         }
         {
           assertion = (!user_.enable) || ((builtins.match "^[0-9]+$" uidKey_ != null) && (user_.uid >= 1000));
