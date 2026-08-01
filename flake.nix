@@ -143,6 +143,7 @@
           };
           editor = { config, pkgs, lib, ... } : {
             imports = [
+              self.modules.base
               ./modules/features/editor
             ];
             config = {

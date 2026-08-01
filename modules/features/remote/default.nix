@@ -7,7 +7,7 @@ in {
   config = {
 
     modules.features.remote.existModule = {
-      os = true;
+      os = false;
       hm = true;
     };
 
