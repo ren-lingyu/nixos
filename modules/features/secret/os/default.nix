@@ -1,9 +1,15 @@
 { config, pkgs, lib, ... } : let
   cfg = config.modules.features.secret;
   llib = import ../lib { inherit config; };
+  sopsGroup = "sops-decrypt";
 in {
 
   config = lib.mkIf cfg.enable {
+
+    users.groups.${sopsGroup} = {
+      name = sopsGroup;
+      members = builtins.map (uid_ : config.modules.users."${builtins.toString uid_}".username) cfg.allowUidList;
+    };
 
     environment.systemPackages = with pkgs; [
       age
@@ -37,18 +43,14 @@ in {
         );
       };
 
-      secrets = llib.mkSopsSecrets [
-        {
-          template = "system";
-          structure = {
-            age = [ "keyFile" ];
-          };
-          overlay = {
-            uid = 1000;
-            gid = 100;
-          };
-        }
-      ];
+      secrets."age.keyFile" = {
+        key = "age/keyFile";
+        path = "/run/secrets/age.keyFile";
+        owner = "root";
+        group = sopsGroup;
+        mode = "0440";
+        neededForUsers = false;
+      };
 
     };
 
