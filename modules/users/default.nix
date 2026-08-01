@@ -78,7 +78,10 @@
 
   config = {
 
-    assertions = builtins.concatLists [
+    assertions = let
+      enabledUsers_ = lib.filterAttrs (unused_name_ : user_ : user_.enable) config.modules.users;
+      enabledUserUidKeys_ = builtins.attrNames enabledUsers_;
+    in builtins.concatLists [
 
       [
         {
@@ -134,6 +137,19 @@
           message = "`modules.users.${uidKey_}.home.manager.enable = true` requires `${builtins.toString (./. + "/${builtins.toString user_.home.manager.source}/default.nix")}` to exist.";
         }
       ]) config.modules.users ))
+
+      (builtins.concatLists (lib.mapAttrsToList (hostName_ : host_ : let
+        userUidKeys_ = builtins.attrNames host_.users;
+      in lib.optionals host_.enable [
+        {
+          assertion = builtins.all (uidKey_ : builtins.hasAttr uidKey_ enabledUsers_) userUidKeys_;
+          message = "`modules.hosts.${hostName_}.users` must only contain UIDs enabled in `modules.users` when this host is enabled.";
+        }
+        {
+          assertion = builtins.all (uidKey_ : builtins.hasAttr uidKey_ host_.users) enabledUserUidKeys_;
+          message = "Every enabled user in `modules.users` must be declared in `modules.hosts.${hostName_}.users` when this host is enabled.";
+        }
+      ]) config.modules.hosts))
 
     ];
 

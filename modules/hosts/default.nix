@@ -17,6 +17,17 @@ in {
           example = true;
           description = "Whether to enable this host profile.";
         };
+        users = lib.mkOption {
+          type = lib.types.attrsOf (lib.types.unique {
+            message = "Each `modules.hosts.${host_}.users.<uid>` can only be defined once.";
+          } lib.types.ints.unsigned);
+          internal = true;
+          default = {};
+          example = {
+            "1000" = 1000;
+          };
+          description = "UID-keyed declarations of managed users registered for this host.";
+        };
         monitors = lib.mkOption {
           type = lib.types.attrsOf (lib.types.unique {
             message = "Each `modules.hosts.${host_}.monitors.<name>` can only be defined once.";
@@ -144,23 +155,36 @@ in {
           message = "`modules.hosts.${hostName_}.flatpak.enable = true` requires `modules.hosts.${hostName_}.enable = true` to exist.";
         }
       ]) cfg))
-      (builtins.concatLists (lib.mapAttrsToList (hostName_ : host_ : let
-        monitors_ = builtins.attrValues host_.monitors;
-        defaultMonitors_ = builtins.filter (monitor_ : monitor_.role == "default") monitors_;
-        monitorNames_ = builtins.map (monitor_ : monitor_.name) monitors_;
-      in [
-        {
-          assertion = (builtins.length defaultMonitors_) <= 1;
-          message = "At most one monitor in `modules.hosts.${hostName_}.monitors` may set `role = \"default\"`.";
-        }
-        {
-          assertion = (builtins.length monitorNames_) == (builtins.length (lib.unique monitorNames_));
-          message = "Monitor names in `modules.hosts.${hostName_}.monitors` must be unique.";
-        }
-      ] ++ (lib.mapAttrsToList (monitorName_ : monitor_ : {
-        assertion = monitor_.name != "";
-        message = "`modules.hosts.${hostName_}.monitors.${monitorName_}.name` must not be empty.";
-      }) host_.monitors)) cfg))
+      (builtins.concatLists (lib.mapAttrsToList (hostName_ : host_ : (builtins.concatLists [
+        (let
+          monitors_ = builtins.attrValues host_.monitors;
+          defaultMonitors_ = builtins.filter (monitor_ : monitor_.role == "default") monitors_;
+          monitorNames_ = builtins.map (monitor_ : monitor_.name) monitors_;
+        in [
+          {
+            assertion = (builtins.length defaultMonitors_) <= 1;
+            message = "At most one monitor in `modules.hosts.${hostName_}.monitors` may set `role = \"default\"`.";
+          }
+          {
+            assertion = (builtins.length monitorNames_) == (builtins.length (lib.unique monitorNames_));
+            message = "Monitor names in `modules.hosts.${hostName_}.monitors` must be unique.";
+          }
+        ])
+        (builtins.concatLists (lib.mapAttrsToList (uidKey_ : uid_ : [
+          {
+            assertion = builtins.match "^[0-9]+$" uidKey_ != null;
+            message = "`modules.hosts.${hostName_}.users.${uidKey_}` must use a numeric UID string as its attribute name, like `modules.hosts.${hostName_}.users.\"1000\"`.";
+          }
+          {
+            assertion = (builtins.match "^[0-9]+$" uidKey_ != null) && (uidKey_ == builtins.toString uid_);
+            message = "`modules.hosts.${hostName_}.users.${uidKey_}` must use the canonical decimal representation of UID ${builtins.toString uid_}.";
+          }
+        ]) host_.users))
+        (lib.mapAttrsToList (monitorName_ : monitor_ : {
+          assertion = monitor_.name != "";
+          message = "`modules.hosts.${hostName_}.monitors.${monitorName_}.name` must not be empty.";
+        }) host_.monitors)
+      ])) cfg))
     ]);
 
   };

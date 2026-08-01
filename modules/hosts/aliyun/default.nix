@@ -7,7 +7,12 @@
   ];
 
   config = {
-    modules.hosts.aliyun.enable = true;
+    modules.hosts.aliyun = {
+      enable = true;
+      users = {
+        "1000" = 1000;
+      };
+    };
   };
 
 }

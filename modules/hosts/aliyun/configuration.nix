@@ -43,9 +43,9 @@ in {
             "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAILCnfaTNuw0Wxh4CfReEKqqU2rT8HqPG/M1HmiDwr0Ry Ren_Lingyu@outlook.com"
           ];
         };
-        "1000" = {
+        "${builtins.toString cfg.users."1000"}" = {
+          uid = cfg.users."1000";
           isNormalUser = true;
-          uid = 1000;
           extraGroups = [
             "wheel"
           ];

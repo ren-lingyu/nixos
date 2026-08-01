@@ -78,8 +78,8 @@ in {
           name = "root";
           hashedPassword = "$y$j9T$I75rvRCS.FR8zj/o3ivGb1$lteEgidoSR8AbjTXhxfemLeiXFIQsxUuUmSl1f0Ni10";
         };
-        "1000" = {
-          uid = 1000;
+        "${builtins.toString cfg.users."1000"}" = {
+          uid = cfg.users."1000";
           isNormalUser = true;
           hashedPassword = "$y$j9T$HZvnP.0ZR5uBiDAviT9xA.$MSExGgePZwjIDZq2n3fOUGGguWKEgvjuIKImW4uf7p4";
           linger = true;

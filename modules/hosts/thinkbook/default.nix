@@ -12,6 +12,9 @@
   config = {
     modules.hosts.thinkbook = {
       enable = true;
+      users = {
+        "1000" = 1000;
+      };
       monitors = {
         "eDP-1" = {
           name = "eDP-1";

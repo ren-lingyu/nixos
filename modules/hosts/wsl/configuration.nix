@@ -40,7 +40,7 @@ in {
 
     wsl = {
       enable = true;
-      defaultUser = "1000";
+      defaultUser = "${builtins.toString cfg.users."1000"}";
       interop = {
         includePath = false;
         register = true;
@@ -59,8 +59,8 @@ in {
     users = {
       groups.docker = {};
       users = {
-        "1000"  = {
-          uid = 1000;
+        "${builtins.toString cfg.users."1000"}" = {
+          uid = cfg.users."1000";
           isNormalUser = true;
           linger = true;
           extraGroups = [ "wheel" "docker" "video" "render" ];
@@ -236,7 +236,7 @@ in {
       tmpfiles.rules = [
         "L+ %t/wayland-0 - - - - ${config.wsl.wslConf.automount.root}/wslg/runtime-dir/wayland-0"
         "L+ %t/wayland-0.lock - - - - ${config.wsl.wslConf.automount.root}/wslg/runtime-dir/wayland-0.lock"
-        "L+ ${config.users.users."1000".home}/ren - - - - ${config.wsl.wslConf.automount.root}/c/Users/Lingyu/Ren"
+        "L+ ${config.users.users."${builtins.toString cfg.users."1000"}".home}/ren - - - - ${config.wsl.wslConf.automount.root}/c/Users/Lingyu/Ren"
       ];
     };
 
