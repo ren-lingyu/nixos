@@ -1,6 +1,9 @@
 { config, pkgs, lib, osConfig, ... } : let
+
   cfg = osConfig.modules.features.secret;
+
   llib = import ../lib { inherit config; inherit osConfig; };
+
 in {
 
   config = lib.mkIf cfg.enable {

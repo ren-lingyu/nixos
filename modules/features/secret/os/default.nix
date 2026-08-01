@@ -1,7 +1,11 @@
 { config, pkgs, lib, ... } : let
+
   cfg = config.modules.features.secret;
+
   llib = import ../lib { inherit config; };
+
   sopsGroup = "sops-decrypt";
+
 in {
 
   config = lib.mkIf cfg.enable {
