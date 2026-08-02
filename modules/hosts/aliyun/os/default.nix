@@ -4,6 +4,11 @@
 
 in {
 
+  imports = [
+    ./hardware-configuration.nix
+    ./disk-config.nix
+  ];
+
   config = lib.mkIf cfg.enable {
 
     nix.settings = {

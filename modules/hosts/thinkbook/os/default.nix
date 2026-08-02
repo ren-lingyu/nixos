@@ -7,6 +7,14 @@
 
 in {
 
+  imports = [
+    ./hardware-configuration.nix
+    ./mount-windows-directory.nix
+    ./virtual-terminal.nix
+    ./boot-manager.nix
+    ./flatpak.nix
+  ];
+
   config = lib.mkIf cfg.enable {
 
     nix.settings = {
