@@ -235,9 +235,6 @@
                 packageGroups.tencent.enable = false;
                 flatpak.enable = true;
               };
-              overlays = {
-                tencent.enable = false;
-              };
             };
           };
           aliyun = { config, pkgs, lib, ... } : {

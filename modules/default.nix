@@ -4,7 +4,6 @@
     ./hosts
     ./users
     ./features
-    ./overlays
   ];
 
   options = {
