@@ -52,10 +52,13 @@
     };
 
     home-manager = {
+
       useGlobalPkgs = true;
       useUserPackages = true;
       backupFileExtension = "bak";
+
       sharedModules = [
+
         ({ config, osConfig, pkgs, lib, ... } : {
           config = {
             programs.fastfetch = {
@@ -91,7 +94,52 @@
             };
           };
         })
+
+        ({ options, config, osConfig, pkgs, lib, ... } : {
+          options = {
+            moduleInterfaces = (builtins.listToAttrs
+              (builtins.map
+                (moduleType_ : {
+                  name = moduleType_;
+                  value = (builtins.listToAttrs
+                    (builtins.map
+                      (module_ : {
+                        name = module_;
+                        value = let
+                          possibleInterfaceOptionsPath_ = ./. + "/${moduleType_}/${module_}/hm/interface-options.nix";
+                        in (lib.optionalAttrs
+                          (builtins.pathExists possibleInterfaceOptionsPath_)
+                          ((import possibleInterfaceOptionsPath_) module_ {
+                            inherit options;
+                            inherit config;
+                            inherit osConfig;
+                            inherit pkgs;
+                            inherit lib;
+                          })
+                        );
+                      })
+                      (builtins.attrNames
+                        (lib.filterAttrs
+                          (name_ : type_ : ((type_ == "directory") && (builtins.pathExists (./. + "/${moduleType_}/${name_}/default.nix"))))
+                          (builtins.readDir (./. + "/${moduleType_}"))
+                        )
+                      )
+                    )
+                  );
+                })
+                (builtins.attrNames
+                  (lib.filterAttrs
+                    (name_ : type_ : ((type_ == "directory") && (builtins.pathExists (./. + "/${name_}/default.nix"))))
+                    (builtins.readDir ./.)
+                  )
+                )
+              )
+            );
+          };
+        })
+
       ];
+
     };
 
   };
