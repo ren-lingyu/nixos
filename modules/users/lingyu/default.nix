@@ -5,10 +5,10 @@
   ];
 
   config = {
-    moduleInterfaces.features.secret = {
+    moduleInterfaces.features.secret.sops = {
       defaultSopsFormat = "yaml";
       defaultSopsFile = ./sops/default.yaml;
-      sopsSecretsInput = [
+      secretsInput = [
         {
           template = "user";
           structure = {
