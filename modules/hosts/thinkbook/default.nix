@@ -1,4 +1,10 @@
-{ config, pkgs, lib, ... } : {
+{ config, pkgs, lib, ... } : let
+
+  cfg = config.modules.hosts.thinkbook;
+
+  hostName_ = "thinkbook";
+
+in {
 
   imports = [
     ./configuration.nix
@@ -10,6 +16,7 @@
   ];
 
   config = {
+
     modules.hosts.thinkbook = {
       enable = true;
       users = {
@@ -34,6 +41,14 @@
         };
       };
     };
+
+    assertions = [
+      {
+        assertion = !cfg.flatpak.enable || cfg.enable;
+        message = "`modules.hosts.${hostName_}.flatpak.enable = true` requires `modules.hosts.${hostName_}.enable = true` to exist.";
+      }
+    ];
+
   };
 
 }
