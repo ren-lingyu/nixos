@@ -162,7 +162,6 @@
               ./modules/features/media
               ./modules/features/office
               ./modules/features/proxy
-              ./modules/features/remote
               ./modules/features/shell
               ./modules/features/texlive
               ./modules/features/x11-session
@@ -307,7 +306,6 @@
                       clash-verge.enable = true;
                       throne.enable = true;
                     };
-                    remote.enable = true;
                     secret.enable = true;
                     shell.enable = true;
                     texlive.enable = true;
@@ -373,7 +371,6 @@
                     font.enable = true;
                     media.enable = false;
                     office.enable = false;
-                    remote.enable = true;
                     secret.enable = true;
                     shell.enable = true;
                     texlive.enable = true;

@@ -7,6 +7,7 @@
     ./langs.nix
     ./email.nix
     ./cloud-server.nix
+    ./rclone.nix
   ];
 
   config = {

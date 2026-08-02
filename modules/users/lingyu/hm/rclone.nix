@@ -1,16 +1,11 @@
-{ config, pkgs, lib, osConfig, ... } : let
+{ config, pkgs, lib, osConfig, ... } : {
 
-  cfg = osConfig.modules.features.remote;
-
-in {
-
-  config = lib.mkIf cfg.enable {
+  config = {
 
     programs.rclone = {
       enable = true;
       package = pkgs.rclone;
-      requiresUnit = "sops-nix.service";
-      remotes = {
+      remotes = lib.mkIf osConfig.modules.features.secret.enable {
         "Nutstore" = {
           config = {
             type = "webdav";
