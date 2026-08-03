@@ -1,6 +1,9 @@
 { options, config, pkgs, lib, ... } : let
 
   featureList_ = builtins.attrNames (lib.filterAttrs (name_ : type_ : ((type_ == "directory") && (builtins.pathExists (./. + "/${name_}/default.nix")))) (builtins.readDir ./.));
+  enabledUserUids_ = builtins.map
+    (user_ : user_.uid)
+    (builtins.attrValues (lib.filterAttrs (unused_userName_ : user_ : user_.enable && user_.uid != null) config.modules.users));
 
 in {
 
@@ -27,7 +30,7 @@ in {
           type = lib.types.listOf lib.types.ints.unsigned;
           default =
             if config.modules.features."${feature_}".existModule.hm == true
-            then lib.unique (builtins.concatLists (lib.mapAttrsToList (unused_hostName_ : host_ : lib.optionals host_.enable (builtins.attrValues host_.users)) config.modules.hosts))
+            then enabledUserUids_
             else [];
           example = [ 1000 1001 ];
           description = "User UIDs whose Home Manager configurations should import the ${feature_} module.";
@@ -94,13 +97,8 @@ in {
           message = "`modules.features.${featureName_}.allowUidList` must not contain duplicate UIDs.";
         }
         {
-          assertion = let
-            enabledHomeManagerUids_ = (builtins.map
-              (user_ : user_.uid)
-              (builtins.attrValues (lib.filterAttrs (unused_userName_ : user_ : user_.enable && user_.uid != null && user_.home.manager.enable) config.modules.users))
-            );
-          in builtins.all (uid_ : builtins.elem uid_ enabledHomeManagerUids_) feature_.allowUidList;
-          message = "`modules.features.${featureName_}.allowUidList` must only contain UIDs declared in `modules.users`, and each listed user must have `enable = true` and `home.manager.enable = true`.";
+          assertion = builtins.all (uid_ : builtins.elem uid_ enabledUserUids_) feature_.allowUidList;
+          message = "`modules.features.${featureName_}.allowUidList` must only contain UIDs assigned to enabled users in `modules.users`.";
         }
       ])
     ])) config.modules.features);

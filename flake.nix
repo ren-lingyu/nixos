@@ -174,20 +174,11 @@
             imports = [
               self.modules.base
             ];
-            config = {
-              modules.users = {
-                lingyu = {
-                  enable = true;
-                  username = "lingyu";
-                  home = {
-                    enable = true;
-                    directory = "/home/lingyu";
-                    manager = {
-                      enable = true;
-                      source = "./lingyu";
-                    };
-                  };
-                };
+            config.modules = {
+              users.lingyu = {
+                enable = true;
+                username = "lingyu";
+                homeDirectory = "/home/lingyu";
               };
             };
           };
@@ -195,21 +186,10 @@
             imports = [
               self.modules.base
             ];
-            config = {
-              modules.users = {
-                lingyu = {
-                  enable = true;
-                  username = "lingyu";
-                  home = {
-                    enable = true;
-                    directory = "/home/lingyu";
-                    manager = {
-                      enable = true;
-                      source = null;
-                    };
-                  };
-                };
-              };
+            config.modules.users.lingyu-minimal = {
+              enable = true;
+              username = "lingyu";
+              homeDirectory = "/home/lingyu";
             };
           };
         };
@@ -306,7 +286,9 @@
                     texlive.enable = true;
                     x11-session.enable = true;
                   };
-                  users.lingyu.uid = config.modules.hosts.thinkbook.users."1000";
+                  users = {
+                    lingyu.uid = config.modules.hosts.thinkbook.users."1000";
+                  };
                 };
               };
             })
@@ -331,7 +313,9 @@
                     secret.enable = false;
                     shell.enable = true;
                   };
-                  users.lingyu.uid = config.modules.hosts.aliyun.users."1000";
+                  users = {
+                    lingyu-minimal.uid = config.modules.hosts.aliyun.users."1000";
+                  };
                 };
               };
             })
