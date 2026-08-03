@@ -27,7 +27,7 @@ in {
           type = lib.types.listOf lib.types.ints.unsigned;
           default =
             if config.modules.features."${feature_}".existModule.hm == true
-            then [ 1000 ]
+            then lib.unique (builtins.concatLists (lib.mapAttrsToList (unused_hostName_ : host_ : lib.optionals host_.enable (builtins.attrValues host_.users)) config.modules.hosts))
             else [];
           example = [ 1000 1001 ];
           description = "User UIDs whose Home Manager configurations should import the ${feature_} module.";
@@ -94,11 +94,12 @@ in {
           message = "`modules.features.${featureName_}.allowUidList` must not contain duplicate UIDs.";
         }
         {
-          assertion = builtins.all (uid_ : let
-            uidKey_ = builtins.toString uid_;
-          in (
-            (builtins.hasAttr uidKey_ config.modules.users) && (config.modules.users."${uidKey_}".enable) && (config.modules.users."${uidKey_}".home.manager.enable)
-          )) feature_.allowUidList;
+          assertion = let
+            enabledHomeManagerUids_ = (builtins.map
+              (user_ : user_.uid)
+              (builtins.attrValues (lib.filterAttrs (unused_userName_ : user_ : user_.enable && user_.uid != null && user_.home.manager.enable) config.modules.users))
+            );
+          in builtins.all (uid_ : builtins.elem uid_ enabledHomeManagerUids_) feature_.allowUidList;
           message = "`modules.features.${featureName_}.allowUidList` must only contain UIDs declared in `modules.users`, and each listed user must have `enable = true` and `home.manager.enable = true`.";
         }
       ])

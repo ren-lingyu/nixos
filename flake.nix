@@ -176,9 +176,8 @@
             ];
             config = {
               modules.users = {
-                "1000" = {
+                lingyu = {
                   enable = true;
-                  uid = 1000;
                   username = "lingyu";
                   home = {
                     enable = true;
@@ -198,9 +197,8 @@
             ];
             config = {
               modules.users = {
-                "1000" = {
+                lingyu = {
                   enable = true;
-                  uid = 1000;
                   username = "lingyu";
                   home = {
                     enable = true;
@@ -308,6 +306,7 @@
                     texlive.enable = true;
                     x11-session.enable = true;
                   };
+                  users.lingyu.uid = config.modules.hosts.thinkbook.users."1000";
                 };
               };
             })
@@ -322,7 +321,7 @@
             self.modules.features.secret
             self.modules.hosts.aliyun
             self.modules.users.lingyu-minimal
-            {
+            ({ config, pkgs, lib, ... } : {
               config = {
                 modules = {
                   base = {
@@ -332,9 +331,10 @@
                     secret.enable = false;
                     shell.enable = true;
                   };
+                  users.lingyu.uid = config.modules.hosts.aliyun.users."1000";
                 };
               };
-            }
+            })
           ];
         };
 
@@ -346,7 +346,7 @@
             self.modules.features.secret
             self.modules.hosts.wsl
             self.modules.users.lingyu
-            {
+            ({ config, pkgs, lib, ... } : {
               config = {
                 modules = {
                   base = {
@@ -372,9 +372,10 @@
                     shell.enable = true;
                     texlive.enable = true;
                   };
+                  users.lingyu.uid = config.modules.hosts.wsl.users."1000";
                 };
               };
-            }
+            })
           ];
         };
 

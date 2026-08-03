@@ -12,7 +12,7 @@ in {
 
     users.groups.${sopsGroup} = {
       name = sopsGroup;
-      members = builtins.map (uid_ : config.modules.users."${builtins.toString uid_}".username) cfg.allowUidList;
+      members = cfg.allowUsernameList;
     };
 
     environment.systemPackages = with pkgs; [

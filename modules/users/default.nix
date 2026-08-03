@@ -1,125 +1,110 @@
-{ config, pkgs, lib, ... } : {
+{ config, pkgs, lib, ... } : let
+
+  usersList_ = builtins.attrNames (lib.filterAttrs (name_ : type_ : ((type_ == "directory") && (builtins.pathExists (./. + "/${name_}/default.nix")))) (builtins.readDir ./.));
+
+in {
 
   options = {
-    modules.users = lib.mkOption {
-      type = lib.types.attrsOf (lib.types.submodule (
-        { name, config, ... } : {
-          options = {
+    modules.users = builtins.listToAttrs (builtins.map (userName_ : {
+      name = userName_;
+      value = {
+        enable = lib.mkOption {
+          type = lib.types.bool;
+          default = false;
+          example = true;
+          description = "Whether to enable the ${userName_} user profile.";
+        };
+        uid = lib.mkOption {
+          type = lib.types.unique {
+            message = "Conflicting UID assignments for `modules.users.${userName_}.uid`.";
+          } (lib.types.nullOr lib.types.ints.unsigned);
+          default = null;
+          internal = true;
+          example = 1000;
+          description = "UID assigned to the ${userName_} user profile by the final flake composition.";
+        };
+        username = lib.mkOption {
+          type = lib.types.str;
+          default = userName_;
+          example = "jane.doe";
+          description = "Login name of the ${userName_} user profile.";
+        };
+        home = {
+          enable = lib.mkOption {
+            type = lib.types.bool;
+            default = config.modules.users.${userName_}.enable;
+            example = true;
+            description = "Whether to manage home-related settings for the ${userName_} user profile.";
+          };
+          directory = lib.mkOption {
+            type = lib.types.path;
+            apply = toString;
+            example = lib.literalExpression "/home/jane.doe";
+            description = "Home directory of the ${userName_} user profile. Must be an absolute path.";
+          };
+          manager = {
             enable = lib.mkOption {
               type = lib.types.bool;
-              default = false;
+              default = config.modules.users.${userName_}.home.enable;
               example = true;
-              description = "Whether to enable this user.";
+              description = "Whether to enable Home Manager for the ${userName_} user profile.";
             };
-            uid = lib.mkOption {
-              type = lib.types.ints.unsigned;
-              default = if builtins.match "^[0-9]+$" name != null
-                        then lib.toInt name
-                        else builtins.throw "`modules.users.${name}` must use a numeric UID string as its attribute name like `modules.users.\"1000\"`.";
-              example = 1000;
-              description = "UID of this user. Defaults to the attribute name.";
-            };
-            username = lib.mkOption {
-              type = lib.types.str;
-              default = "";
-              example = "jane.doe";
-              description = "Login name of this user.";
-            };
-            home = {
-              enable = lib.mkOption {
-                type = lib.types.bool;
-                default = config.enable;
-                example = true;
-                description = "Whether to let this module manage home-related settings for this user.";
-              };
-              directory = lib.mkOption {
-                type = lib.types.path;
-                apply = toString;
-                example = lib.literalExpression "/home/jane.doe";
-                description = "Home directory of this user. Must be an absolute path.";
-              };
-              manager = {
-                enable = lib.mkOption {
-                  type = lib.types.bool;
-                  default = config.home.enable;
-                  example = true;
-                  description = "Whether to enable Home Manager for this user.";
-                };
-                source = lib.mkOption {
-                  type = lib.types.nullOr lib.types.str;
-                  default = "./${config.username}";
-                  example = lib.literalExpression "./jane.doe";
-                  description = "Relative path under `modules/users` to this user's Home Manager module source.";
-                };
-              };
-            };
-          };
-        }
-      ));
-      default = {};
-      example = {
-        "1000" = {
-          enable = true;
-          uid = 1000;
-          username = "jane.doe";
-          home = {
-            enable = true;
-            directory = "/home/jane.doe";
-            manager = {
-              enable = true;
-              source = "./jane.doe";
+            source = lib.mkOption {
+              type = lib.types.nullOr lib.types.str;
+              default = "./${userName_}";
+              example = lib.literalExpression "./jane.doe";
+              description = "Relative path under `modules/users` to the ${userName_} Home Manager module source.";
             };
           };
         };
       };
-      description = "UID-keyed attribute set of user configurations.";
-    };
+    }) usersList_);
   };
 
   config = {
 
     assertions = let
       enabledUsers_ = lib.filterAttrs (unused_name_ : user_ : user_.enable) config.modules.users;
-      enabledUserUidKeys_ = builtins.attrNames enabledUsers_;
+      enabledUserUids_ = builtins.map (user_ : user_.uid) (builtins.attrValues enabledUsers_);
+      assignedUserUids_ = builtins.filter (uid_ : uid_ != null) (builtins.map (user_ : user_.uid) (builtins.attrValues config.modules.users));
     in builtins.concatLists [
 
       [
         {
-          assertion = let
-            usersAttrSet = lib.mapAttrsToList (x_ : y_ : y_.username) (lib.filterAttrs (x_ : y_ : y_.enable) config.modules.users);
-          in (builtins.length usersAttrSet) == builtins.length (lib.unique usersAttrSet);
+          assertion = let usernames_ = builtins.map (user_ : user_.username) (builtins.attrValues enabledUsers_);
+          in (builtins.length usernames_) == builtins.length (lib.unique usernames_);
           message = "Enabled users in `modules.users` must have unique login names.";
+        }
+        {
+          assertion = (builtins.length assignedUserUids_) == (builtins.length (lib.unique assignedUserUids_));
+          message = "Assigned UIDs in `modules.users` must be unique.";
         }
       ]
 
-      (builtins.concatLists (lib.mapAttrsToList (uidKey_ : user_ : [
+      (builtins.concatLists (lib.mapAttrsToList (userName_ : user_ : [
         {
-          assertion = builtins.match "^[0-9]+$" uidKey_ != null;
-          message = "`modules.users.${uidKey_}` must use a numeric UID string as its attribute name, like `modules.users.\"1000\"`.";
+          assertion = user_.enable == (user_.uid != null);
+          message = "`modules.users.${userName_}.enable` must be true exactly when `modules.users.${userName_}.uid` is assigned by the final flake composition.";
         }
         {
-          assertion = (builtins.match "^[0-9]+$" uidKey_ != null) && (uidKey_ == builtins.toString user_.uid);
-          message = "`modules.users.${uidKey_}` must use the canonical decimal representation of UID ${builtins.toString user_.uid}.";
-        }
-        {
-          assertion = (!user_.enable) || ((builtins.match "^[0-9]+$" uidKey_ != null) && (user_.uid >= 1000));
-          message = "`modules.users.${uidKey_}.uid` must be greater than or equal to 1000 when this user is enabled.";
+          assertion = user_.uid == null || user_.uid >= 1000;
+          message = "`modules.users.${userName_}.uid` must be greater than or equal to 1000 when assigned.";
         }
         {
           assertion = !user_.enable || user_.username != "";
-          message = "`modules.users.${uidKey_}.username` must not be empty when this user is enabled.";
+          message = "`modules.users.${userName_}.username` must not be empty when this user is enabled.";
         }
         {
           assertion = !user_.home.enable || user_.enable;
-          message = "`modules.users.${uidKey_}.home.enable = true` requires `modules.users.${uidKey_}.enable = true`.";
+          message = "`modules.users.${userName_}.home.enable = true` requires `modules.users.${userName_}.enable = true`.";
         }
         {
           assertion = !user_.home.enable || lib.hasPrefix "/" (builtins.toString user_.home.directory);
-          message = "`modules.users.${uidKey_}.home.directory` must be an absolute path when `modules.users.${uidKey_}.home.enable = true`.";
+          message = "`modules.users.${userName_}.home.directory` must be an absolute path when `modules.users.${userName_}.home.enable = true`.";
         }
         {
           assertion = !user_.home.manager.enable || user_.home.enable;
-          message = "`modules.users.${uidKey_}.home.manager.enable = true` requires `modules.users.${uidKey_}.home.enable = true`.";
+          message = "`modules.users.${userName_}.home.manager.enable = true` requires `modules.users.${userName_}.home.enable = true`.";
         }
         {
           assertion = if (user_.home.manager.source != null)
@@ -128,33 +113,33 @@
                         sourcePathString = builtins.unsafeDiscardStringContext (builtins.toString (./. + "/${user_.home.manager.source}"));
                       in !user_.home.manager.enable || lib.hasPrefix "${basePathString}/" sourcePathString)
                       else !user_.home.manager.enable || (user_.home.manager.source == null);
-            message = "`modules.users.${uidKey_}.home.manager.source` must be `null` or resolve under `${builtins.toString ./.}`.";
+            message = "`modules.users.${userName_}.home.manager.source` must be `null` or resolve under `${builtins.toString ./.}`.";
         }
         {
           assertion = if (user_.home.manager.source != null)
                       then !user_.home.manager.enable || builtins.pathExists (./. + "/${builtins.toString user_.home.manager.source}/default.nix")
                       else !user_.home.manager.enable || (user_.home.manager.source == null);
-          message = "`modules.users.${uidKey_}.home.manager.enable = true` requires `${builtins.toString (./. + "/${builtins.toString user_.home.manager.source}/default.nix")}` to exist.";
+          message = "`modules.users.${userName_}.home.manager.enable = true` requires `${builtins.toString (./. + "/${builtins.toString user_.home.manager.source}/default.nix")}` to exist.";
         }
       ]) config.modules.users ))
 
       (builtins.concatLists (lib.mapAttrsToList (hostName_ : host_ : let
-        userUidKeys_ = builtins.attrNames host_.users;
+        hostUids_ = builtins.attrValues host_.users;
       in lib.optionals host_.enable [
         {
-          assertion = builtins.all (uidKey_ : builtins.hasAttr uidKey_ enabledUsers_) userUidKeys_;
+          assertion = builtins.all (uid_ : builtins.elem uid_ enabledUserUids_) hostUids_;
           message = "`modules.hosts.${hostName_}.users` must only contain UIDs enabled in `modules.users` when this host is enabled.";
         }
         {
-          assertion = builtins.all (uidKey_ : builtins.hasAttr uidKey_ host_.users) enabledUserUidKeys_;
+          assertion = builtins.all (uid_ : builtins.elem uid_ hostUids_) enabledUserUids_;
           message = "Every enabled user in `modules.users` must be declared in `modules.hosts.${hostName_}.users` when this host is enabled.";
         }
       ]) config.modules.hosts))
 
     ];
 
-    users.users = builtins.listToAttrs (lib.mapAttrsToList (uidKey_ : user_ : {
-      name = builtins.toString uidKey_;
+    users.users = builtins.listToAttrs (lib.mapAttrsToList (unused_userName_ : user_ : {
+      name = builtins.toString user_.uid;
       value = lib.mkMerge [
         {
           isNormalUser = lib.mkForce true;
@@ -166,10 +151,10 @@
           home = lib.mkForce (builtins.toString user_.home.directory);
         })
       ];
-    }) (lib.filterAttrs (x_ : y_ : y_.enable) config.modules.users));
+    }) (lib.filterAttrs (unused_name_ : user_ : user_.enable && user_.uid != null) config.modules.users));
 
-    home-manager.users = builtins.listToAttrs (lib.mapAttrsToList (uidKey_ : user_ : {
-      name = builtins.toString uidKey_;
+    home-manager.users = builtins.listToAttrs (lib.mapAttrsToList (unused_userName_ : user_ : {
+      name = builtins.toString user_.uid;
       value = {
         imports = lib.optionals (user_.home.manager.source != null) [
           (./. + "/${builtins.toString user_.home.manager.source}")
@@ -180,7 +165,7 @@
           homeDirectory = lib.mkForce (builtins.toString user_.home.directory);
         };
       };
-    }) (lib.filterAttrs (x_ : y_ : (y_.enable && y_.home.enable && y_.home.manager.enable)) config.modules.users));
+    }) (lib.filterAttrs (unused_name_ : user_ : (user_.enable && user_.uid != null && user_.home.enable && user_.home.manager.enable)) config.modules.users));
 
   };
 
