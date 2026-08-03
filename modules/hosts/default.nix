@@ -1,7 +1,7 @@
 { options, config, pkgs, lib, ... } : let
 
   cfg = config.modules.hosts;
-  hostsList_ = builtins.attrNames (lib.filterAttrs (name_ : type_ : ((type_ == "directory") && (builtins.pathExists (./. + "/${name_}/default.nix")))) (builtins.readDir ./.));
+  hostList_ = builtins.attrNames (lib.filterAttrs (name_ : type_ : ((type_ == "directory") && (builtins.pathExists (./. + "/${name_}/default.nix")))) (builtins.readDir ./.));
 
 in {
 
@@ -114,7 +114,7 @@ in {
           inherit lib;
         }
       ));
-    }) hostsList_));
+    }) hostList_));
   };
 
   config = {

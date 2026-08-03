@@ -1,6 +1,6 @@
 { options, config, pkgs, lib, ... } : let
 
-  featuresList_ = builtins.attrNames (lib.filterAttrs (name_ : type_ : ((type_ == "directory") && (builtins.pathExists (./. + "/${name_}/default.nix")))) (builtins.readDir ./.));
+  featureList_ = builtins.attrNames (lib.filterAttrs (name_ : type_ : ((type_ == "directory") && (builtins.pathExists (./. + "/${name_}/default.nix")))) (builtins.readDir ./.));
 
 in {
 
@@ -63,7 +63,7 @@ in {
         }
       ));
 
-    }) featuresList_));
+    }) featureList_));
 
   };
 

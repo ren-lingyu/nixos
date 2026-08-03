@@ -1,6 +1,6 @@
 { config, pkgs, lib, ... } : let
 
-  usersList_ = builtins.attrNames (lib.filterAttrs (name_ : type_ : ((type_ == "directory") && (builtins.pathExists (./. + "/${name_}/default.nix")))) (builtins.readDir ./.));
+  userList_ = builtins.attrNames (lib.filterAttrs (name_ : type_ : ((type_ == "directory") && (builtins.pathExists (./. + "/${name_}/default.nix")))) (builtins.readDir ./.));
 
 in {
 
@@ -58,7 +58,7 @@ in {
           };
         };
       };
-    }) usersList_);
+    }) userList_);
   };
 
   config = {
