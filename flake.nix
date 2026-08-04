@@ -85,14 +85,21 @@
 
     flake = {
 
+      lib = import ./lib;
+
       modules = {
 
-        base = { config, pkgs, lib, ... } : {
+        base = { config, pkgs, lib, ... } : let
+          llib = self.lib;
+        in {
           imports = [
             inputs.home-manager.nixosModules.home-manager
             ./modules
           ];
           config = {
+            _module.args = {
+              llib = llib;
+            };
             nixpkgs = {
               overlays = [
                 inputs.self-nixpkgs.overlays.default
@@ -105,6 +112,7 @@
               ];
               extraSpecialArgs = {
                 inherit inputs;
+                inherit llib;
               };
             };
           };

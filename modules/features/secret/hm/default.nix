@@ -1,10 +1,10 @@
-{ config, pkgs, lib, osConfig, ... } : let
+{ config, pkgs, lib, osConfig, llib, ... } : let
 
   cfg = osConfig.modules.features.secret;
 
   itf = config.moduleInterfaces.features.secret;
 
-  llib = import ../lib { inherit config; inherit osConfig; };
+  lmf = llib.moduleFunctions.features.secret { inherit config; inherit osConfig; };
 
 in {
 
@@ -35,7 +35,7 @@ in {
         sshKeyPaths = [];
       };
 
-      secrets = llib.mkSopsSecrets itf.sops.secretsInput;
+      secrets = lmf.mkSopsSecrets itf.sops.secretsInput;
 
     };
 
