@@ -12,6 +12,10 @@
     inherit pkgs llib;
   };
 
+  module-composition = import ./module-composition {
+    inherit pkgs llib;
+  };
+
   secret-functions = import ./secret-functions {
     inherit pkgs llib;
   };
