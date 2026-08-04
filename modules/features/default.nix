@@ -5,6 +5,8 @@
     (user_ : user_.uid)
     (builtins.attrValues (lib.filterAttrs (unused_userName_ : user_ : user_.enable && user_.uid != null) config.modules.users));
 
+  lmf = llib.moduleFunctions.features.default;
+
 in {
 
   options = {
@@ -82,16 +84,20 @@ in {
       ])
     ])) config.modules.features);
 
-    home-manager.users = builtins.mapAttrs (uidKey_ : imports_ : {
+    home-manager.users = builtins.mapAttrs (unused_uidKey_ : imports_ : {
       imports = imports_;
-    }) (lib.foldlAttrs (x_ : featureName_ : feature_ : (builtins.foldl' (y_ : uid_ : (let
-      homeManagerModulePath_ = ./. + "/${featureName_}/hm";
-      uidString_ = builtins.toString uid_;
-    in (
-      if builtins.hasAttr uidString_ y_
-      then y_ // { "${uidString_}" = [ homeManagerModulePath_ ] ++ y_."${uidString_}"; }
-      else y_ // { "${uidString_}" = [ homeManagerModulePath_ ]; }
-    ))) x_ (lib.optionals (feature_.enable && (feature_.existModule.hm == true)) feature_.allowUidList))) {} config.modules.features);
+    }) (lmf.groupImportsByUid
+      (unused_featureName_ : feature_ : (
+        lib.optionals
+          (feature_.enable && (feature_.existModule.hm == true))
+          feature_.allowUidList
+        )
+      )
+      (featureName_ : unused_feature_ : [
+        (./. + "/${featureName_}/hm")
+      ])
+      config.modules.features
+    );
 
   };
 

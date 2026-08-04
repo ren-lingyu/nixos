@@ -20,6 +20,8 @@
 
     features = {
 
+      default = import ./modules.feature.default.nix { inherit lib; };
+
       secret = import ./modules.feature.secret.nix;
 
     };
