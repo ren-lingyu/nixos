@@ -377,7 +377,19 @@
 
     };
 
-    perSystem = { inputs', pkgs, ... } : {
+    perSystem = { inputs', pkgs, ... } : let
+
+      llib = self.lib { lib = pkgs.lib; };
+
+      checks = import ./tests {
+        inherit llib;
+        inherit pkgs;
+      };
+
+    in {
+
+      inherit checks;
+
       apps = {
         nixos-anywhere = {
           type = "app";
