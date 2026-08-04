@@ -62,6 +62,7 @@ in {
           inherit config;
           inherit pkgs;
           inherit lib;
+          inherit llib;
         }
       ));
     }) hostList_));

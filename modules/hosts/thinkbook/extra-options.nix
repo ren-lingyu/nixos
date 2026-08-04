@@ -1,4 +1,4 @@
-host_ : { options, config, pkgs, lib, ... } : {
+host_ : { options, config, pkgs, lib, llib, ... } : {
 
   packageGroups = {
     tencent.enable = lib.mkOption {

@@ -1,4 +1,4 @@
-feature_ : { config, pkgs, lib, ... } : {
+feature_ : { config, pkgs, lib, llib, ... } : {
 
   clash-verge.enable = lib.mkOption {
     type = lib.types.bool;

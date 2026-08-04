@@ -1,4 +1,4 @@
-feature_ : { options, config, osConfig, pkgs, lib, ... } : {
+feature_ : { options, config, osConfig, pkgs, lib, llib, ... } : {
 
   sops = {
 

@@ -95,7 +95,7 @@
           };
         })
 
-        ({ options, config, osConfig, pkgs, lib, ... } : {
+        ({ options, config, osConfig, pkgs, lib, llib, ... } : {
           options = {
             moduleInterfaces = (builtins.listToAttrs
               (builtins.map
@@ -115,6 +115,7 @@
                             inherit osConfig;
                             inherit pkgs;
                             inherit lib;
+                            inherit llib;
                           })
                         );
                       })

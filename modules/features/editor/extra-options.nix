@@ -1,4 +1,4 @@
-feature_ : { config, pkgs, lib, ... } : {
+feature_ : { config, pkgs, lib, llib, ... } : {
 
   defaultEditor = lib.mkOption {
     type = lib.types.nullOr (lib.types.enum [

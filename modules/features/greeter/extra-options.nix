@@ -1,4 +1,4 @@
-feature_ : { config, pkgs, lib, ... } : {
+feature_ : { config, pkgs, lib, llib, ... } : {
 
   sessionPackages = lib.mkOption {
     type = lib.types.unique {
