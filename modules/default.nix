@@ -17,7 +17,7 @@
         type = lib.types.bool;
         default = false;
         example = true;
-        description = "Whether to enable and create xdg user directories.";
+        description = "Whether to enable and create XDG user directories.";
       };
     };
   };

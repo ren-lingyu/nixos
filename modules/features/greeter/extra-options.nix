@@ -11,7 +11,7 @@ feature_ : { config, pkgs, lib, llib, ... } : {
 
   monitor = lib.mkOption {
     type = lib.types.unique {
-      message = "`modules.features.greater.monitor`";
+      message = "Conflicting definitions for `modules.features.${feature_}.monitor`.";
     } (lib.types.submodule ({ name, config, ... } : {
       options = {
         name = lib.mkOption {

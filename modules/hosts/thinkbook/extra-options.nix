@@ -14,7 +14,7 @@ host_ : { options, config, pkgs, lib, llib, ... } : {
       type = lib.types.bool;
       default = false;
       example = true;
-      description = "Whether to enable flatpak.";
+      description = "Whether to enable Flatpak.";
     };
   };
 

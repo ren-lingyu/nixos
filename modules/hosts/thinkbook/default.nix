@@ -44,7 +44,7 @@ in {
     assertions = [
       {
         assertion = !cfg.flatpak.enable || cfg.enable;
-        message = "`modules.hosts.${hostName_}.flatpak.enable = true` requires `modules.hosts.${hostName_}.enable = true` to exist.";
+        message = "`modules.hosts.${hostName_}.flatpak.enable = true` requires `modules.hosts.${hostName_}.enable = true`.";
       }
     ];
 
