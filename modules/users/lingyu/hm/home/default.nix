@@ -1,0 +1,120 @@
+{ config, lib, pkgs, ... } : {
+
+  imports = [
+    ./terminal.nix
+    ./keyring.nix
+    ./git.nix
+    ./langs.nix
+    ./email.nix
+    ./cloud-server.nix
+    ./rclone.nix
+  ];
+
+  config = {
+
+    home = {
+      packages = with pkgs; [
+        adwaita-icon-theme
+        chafa
+        gnumake
+        jq
+        ripgrep
+        trash-cli
+        tree
+        unzip
+        vulkan-tools
+        xclip
+        xclock
+        xcursor-themes
+        xeyes
+      ];
+      sessionVariables = {
+        QT_QPA_PLATFORM = "xcb";
+        XCURSOR_THEME = "Adwaita";
+        XCURSOR_SIZE = "24";
+        GPG_TTY = "$(tty)";
+        TEXINPUTS = "$HOME/org/texmf//:";
+        BIBINPUTS = "$HOME/org/texmf//:";
+        BSTINPUTS = "$HOME/org/texmf//:";
+      };
+      sessionPath = [
+        "${config.xdg.binHome}"
+      ];
+      file = {
+        ".local/bin/rc" = {
+          enable = true;
+          source = ./.local/bin/rc.sh;
+          target = ".local/bin/rc";
+          executable = true;
+        };
+        ".local/bin/org" = {
+          enable = true;
+          source = ./.local/bin/org.sh;
+          target = ".local/bin/org";
+          executable = true;
+        };
+        ".local/bin/ssha" = {
+          enable = true;
+          source = ./.local/bin/ssha.sh;
+          target = ".local/bin/ssha";
+          executable = true;
+        };
+      };
+    };
+
+    systemd = {
+      user = {
+        sessionVariables = config.home.sessionVariables;
+      };
+    };
+
+    programs.direnv = {
+      enable = true;
+      package = pkgs.direnv;
+      enableBashIntegration = true;
+      nix-direnv.enable = true;
+    };
+
+    programs.ssh = {
+      enable = true;
+      enableDefaultConfig = false;
+      settings = {
+        "*" = {
+          forwardAgent = false;
+          serverAliveInterval = 0;
+          serverAliveCountMax = 3;
+          compression = false;
+          addKeysToAgent = "no";
+          hashKnownHosts = false;
+          userKnownHostsFile = "${config.home.homeDirectory}/.ssh/known_hosts";
+          controlMaster = "no";
+          controlPath = "${config.home.homeDirectory}/.ssh/master-%r@%n:%p";
+          controlPersist = "no";
+        };
+      };
+    };
+
+    programs.zathura = {
+      enable = true;
+      package = pkgs.zathura;
+      options = {};
+      mappings = {};
+    };
+
+    xdg = {
+      autostart = {
+        enable = false;
+        readOnly = true;
+        entries = [];
+      };
+      mimeApps = {
+        enable = true;
+        defaultApplications = {
+          "application/pdf" = "org.pwmt.zathura.desktop";
+        };
+      };
+    };
+
+  };
+
+}

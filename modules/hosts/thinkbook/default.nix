@@ -35,6 +35,10 @@ in {
           scale = 1.0;
         };
       };
+      existModule = {
+        os = true;
+        hm = false;
+      };
     };
 
     assertions = [

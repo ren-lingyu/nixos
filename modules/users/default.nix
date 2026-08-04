@@ -4,6 +4,8 @@
 
 in {
 
+  imports = builtins.map (userProfileName_ : ./. + "/${userProfileName_}") userProfileList_;
+
   options = {
     modules.users = builtins.listToAttrs (builtins.map (userProfileName_ : {
       name = userProfileName_;
@@ -34,6 +36,26 @@ in {
           default = "/home/${config.modules.users.${userProfileName_}.username}";
           example = "/home/jane.doe";
           description = "Home directory of the ${userProfileName_} user profile. Must be an absolute path.";
+        };
+        existModule = {
+          os = lib.mkOption {
+            type = lib.types.unique {
+              message = "Only one module may define `modules.users.${userProfileName_}.existModule.os`.";
+            } (lib.types.nullOr lib.types.bool);
+            internal = true;
+            default = null;
+            example = true;
+            description = "Whether the ${userProfileName_} user profile has an OS module.";
+          };
+          hm = lib.mkOption {
+            type = lib.types.unique {
+              message = "Only one module may define `modules.users.${userProfileName_}.existModule.hm`.";
+            } (lib.types.nullOr lib.types.bool);
+            internal = true;
+            default = null;
+            example = true;
+            description = "Whether the ${userProfileName_} user profile has a Home Manager module.";
+          };
         };
       };
     }) userProfileList_);
@@ -72,6 +94,22 @@ in {
           assertion = !user_.enable || lib.hasPrefix "/" user_.homeDirectory;
           message = "`modules.users.${userProfileName_}.homeDirectory` must be an absolute path when this user is enabled.";
         }
+        {
+          assertion = user_.existModule.os == null || user_.existModule.os == builtins.pathExists (./. + "/${userProfileName_}/os/default.nix");
+          message = "`modules.users.${userProfileName_}.existModule.os` must match whether `${builtins.toString (./. + "/${userProfileName_}/os/default.nix")}` exists.";
+        }
+        {
+          assertion = user_.existModule.hm == null || user_.existModule.hm == builtins.pathExists (./. + "/${userProfileName_}/hm/default.nix");
+          message = "`modules.users.${userProfileName_}.existModule.hm` must match whether `${builtins.toString (./. + "/${userProfileName_}/hm/default.nix")}` exists.";
+        }
+        {
+          assertion = (user_.existModule.os == null) == (user_.existModule.hm == null);
+          message = "`modules.users.${userProfileName_}.existModule.os` and `modules.users.${userProfileName_}.existModule.hm` must either both be declared or both be `null`.";
+        }
+        {
+          assertion = !user_.enable || (user_.existModule.os != null && user_.existModule.hm != null);
+          message = "`modules.users.${userProfileName_}.enable = true` requires the user profile to declare `existModule.os` and `existModule.hm`.";
+        }
       ]) config.modules.users ))
 
       (builtins.concatLists (lib.mapAttrsToList (hostName_ : host_ : let
@@ -99,8 +137,8 @@ in {
     home-manager.users = builtins.listToAttrs (lib.mapAttrsToList (userProfileName_ : user_ : {
       name = builtins.toString user_.uid;
       value = {
-        imports = [
-          (./. + "/${userProfileName_}")
+        imports = lib.optionals (user_.existModule.hm == true) [
+          (./. + "/${userProfileName_}/hm")
         ];
         home = {
           uid = lib.mkForce user_.uid;

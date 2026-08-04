@@ -10,6 +10,10 @@
       users = {
         "1000" = 1000;
       };
+      existModule = {
+        os = true;
+        hm = false;
+      };
     };
   };
 
