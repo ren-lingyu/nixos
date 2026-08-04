@@ -1,4 +1,4 @@
-{ options, config, pkgs, lib, ... } : let
+{ options, config, pkgs, lib, llib, ... } : let
 
   cfg = config.modules.hosts;
   hostList_ = builtins.attrNames (lib.filterAttrs (name_ : type_ : ((type_ == "directory") && (builtins.pathExists (./. + "/${name_}/default.nix")))) (builtins.readDir ./.));
@@ -31,65 +31,7 @@ in {
         monitors = lib.mkOption {
           type = lib.types.attrsOf (lib.types.unique {
             message = "Each `modules.hosts.${host_}.monitors.<name>` can only be defined once.";
-          } (lib.types.submodule (
-            { name, config, ... } : {
-              options = {
-                name = lib.mkOption {
-                  type = lib.types.str;
-                  default = name;
-                  example = "eDP-1";
-                  description = "Name of the monitor.";
-                };
-                role = lib.mkOption {
-                  type = lib.types.nullOr (lib.types.enum [
-                    "default"
-                  ]);
-                  default = null;
-                  description = "The roles of the monitor.";
-                };
-                mode = let
-                  positiveInt_ = lib.types.addCheck lib.types.ints.unsigned (x_ : x_ > 0);
-                  positiveFloat_ = lib.types.addCheck lib.types.float (x_ : x_ > 0);
-                in lib.mkOption {
-                  type = lib.types.nullOr (lib.types.submodule {
-                    options = {
-                      width = lib.mkOption {
-                        type = positiveInt_;
-                        example = 3072;
-                        description = "Width of the monitor mode in pixels.";
-                      };
-                      height = lib.mkOption {
-                        type = positiveInt_;
-                        example = 1920;
-                        description = "Height of the monitor mode in pixels.";
-                      };
-                      refresh = lib.mkOption {
-                        type = lib.types.nullOr positiveFloat_;
-                        default = null;
-                        example = 60.0;
-                        description = "Refresh rate of the monitor mode in Hz.";
-                      };
-                    };
-                  });
-                  default = null;
-                  example = {
-                    width = 3072;
-                    height = 1920;
-                    refresh = 60.0;
-                  };
-                  description = "Preferred monitor mode.";
-                };
-                scale = let
-                  positiveFloat_ = lib.types.addCheck lib.types.float (x_ : x_ > 0);
-                in lib.mkOption {
-                  type = lib.types.nullOr positiveFloat_;
-                  default = null;
-                  example = 1.6;
-                  description = "Scale of the monitor in pixels.";
-                };
-              };
-            }
-          )));
+          } llib.types.monitor);
           internal = true;
           default = {};
           example = {

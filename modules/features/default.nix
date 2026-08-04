@@ -1,4 +1,4 @@
-{ options, config, pkgs, lib, ... } : let
+{ options, config, pkgs, lib, llib, ... } : let
 
   featureList_ = builtins.attrNames (lib.filterAttrs (name_ : type_ : ((type_ == "directory") && (builtins.pathExists (./. + "/${name_}/default.nix")))) (builtins.readDir ./.));
   enabledUserUids_ = builtins.map
@@ -63,6 +63,7 @@ in {
           inherit config;
           inherit pkgs;
           inherit lib;
+          inherit llib;
         }
       ));
 

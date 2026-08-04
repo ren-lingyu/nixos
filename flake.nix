@@ -90,8 +90,10 @@
       modules = {
 
         base = { config, pkgs, lib, ... } : let
-          llib = self.lib;
+          llib = self.lib { inherit lib; };
         in {
+          _file = ./flake.nix;
+          key = "${builtins.toString ./flake.nix}#self.modules.base";
           imports = [
             inputs.home-manager.nixosModules.home-manager
             ./modules
