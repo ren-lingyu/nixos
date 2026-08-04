@@ -1,8 +1,12 @@
 feature_ : { config, pkgs, lib, ... } : {
 
   sessionPackages = lib.mkOption {
-    type = lib.types.listOf lib.types.package;
-    description = "";
+    type = lib.types.unique {
+      message = "Conflicting definitions for `modules.features.${feature_}.sessionPackages`.";
+    } (lib.types.listOf lib.types.package);
+    internal = true;
+    default = [];
+    description = "Internal session packages provided to the greeter.";
   };
 
   monitor = lib.mkOption {

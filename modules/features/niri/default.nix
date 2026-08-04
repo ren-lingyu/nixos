@@ -39,7 +39,7 @@ in {
         else {}
       );
 
-      session-wrapper = lib.mkIf config.programs.niri.enable (let
+      session-wrapper = lib.mkIf cfg.enable (let
         commandName_ = "Niri";
       in pkgs.runCommand "niri-session-wrapper" {
         meta.mainProgram = "${commandName_}";

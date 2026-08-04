@@ -36,9 +36,14 @@ in {
       };
 
       sessionPackages = builtins.concatLists (builtins.map (
-        x_ : lib.optionals (
-          (lib.attrByPath [ x_ "session-wrapper" ] null options.modules.features) != null
-        ) [ config.modules.features.${x_}.session-wrapper ]
+        providerName_ : let
+          hasSessionWrapperOption_ = (
+            (lib.attrByPath [ providerName_ "session-wrapper" ] null options.modules.features) != null
+          );
+          sessionWrapper_ = config.modules.features.${providerName_}.session-wrapper;
+        in lib.optionals (hasSessionWrapperOption_ && sessionWrapper_ != null) [
+          sessionWrapper_
+        ]
       ) [
         "niri"
         "x11-session"
@@ -70,6 +75,10 @@ in {
           )) activeMonitors_);
         in (!cfg.enable || (builtins.length defaultMonitors_) == 1);
         message = "`modules.features.greeter.enable = true` requires exactly one monitor in the enabled host's `monitors` to set `role = \"default\"`.";
+      }
+      {
+        assertion = !cfg.enable || cfg.sessionPackages != [];
+        message = "`modules.features.greeter.enable = true` requires at least one session provider.";
       }
     ];
 
