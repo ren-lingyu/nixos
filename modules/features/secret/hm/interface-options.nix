@@ -4,7 +4,7 @@ feature_ : { options, config, osConfig, pkgs, lib, llib, ... } : {
 
     secretsInput = lib.mkOption {
       type = lib.types.unique {
-        message = "Conflicting definitions for `moduleInterfaces.features.${feature_}.sopsSecretsInput`.";
+        message = "Conflicting definitions for `moduleInterfaces.features.${feature_}.sops.secretsInput`.";
       } (lib.types.listOf (lib.types.submodule {
         options = {
           template = lib.mkOption {
@@ -35,7 +35,7 @@ feature_ : { options, config, osConfig, pkgs, lib, llib, ... } : {
 
     defaultSopsFormat = lib.mkOption {
       type = lib.types.unique {
-        message = "Conflicting definitions for `moduleInterfaces.features.${feature_}.defaultSopsFormat`.";
+        message = "Conflicting definitions for `moduleInterfaces.features.${feature_}.sops.defaultSopsFormat`.";
       } lib.types.str;
       default = "yaml";
       internal = true;
@@ -44,7 +44,7 @@ feature_ : { options, config, osConfig, pkgs, lib, llib, ... } : {
 
     defaultSopsFile = lib.mkOption {
       type = lib.types.unique {
-        message = "Conflicting definitions for `moduleInterfaces.features.${feature_}.defaultSopsFile`.";
+        message = "Conflicting definitions for `moduleInterfaces.features.${feature_}.sops.defaultSopsFile`.";
       } lib.types.path;
       internal = true;
       description = "Encrypted SOPS file containing secrets for this Home Manager user.";
