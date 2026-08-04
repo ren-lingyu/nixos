@@ -1,4 +1,4 @@
-{ config, pkgs, lib, ... } : let
+{ config, pkgs, lib, llib, ... } : let
 
   userList_ = builtins.attrNames (lib.filterAttrs (name_ : type_ : ((type_ == "directory") && (builtins.pathExists (./. + "/${name_}/default.nix")))) (builtins.readDir ./.));
 
@@ -37,25 +37,13 @@ in {
           example = "/home/jane.doe";
           description = "Home directory of the ${user_} user profile. Must be an absolute path.";
         };
-        existModule = {
-          os = lib.mkOption {
-            type = lib.types.unique {
-              message = "Only one module may define `modules.users.${user_}.existModule.os`.";
-            } (lib.types.nullOr lib.types.bool);
-            internal = true;
-            default = null;
-            example = true;
-            description = "Whether the ${user_} user profile has an OS module.";
+        existModule = lib.mkOption {
+          type = llib.types.existModule {
+            optionPath = "modules.users.${user_}.existModule";
           };
-          hm = lib.mkOption {
-            type = lib.types.unique {
-              message = "Only one module may define `modules.users.${user_}.existModule.hm`.";
-            } (lib.types.nullOr lib.types.bool);
-            internal = true;
-            default = null;
-            example = true;
-            description = "Whether the ${user_} user profile has a Home Manager module.";
-          };
+          internal = true;
+          default = {};
+          description = "Module availability declared by the ${user_} user profile.";
         };
       };
     }) userList_);
@@ -81,35 +69,29 @@ in {
         }
       ]
 
-      (builtins.concatLists (lib.mapAttrsToList (userName_ : user_ : [
-        {
-          assertion = !user_.enable || user_.uid != null;
-          message = "`modules.users.${userName_}.enable = true` requires `modules.users.${userName_}.uid` to be assigned by the final flake composition.";
-        }
-        {
-          assertion = user_.uid == null || user_.uid >= 1000;
-          message = "`modules.users.${userName_}.uid` must be greater than or equal to 1000 when assigned.";
-        }
-        {
-          assertion = !user_.enable || lib.hasPrefix "/" user_.homeDirectory;
-          message = "`modules.users.${userName_}.homeDirectory` must be an absolute path when this user is enabled.";
-        }
-        {
-          assertion = user_.existModule.os == null || user_.existModule.os == builtins.pathExists (./. + "/${userName_}/os/default.nix");
-          message = "`modules.users.${userName_}.existModule.os` must match whether `${builtins.toString (./. + "/${userName_}/os/default.nix")}` exists.";
-        }
-        {
-          assertion = user_.existModule.hm == null || user_.existModule.hm == builtins.pathExists (./. + "/${userName_}/hm/default.nix");
-          message = "`modules.users.${userName_}.existModule.hm` must match whether `${builtins.toString (./. + "/${userName_}/hm/default.nix")}` exists.";
-        }
-        {
-          assertion = (user_.existModule.os == null) == (user_.existModule.hm == null);
-          message = "`modules.users.${userName_}.existModule.os` and `modules.users.${userName_}.existModule.hm` must either both be declared or both be `null`.";
-        }
-        {
-          assertion = !user_.enable || (user_.existModule.os != null && user_.existModule.hm != null);
-          message = "`modules.users.${userName_}.enable = true` requires the user profile to declare `existModule.os` and `existModule.hm`.";
-        }
+      (builtins.concatLists (lib.mapAttrsToList (userName_ : user_ : builtins.concatLists [
+        [
+          {
+            assertion = !user_.enable || user_.uid != null;
+            message = "`modules.users.${userName_}.enable = true` requires `modules.users.${userName_}.uid` to be assigned by the final flake composition.";
+          }
+          {
+            assertion = user_.uid == null || user_.uid >= 1000;
+            message = "`modules.users.${userName_}.uid` must be greater than or equal to 1000 when assigned.";
+          }
+          {
+            assertion = !user_.enable || lib.hasPrefix "/" user_.homeDirectory;
+            message = "`modules.users.${userName_}.homeDirectory` must be an absolute path when this user is enabled.";
+          }
+        ]
+        (llib.assertions.existModule {
+          enable = user_.enable;
+          value = user_.existModule;
+          optionPath = "modules.users.${userName_}.existModule";
+          osModulePath = ./. + "/${userName_}/os/default.nix";
+          hmModulePath = ./. + "/${userName_}/hm/default.nix";
+          enabledMessage = "`modules.users.${userName_}.enable = true` requires the user profile to declare `existModule.os` and `existModule.hm`.";
+        })
       ]) config.modules.users ))
 
       (builtins.concatLists (lib.mapAttrsToList (hostName_ : host_ : let

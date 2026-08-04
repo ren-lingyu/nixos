@@ -36,25 +36,13 @@ in {
           description = "User UIDs whose Home Manager configurations should import the ${feature_} module.";
         };
 
-        existModule = {
-          os = lib.mkOption {
-            type = lib.types.unique {
-              message = "Only one module may define `modules.features.${feature_}.existModule.os`.";
-            } (lib.types.nullOr lib.types.bool);
-            internal = true;
-            default = null;
-            example = true;
-            description = "Whether this feature has an OS module.";
+        existModule = lib.mkOption {
+          type = llib.types.existModule {
+            optionPath = "modules.features.${feature_}.existModule";
           };
-          hm = lib.mkOption {
-            type = lib.types.unique {
-              message = "Only one module may define `modules.features.${feature_}.existModule.hm`.";
-            } (lib.types.nullOr lib.types.bool);
-            internal = true;
-            default = null;
-            example = true;
-            description = "Whether this feature has a Home Manager module.";
-          };
+          internal = true;
+          default = {};
+          description = "Module availability declared by the ${feature_} feature.";
         };
 
       } // (lib.optionalAttrs (builtins.pathExists possibleExtraOptionsPath_) (
@@ -74,24 +62,14 @@ in {
   config = {
 
     assertions = builtins.concatLists (lib.mapAttrsToList (featureName_ : feature_ : (builtins.concatLists [
-      [
-        {
-          assertion = feature_.existModule.os == null || feature_.existModule.os == builtins.pathExists (./. + "/${featureName_}/os/default.nix");
-          message = "`modules.features.${featureName_}.existModule.os` must match whether `${builtins.toString (./. + "/${featureName_}/os/default.nix")}` exists.";
-        }
-        {
-          assertion = feature_.existModule.hm == null || feature_.existModule.hm == builtins.pathExists (./. + "/${featureName_}/hm/default.nix");
-          message = "`modules.features.${featureName_}.existModule.hm` must match whether `${builtins.toString (./. + "/${featureName_}/hm/default.nix")}` exists.";
-        }
-        {
-          assertion = (feature_.existModule.os == null) == (feature_.existModule.hm == null);
-          message = "`modules.features.${featureName_}.existModule.os` and `modules.features.${featureName_}.existModule.hm` must either both be declared or both be `null`.";
-        }
-        {
-          assertion = !feature_.enable || (feature_.existModule.os != null && feature_.existModule.hm != null);
-          message = "`modules.features.${featureName_}.enable = true` requires the feature module to be imported and declare `existModule.os` and `existModule.hm`.";
-        }
-      ]
+      (llib.assertions.existModule {
+        enable = feature_.enable;
+        value = feature_.existModule;
+        optionPath = "modules.features.${featureName_}.existModule";
+        osModulePath = ./. + "/${featureName_}/os/default.nix";
+        hmModulePath = ./. + "/${featureName_}/hm/default.nix";
+        enabledMessage = "`modules.features.${featureName_}.enable = true` requires the feature module to be imported and declare `existModule.os` and `existModule.hm`.";
+      })
       (lib.optionals (feature_.enable && (feature_.existModule.hm == true)) [
         {
           assertion = (builtins.length feature_.allowUidList) == (builtins.length (lib.unique feature_.allowUidList));

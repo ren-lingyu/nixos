@@ -48,25 +48,13 @@ in {
           };
           description = "Monitor declarations for this host.";
         };
-        existModule = {
-          os = lib.mkOption {
-            type = lib.types.unique {
-              message = "Only one module may define `modules.hosts.${host_}.existModule.os`.";
-            } (lib.types.nullOr lib.types.bool);
-            internal = true;
-            default = null;
-            example = true;
-            description = "Whether the ${host_} host profile has an OS module.";
+        existModule = lib.mkOption {
+          type = llib.types.existModule {
+            optionPath = "modules.hosts.${host_}.existModule";
           };
-          hm = lib.mkOption {
-            type = lib.types.unique {
-              message = "Only one module may define `modules.hosts.${host_}.existModule.hm`.";
-            } (lib.types.nullOr lib.types.bool);
-            internal = true;
-            default = null;
-            example = true;
-            description = "Whether the ${host_} host profile has a Home Manager module.";
-          };
+          internal = true;
+          default = {};
+          description = "Module availability declared by the ${host_} host profile.";
         };
       } // (lib.optionalAttrs (builtins.pathExists possibleExtraOptionsPath_) (
         (import possibleExtraOptionsPath_) host_ {
@@ -91,24 +79,14 @@ in {
           message = "At most one host in `modules.hosts` may set `enable = true`. Enabled hosts: ${builtins.concatStringsSep ", " enabledHostNames_}.";
         }
       ]
-      (builtins.concatLists (lib.mapAttrsToList (hostName_ : host_ : [
-        {
-          assertion = host_.existModule.os == null || host_.existModule.os == builtins.pathExists (./. + "/${hostName_}/os/default.nix");
-          message = "`modules.hosts.${hostName_}.existModule.os` must match whether `${builtins.toString (./. + "/${hostName_}/os/default.nix")}` exists.";
-        }
-        {
-          assertion = host_.existModule.hm == null || host_.existModule.hm == builtins.pathExists (./. + "/${hostName_}/hm/default.nix");
-          message = "`modules.hosts.${hostName_}.existModule.hm` must match whether `${builtins.toString (./. + "/${hostName_}/hm/default.nix")}` exists.";
-        }
-        {
-          assertion = (host_.existModule.os == null) == (host_.existModule.hm == null);
-          message = "`modules.hosts.${hostName_}.existModule.os` and `modules.hosts.${hostName_}.existModule.hm` must either both be declared or both be `null`.";
-        }
-        {
-          assertion = !host_.enable || (host_.existModule.os != null && host_.existModule.hm != null);
-          message = "`modules.hosts.${hostName_}.enable = true` requires the host profile to declare `existModule.os` and `existModule.hm`.";
-        }
-      ]) cfg))
+      (builtins.concatLists (lib.mapAttrsToList (hostName_ : host_ : llib.assertions.existModule {
+        enable = host_.enable;
+        value = host_.existModule;
+        optionPath = "modules.hosts.${hostName_}.existModule";
+        osModulePath = ./. + "/${hostName_}/os/default.nix";
+        hmModulePath = ./. + "/${hostName_}/hm/default.nix";
+        enabledMessage = "`modules.hosts.${hostName_}.enable = true` requires the host profile to declare `existModule.os` and `existModule.hm`.";
+      }) cfg))
       (builtins.concatLists (lib.mapAttrsToList (hostName_ : host_ : (builtins.concatLists [
         (let
           monitors_ = builtins.attrValues host_.monitors;
