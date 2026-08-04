@@ -2,7 +2,7 @@
 
   cfg = osConfig.modules.features.secret;
 
-  itf = config.moduleInterfaces.features.secret;
+  mif = config.moduleInterfaces.features.secret;
 
   lmf = llib.moduleFunctions.features.secret { inherit config; inherit osConfig; };
 
@@ -16,8 +16,8 @@ in {
 
     sops = {
 
-      defaultSopsFormat = itf.sops.defaultSopsFormat;
-      defaultSopsFile = itf.sops.defaultSopsFile;
+      defaultSopsFormat = mif.sops.defaultSopsFormat;
+      defaultSopsFile = mif.sops.defaultSopsFile;
       defaultSopsKey = null;
       keepGenerations = 1;
       validateSopsFiles = true;
@@ -35,7 +35,7 @@ in {
         sshKeyPaths = [];
       };
 
-      secrets = lmf.mkSopsSecrets itf.sops.secretsInput;
+      secrets = lmf.mkSopsSecrets mif.sops.secretsInput;
 
     };
 

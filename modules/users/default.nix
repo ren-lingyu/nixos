@@ -1,64 +1,64 @@
 { config, pkgs, lib, ... } : let
 
-  userProfileList_ = builtins.attrNames (lib.filterAttrs (name_ : type_ : ((type_ == "directory") && (builtins.pathExists (./. + "/${name_}/default.nix")))) (builtins.readDir ./.));
+  userList_ = builtins.attrNames (lib.filterAttrs (name_ : type_ : ((type_ == "directory") && (builtins.pathExists (./. + "/${name_}/default.nix")))) (builtins.readDir ./.));
 
 in {
 
-  imports = builtins.map (userProfileName_ : ./. + "/${userProfileName_}") userProfileList_;
+  imports = builtins.map (user_ : ./. + "/${user_}") userList_;
 
   options = {
-    modules.users = builtins.listToAttrs (builtins.map (userProfileName_ : {
-      name = userProfileName_;
+    modules.users = builtins.listToAttrs (builtins.map (user_ : {
+      name = user_;
       value = {
         enable = lib.mkOption {
           type = lib.types.bool;
           default = false;
           example = true;
-          description = "Whether to enable the ${userProfileName_} user profile.";
+          description = "Whether to enable the ${user_} user profile.";
         };
         uid = lib.mkOption {
           type = lib.types.unique {
-            message = "Conflicting UID assignments for `modules.users.${userProfileName_}.uid`.";
+            message = "Conflicting UID assignments for `modules.users.${user_}.uid`.";
           } (lib.types.nullOr lib.types.ints.unsigned);
           default = null;
           internal = true;
           example = 1000;
-          description = "UID assigned to the ${userProfileName_} user profile by the final flake composition.";
+          description = "UID assigned to the ${user_} user profile by the final flake composition.";
         };
         username = lib.mkOption {
           type = lib.types.nonEmptyStr;
-          default = userProfileName_;
+          default = user_;
           example = "jane.doe";
-          description = "Login name of the ${userProfileName_} user profile.";
+          description = "Login name of the ${user_} user profile.";
         };
         homeDirectory = lib.mkOption {
           type = lib.types.str;
-          default = "/home/${config.modules.users.${userProfileName_}.username}";
+          default = "/home/${config.modules.users.${user_}.username}";
           example = "/home/jane.doe";
-          description = "Home directory of the ${userProfileName_} user profile. Must be an absolute path.";
+          description = "Home directory of the ${user_} user profile. Must be an absolute path.";
         };
         existModule = {
           os = lib.mkOption {
             type = lib.types.unique {
-              message = "Only one module may define `modules.users.${userProfileName_}.existModule.os`.";
+              message = "Only one module may define `modules.users.${user_}.existModule.os`.";
             } (lib.types.nullOr lib.types.bool);
             internal = true;
             default = null;
             example = true;
-            description = "Whether the ${userProfileName_} user profile has an OS module.";
+            description = "Whether the ${user_} user profile has an OS module.";
           };
           hm = lib.mkOption {
             type = lib.types.unique {
-              message = "Only one module may define `modules.users.${userProfileName_}.existModule.hm`.";
+              message = "Only one module may define `modules.users.${user_}.existModule.hm`.";
             } (lib.types.nullOr lib.types.bool);
             internal = true;
             default = null;
             example = true;
-            description = "Whether the ${userProfileName_} user profile has a Home Manager module.";
+            description = "Whether the ${user_} user profile has a Home Manager module.";
           };
         };
       };
-    }) userProfileList_);
+    }) userList_);
   };
 
   config = {
@@ -81,34 +81,34 @@ in {
         }
       ]
 
-      (builtins.concatLists (lib.mapAttrsToList (userProfileName_ : user_ : [
+      (builtins.concatLists (lib.mapAttrsToList (userName_ : user_ : [
         {
           assertion = !user_.enable || user_.uid != null;
-          message = "`modules.users.${userProfileName_}.enable = true` requires `modules.users.${userProfileName_}.uid` to be assigned by the final flake composition.";
+          message = "`modules.users.${userName_}.enable = true` requires `modules.users.${userName_}.uid` to be assigned by the final flake composition.";
         }
         {
           assertion = user_.uid == null || user_.uid >= 1000;
-          message = "`modules.users.${userProfileName_}.uid` must be greater than or equal to 1000 when assigned.";
+          message = "`modules.users.${userName_}.uid` must be greater than or equal to 1000 when assigned.";
         }
         {
           assertion = !user_.enable || lib.hasPrefix "/" user_.homeDirectory;
-          message = "`modules.users.${userProfileName_}.homeDirectory` must be an absolute path when this user is enabled.";
+          message = "`modules.users.${userName_}.homeDirectory` must be an absolute path when this user is enabled.";
         }
         {
-          assertion = user_.existModule.os == null || user_.existModule.os == builtins.pathExists (./. + "/${userProfileName_}/os/default.nix");
-          message = "`modules.users.${userProfileName_}.existModule.os` must match whether `${builtins.toString (./. + "/${userProfileName_}/os/default.nix")}` exists.";
+          assertion = user_.existModule.os == null || user_.existModule.os == builtins.pathExists (./. + "/${userName_}/os/default.nix");
+          message = "`modules.users.${userName_}.existModule.os` must match whether `${builtins.toString (./. + "/${userName_}/os/default.nix")}` exists.";
         }
         {
-          assertion = user_.existModule.hm == null || user_.existModule.hm == builtins.pathExists (./. + "/${userProfileName_}/hm/default.nix");
-          message = "`modules.users.${userProfileName_}.existModule.hm` must match whether `${builtins.toString (./. + "/${userProfileName_}/hm/default.nix")}` exists.";
+          assertion = user_.existModule.hm == null || user_.existModule.hm == builtins.pathExists (./. + "/${userName_}/hm/default.nix");
+          message = "`modules.users.${userName_}.existModule.hm` must match whether `${builtins.toString (./. + "/${userName_}/hm/default.nix")}` exists.";
         }
         {
           assertion = (user_.existModule.os == null) == (user_.existModule.hm == null);
-          message = "`modules.users.${userProfileName_}.existModule.os` and `modules.users.${userProfileName_}.existModule.hm` must either both be declared or both be `null`.";
+          message = "`modules.users.${userName_}.existModule.os` and `modules.users.${userName_}.existModule.hm` must either both be declared or both be `null`.";
         }
         {
           assertion = !user_.enable || (user_.existModule.os != null && user_.existModule.hm != null);
-          message = "`modules.users.${userProfileName_}.enable = true` requires the user profile to declare `existModule.os` and `existModule.hm`.";
+          message = "`modules.users.${userName_}.enable = true` requires the user profile to declare `existModule.os` and `existModule.hm`.";
         }
       ]) config.modules.users ))
 
@@ -123,7 +123,7 @@ in {
 
     ];
 
-    users.users = builtins.listToAttrs (lib.mapAttrsToList (unused_userProfileName_ : user_ : {
+    users.users = builtins.listToAttrs (lib.mapAttrsToList (unused_userName_ : user_ : {
       name = builtins.toString user_.uid;
       value = {
         isNormalUser = lib.mkForce true;
@@ -134,11 +134,11 @@ in {
       };
     }) (lib.filterAttrs (unused_name_ : user_ : user_.enable && user_.uid != null) config.modules.users));
 
-    home-manager.users = builtins.listToAttrs (lib.mapAttrsToList (userProfileName_ : user_ : {
+    home-manager.users = builtins.listToAttrs (lib.mapAttrsToList (userName_ : user_ : {
       name = builtins.toString user_.uid;
       value = {
         imports = lib.optionals (user_.existModule.hm == true) [
-          (./. + "/${userProfileName_}/hm")
+          (./. + "/${userName_}/hm")
         ];
         home = {
           uid = lib.mkForce user_.uid;
