@@ -11,7 +11,6 @@
     programs.niri.settings = {
       environment = {
         QT_QPA_PLATFORM = "wayland";
-        GDK_BACKEND = "wayland";
       };
       spawn-at-startup = builtins.concatLists [
         # (lib.optionals config.programs.noctalia-shell.enable [
