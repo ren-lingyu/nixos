@@ -30,14 +30,6 @@ in {
       package = osConfig.programs.niri.package;
     };
 
-    programs.wayfile = {
-      enable = true;
-      package = pkgs.wayfile;
-      mimeTypes = [
-        "inode/directory"
-      ];
-    };
-
     programs.fuzzel = lib.mkIf (!config.programs.noctalia-shell.enable) {
       enable = true;
       package = pkgs.fuzzel;

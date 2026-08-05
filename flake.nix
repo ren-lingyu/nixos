@@ -168,6 +168,7 @@
               self.modules.base
               ./modules/features/agent
               ./modules/features/diagnostics
+              ./modules/features/file-manager
               ./modules/features/font
               ./modules/features/greeter
               ./modules/features/media
@@ -278,6 +279,7 @@
                         services.package = pkgs.emacs-pgtk-twist;
                       };
                     };
+                    file-manager.enable = true;
                     font.enable = true;
                     greeter.enable = true;
                     media.enable = true;
@@ -360,6 +362,7 @@
                       neovim.enable = true;
                       emacs.enable = true;
                     };
+                    file-manager.enable = true;
                     font.enable = true;
                     media.enable = false;
                     office.enable = false;

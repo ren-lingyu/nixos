@@ -78,6 +78,7 @@ Home Manager 模块可以通过 =home-manager.users.<uid>.imports= 合并, 因�
 ├── agent/
 ├── diagnostics/
 ├── editor/
+├── file-manager/
 ├── font/
 ├── greeter/
 ├── media/
@@ -130,6 +131,16 @@ Home Manager 模块可以通过 =home-manager.users.<uid>.imports= 合并, 因�
 #+end_example
 
 声明 editor feature 的 HM 模块入口, 并通过 =extra-options.nix= 定义默认编辑器, vim, neovim 和 emacs 相关 option. =hm/default.nix= 配置 nixvim, vim, Emacs program 和 Emacs service.
+
+***** [[file:./modules/features/file-manager/][/modules/features/file-manager]]
+#+begin_example
+/modules/features/file-manager/
+├── default.nix
+└── hm/
+    └── default.nix
+#+end_example
+
+声明 file-manager feature 的 HM 模块入口. feature 启用时始终提供 Yazi; 当 Niri feature 同时启用时额外提供 Wayfile 并将它注册为默认目录处理器, 其他环境则使用 Yazi.
 
 ***** [[file:./modules/features/font/][/modules/features/font]]
 #+begin_example
