@@ -4,8 +4,47 @@
 * 简介
 这是一个基于 Flake 的 NixOS 配置仓库.
 
-* 结构
+* 架构约定
+=flake.nix= 是最终组装层, 统一管理 flake inputs、外部 NixOS/Home Manager modules、overlays 和 =nixosConfigurations=. 具体配置由三类平级 profile 提供:
 
+- =modules/hosts/= 描述主机身份、硬件和主机拥有的资源. host 只通过 UID registry 声明可管理的用户, 不声明用户名或 user profile.
+- =modules/users/= 描述 user profile 和个人 Home Manager 配置. user 不决定自己属于哪台 host.
+- =modules/features/= 描述可复用的功能实现, 可同时提供 OS 和 HM 模块.
+
+三类 profile 只决定各自负责的事务. profile 选择、UID 绑定与外部依赖注入由 =flake.nix= 负责. =lib/= 则提供公共类型、断言生成器和模块聚合函数, 在模块参数中名为 =llib=.
+
+* Option 和组装协议
+** =enable= 与 =existModule=
+
+=modules.<kind>.<name>.enable= 表示在当前最终配置中启用该 profile. =existModule.{os,hm}= 则是 profile 根入口声明的内部事实信息:
+
+- =true= 表示对应子模块存在.
+- =false= 表示对应子模块不存在.
+- =null= 表示 profile 根入口尚未声明模块性质.
+
+=existModule= 不控制 profile 是否启用, 也不表示 Home Manager 本身是否存在. 统一断言会将它与 =os/default.nix= 和 =hm/default.nix= 的实际情况比较; =existModule.hm= 还用于决定是否向 Home Manager 用户送达该 profile 的 HM 实现.
+
+** User 与 UID
+=modules.users= 以 profile 名为 key, =username= 是可与 profile 名不同的登录名. host 以 =modules.hosts.<host>.users."<uid>" = <uid>= 登记可用 UID; =flake.nix= 在最终组装时完成绑定:
+
+#+begin_src nix
+modules.users.lingyu.uid = config.modules.hosts.thinkbook.users."1000";
+#+end_src
+
+断言保证启用的 user 已绑定 UID、启用用户的用户名和 UID 各自唯一, 且 UID 已在启用 host 中登记. host registry 可以包含尚未绑定给当前 user profile 的 UID.
+
+** Feature 的 HM 送达
+=modules.features.<name>.allowUidList= 指定应向哪些 Home Manager 用户导入该 feature 的 =hm/default.nix=. 当 feature 存在 HM 模块时, 它默认包含所有已启用且已绑定 UID 的 user; 否则默认为空. 列表不能包含重复 UID, 也不能引用未分配给启用 user 的 UID.
+
+** =moduleInterfaces=
+=moduleInterfaces= 是 Home Manager 模块之间的内部通信命名空间. =modules/default.nix= 自动发现 =modules/<kind>/<name>/hm/interface-options.nix=, 并将定义注册到每个 Home Manager 用户自己的 option 合并范围中. user profile 可以通过 =moduleInterfaces.<kind>.<name>.*= 向 feature 提供 per-user 内部数据; 当前 secret feature 用它接收 SOPS 输入.
+
+** 导入时机
+NixOS =imports= 无法根据 =config= 动态决定. host 和 feature 根入口由 =self.modules.*= wrapper 在 =flake.nix= 中静态导入; user 根入口由 =modules/users/default.nix= 统一静态导入. wrapper 同时引入所需 flake inputs, 避免外部依赖和 =inputs.<name>= 命名散落到 profile 实现中.
+
+Home Manager 模块可以通过 =home-manager.users.<uid>.imports= 合并, 因此 HM 实现可根据 =enable=、=existModule.hm= 和 =allowUidList= 进行条件送达. =self.modules.base= 通过 =_module.args.llib= 向 NixOS 模块传递本地函数库, 并通过 =home-manager.extraSpecialArgs= 将它传递给 Home Manager 模块.
+
+* 结构
 ** [[file:./][/]]
 #+begin_example
 /
@@ -14,7 +53,9 @@
 ├── README.org
 ├── flake.lock
 ├── flake.nix
-└── modules/
+├── lib/
+├── modules/
+└── tests/
 #+end_example
 
 仓库根目录放置 flake 入口, lock 文件, README 和模块目录. =flake.nix= 使用 =flake-parts= 组织输出, 定义 =nixosConfigurations= 和 =nixos-anywhere= flake app. =nixpkgs= 使用 =nixos-unstable=, 并启用 =nix-command= 与 =flakes=.
@@ -25,17 +66,17 @@
 ├── default.nix
 ├── features/
 ├── hosts/
-├── overlays/
 └── users/
 #+end_example
 
-[[file:./modules/default.nix][modules/default.nix]] 是仓库模块入口, 汇总 features, hosts, overlays 和 users, 并定义通用 Nix/NixOS 与 home-manager 基础配置.
+[[file:./modules/default.nix][modules/default.nix]] 是仓库模块入口, 汇总 features, hosts 和 users, 定义通用 Nix/NixOS 与 Home Manager 基础配置, 并向每个 Home Manager 用户注册 =moduleInterfaces= options.
 
 **** [[file:./modules/features/][/modules/features]]
 #+begin_example
 /modules/features/
 ├── default.nix
 ├── agent/
+├── diagnostics/
 ├── editor/
 ├── font/
 ├── greeter/
@@ -43,7 +84,6 @@
 ├── niri/
 ├── office/
 ├── proxy/
-├── remote/
 ├── secret/
 ├── shell/
 ├── texlive/
@@ -52,9 +92,9 @@
 
 [[file:./modules/features/default.nix][modules/features/default.nix]] 按功能领域组织 NixOS 与 home-manager 模块, 自动发现含 =default.nix= 的 feature 目录, 定义 =modules.features.*= option, 并把启用的 HM feature 导入到对应用户.
 
-所有 feature 都由 [[file:./modules/features/default.nix][modules/features/default.nix]] 自动发现, 并以 =modules.features.<name>= option 暴露. 各 host 通过 =modules.features.<name>.enable= 按需启用 feature; 含 HM 模块的 feature 会按 =allowUidList= 导入到对应用户.
+所有 feature 都由 [[file:./modules/features/default.nix][modules/features/default.nix]] 自动发现, 并以 =modules.features.<name>= option 暴露. 最终配置通过 =modules.features.<name>.enable= 按需启用 feature; 含 HM 模块的 feature 会按 =allowUidList= 导入到对应 UID 的 Home Manager 配置.
 
-每个 feature 以 =default.nix= 作为入口, 并按 =os/= (系统级), =hm/= (用户级), =lib/= (模块内部函数) 分层. 下列 feature 小节会把这些内部子目录放在各自代码块与说明中, 不再单独展开为 headline.
+每个 feature 以 =default.nix= 作为根入口, 并按需使用 =os/= 和 =hm/= 存放系统级与用户级实现. =extra-options.nix= 扩展 feature options; =hm/interface-options.nix= 定义 per-user 的内部 HM 通信接口. 目录可以只包含适用的子模块, 并由 =existModule= 断言核对实际结构.
 
 ***** [[file:./modules/features/agent/][/modules/features/agent]]
 #+begin_example
@@ -69,6 +109,16 @@
 #+end_example
 
 声明 agent feature 的 HM 模块入口, 并要求启用 agent 时同时启用 secret feature. =hm/default.nix= 配置用户级 AI/agent 工具, 包括 =aichat=, =opencode=, =pi-coding-agent= 及其 context, skills 和密钥引用.
+
+***** [[file:./modules/features/diagnostics/][/modules/features/diagnostics]]
+#+begin_example
+/modules/features/diagnostics/
+├── default.nix
+└── hm/
+    └── default.nix
+#+end_example
+
+声明 diagnostics feature 的 HM 模块入口, 配置用户级诊断与性能分析工具.
 
 ***** [[file:./modules/features/editor/][/modules/features/editor]]
 #+begin_example
@@ -165,27 +215,14 @@
 
 声明 proxy feature 的 OS 模块入口和 clash-verge, throne, mihomo, v2raya 等子选项约束. =os/default.nix= 配置系统级代理组件的 package 与运行模式.
 
-***** [[file:./modules/features/remote/][/modules/features/remote]]
-#+begin_example
-/modules/features/remote/
-├── default.nix
-└── hm/
-    └── default.nix
-#+end_example
-
-声明 remote feature 的 HM 模块入口, 并要求启用 remote 时同时启用 secret feature. =hm/default.nix= 配置 rclone remotes, 包括 WebDAV, S3 和 OneDrive 等远程存储, 密钥由 sops 提供.
-
 ***** [[file:./modules/features/secret/][/modules/features/secret]]
 #+begin_example
 /modules/features/secret/
 ├── default.nix
+├── extra-options.nix
 ├── hm/
 │   ├── default.nix
-│   └── sops/
-│       ├── .sops.yaml
-│       └── default.yaml
-├── lib/
-│   └── default.nix
+│   └── interface-options.nix
 └── os/
     ├── default.nix
     └── sops/
@@ -193,7 +230,7 @@
         └── default.yaml
 #+end_example
 
-声明 secret feature 的 OS, HM 和 lib 模块入口. =secret= 通过 =sops-nix= 管理密钥; 系统级秘密以 host ssh key 加密; 用户级秘密以独立的 age key 加密, 该 age key 文件本身作为系统级 secret 由 host key 保护. =hm/default.nix= 声明用户级 secrets; =os/default.nix= 声明系统级 secrets; =lib/default.nix= 提供模块内部复用的辅助函数.
+声明 secret feature 的 OS 与 HM 模块入口. =secret= 通过 =sops-nix= 管理密钥; 用户级 age key 文件作为系统级 secret 由 host key 保护. =hm/interface-options.nix= 定义 per-user SOPS 输入; secret 生成函数位于仓库公共 =lib/= 中.
 
 ***** [[file:./modules/features/shell/][/modules/features/shell]]
 #+begin_example
@@ -239,15 +276,16 @@
 └── wsl/
 #+end_example
 
-[[file:./modules/hosts/default.nix][modules/hosts/default.nix]] 定义 host profile option, 监视器声明, package group 和 flatpak 开关, 并确保最多只启用一个 host.
+[[file:./modules/hosts/default.nix][modules/hosts/default.nix]] 按目录名自动定义 host profile options, 统一提供 UID registry、monitor 和 =existModule= 接口, 并确保最多只启用一个 host.
 
 ***** [[file:./modules/hosts/aliyun/][/modules/hosts/aliyun]]
 #+begin_example
 /modules/hosts/aliyun/
 ├── default.nix
-├── configuration.nix
-├── disk-config.nix
-└── hardware-configuration.nix
+└── os/
+    ├── default.nix
+    ├── disk-config.nix
+    └── hardware-configuration.nix
 #+end_example
 
 阿里云 ECS host, hostname =nixos-server=, 通过 =nixos-anywhere= + =disko= 远程部署和分区.
@@ -256,12 +294,14 @@
 #+begin_example
 /modules/hosts/thinkbook/
 ├── default.nix
-├── boot-manager.nix
-├── configuration.nix
-├── flatpak.nix
-├── hardware-configuration.nix
-├── mount-windows-directory.nix
-└── virtual-terminal.nix
+├── extra-options.nix
+└── os/
+    ├── default.nix
+    ├── boot-manager.nix
+    ├── flatpak.nix
+    ├── hardware-configuration.nix
+    ├── mount-windows-directory.nix
+    └── virtual-terminal.nix
 #+end_example
 
 ThinkBook bare metal NixOS host, hostname =nixos=, 配置本机硬件, 启动, Flatpak, Windows 分区挂载和虚拟终端.
@@ -270,61 +310,67 @@ ThinkBook bare metal NixOS host, hostname =nixos=, 配置本机硬件, 启动, F
 #+begin_example
 /modules/hosts/wsl/
 ├── default.nix
-└── configuration.nix
+└── os/
+    └── default.nix
 #+end_example
 
 NixOS-WSL host, hostname =nixos-wsl=.
-
-**** [[file:./modules/overlays/][/modules/overlays]]
-#+begin_example
-/modules/overlays/
-├── default.nix
-└── tencent/
-#+end_example
-
-[[file:./modules/overlays/default.nix][modules/overlays/default.nix]] 自动发现含 =default.nix= 的 overlay 目录, 定义 =modules.overlays.*.enable= option 并导入 overlay 模块.
-
-***** [[file:./modules/overlays/tencent/][/modules/overlays/tencent]]
-#+begin_example
-/modules/overlays/tencent/
-└── default.nix
-#+end_example
-
-=tencent= overlay 用于覆盖上游 =qq= 和 =wechat= 等 unfree 软件的版本与下载链接, 修复因腾讯官方链接变更导致的构建失败, 当前已弃用.
 
 **** [[file:./modules/users/][/modules/users]]
 #+begin_example
 /modules/users/
 ├── default.nix
-└── lingyu/
+├── lingyu/
+└── lingyu-minimal/
 #+end_example
 
-[[file:./modules/users/default.nix][modules/users/default.nix]] 定义 UID-keyed 用户配置, 创建 NixOS user, 并把对应用户 home-manager source 导入到 =home-manager.users=.
+[[file:./modules/users/default.nix][modules/users/default.nix]] 按目录名自动定义 =modules.users.<profile>= options, 创建 NixOS user, 并将对应 HM 模块导入到 UID-keyed 的 =home-manager.users=.
 
 ***** [[file:./modules/users/lingyu/][/modules/users/lingyu]]
 #+begin_example
 /modules/users/lingyu/
 ├── default.nix
-├── cloud-server.nix
-├── email.nix
-├── git.nix
-├── home.nix
-├── keyring.nix
-├── langs.nix
-├── terminal.nix
-└── .local/
-    └── bin/
-        ├── org.sh
-        ├── rc.sh
-        └── ssha.sh
+└── hm/
+    ├── default.nix
+    ├── home/
+    │   ├── .local/bin/
+    │   │   ├── org.sh
+    │   │   ├── rc.sh
+    │   │   └── ssha.sh
+    │   ├── default.nix
+    │   ├── cloud-server.nix
+    │   ├── email.nix
+    │   ├── git.nix
+    │   ├── keyring.nix
+    │   ├── langs.nix
+    │   ├── rclone.nix
+    │   └── terminal.nix
+    └── sops/
+        ├── .sops.yaml
+        └── default.yaml
 #+end_example
 
 配置 lingyu 用户的个人 home-manager 模块, 包含 email, git, keyring, langs, terminal 等用户级配置.
 
-=modules/users/lingyu/.local/bin/= 放置个人脚本:
+=modules/users/lingyu/hm/home/.local/bin/= 放置个人脚本:
 - =org=: 进入 =~/org= 目录并准备 make 函数, 支持 --texlive 调用 TeX Live 工具.
 - =rc=: rclone 同步包装器, 支持 push/pull 子命令, 限制传输并发并显示进度.
 - =ssha=: 启动 =ssh-agent= 并加载默认 ed25519 私钥.
+
+***** [[file:./modules/users/lingyu-minimal/][/modules/users/lingyu-minimal]]
+#+begin_example
+/modules/users/lingyu-minimal/
+└── default.nix
+#+end_example
+
+最小用户 profile, 不提供私有 HM 模块, 但仍可以接收最终配置启用的公共 HM features.
+
+* 测试
+=tests/= 通过 =perSystem.checks= 接入 flake, 覆盖自定义类型、=existModule= 断言、按 UID 聚合 HM imports、secret 生成函数, 以及 user/host/feature 的负向组合约束.
+
+#+begin_src sh
+nix flake check
+#+end_src
 
 * 许可
 MIT License (见 [[file:./LICENSE][LICENSE]]).

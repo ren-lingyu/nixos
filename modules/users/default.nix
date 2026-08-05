@@ -4,6 +4,7 @@
 
 in {
 
+  # User roots declare profile metadata; only their `hm/` implementations are conditional.
   imports = builtins.map (user_ : ./. + "/${user_}") userList_;
 
   options = {

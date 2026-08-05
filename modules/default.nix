@@ -12,6 +12,7 @@
         type = lib.types.listOf lib.types.str;
         default = [];
         example = [ "github-copilot-cli" ];
+        description = "Package names allowed by the global unfree package predicate.";
       };
       createXdgUserDirectories = lib.mkOption {
         type = lib.types.bool;
@@ -95,6 +96,7 @@
           };
         })
 
+        # Register interfaces for every HM user; their values still merge per user.
         ({ options, config, osConfig, pkgs, lib, llib, ... } : {
           options = {
             moduleInterfaces = (builtins.listToAttrs

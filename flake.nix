@@ -99,6 +99,8 @@
             ./modules
           ];
           config = {
+            # `llib` must be available before profile submodules are evaluated.
+            # Home Manager has a separate argument scope, so it is passed again below.
             _module.args = {
               llib = llib;
             };

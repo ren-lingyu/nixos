@@ -84,6 +84,7 @@ in {
       ])
     ])) config.modules.features);
 
+    # Unlike NixOS `imports`, HM user imports can be assembled after option merging.
     home-manager.users = builtins.mapAttrs (unused_uidKey_ : imports_ : {
       imports = imports_;
     }) (lmf.groupImportsByUid

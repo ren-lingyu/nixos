@@ -22,9 +22,8 @@
     );
   in go [] attrs;
 
-  # 这个函数的第一个参数应当是一个列表, 其中每个元素都是一个字符串的列表.
+  # Convert path component lists into sops-nix name/value attributes.
   fromTemplates = let
-    # 这里用到了柯里化
     origin = { pathPrefix, attrs ? {} } : list : { ... }@overlayAttrs : builtins.map (x : let
         nameString = builtins.concatStringsSep "." x;
         keyString = builtins.concatStringsSep "/" x;
@@ -55,11 +54,10 @@
   };
 
   mkSopsSecrets = attrsList : let
-    # 这是一个辅助函数.
     fun = { template ? "default", structure ? {}, overlay ? {} } : fromTemplates.${template} (fromStructure structure) overlay;
   in builtins.listToAttrs (
     builtins.concatLists (
-      # 确保列表作为输入参数时, 只有作为属性集的列表元素才有效.
+      # Ignore non-attribute entries so optional fragments can share one input list.
       builtins.map (x : fun x) (builtins.filter builtins.isAttrs attrsList)
     )
   );
