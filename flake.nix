@@ -175,6 +175,7 @@
               ./modules/features/office
               ./modules/features/proxy
               ./modules/features/shell
+              ./modules/features/terminal
               ./modules/features/texlive
               ./modules/features/x11-session
             ];
@@ -296,6 +297,7 @@
                     };
                     secret.enable = true;
                     shell.enable = true;
+                    terminal.enable = true;
                     texlive.enable = true;
                     x11-session.enable = true;
                   };
@@ -368,6 +370,7 @@
                     office.enable = false;
                     secret.enable = true;
                     shell.enable = true;
+                    terminal.enable = true;
                     texlive.enable = true;
                   };
                   users.lingyu.uid = config.modules.hosts.wsl.users."1000";
