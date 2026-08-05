@@ -7,14 +7,15 @@ in {
   config = lib.mkIf cfg.enable {
 
     programs.bash = {
-      enable = false;
+      enable = !osConfig.programs.zsh.enable;
+      package = cfg.bash.package;
       enableCompletion = true;
       shellAliases = {};
     };
 
     programs.zsh = {
       enable = osConfig.programs.zsh.enable;
-      package = pkgs.zsh;
+      package = cfg.zsh.package;
       defaultKeymap = "emacs";
       enableCompletion = true;
       autosuggestion = {
@@ -35,13 +36,7 @@ in {
         findNoDups = true;
       };
       initContent = lib.mkMerge [
-        # (lib.mkOrder 500 (builtins.concatStringsSep "\n" [
-        #   "if [[ -r \"\${XDG_CACHE_HOME:-\$HOME/.cache}/p10k-instant-prompt-\${(%):-%n}.zsh\" ]]; then"
-        #   "source \"\${XDG_CACHE_HOME:-\$HOME/.cache}/p10k-instant-prompt-\${(%):-%n}.zsh\""
-        #   "fi"
-        # ]))
         (lib.mkOrder 1000 (builtins.concatStringsSep "\n" [
-          # "[[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh"
           "function delete-char-or-kill-region {"
           "if [[ $REGION_ACTIVE -eq 1 ]]; then"
           "zle kill-region"
@@ -55,13 +50,6 @@ in {
         ]))
       ];
       shellAliases = {};
-      # plugins = [
-      #   {
-      #     name = "powerlevel10k";
-      #     src = pkgs.zsh-powerlevel10k;
-      #     file = "share/zsh-powerlevel10k/powerlevel10k.zsh-theme";
-      #   }
-      # ];
       # 没有采用静态加载且暂时用不到插件功能故禁用 antidote
       antidote = {
         enable = false;

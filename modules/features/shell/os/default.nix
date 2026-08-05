@@ -7,7 +7,15 @@ in {
   config = lib.mkIf cfg.enable {
 
     users = {
-      defaultUserShell = pkgs.zsh;
+      defaultUserShell = (
+        if (config.programs.zsh.enable == true)
+        then (
+          cfg.zsh.package
+        )
+        else (
+          cfg.bash.package
+        )
+      );
     };
 
     programs = {
