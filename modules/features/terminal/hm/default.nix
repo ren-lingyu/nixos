@@ -22,6 +22,13 @@ in {
     programs.kitty = {
       enable = true;
       package = pkgs.kitty;
+      settings = {
+        scrollback_lines = 10000;
+        scrollback_pager_history_size = 10;
+        enable_audio_bell = false;
+        window_padding_width = 4;
+        notify_on_cmd_finish = "invisible 10.0";
+      };
     };
 
     xdg.terminal-exec = {
