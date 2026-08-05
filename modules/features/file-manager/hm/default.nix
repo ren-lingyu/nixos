@@ -19,6 +19,12 @@ in {
       package = pkgs.yazi;
       enableZshIntegration = config.programs.zsh.enable;
       enableBashIntegration = config.programs.bash.enable;
+      extraPackages = [
+        pkgs.fd
+        pkgs.ripgrep
+        pkgs.fzf
+        pkgs.zoxide
+      ];
     };
 
     programs.wayfile = lib.mkIf niriCfg.enable {
