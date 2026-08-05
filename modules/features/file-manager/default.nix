@@ -1,8 +1,12 @@
 { config, pkgs, lib, ... } : {
 
+  imports = [
+    ./os
+  ];
+
   config = {
     modules.features.file-manager.existModule = {
-      os = false;
+      os = true;
       hm = true;
     };
   };
