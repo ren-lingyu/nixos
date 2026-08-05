@@ -126,7 +126,6 @@
           niri = { config, pkgs, lib, ... } : {
             imports = [
               self.modules.base
-              inputs.sops-nix.nixosModules.sops
               ./modules/features/niri
             ];
             config = {
