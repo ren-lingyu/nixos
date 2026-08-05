@@ -29,7 +29,10 @@
       init.defaultBranch = "main";
       commit.gpgSign = true;
       signing.signByDefault = true;
-      gpg.program = "${pkgs.gnupg}/bin/gpg";
+      gpg.program = "${lib.getExe' pkgs.gnupg "gpg"}";
+      alias = {
+        ipv4 = ''!git -c core.sshCommand="ssh -4"'';
+      };
     } // (lib.optionalAttrs config.programs.difftastic.git.enable {
       difftool.prompt = false;
       pager.difftool = true;
