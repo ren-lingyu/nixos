@@ -9,10 +9,10 @@ in lib.types.submodule ({ name, ... } : {
   options = {
 
     name = lib.mkOption {
-      type = lib.types.str;
+      type = lib.types.nonEmptyStr;
       default = name;
       example = "eDP-1";
-      description = "Name of the monitor.";
+      description = "Output name of the monitor.";
     };
 
     role = lib.mkOption {
@@ -20,7 +20,7 @@ in lib.types.submodule ({ name, ... } : {
         "default"
       ]);
       default = null;
-      description = "The roles of the monitor.";
+      description = "Role assigned to the monitor.";
     };
 
     mode = lib.mkOption {
@@ -57,7 +57,7 @@ in lib.types.submodule ({ name, ... } : {
       type = lib.types.nullOr positiveFloat_;
       default = null;
       example = 1.6;
-      description = "Scale of the monitor in pixels.";
+      description = "Scale factor applied to the monitor.";
     };
 
   };

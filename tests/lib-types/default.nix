@@ -55,6 +55,9 @@
     (assertEqual "monitor width" 3072 monitor_.mode.width)
     (assertEqual "monitor refresh" 120.0 monitor_.mode.refresh)
     (assertEqual "monitor scale" 1.5 monitor_.scale)
+    (assertTrue "monitor rejects empty name" (evaluationFails ((evalMonitors {
+      broken.name = "";
+    }).broken.name)))
     (assertTrue "monitor rejects zero width" (evaluationFails ((evalMonitors {
       broken.mode = {
         width = 0;

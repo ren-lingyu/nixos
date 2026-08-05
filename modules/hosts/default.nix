@@ -113,10 +113,6 @@ in {
             message = "`modules.hosts.${hostName_}.users.${uidKey_}` must use the canonical decimal representation of UID ${builtins.toString uid_}.";
           }
         ]) host_.users))
-        (lib.mapAttrsToList (monitorName_ : monitor_ : {
-          assertion = monitor_.name != "";
-          message = "`modules.hosts.${hostName_}.monitors.${monitorName_}.name` must not be empty.";
-        }) host_.monitors)
       ])) cfg))
     ]);
 
