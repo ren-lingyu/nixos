@@ -13,9 +13,9 @@
         hotkey-overlay = { title = "Run an Editor: Emacs (Client)"; };
         action.spawn = [ "${lib.getExe' config.services.emacs.package "emacsclient"}" "-c" ];
       };
-      "Mod+T" = lib.mkIf config.programs.kitty.enable {
-        hotkey-overlay = { title = "Open a Terminal: kitty"; };
-        action.spawn = [ "${lib.getExe config.programs.kitty.package}" ];
+      "Mod+T" = lib.mkIf config.xdg.terminal-exec.enable {
+        hotkey-overlay = { title = "Open a Terminal"; };
+        action.spawn = [ "${lib.getExe config.xdg.terminal-exec.package}" ];
       };
       "Mod+B" = {
         hotkey-overlay = { title = "Run a Browser"; };

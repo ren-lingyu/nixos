@@ -35,7 +35,9 @@ in {
       package = pkgs.fuzzel;
       settings = {
         main = {
-          terminal = "${lib.getExe config.programs.kitty.package}";
+          terminal = lib.mkIf config.xdg.terminal-exec.enable (
+            lib.getExe config.xdg.terminal-exec.package
+          );
           icon-theme = "Adwaita";
           layer = "overlay";
         };

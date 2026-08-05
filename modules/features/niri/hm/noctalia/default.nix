@@ -394,7 +394,9 @@ in {
           position = "center";
           pinnedApps = [ ];
           sortByMostUsed = true;
-          terminalCommand = "${lib.getExe config.programs.kitty.package} -e";
+          terminalCommand = lib.mkIf config.xdg.terminal-exec.enable (
+            lib.getExe config.xdg.terminal-exec.package
+          );
           customLaunchPrefixEnabled = false;
           customLaunchPrefix = "";
           viewMode = "list";
