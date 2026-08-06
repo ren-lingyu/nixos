@@ -19,16 +19,19 @@
   programs.git = {
     enable = true;
     package = pkgs.gitFull;
+    signing = {
+      key = "65F85A2624D239F0!";
+      format = "openpgp";
+      signer = (lib.getExe' pkgs.gnupg "gpg");
+      signByDefault = true;
+    };
     settings = {
       user = {
         name = "ren-lingyu";
         email = "Ren_Lingyu@outlook.com";
-	    signingkey = "65F85A2624D239F0";
       };
       core.editor = "vim";
       init.defaultBranch = "main";
-      commit.gpgSign = true;
-      signing.signByDefault = true;
       gpg.program = "${lib.getExe' pkgs.gnupg "gpg"}";
       alias = {
         ipv4 = ''!git -c core.sshCommand="ssh -4"'';
