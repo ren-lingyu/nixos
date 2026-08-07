@@ -28,6 +28,7 @@
     nix = {
       settings = {
         experimental-features = [ "nix-command" "flakes" ];
+        sandbox = true;
       };
       gc = {
         automatic = true;
