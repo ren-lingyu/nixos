@@ -146,6 +146,24 @@
     },
     "flake-parts_2": {
       "inputs": {
+        "nixpkgs-lib": "nixpkgs-lib_2"
+      },
+      "locked": {
+        "lastModified": 1763759067,
+        "narHash": "sha256-LlLt2Jo/gMNYAwOgdRQBrsRoOz7BPRkzvNaI/fzXi2Q=",
+        "owner": "hercules-ci",
+        "repo": "flake-parts",
+        "rev": "2cccadc7357c0ba201788ae99c4dfa90728ef5e0",
+        "type": "github"
+      },
+      "original": {
+        "owner": "hercules-ci",
+        "repo": "flake-parts",
+        "type": "github"
+      }
+    },
+    "flake-parts_3": {
+      "inputs": {
         "nixpkgs-lib": [
           "nixvim",
           "nixpkgs"
@@ -201,6 +219,29 @@
         "shallow": true,
         "type": "git",
         "url": "https://github.com/nix-community/home-manager.git"
+      }
+    },
+    "lem": {
+      "inputs": {
+        "flake-parts": "flake-parts_2",
+        "nixpkgs": [
+          "nixpkgs"
+        ]
+      },
+      "locked": {
+        "lastModified": 1784549748,
+        "narHash": "sha256-kgz9Rsow+SeVRSjAbi6hfUzhxRppgdFViq85A3CTMTs=",
+        "ref": "refs/heads/main",
+        "rev": "492312e47ba6e46a327ea3e074ccbf5cc39666a3",
+        "shallow": true,
+        "type": "git",
+        "url": "https://github.com/lem-project/lem.git"
+      },
+      "original": {
+        "ref": "refs/heads/main",
+        "shallow": true,
+        "type": "git",
+        "url": "https://github.com/lem-project/lem.git"
       }
     },
     "melpa": {
@@ -466,6 +507,21 @@
         "type": "github"
       }
     },
+    "nixpkgs-lib_2": {
+      "locked": {
+        "lastModified": 1761765539,
+        "narHash": "sha256-b0yj6kfvO8ApcSE+QmA6mUfu8IYG6/uU28OFn4PaC8M=",
+        "owner": "nix-community",
+        "repo": "nixpkgs.lib",
+        "rev": "719359f4562934ae99f5443f20aa06c2ffff91fc",
+        "type": "github"
+      },
+      "original": {
+        "owner": "nix-community",
+        "repo": "nixpkgs.lib",
+        "type": "github"
+      }
+    },
     "nixpkgs-stable": {
       "locked": {
         "lastModified": 1782847189,
@@ -517,7 +573,7 @@
     },
     "nixvim": {
       "inputs": {
-        "flake-parts": "flake-parts_2",
+        "flake-parts": "flake-parts_3",
         "nixpkgs": "nixpkgs_3",
         "systems": "systems"
       },
@@ -592,6 +648,7 @@
         "emarccs": "emarccs",
         "flake-parts": "flake-parts",
         "home-manager": "home-manager",
+        "lem": "lem",
         "niri-flake": "niri-flake",
         "nix-flatpak": "nix-flatpak",
         "nixos-anywhere": "nixos-anywhere",

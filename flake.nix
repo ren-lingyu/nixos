@@ -48,6 +48,10 @@
       url = "git+https://github.com/nix-community/nixvim.git?ref=refs/heads/main&shallow=1";
       # inputs.nixpkgs.follows = "nixpkgs";
     };
+    lem = {
+      url = "git+https://github.com/lem-project/lem.git?ref=refs/heads/main&shallow=1";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
     nixos-wsl = {
       url = "git+https://github.com/nix-community/NixOS-WSL.git?ref=refs/heads/main&shallow=1";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -158,6 +162,11 @@
               ./modules/features/editor
             ];
             config = {
+              nixpkgs = {
+                overlays = [
+                  inputs.lem.overlays.default
+                ];
+              };
               home-manager.sharedModules = [
                 inputs.nixvim.homeModules.nixvim
               ];
@@ -278,6 +287,10 @@
                         enable = true;
                         programs.package = pkgs.emacs31-pgtk;
                         services.package = pkgs.emacs-pgtk-twist;
+                      };
+                      lem = {
+                        enable = true;
+                        package = pkgs.lem-webview;
                       };
                     };
                     file-manager.enable = true;

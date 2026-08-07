@@ -6,6 +6,10 @@ in {
 
   config = lib.mkIf cfg.enable {
 
+    home.packages = lib.optionals cfg.lem.enable [
+      cfg.lem.package
+    ];
+
     programs.nixvim = {
       enable = cfg.neovim.enable;
       nixpkgs = {

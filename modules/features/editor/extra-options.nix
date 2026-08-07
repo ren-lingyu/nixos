@@ -46,4 +46,19 @@ feature_ : { config, pkgs, lib, llib, ... } : {
     };
   };
 
+  lem = {
+    enable = lib.mkOption {
+      type = lib.types.bool;
+      default = false;
+      example = true;
+      description = "Whether to enable Lem.";
+    };
+    package = lib.mkOption {
+      type = lib.types.package;
+      default = pkgs.lem-webview;
+      example = lib.literalExpression "pkgs.lem-webview";
+      description = "The Lem package added in `home.packages`.";
+    };
+  };
+
 }
