@@ -1,38 +1,36 @@
 { config, lib, pkgs, ... } : {
 
   home.packages = with pkgs; [
-    nodejs
-    python3
-    go
-    jdk
-    lua
-    julia
-    lean4
-    typescript
-
-    guile
-    sbcl
-    nixd                              # Nix
     bash-language-server              # Shell
     clang-tools                       # C / C++ (clangd)
+    dockerfile-language-server        # Dockerfile
+    go
     gopls                             # Go
+    guile
+    haskell-language-server           # Haskell
+    jdk
     jdt-language-server               # Java
-    typescript-language-server        # TS / JS
-    pyright                           # Python
+    julia
+    lean4
+    lemminx                           # XML
+    lua
     lua-language-server               # Lua
     marksman                          # Markdown
-    yaml-language-server              # YAML
-    taplo                             # TOML
-    vscode-langservers-extracted      # HTML / CSS / JSON
-    dockerfile-language-server        # Dockerfile
-    sqls                              # SQL
-    texlab                            # LaTeX
-    lemminx                           # XML
-    haskell-language-server           # Haskell
-
-    shfmt                             # shell formatter
-    stylua                            # Lua formatter
+    nixd                              # Nix
     nixfmt                            # Nix formatter
+    nodejs
+    pyright                           # Python
+    python3
+    sbcl
+    shfmt                             # shell formatter
+    sqls                              # SQL
+    stylua                            # Lua formatter
+    taplo                             # TOML
+    texlab                            # LaTeX
+    typescript
+    typescript-language-server        # TS / JS
+    vscode-langservers-extracted      # HTML / CSS / JSON
+    yaml-language-server              # YAML
   ];
 
 }
