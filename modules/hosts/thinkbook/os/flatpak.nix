@@ -76,6 +76,7 @@ in {
               "xdg-pictures"
               "xdg-download"
               "xdg-documents"
+              "xdg-desktop"
             ];
           };
         };
