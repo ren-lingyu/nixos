@@ -63,6 +63,7 @@ in {
             yamlls.enable = true;
           };
         };
+        orgmode.enable = true;
       };
       colorschemes = {
         catppuccin = {
