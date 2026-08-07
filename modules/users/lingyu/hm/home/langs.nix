@@ -10,6 +10,8 @@
     lean4
     typescript
 
+    guile
+    sbcl
     nixd                              # Nix
     bash-language-server              # Shell
     clang-tools                       # C / C++ (clangd)
