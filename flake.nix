@@ -338,7 +338,7 @@
                     createXdgUserDirectories = false;
                   };
                   features = {
-                    secret.enable = false;
+                    secret.enable = true;
                     shell.enable = true;
                   };
                   users = {
