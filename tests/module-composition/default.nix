@@ -91,7 +91,10 @@
     "Every enabled user in `modules.users` must be declared in `modules.hosts.thinkbook.users` when this host is enabled."
     (evalHostUserAssertions_ {
       modules = {
-        hosts.thinkbook.enable = true;
+        hosts.thinkbook = {
+          enable = true;
+          users = lib.mkForce {};
+        };
         users.lingyu = {
           enable = true;
           uid = 1000;

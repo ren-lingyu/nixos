@@ -70,6 +70,29 @@ in {
 
   config = {
 
+    modules.hosts = (builtins.listToAttrs
+      (builtins.map
+        (host_ : {
+          name = host_;
+          value = let
+            possibleMetadataPath_ = ./. + "/${builtins.toString host_}/metadata.nix";
+          in (lib.optionalAttrs
+            (builtins.pathExists possibleMetadataPath_)
+            ((import possibleMetadataPath_)
+              host_
+              {
+                inherit config;
+                inherit pkgs;
+                inherit lib;
+                inherit llib;
+              }
+            )
+          );
+        })
+        hostList_
+      )
+    );
+
     assertions = let
       enabledHosts_ = lib.filterAttrs (unused_name_ : host_ : host_.enable) cfg;
       enabledHostNames_ = builtins.attrNames enabledHosts_;
