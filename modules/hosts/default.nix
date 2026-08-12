@@ -67,6 +67,27 @@ in {
           example = "203.0.113.10";
           description = "Public IP address assigned to this host.";
         };
+        publicHostKey = lib.mkOption {
+          type = lib.types.unique {
+            message = "`modules.hosts.${host_}.publicHostKey` can only be defined once.";
+          } (lib.types.submodule {
+            options = builtins.listToAttrs (builtins.map (keyFormat_ : {
+              name = keyFormat_;
+              value = lib.mkOption {
+                type = lib.types.nullOr lib.types.nonEmptyStr;
+                default = null;
+                description = "Public ${keyFormat_} key used to identify this host.";
+              };
+            }) [ "age" "ssh" ]);
+          });
+          internal = true;
+          default = {};
+          example = {
+            age = "age1...";
+            ssh = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAA...";
+          };
+          description = "Public identity keys for this host, grouped by key format.";
+        };
         existModule = lib.mkOption {
           type = llib.types.existModule {
             optionPath = "modules.hosts.${host_}.existModule";

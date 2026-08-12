@@ -27,4 +27,6 @@ host_ : { config, pkgs, lib, llib, ... } : {
     ingress = [ "spoke" ];
   };
 
+  publicHostKey.age = "age1ftcurndrgcxtcqd7p4r0z5mwavrt9ux9slvd3zlxqgzn4vs54vqqg0xk3m";
+
 }

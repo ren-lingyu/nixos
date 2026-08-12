@@ -8,4 +8,6 @@ host_ : { config, pkgs, lib, llib, ... } : {
 
   intranetClaims = {};
 
+  publicHostKey.age = "age1x6nxamdaqd9428nth4f4p2ltnm4sehwp9msln0l45h4dpkv2pp8shm7x8l";
+
 }
