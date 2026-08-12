@@ -53,6 +53,11 @@
       ];
     };
 
+    services.userborn = {
+      enable = true;
+      package = pkgs.userborn;
+    };
+
     home-manager = {
 
       useGlobalPkgs = true;
