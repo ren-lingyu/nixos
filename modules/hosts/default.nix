@@ -48,6 +48,25 @@ in {
           };
           description = "Monitor declarations for this host.";
         };
+        intranetClaims = lib.mkOption {
+          type = lib.types.unique {
+            message = "`modules.hosts.${host_}.intranetClaims` can only be defined once.";
+          } (lib.types.attrsOf (lib.types.listOf lib.types.nonEmptyStr));
+          internal = true;
+          example = {
+            ingress = [ "hub" ];
+          };
+          description = "Interconnect nodes claimed by this host, grouped by intranet name.";
+        };
+        publicIpAddress = lib.mkOption {
+          type = lib.types.unique {
+            message = "`modules.hosts.${host_}.publicIpAddress` can only be defined once.";
+          } (lib.types.nullOr lib.types.str);
+          internal = true;
+          default = null;
+          example = "203.0.113.10";
+          description = "Public IP address assigned to this host.";
+        };
         existModule = lib.mkOption {
           type = llib.types.existModule {
             optionPath = "modules.hosts.${host_}.existModule";

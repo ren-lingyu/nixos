@@ -180,6 +180,7 @@
               ./modules/features/file-manager
               ./modules/features/font
               ./modules/features/greeter
+              ./modules/features/interconnect
               ./modules/features/media
               ./modules/features/office
               ./modules/features/proxy
@@ -296,6 +297,7 @@
                     file-manager.enable = true;
                     font.enable = true;
                     greeter.enable = true;
+                    interconnect.enable = true;
                     media.enable = true;
                     niri = {
                       enable = true;
@@ -338,6 +340,7 @@
                     createXdgUserDirectories = false;
                   };
                   features = {
+                    interconnect.enable = true;
                     secret.enable = true;
                     shell.enable = true;
                   };

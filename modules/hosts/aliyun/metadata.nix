@@ -6,4 +6,10 @@ host_ : { config, pkgs, lib, llib, ... } : {
 
   monitors = {};
 
+  intranetClaims = {
+    ingress = [ "hub" ];
+  };
+
+  publicIpAddress = "39.97.244.246";
+
 }

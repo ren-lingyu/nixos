@@ -6,4 +6,6 @@ host_ : { config, pkgs, lib, llib, ... } : {
 
   monitors = {};
 
+  intranetClaims = {};
+
 }

@@ -23,4 +23,8 @@ host_ : { config, pkgs, lib, llib, ... } : {
     };
   };
 
+  intranetClaims = {
+    ingress = [ "spoke" ];
+  };
+
 }
