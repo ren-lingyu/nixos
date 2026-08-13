@@ -91,6 +91,13 @@ in {
       ];
     };
 
+    security.sudo.extraConfig = builtins.concatStringsSep "\n" [
+      "Defaults env_keep += \"http_proxy HTTP_PROXY\""
+      "Defaults env_keep += \"https_proxy HTTPS_PROXY\""
+      "Defaults env_keep += \"no_proxy NO_PROXY\""
+      "Defaults env_keep += \"GOPROXY\""
+    ];
+
     xdg = {
       mime = {
         enable = true;
