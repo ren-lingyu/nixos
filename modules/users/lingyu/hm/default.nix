@@ -27,9 +27,6 @@
             "deepseek" = {
               "apiKey" = [ "opencode" "pi" ];
             };
-            "modelscope" = {
-              "apiKey" = [ "opencode" ];
-            };
           };
         }
       ];

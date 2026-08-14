@@ -15,9 +15,6 @@ deepseek:
     apiKey:
         opencode: ENC[AES256_GCM,data:d5gQu34zmV1IJTOL3tBzvhynlE5NKt+JH+ZKedTXLguw1LU=,iv:myi4tFhEScZ8Ji7MvIMcjgWR1Ume/+jQaBbzOaSZR6I=,tag:AoTr6TqyUIziJsulLzmhkg==,type:str]
         pi: ENC[AES256_GCM,data:HVI/zBaG6mfpEd08uwd290LIDt7SHQuTZ5H2FLuB4aQwchY=,iv:h+LPijJoe5h9JbGXObtdz/TyQ2Lm89Zp+ycM0xGa5wE=,tag:SYSFkQG0PC4Wdw9d/E+eEw==,type:str]
-modelscope:
-    apiKey:
-        opencode: ENC[AES256_GCM,data:UyEP43HDaHrYVRYngDRGAF/D6oSvvRMFALIQxxLJUhdchsg2RHXS,iv:h023LPlOAp1oNMI49nFlFK9lNu/oHdUIG4Fs6WIfIeI=,tag:ClrYv4t5q96t+IifjNqIDg==,type:str]
 alibabacloud:
     oss:
         access_key_id: ENC[AES256_GCM,data:WZ9hze7CDeCbkpcPWgG4RKngjOTPGWbu,iv:4XFq5WQd9c98NUdtdEzmBPXzXmf4QjsRfdUXApgyBkQ=,tag:nQfl+BVVwtganOn3QkHeHQ==,type:str]
@@ -33,7 +30,7 @@ sops:
             a3eIK0PIBhWWHu3cMN9L1m93fJnfAjt9/98lLrANauMrFL3qeGVH1w==
             -----END AGE ENCRYPTED FILE-----
           recipient: age1kgwar87m34mfg5zhtywg42umlax77y28tvucu0wkdwrq870wdf9s782jqe
-    lastmodified: "2026-08-14T15:57:04Z"
-    mac: ENC[AES256_GCM,data:6bjwVcYg2q9v2vTyXgO3mp2vSCjcZJsIVikC7dKzgBnPmZ9eIfMmTNdrPZx5QKXOEj1wGK4Hv3Qkumo1J39PT86GK/B/f7HM6DXP5E+cbLoH8cGZ0OOd+cU+ZYgpEFmFPN8Ot16ZlR+ehPW1iiq9dmOylBPspwUhoUhQHWy6z7w=,iv:CzYBIy2nI2/y5HfdvCS4Eus8l4iLs0Cvj5AHjRj8InE=,tag:htgf2raEXnAWC0o8ZAFiUQ==,type:str]
+    lastmodified: "2026-08-14T16:15:34Z"
+    mac: ENC[AES256_GCM,data:fD2Ddr6zjag30za3Cdkd5ZQmrslSoys63iR7+Q5Lse59Wf5mcwLuOQfABdip3uwY+jza/gTptQrL4XpX42rEWYUYwsMZzyENXr1jBeeCl02FOw5pXmE1tNBfIM1pTCJgAEM36DiIRG8gpGY3W9jrHrdneQXC3LcnDV7JQ3tq5vc=,iv:fNheBgvbki6+UL0sPXMOlPVxwOJkYlMmWMCZ/vieiE0=,tag:3oBr7Qhyw6HoWieLVVJVig==,type:str]
     unencrypted_suffix: _unencrypted
     version: 3.13.3
