@@ -307,19 +307,6 @@ in {
           disableWhileTyping = true;
         };
       };
-      ollama = {
-        enable = false;
-        package = pkgs.ollama;
-        host = "127.0.0.1";
-        port = 11434;
-        loadModels = [
-          "qwen3-coder-next:cloud"
-          "qwen3.5:cloud"
-          "deepseek-v3.2:cloud"
-          "gemini-3-flash-preview:cloud"
-        ];
-        syncModels = true;
-      };
     };
 
     # This option defines the first version of NixOS you have installed on this particular machine,

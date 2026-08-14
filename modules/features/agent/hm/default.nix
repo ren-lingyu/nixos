@@ -6,28 +6,6 @@ in {
 
   config = lib.mkIf cfg.enable {
 
-    programs.aichat = {
-      enable = osConfig.services.ollama.enable;
-      package = pkgs.aichat;
-      settings = {
-        model = "ollama:deepseek-v3.2:cloud";
-        clients = [
-          {
-            type = "openai-compatible";
-            name = "ollama";
-            api_base = "http://${osConfig.services.ollama.host}:${builtins.toString osConfig.services.ollama.port}/v1";
-            models = [
-              {
-                name = "deepseek-v3.2:cloud";
-                supports_function_calling = false;
-                supports_vision = false;
-              }
-            ];
-          }
-        ];
-      };
-    };
-
     programs.opencode = {
 
       enable = true;
@@ -44,7 +22,6 @@ in {
 
         enabled_providers = builtins.concatLists [
           [ "deepseek" "modelscope" ]
-          (lib.optionals osConfig.services.ollama.enable [ "ollama" "ollama_cloud" ])
         ];
 
         provider = let
@@ -100,27 +77,6 @@ in {
             };
 
           }
-
-          (lib.optionalAttrs osConfig.services.ollama.enable {
-
-            ollama = {
-              name = "Ollama";
-              options = {
-                baseURL = "http://${osConfig.services.ollama.host}:${builtins.toString osConfig.services.ollama.port}/v1";
-              };
-              models = fromList osConfig.services.ollama.loadModels;
-            };
-
-            ollama_cloud = {
-              name = "Ollama (Cloud)";
-              options = {
-                baseURL = "https://ollama.com/v1";
-                apiKey = "{file:${config.sops.secrets."ollama.apiKey.opencode".path}}";
-              };
-              models = fromList (builtins.filter (x: builtins.match ".*:cloud$" x != null) osConfig.services.ollama.loadModels);
-            };
-
-          })
 
         ]);
 
