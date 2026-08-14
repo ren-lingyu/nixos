@@ -16,7 +16,7 @@
     inherit pkgs llib;
   };
 
-  secret-functions = import ./secret-functions {
+  sops-functions = import ./sops-functions {
     inherit pkgs llib;
   };
 

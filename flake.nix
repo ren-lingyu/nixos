@@ -144,11 +144,11 @@
               ];
             };
           };
-          secret = { config, pkgs, lib, ... } : {
+          sops = { config, pkgs, lib, ... } : {
             imports = [
               self.modules.base
               inputs.sops-nix.nixosModules.sops
-              ./modules/features/secret
+              ./modules/features/sops
             ];
             config = {
               home-manager.sharedModules = [
@@ -257,7 +257,7 @@
             self.modules.features.share
             self.modules.features.editor
             self.modules.features.niri
-            self.modules.features.secret
+            self.modules.features.sops
             self.modules.hosts.thinkbook
             self.modules.users.lingyu
             ({ config, pkgs, lib, ... } : {
@@ -310,7 +310,7 @@
                       clash-verge.enable = true;
                       throne.enable = true;
                     };
-                    secret.enable = true;
+                    sops.enable = true;
                     shell.enable = true;
                     terminal.enable = true;
                     texlive.enable = true;
@@ -330,7 +330,7 @@
           modules = [
             self.modules.features.share
             self.modules.features.editor
-            self.modules.features.secret
+            self.modules.features.sops
             self.modules.hosts.aliyun
             self.modules.users.lingyu-minimal
             ({ config, pkgs, lib, ... } : {
@@ -341,7 +341,7 @@
                   };
                   features = {
                     interconnect.enable = true;
-                    secret.enable = true;
+                    sops.enable = true;
                     shell.enable = true;
                   };
                   users = {
@@ -358,7 +358,7 @@
           modules = [
             self.modules.features.share
             self.modules.features.editor
-            self.modules.features.secret
+            self.modules.features.sops
             self.modules.hosts.wsl
             self.modules.users.lingyu
             ({ config, pkgs, lib, ... } : {
@@ -384,7 +384,7 @@
                     font.enable = true;
                     media.enable = false;
                     office.enable = false;
-                    secret.enable = true;
+                    sops.enable = true;
                     shell.enable = true;
                     terminal.enable = true;
                     texlive.enable = true;

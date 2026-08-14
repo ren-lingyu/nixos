@@ -1,6 +1,6 @@
 { config, lib, pkgs, ... } : let
 
-  cfg = config.modules.features.secret;
+  cfg = config.modules.features.sops;
 
   getUsernameByUid_ = uid_ : let
     enabledUsersByUid_ = builtins.listToAttrs (builtins.map (user_ : {
@@ -20,7 +20,7 @@ in {
   ];
 
   config = {
-    modules.features.secret = {
+    modules.features.sops = {
       existModule = {
         os = true;
         hm = true;

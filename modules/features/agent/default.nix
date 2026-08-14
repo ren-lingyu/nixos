@@ -13,8 +13,8 @@ in {
 
     assertions = [
       {
-        assertion = !cfg.enable || config.modules.features.secret.enable;
-        message = "`modules.features.agent.enable = true` requires `modules.features.secret.enable = true`.";
+        assertion = !cfg.enable || config.modules.features.sops.enable;
+        message = "`modules.features.agent.enable = true` requires `modules.features.sops.enable = true`.";
       }
     ];
 

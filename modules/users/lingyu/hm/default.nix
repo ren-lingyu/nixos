@@ -5,7 +5,7 @@
   ];
 
   config = {
-    moduleInterfaces.features.secret.sops = {
+    moduleInterfaces.features.sops = {
       defaultSopsFormat = "yaml";
       defaultSopsFile = ./sops/default.yaml;
       secretsInput = [

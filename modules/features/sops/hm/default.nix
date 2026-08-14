@@ -1,10 +1,10 @@
 { config, pkgs, lib, osConfig, llib, ... } : let
 
-  cfg = osConfig.modules.features.secret;
+  cfg = osConfig.modules.features.sops;
 
-  mif = config.moduleInterfaces.features.secret;
+  mif = config.moduleInterfaces.features.sops;
 
-  lmf = llib.moduleFunctions.features.secret { inherit config; inherit osConfig; };
+  lmf = llib.moduleFunctions.features.sops { inherit config; inherit osConfig; };
 
 in {
 
@@ -16,8 +16,8 @@ in {
 
     sops = {
 
-      defaultSopsFormat = mif.sops.defaultSopsFormat;
-      defaultSopsFile = mif.sops.defaultSopsFile;
+      defaultSopsFormat = mif.defaultSopsFormat;
+      defaultSopsFile = mif.defaultSopsFile;
       defaultSopsKey = null;
       keepGenerations = 1;
       validateSopsFiles = true;
@@ -35,7 +35,7 @@ in {
         sshKeyPaths = [];
       };
 
-      secrets = lmf.mkSopsSecrets mif.sops.secretsInput;
+      secrets = lmf.mkSopsSecrets mif.secretsInput;
 
     };
 

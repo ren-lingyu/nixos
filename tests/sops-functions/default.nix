@@ -5,7 +5,7 @@
     then true
     else throw "Test `${name_}` failed: values differ.";
 
-  secretFunctions_ = llib.moduleFunctions.features.secret {
+  sopsFunctions_ = llib.moduleFunctions.features.sops {
     config = {
       home.uid = 1000;
       sops = {
@@ -15,7 +15,7 @@
     };
   };
 
-  secrets_ = secretFunctions_.mkSopsSecrets [
+  secrets_ = sopsFunctions_.mkSopsSecrets [
     {
       template = "system";
       structure.database = [ "password" ];
@@ -34,7 +34,7 @@
       [ "list" "first" ]
       [ "list" "second" ]
       [ "nested" "leaf" ]
-    ] (secretFunctions_.fromStructure {
+    ] (sopsFunctions_.fromStructure {
       empty = [];
       ignored = "value";
       list = [ "first" "second" ];
@@ -54,6 +54,6 @@
     (assertEqual "user template path" "/run/user/1000/secrets/cloud.token" secrets_."cloud.token".path)
   ];
 
-in assert builtins.deepSeq tests_ true; pkgs.runCommand "nixos-secret-functions" {} ''
+in assert builtins.deepSeq tests_ true; pkgs.runCommand "nixos-sops-functions" {} ''
   touch $out
 ''

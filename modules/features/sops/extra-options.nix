@@ -6,7 +6,7 @@ feature_ : { config, pkgs, lib, llib, ... } : {
     } (lib.types.listOf lib.types.nonEmptyStr);
     default = [];
     internal = true;
-    description = "Login names resolved from `allowUidList` for internal use by the Secret feature.";
+    description = "Login names resolved from `allowUidList` for internal use by the SOPS feature.";
   };
 
 }

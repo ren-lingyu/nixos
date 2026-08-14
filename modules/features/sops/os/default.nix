@@ -1,6 +1,6 @@
 { config, pkgs, lib, ... } : let
 
-  cfg = config.modules.features.secret;
+  cfg = config.modules.features.sops;
 
   sopsGroup = "sops-decrypt";
 

@@ -22,7 +22,7 @@
 
       default = import ./moduleFunctions.features.default.nix { inherit lib; };
 
-      secret = import ./moduleFunctions.features.secret.nix;
+      sops = import ./moduleFunctions.features.sops.nix;
 
     };
 
