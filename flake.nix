@@ -39,6 +39,16 @@
       url = "git+https://github.com/nix-community/home-manager.git?ref=refs/heads/master&shallow=1";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+    agenix = {
+      url = "git+https://github.com/ryantm/agenix.git?ref=refs/heads/main&shallow=1";
+      inputs.nixpkgs.follows = "nixpkgs";
+      inputs.home-manager.follows = "home-manager";
+      inputs.darwin.follows = "";
+    };
+    agenix-rekey = {
+      url = "git+https://github.com/oddlama/agenix-rekey.git?ref=refs/heads/main&shallow=1";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
     sops-nix = {
       url = "git+https://github.com/Mic92/sops-nix.git?ref=refs/heads/master&shallow=1";
       inputs.nixpkgs.follows = "nixpkgs";
