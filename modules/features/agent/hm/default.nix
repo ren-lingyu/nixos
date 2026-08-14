@@ -2,6 +2,8 @@
 
   cfg = osConfig.modules.features.agent;
 
+  mif = config.moduleInterfaces.features.agent;
+
 in {
 
   config = lib.mkIf cfg.enable {
@@ -20,41 +22,40 @@ in {
         small_model = "deepseek/deepseek-v4-flash";
         autoupdate = false;
 
-        enabled_providers = builtins.concatLists [
-          [ "deepseek" ]
-        ];
+        enabled_providers = (builtins.attrNames
+          (lib.filterAttrs
+            (name_ : value_ : value_.enable == true)
+            mif.opencode.providers
+          )
+        );
 
-        provider = (lib.mergeAttrsList [
+        provider = {
 
-          {
-
-            deepseek = {
-              name = "DeepSeek";
-              options = {
-                baseURL = "https://api.deepseek.com";
-                apiKey = "{file:${config.sops.secrets."deepseek.apiKey.opencode".path}}";
-              };
-              models = {
-                deepseek-v4-pro = {
-                  name = "DeepSeek-V4-Pro";
-                  limit = {
-                    context = 1000000;
-                    output = 384000;
-                  };
+          deepseek = lib.mkIf mif.opencode.providers.deepseek.enable {
+            name = "DeepSeek";
+            options = {
+              baseURL = "https://api.deepseek.com";
+              apiKey = "{file:${mif.opencode.providers.deepseek.apiKey}}";
+            };
+            models = {
+              deepseek-v4-pro = {
+                name = "DeepSeek-V4-Pro";
+                limit = {
+                  context = 1000000;
+                  output = 384000;
                 };
-                deepseek-v4-flash = {
-                  name = "DeepSeek-V4-Flash";
-                  limit = {
-                    context = 1000000;
-                    output = 384000;
-                  };
+              };
+              deepseek-v4-flash = {
+                name = "DeepSeek-V4-Flash";
+                limit = {
+                  context = 1000000;
+                  output = 384000;
                 };
               };
             };
+          };
 
-          }
-
-        ]);
+        };
 
       };
 
@@ -116,10 +117,10 @@ in {
         cat_ = x_ : "!${lib.getExe' pkgs.coreutils "cat"} ${lib.escapeShellArg x_}";
       in {
         providers = {
-          deepseek = {
+          deepseek = lib.mkIf mif.pi.providers.deepseek.enable {
             api = "openai-completions";
             baseUrl = "https://api.deepseek.com";
-            apiKey = cat_ config.sops.secrets."deepseek.apiKey.pi".path;
+            apiKey = cat_ mif.pi.providers.deepseek.apiKey;
           };
         };
       };
