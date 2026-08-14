@@ -21,21 +21,10 @@ in {
         autoupdate = false;
 
         enabled_providers = builtins.concatLists [
-          [ "deepseek" "modelscope" ]
+          [ "deepseek" ]
         ];
 
-        provider = let
-
-          fromList = list : builtins.listToAttrs (
-            builtins.map (x : {
-              name = builtins.toString x;
-              value = {
-                name = builtins.toString x;
-              };
-            }) list
-          );
-
-        in (lib.mergeAttrsList [
+        provider = (lib.mergeAttrsList [
 
           {
 
@@ -61,19 +50,6 @@ in {
                   };
                 };
               };
-            };
-
-            modelscope = {
-              name = "ModelScope";
-              options = {
-                baseURL = "https://api-inference.modelscope.cn/v1";
-                apiKey = "{file:${config.sops.secrets."modelscope.apiKey.opencode".path}}";
-              };
-              models = fromList [
-                "Qwen/Qwen3.5-397B-A17B"
-                "ZhipuAI/GLM-4.7-Flash"
-                "ZhipuAI/GLM-5.1"
-              ];
             };
 
           }
