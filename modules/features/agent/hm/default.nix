@@ -15,11 +15,15 @@ in {
       enableMcpIntegration = false;
       extraPackages = [];
 
-      settings = {
+      settings = (lib.optionalAttrs
+        mif.opencode.providers.deepseek.enable
+        {
+          model = "deepseek/deepseek-v4-pro";
+          small_model = "deepseek/deepseek-v4-flash";
+        }
+      ) // {
 
         permission = "ask";
-        model = "deepseek/deepseek-v4-pro";
-        small_model = "deepseek/deepseek-v4-flash";
         autoupdate = false;
 
         enabled_providers = (builtins.attrNames

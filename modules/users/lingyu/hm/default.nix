@@ -1,4 +1,4 @@
-{ config, lib, pkgs, ... } : {
+{ config, lib, pkgs, osConfig, ... } : {
 
   imports = [
     ./home
@@ -33,7 +33,7 @@
             }
           ];
         };
-        agent = {
+        agent = lib.mkIf osConfig.modules.features.sops.enable {
           opencode = {
             providers = {
               deepseek = {
