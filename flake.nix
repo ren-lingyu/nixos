@@ -97,6 +97,10 @@
       "x86_64-linux"
     ];
 
+    imports = [
+      inputs.agenix-rekey.flakeModule
+    ];
+
     flake = {
 
       lib = import ./lib;
@@ -109,6 +113,8 @@
           _file = ./flake.nix;
           key = "${builtins.toString ./flake.nix}#self.modules.base";
           imports = [
+            inputs.agenix.nixosModules.default
+            inputs.agenix-rekey.nixosModules.default
             inputs.home-manager.nixosModules.home-manager
             ./modules
           ];
