@@ -13,6 +13,7 @@
 
 !modules/
 !modules/**/
+!modules/**/*.age
 !modules/**/*.css
 !modules/**/*.md
 !modules/**/*.nix
