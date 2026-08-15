@@ -4,17 +4,26 @@
 
 in {
 
-  config = lib.mkIf cfg.enable {
+  config = lib.mkIf cfg.enable (lib.mkMerge [
 
-    networking = lib.mkMerge [
+    {
 
-      {
+      networking.wireguard.enable = true;
 
-        wireguard.enable = true;
+    }
 
-      }
+    (lib.mkIf cfg.intranets.ingress.hub.claimed {
 
-      (lib.mkIf cfg.intranets.ingress.hub.claimed {
+      age.secrets = {
+        interconnect-wireguard-ingress-hub = {
+          rekeyFile = ./ingress.hub.age;
+          owner = "root";
+          group = "root";
+          mode = "0400";
+        };
+      };
+
+      networking = {
 
         firewall = {
           allowedUDPPorts = [
@@ -30,8 +39,8 @@ in {
                 "10.100.0.1/24"
               ];
               listenPort = 51820;
-              privateKeyFile = "/var/lib/wireguard/wg0-private-key";
-              generatePrivateKeyFile = true;
+              privateKeyFile = config.age.secrets.interconnect-wireguard-ingress-hub.path;
+              generatePrivateKeyFile = false;
               peers = [
                 {
                   publicKey = "XASMyK2E6Jluj1jjsWc4eNXOA5OwjW3E5HlCCocK/BE=";
@@ -44,9 +53,22 @@ in {
           };
         };
 
-      })
+      };
 
-      (lib.mkIf cfg.intranets.ingress.spoke.claimed {
+    })
+
+    (lib.mkIf cfg.intranets.ingress.spoke.claimed {
+
+      age.secrets = {
+        interconnect-wireguard-ingress-spoke = {
+          rekeyFile = ./ingress.spoke.age;
+          owner = "root";
+          group = "root";
+          mode = "0400";
+        };
+      };
+
+      networking = {
 
         wireguard = {
           interfaces = {
@@ -55,8 +77,8 @@ in {
               ips = [
                 "10.100.0.2/24"
               ];
-              privateKeyFile = "/var/lib/wireguard/wg0-private-key";
-              generatePrivateKeyFile = true;
+              privateKeyFile = config.age.secrets.interconnect-wireguard-ingress-spoke.path;
+              generatePrivateKeyFile = false;
               peers = [
                 {
                   publicKey = "NR1Zb8NAO2TpywtE9uZsftU8EWytnUWwOlVMDppZuww=";
@@ -71,10 +93,10 @@ in {
           };
         };
 
-      })
+      };
 
-    ];
+    })
 
-  };
+  ]);
 
 }
