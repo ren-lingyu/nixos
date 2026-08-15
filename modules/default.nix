@@ -76,9 +76,14 @@
       };
     };
 
-    systemd.services."user@".after = [
-      "agenix-install-secrets.service"
-    ];
+    systemd.services = {
+      "user@" = {
+        after = [
+          "agenix-install-secrets.service"
+        ];
+        overrideStrategy = "asDropin";
+      };
+    };
 
     home-manager = {
 
