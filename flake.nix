@@ -426,6 +426,10 @@
         inherit pkgs llib;
       };
 
+      packages = import ./pkgs {
+        inherit pkgs lib;
+      };
+
       apps = {
         nixos-anywhere = {
           type = "app";
@@ -433,6 +437,16 @@
           meta.description = "Run nixos-anywhere from this flake";
         };
       };
+
+      devShells = {
+        agenix = pkgs.mkShell {
+          nativeBuildInputs = [
+            config.agenix-rekey.package
+          ];
+        };
+      };
+
+      agenix-rekey.agePackage = config.packages.rage-armored;
 
     };
 
