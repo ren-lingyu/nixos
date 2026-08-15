@@ -11,6 +11,12 @@
 !lib/**/
 !lib/**/*.nix
 
+!pkgs/
+!pkgs/**/
+!pkgs/**/*.nix
+!pkgs/**/*.scm
+!pkgs/**/*.sh
+
 !modules/
 !modules/**/
 !modules/**/*.age
