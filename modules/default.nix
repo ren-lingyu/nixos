@@ -76,6 +76,10 @@
       };
     };
 
+    systemd.services."user@".after = [
+      "agenix-install-secrets.service"
+    ];
+
     home-manager = {
 
       useGlobalPkgs = true;
