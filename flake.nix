@@ -416,14 +416,14 @@
 
     };
 
-    perSystem = { inputs', pkgs, ... } : let
+    perSystem = { inputs', config, pkgs, lib, ... } : let
 
-      llib = self.lib { lib = pkgs.lib; };
+      llib = self.lib { inherit lib; };
 
     in {
 
       checks = import ./tests {
-        inherit llib pkgs;
+        inherit pkgs llib;
       };
 
       apps = {
