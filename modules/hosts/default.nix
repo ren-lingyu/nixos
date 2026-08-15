@@ -187,8 +187,8 @@ in {
     in (builtins.concatLists [
       [
         {
-          assertion = (builtins.length enabledHostNames_) <= 1;
-          message = "At most one host in `modules.hosts` may set `enable = true`. Enabled hosts: ${builtins.concatStringsSep ", " enabledHostNames_}.";
+          assertion = (builtins.length enabledHostNames_) == 1;
+          message = "Exactly one host in `modules.hosts` must set `enable = true`. Enabled hosts: ${builtins.concatStringsSep ", " enabledHostNames_}.";
         }
       ]
       (builtins.concatLists (lib.mapAttrsToList (hostName_ : host_ : llib.assertions.existModule {
