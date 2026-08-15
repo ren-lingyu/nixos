@@ -81,10 +81,49 @@
     (throw "Expected assertion `${message_}` was not generated.")
     assertions_;
 
+  hostExistModule_ = {
+    os = true;
+    hm = false;
+  };
+
+  noEnabledHostAssertion_ = assertionByMessage_
+    "Exactly one host in `modules.hosts` must set `enable = true`. Enabled hosts: ."
+    (evalHostUserAssertions_ {});
+
+  oneEnabledHostAssertion_ = assertionByMessage_
+    "Exactly one host in `modules.hosts` must set `enable = true`. Enabled hosts: thinkbook."
+    (evalHostUserAssertions_ {
+      modules.hosts.thinkbook = {
+        enable = true;
+        existModule = hostExistModule_;
+      };
+    });
+
+  multipleEnabledHostAssertion_ = assertionByMessage_
+    "Exactly one host in `modules.hosts` must set `enable = true`. Enabled hosts: aliyun, thinkbook."
+    (evalHostUserAssertions_ {
+      modules.hosts = {
+        aliyun = {
+          enable = true;
+          existModule = hostExistModule_;
+        };
+        thinkbook = {
+          enable = true;
+          existModule = hostExistModule_;
+        };
+      };
+    });
+
   missingUidAssertion_ = assertionByMessage_
     "`modules.users.lingyu.enable = true` requires `modules.users.lingyu.uid` to be assigned by the final flake composition."
     (evalHostUserAssertions_ {
-      modules.users.lingyu.enable = true;
+      modules = {
+        hosts.thinkbook = {
+          enable = true;
+          existModule = hostExistModule_;
+        };
+        users.lingyu.enable = true;
+      };
     });
 
   unregisteredUidAssertion_ = assertionByMessage_
@@ -93,6 +132,7 @@
       modules = {
         hosts.thinkbook = {
           enable = true;
+          existModule = hostExistModule_;
           users = lib.mkForce {};
         };
         users.lingyu = {
@@ -121,7 +161,10 @@
       };
     });
 
-in assert !missingUidAssertion_.assertion;
+in assert !noEnabledHostAssertion_.assertion;
+   assert oneEnabledHostAssertion_.assertion;
+   assert !multipleEnabledHostAssertion_.assertion;
+   assert !missingUidAssertion_.assertion;
    assert !unregisteredUidAssertion_.assertion;
    assert !unknownFeatureUidAssertion_.assertion;
 pkgs.runCommand "nixos-module-composition" {} ''
