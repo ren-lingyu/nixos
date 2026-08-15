@@ -1,6 +1,7 @@
-{ options, config, pkgs, lib, ... } : let
+{ options, config, pkgs, lib, llib, ... } : let
 
   cfg = config.modules.features.greeter;
+  enabledHost_ = llib.moduleFunctions.hosts.default.getUniqueEnabledHost config.modules.hosts;
 
 in {
 
@@ -18,13 +19,11 @@ in {
       };
 
       monitor = let
-        enabledHosts_ = builtins.attrValues (lib.filterAttrs (unused_name_ : host_ : (
-          host_.enable
-        )) config.modules.hosts);
-        activeMonitors_ =
-          if (builtins.length enabledHosts_) == 1
-          then (builtins.head enabledHosts_).monitors
-          else {};
+        activeMonitors_ = (
+          if (enabledHost_ != {})
+          then enabledHost_.monitors
+          else {}
+        );
         defaultMonitors_ = builtins.attrValues (lib.filterAttrs (unused_name_ : monitor_ : (
           monitor_.role == "default"
         )) activeMonitors_);
@@ -53,21 +52,14 @@ in {
 
     assertions = [
       {
-        assertion = let
-          enabledHosts_ = builtins.attrValues (lib.filterAttrs (unused_name_ : host_ : (
-            host_.enable
-          )) config.modules.hosts);
-        in (!cfg.enable || (builtins.length enabledHosts_) == 1);
+        assertion = (!cfg.enable || enabledHost_ != {});
         message = "`modules.features.greeter.enable = true` requires exactly one host in `modules.hosts` to set `enable = true`.";
       }
       {
         assertion = let
-          enabledHosts_ = builtins.attrValues (lib.filterAttrs (unused_name_ : host_ : (
-            host_.enable
-          )) config.modules.hosts);
           activeMonitors_ = (
-            if (builtins.length enabledHosts_) == 1
-            then (builtins.head enabledHosts_).monitors
+            if (enabledHost_ != {})
+            then enabledHost_.monitors
             else {}
           );
           defaultMonitors_ = builtins.attrValues (lib.filterAttrs (unused_name_ : monitor_ : (

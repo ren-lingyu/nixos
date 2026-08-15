@@ -1,6 +1,7 @@
-{ config, pkgs, lib, ... } : let
+{ config, pkgs, lib, llib, ... } : let
 
   cfg = config.modules.features.niri;
+  enabledHost_ = llib.moduleFunctions.hosts.default.getUniqueEnabledHost config.modules.hosts;
 
   noctaliaEnable = (
     config.networking.networkmanager.enable
@@ -29,13 +30,9 @@ in {
         hm = true;
       };
 
-      monitors = let
-        enabledHosts_ = builtins.attrValues (lib.filterAttrs (unused_name_ : host_ : (
-          host_.enable
-        )) config.modules.hosts);
-      in (
-        if (builtins.length enabledHosts_) == 1
-        then (builtins.head enabledHosts_).monitors
+      monitors = (
+        if (enabledHost_ != {})
+        then enabledHost_.monitors
         else {}
       );
 
@@ -57,11 +54,7 @@ in {
 
     assertions = [
       {
-        assertion = let
-          enabledHosts_ = builtins.attrValues (lib.filterAttrs (unused_name_ : host_ : (
-            host_.enable
-          )) config.modules.hosts);
-        in (!cfg.enable || (builtins.length enabledHosts_) == 1);
+        assertion = (!cfg.enable || enabledHost_ != {});
         message = "`modules.features.niri.enable = true` requires exactly one host in `modules.hosts` to set `enable = true`.";
       }
       {

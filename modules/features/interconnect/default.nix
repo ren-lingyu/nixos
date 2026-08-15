@@ -1,12 +1,9 @@
-{ config, pkgs, lib, ... } : let
+{ config, pkgs, lib, llib, ... } : let
 
   cfg = config.modules.features.interconnect;
 
   hosts_ = config.modules.hosts;
-
-  enabledHostNames_ = builtins.attrNames (lib.filterAttrs (unused_name_ : host_ : (
-    host_.enable
-  )) hosts_);
+  enabledHost_ = llib.moduleFunctions.hosts.default.getUniqueEnabledHost hosts_;
 
   claimantNamesOf_ = netName_ : nodeName_ : builtins.attrNames (lib.filterAttrs (unused_name_ : host_ : (
     builtins.elem nodeName_ (lib.attrByPath [ "intranetClaims" netName_ ] [] host_)
@@ -18,12 +15,14 @@
 
   in {
 
-    claimed = (builtins.length enabledHostNames_) == 1
+    claimed = (
+      (enabledHost_ != {})
       && builtins.elem nodeName_ (lib.attrByPath
         [ "intranetClaims" netName_ ]
         []
-        hosts_.${builtins.head enabledHostNames_}
-      );
+        enabledHost_
+      )
+    );
 
   } // (lib.optionalAttrs
     ((builtins.length claimantNames_) == 1)
@@ -76,7 +75,7 @@ in {
 
       [
         {
-          assertion = !cfg.enable || (builtins.length enabledHostNames_) == 1;
+          assertion = (!cfg.enable || enabledHost_ != {});
           message = "`modules.features.interconnect.enable = true` requires exactly one host in `modules.hosts` to set `enable = true`.";
         }
       ]
