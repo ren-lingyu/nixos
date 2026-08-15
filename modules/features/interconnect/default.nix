@@ -16,8 +16,7 @@
   in {
 
     claimed = (
-      (enabledHost_ != {})
-      && builtins.elem nodeName_ (lib.attrByPath
+      builtins.elem nodeName_ (lib.attrByPath
         [ "intranetClaims" netName_ ]
         []
         enabledHost_
@@ -72,14 +71,6 @@ in {
     };
 
     assertions = builtins.concatLists [
-
-      [
-        {
-          assertion = (!cfg.enable || enabledHost_ != {});
-          message = "`modules.features.interconnect.enable = true` requires exactly one host in `modules.hosts` to set `enable = true`.";
-        }
-      ]
-
       (builtins.concatLists
         (lib.mapAttrsToList
           (hostName_ : host_ : (builtins.concatLists

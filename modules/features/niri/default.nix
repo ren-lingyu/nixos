@@ -30,11 +30,7 @@ in {
         hm = true;
       };
 
-      monitors = (
-        if (enabledHost_ != {})
-        then enabledHost_.monitors
-        else {}
-      );
+      monitors = enabledHost_.monitors;
 
       session-wrapper = lib.mkIf cfg.enable (let
         commandName_ = "Niri";
@@ -54,14 +50,12 @@ in {
 
     assertions = [
       {
-        assertion = (!cfg.enable || enabledHost_ != {});
-        message = "`modules.features.niri.enable = true` requires exactly one host in `modules.hosts` to set `enable = true`.";
-      }
-      {
         assertion = let
-          defaultMonitors_ = builtins.attrValues (lib.filterAttrs (unused_name_ : monitor_ : (
-            monitor_.role == "default"
-          )) cfg.monitors);
+          defaultMonitors_ = (
+            builtins.attrValues (lib.filterAttrs (unused_name_ : monitor_ : (
+              monitor_.role == "default"
+            )) cfg.monitors)
+          );
         in (!cfg.enable || (builtins.length defaultMonitors_) == 1);
         message = "`modules.features.niri.enable = true` requires exactly one monitor in the enabled host's `monitors` to set `role = \"default\"`.";
       }
