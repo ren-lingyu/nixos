@@ -26,6 +26,12 @@ in {
         hm = true;
       };
       allowUsernameList = lib.optionals cfg.enable (builtins.map getUsernameByUid_ cfg.allowUidList);
+      ageKeys = {
+        hm = rec {
+          name = "sops.hm";
+          path = config.age.secrets.${name}.path;
+        };
+      };
     };
   };
 

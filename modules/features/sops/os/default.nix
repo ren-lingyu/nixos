@@ -20,40 +20,13 @@ in {
       ssh-to-pgp
     ];
 
-    sops = {
-
-      defaultSopsFormat = "yaml";
-      defaultSopsFile = ./sops/default.yaml;
-      defaultSopsKey = null;
-      keepGenerations = 1;
-      validateSopsFiles = true;
-      environment = {};
-
-      log = [
-        "keyImport"
-        "secretChanges"
-      ];
-
-      age = {
-        generateKey = false;
-        keyFile = null;
-        plugins = [];
-        sshKeyPaths = lib.optionals config.services.openssh.enable (
-          builtins.map (hostKeys : hostKeys.path) (
-            lib.filter (hostKeys : hostKeys.type == "ed25519") config.services.openssh.hostKeys
-          )
-        );
-      };
-
-      secrets."age.keyFile" = {
-        key = "age/keyFile";
-        path = "/run/secrets/age.keyFile";
+    age.secrets = {
+      ${cfg.ageKeys.hm.name} = {
+        rekeyFile = ./sops.hm.age;
         owner = "root";
         group = sopsGroup;
         mode = "0440";
-        neededForUsers = false;
       };
-
     };
 
   };

@@ -11,7 +11,7 @@ in {
   config = lib.mkIf cfg.enable {
 
     home.sessionVariables = {
-      SOPS_AGE_KEY_FILE = osConfig.sops.secrets."age.keyFile".path;
+      SOPS_AGE_KEY_FILE = cfg.ageKeys.hm.path;
     };
 
     sops = {
@@ -30,7 +30,7 @@ in {
 
       age = {
         generateKey = false;
-        keyFile = osConfig.sops.secrets."age.keyFile".path;
+        keyFile = cfg.ageKeys.hm.path;
         plugins = [];
         sshKeyPaths = [];
       };
