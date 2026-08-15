@@ -27,9 +27,18 @@ host_ : { config, pkgs, lib, llib, ... } : {
     ingress = [ "spoke" ];
   };
 
-  publicHostKey = {
-    ssh = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIOyNxiBW0UgXKhVHB1yo7iFjiVowkIpqNidWKbmual27";
-    age = "age1ftcurndrgcxtcqd7p4r0z5mwavrt9ux9slvd3zlxqgzn4vs54vqqg0xk3m";
+  identityKeys = {
+    ssh = {
+      public = {
+        key = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIOyNxiBW0UgXKhVHB1yo7iFjiVowkIpqNidWKbmual27";
+        ageRecipient = "age1ftcurndrgcxtcqd7p4r0z5mwavrt9ux9slvd3zlxqgzn4vs54vqqg0xk3m";
+        path = "/etc/ssh/ssh_host_ed25519_key.pub";
+      };
+      private = {
+        key = null;
+        path = "/etc/ssh/ssh_host_ed25519_key";
+      };
+    };
   };
 
 }

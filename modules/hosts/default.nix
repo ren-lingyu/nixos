@@ -67,26 +67,74 @@ in {
           example = "203.0.113.10";
           description = "Public IP address assigned to this host.";
         };
-        publicHostKey = lib.mkOption {
+        identityKeys = lib.mkOption {
           type = lib.types.unique {
-            message = "`modules.hosts.${host_}.publicHostKey` can only be defined once.";
+            message = "`modules.hosts.${host_}.identityKeys` can only be defined once.";
           } (lib.types.submodule {
             options = builtins.listToAttrs (builtins.map (keyFormat_ : {
               name = keyFormat_;
               value = lib.mkOption {
-                type = lib.types.nullOr lib.types.nonEmptyStr;
-                default = null;
-                description = "Public ${keyFormat_} key used to identify this host.";
+                type = lib.types.submodule {
+                  options = {
+                    public = lib.mkOption {
+                      type = lib.types.submodule {
+                        options = {
+                          key = lib.mkOption {
+                            type = lib.types.nullOr lib.types.nonEmptyStr;
+                            default = null;
+                            description = "Public ${keyFormat_} key material for this host.";
+                          };
+                          ageRecipient = lib.mkOption {
+                            type = lib.types.nullOr lib.types.nonEmptyStr;
+                            default = null;
+                            description = "Age recipient derived from the public ${keyFormat_} key for this host.";
+                          };
+                          path = lib.mkOption {
+                            type = lib.types.nullOr lib.types.nonEmptyStr;
+                            default = null;
+                            description = "Runtime path of the public ${keyFormat_} key on this host.";
+                          };
+                        };
+                      };
+                      default = {};
+                      description = "Public ${keyFormat_} identity key metadata for this host.";
+                    };
+                    private = lib.mkOption {
+                      type = lib.types.submodule {
+                        options = {
+                          key = lib.mkOption {
+                            type = lib.types.nullOr (lib.types.either lib.types.path lib.types.nonEmptyStr);
+                            default = null;
+                            description = "Private ${keyFormat_} key material for this host. Path values point to a repository file containing the key material; string values contain the key material inline. Stored private key material should be encrypted.";
+                          };
+                          path = lib.mkOption {
+                            type = lib.types.nullOr lib.types.nonEmptyStr;
+                            default = null;
+                            description = "Runtime path of the private ${keyFormat_} key on this host.";
+                          };
+                        };
+                      };
+                      default = {};
+                      description = "Private ${keyFormat_} identity key metadata for this host.";
+                    };
+                  };
+                };
               };
             }) [ "age" "ssh" ]);
           });
           internal = true;
           default = {};
           example = {
-            age = "age1...";
-            ssh = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAA...";
+            ssh = {
+              public = {
+                key = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAA...";
+                ageRecipient = "age1...";
+                path = "/etc/ssh/ssh_host_ed25519_key.pub";
+              };
+              private.path = "/etc/ssh/ssh_host_ed25519_key";
+            };
           };
-          description = "Public identity keys for this host, grouped by key format.";
+          description = "Identity keys for this host, grouped by key format.";
         };
         existModule = lib.mkOption {
           type = llib.types.existModule {
