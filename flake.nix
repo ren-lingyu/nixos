@@ -420,14 +420,11 @@
 
       llib = self.lib { lib = pkgs.lib; };
 
-      checks = import ./tests {
-        inherit llib;
-        inherit pkgs;
-      };
-
     in {
 
-      inherit checks;
+      checks = import ./tests {
+        inherit llib pkgs;
+      };
 
       apps = {
         nixos-anywhere = {
