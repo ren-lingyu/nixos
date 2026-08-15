@@ -65,13 +65,14 @@
         enabledHost_.identityKeys.ssh.private.path
       ];
       rekey = {
+        storageMode = "derivation";
         masterIdentities = [
           {
             identity = "/var/lib/master-key";
             pubkey = "age1zds7ax4umgu9wjwn7yvp4gndv6fl7h2f8ycwa0edx2pgcdqq53ds9jlxt9";
           }
         ];
-        hostPubkey = enabledHost_.identityKeys.ssh.public.ageRecipient;
+        hostPubkey = enabledHost_.identityKeys.ssh.public.key;
       };
     };
 
