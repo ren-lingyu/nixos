@@ -37,7 +37,7 @@ modules.users.lingyu.uid = config.modules.hosts.thinkbook.users."1000";
 =modules.features.<name>.allowUidList= 指定应向哪些 Home Manager 用户导入该 feature 的 =hm/default.nix=. 当 feature 存在 HM 模块时, 它默认包含所有已启用且已绑定 UID 的 user; 否则默认为空. 列表不能包含重复 UID, 也不能引用未分配给启用 user 的 UID.
 
 ** =moduleInterfaces=
-=moduleInterfaces= 是 Home Manager 模块之间的内部通信命名空间. =modules/default.nix= 自动发现 =modules/<kind>/<name>/hm/interface-options.nix=, 并将定义注册到每个 Home Manager 用户自己的 option 合并范围中. user profile 可以通过 =moduleInterfaces.<kind>.<name>.*= 向 feature 提供 per-user 内部数据; 当前 secret feature 用它接收 SOPS 输入.
+=moduleInterfaces= 是 Home Manager 模块之间的内部通信命名空间. =modules/default.nix= 自动发现 =modules/<kind>/<name>/hm/interface-options.nix=, 并将定义注册到每个 Home Manager 用户自己的 option 合并范围中. user profile 可以通过 =moduleInterfaces.<kind>.<name>.*= 向 feature 提供 per-user 内部数据; 当前 sops feature 用它接收 per-user SOPS 输入, agent feature 用它接收 provider API key 文件路径.
 
 ** 导入时机
 NixOS =imports= 无法根据 =config= 动态决定. host 和 feature 根入口由 =self.modules.*= wrapper 在 =flake.nix= 中静态导入; user 根入口由 =modules/users/default.nix= 统一静态导入. wrapper 同时引入所需 flake inputs, 避免外部依赖和 =inputs.<name>= 命名散落到 profile 实现中.
@@ -55,10 +55,36 @@ Home Manager 模块可以通过 =home-manager.users.<uid>.imports= 合并, 因�
 ├── flake.nix
 ├── lib/
 ├── modules/
+├── pkgs/
 └── tests/
 #+end_example
 
-仓库根目录放置 flake 入口, lock 文件, README 和模块目录. =flake.nix= 使用 =flake-parts= 组织输出, 定义 =nixosConfigurations= 和 =nixos-anywhere= flake app. =nixpkgs= 使用 =nixos-unstable=, 并启用 =nix-command= 与 =flakes=.
+仓库根目录放置 flake 入口, lock 文件, README, 本地 package 集合和模块目录. =flake.nix= 使用 =flake-parts= 组织输出, 定义 =nixosConfigurations=, =packages=, =checks= 和 =devShells=. =nixpkgs= 使用 =nixos-unstable=, 并启用 =nix-command= 与 =flakes=.
+
+根 flake inputs 按使用位置集中传递:
+- =nixpkgs=: 提供最终系统与 =perSystem= 的 package set, 也是多个 inputs 的 =follows= 目标.
+- =self-nixpkgs=: 作为 overlay 和 Home Manager shared module 注入基础模块.
+- =emarccs=: 作为 overlay 注入基础模块.
+- =flake-parts=: 组装 flake outputs.
+- =home-manager=: 作为 NixOS module 导入基础模块, 并作为 =agenix= 的 =home-manager= follows 目标.
+- =agenix= 和 =agenix-rekey=: 提供 age secret 与 rekey module; =agenix-rekey.agePackage= 使用本仓库的 =rage-armored=.
+- =sops-nix=: 注入 sops feature 所需的 NixOS 与 Home Manager modules.
+- =nixvim= 和 =lem=: 注入 editor feature 所需的 Home Manager module 与 overlay.
+- =niri-flake= 和 =noctalia=: 注入 niri feature 所需的 overlay 和 Home Manager modules.
+- =nix-flatpak=: 注入 thinkbook host 的 Flatpak module.
+- =nixos-wsl=: 注入 wsl host 的 NixOS-WSL module.
+- =nixos-anywhere= 和 =disko=: 提供部署 devShell 与 aliyun host 的 disko module; =disko= 通过 =follows= 复用 =nixos-anywhere/disko=.
+
+*** [[file:./pkgs/][/pkgs]]
+#+begin_example
+/pkgs/
+├── default.nix
+└── rage-armored/
+    ├── default.nix
+    └── wrapper.scm
+#+end_example
+
+[[file:./pkgs/default.nix][pkgs/default.nix]] 汇总仓库本地 package. =rage-armored= 基于 =pkgs.rage= 安装 wrapper, 将原始二进制保留为 =rage-unwrapped=, 并在常规加密调用中默认注入 =--armor=. =flake.nix= 将它暴露到 =packages=, 并作为 =agenix-rekey.agePackage= 使用.
 
 *** [[file:./modules/][/modules]]
 #+begin_example
@@ -81,12 +107,14 @@ Home Manager 模块可以通过 =home-manager.users.<uid>.imports= 合并, 因�
 ├── file-manager/
 ├── font/
 ├── greeter/
+├── interconnect/
 ├── media/
 ├── niri/
 ├── office/
 ├── proxy/
-├── secret/
 ├── shell/
+├── sops/
+├── terminal/
 ├── texlive/
 └── x11-session/
 #+end_example
@@ -103,13 +131,14 @@ Home Manager 模块可以通过 =home-manager.users.<uid>.imports= 合并, 因�
 ├── default.nix
 └── hm/
     ├── default.nix
+    ├── interface-options.nix
     ├── context.md
     └── skills/
         └── git-maintenance/
             └── SKILL.md
 #+end_example
 
-声明 agent feature 的 HM 模块入口, 并要求启用 agent 时同时启用 secret feature. =hm/default.nix= 配置用户级 AI/agent 工具, 包括 =aichat=, =opencode=, =pi-coding-agent= 及其 context, skills 和密钥引用.
+声明 agent feature 的 HM 模块入口. =hm/default.nix= 配置用户级 AI/agent 工具, 包括 =opencode=, =pi-coding-agent=, =codex= 和 =github-copilot-cli= 及其 context, skills 和 provider API key 文件引用.
 
 ***** [[file:./modules/features/diagnostics/][/modules/features/diagnostics]]
 #+begin_example
@@ -136,11 +165,14 @@ Home Manager 模块可以通过 =home-manager.users.<uid>.imports= 合并, 因�
 #+begin_example
 /modules/features/file-manager/
 ├── default.nix
-└── hm/
+├── extra-options.nix
+├── hm/
+│   └── default.nix
+└── os/
     └── default.nix
 #+end_example
 
-声明 file-manager feature 的 HM 模块入口. feature 启用时始终提供 Yazi; 当 Niri feature 同时启用时额外提供 Wayfile 并将它注册为默认目录处理器, 其他环境则使用 Yazi.
+声明 file-manager feature 的 OS 与 HM 模块入口. feature 启用时始终提供 Yazi; 当 Niri feature 同时启用时额外提供 Wayfile 并将它注册为默认目录处理器, 其他环境则使用 Yazi. =os/default.nix= 在启用 file chooser 时向系统 link 应用入口和 XDG portal 目录.
 
 ***** [[file:./modules/features/font/][/modules/features/font]]
 #+begin_example
@@ -152,7 +184,7 @@ Home Manager 模块可以通过 =home-manager.users.<uid>.imports= 合并, 因�
     └── default.nix
 #+end_example
 
-声明 font feature 同时包含 OS 与 HM 模块. =hm/default.nix= 预留用户级字体配置入口; =os/default.nix= 配置系统字体包, fontconfig 默认字体族和本地字体目录.
+声明 font feature 同时包含 OS 与 HM 模块. =hm/default.nix= 启用用户级 fontconfig 并继承系统默认字体族; =os/default.nix= 配置系统字体包, fontconfig 默认字体族和本地字体目录.
 
 ***** [[file:./modules/features/greeter/][/modules/features/greeter]]
 #+begin_example
@@ -164,6 +196,19 @@ Home Manager 模块可以通过 =home-manager.users.<uid>.imports= 合并, 因�
 #+end_example
 
 声明 greeter feature 的 OS 模块入口, 根据启用的 host 推导默认显示器, 并收集可用 session wrapper. =os/default.nix= 配置系统级 greeter 相关服务和 session 列表.
+
+***** [[file:./modules/features/interconnect/][/modules/features/interconnect]]
+#+begin_example
+/modules/features/interconnect/
+├── default.nix
+├── extra-options.nix
+└── os/
+    ├── default.nix
+    ├── ingress.hub.age
+    └── ingress.spoke.age
+#+end_example
+
+声明 interconnect feature 的 OS 模块入口. =default.nix= 根据 host 的 =intranetClaims= 推导 ingress hub/spoke 节点并检查声明数量; =os/default.nix= 配置 WireGuard, hub 侧 UDP 端口和节点私钥.
 
 ***** [[file:./modules/features/media/][/modules/features/media]]
 #+begin_example
@@ -226,27 +271,11 @@ Home Manager 模块可以通过 =home-manager.users.<uid>.imports= 合并, 因�
 
 声明 proxy feature 的 OS 模块入口和 clash-verge, throne, mihomo, v2raya 等子选项约束. =os/default.nix= 配置系统级代理组件的 package 与运行模式.
 
-***** [[file:./modules/features/secret/][/modules/features/secret]]
-#+begin_example
-/modules/features/secret/
-├── default.nix
-├── extra-options.nix
-├── hm/
-│   ├── default.nix
-│   └── interface-options.nix
-└── os/
-    ├── default.nix
-    └── sops/
-        ├── .sops.yaml
-        └── default.yaml
-#+end_example
-
-声明 secret feature 的 OS 与 HM 模块入口. =secret= 通过 =sops-nix= 管理密钥; 用户级 age key 文件作为系统级 secret 由 host key 保护. =hm/interface-options.nix= 定义 per-user SOPS 输入; secret 生成函数位于仓库公共 =lib/= 中.
-
 ***** [[file:./modules/features/shell/][/modules/features/shell]]
 #+begin_example
 /modules/features/shell/
 ├── default.nix
+├── extra-options.nix
 ├── hm/
 │   └── default.nix
 └── os/
@@ -254,6 +283,31 @@ Home Manager 模块可以通过 =home-manager.users.<uid>.imports= 合并, 因�
 #+end_example
 
 声明 shell feature 的 OS 与 HM 模块入口. =hm/default.nix= 配置 zsh, starship 和 shell 行为; =os/default.nix= 配置系统级 shell 支持.
+
+***** [[file:./modules/features/sops/][/modules/features/sops]]
+#+begin_example
+/modules/features/sops/
+├── default.nix
+├── extra-options.nix
+├── hm/
+│   ├── default.nix
+│   └── interface-options.nix
+└── os/
+    ├── default.nix
+    └── sops.hm.age
+#+end_example
+
+声明 sops feature 的 OS 与 HM 模块入口. =default.nix= 根据 =allowUidList= 推导允许读取密钥的用户名列表, 并提供 HM age key 文件路径; =os/default.nix= 创建 =sops-decrypt= group, 安装 SOPS 相关工具, 并通过 =age.secrets= 暴露 HM 使用的 age key file. =hm/interface-options.nix= 定义 per-user SOPS 输入.
+
+***** [[file:./modules/features/terminal/][/modules/features/terminal]]
+#+begin_example
+/modules/features/terminal/
+├── default.nix
+└── hm/
+    └── default.nix
+#+end_example
+
+声明 terminal feature 的 HM 模块入口. =hm/default.nix= 配置用户级 terminal 程序, 当前启用 Kitty 并通过 =xdg-terminal-exec= 将其设为默认 terminal.
 
 ***** [[file:./modules/features/texlive/][/modules/features/texlive]]
 #+begin_example
@@ -276,7 +330,7 @@ Home Manager 模块可以通过 =home-manager.users.<uid>.imports= 合并, 因�
     └── default.nix
 #+end_example
 
-声明 x11-session feature 的 OS 与 HM 模块入口, 并生成 IceWM/X11 session wrapper. =hm/default.nix= 预留用户级 X11 session 配置入口; =os/default.nix= 配置系统级 X11 session 支持.
+声明 x11-session feature 的 OS 与 HM 模块入口, 并生成 IceWM/X11 session wrapper. =hm/default.nix= 配置用户级 Rofi; =os/default.nix= 配置系统级 X11 session 支持.
 
 **** [[file:./modules/hosts/][/modules/hosts]]
 #+begin_example
@@ -287,12 +341,16 @@ Home Manager 模块可以通过 =home-manager.users.<uid>.imports= 合并, 因�
 └── wsl/
 #+end_example
 
-[[file:./modules/hosts/default.nix][modules/hosts/default.nix]] 按目录名自动定义 host profile options, 统一提供 UID registry、monitor 和 =existModule= 接口, 并确保最多只启用一个 host.
+[[file:./modules/hosts/default.nix][modules/hosts/default.nix]] 按目录名自动定义 host profile options, 统一提供 UID registry、monitor 和 =existModule= 接口, 并确保恰好启用一个 host.
+
+各 host 的 =metadata.nix= 由 [[file:./modules/hosts/default.nix][modules/hosts/default.nix]] 自动导入, 用于声明 UID registry、monitor、intranet claims、public IP 和 identity key metadata. =ssh.private.age= 保存该 host 的加密 SSH host private key, 并由 =metadata.nix= 引用.
 
 ***** [[file:./modules/hosts/aliyun/][/modules/hosts/aliyun]]
 #+begin_example
 /modules/hosts/aliyun/
 ├── default.nix
+├── metadata.nix
+├── ssh.private.age
 └── os/
     ├── default.nix
     ├── disk-config.nix
@@ -306,6 +364,8 @@ Home Manager 模块可以通过 =home-manager.users.<uid>.imports= 合并, 因�
 /modules/hosts/thinkbook/
 ├── default.nix
 ├── extra-options.nix
+├── metadata.nix
+├── ssh.private.age
 └── os/
     ├── default.nix
     ├── boot-manager.nix
@@ -321,6 +381,8 @@ ThinkBook bare metal NixOS host, hostname =nixos=, 配置本机硬件, 启动, F
 #+begin_example
 /modules/hosts/wsl/
 ├── default.nix
+├── metadata.nix
+├── ssh.private.age
 └── os/
     └── default.nix
 #+end_example
@@ -354,17 +416,16 @@ NixOS-WSL host, hostname =nixos-wsl=.
     │   ├── git.nix
     │   ├── keyring.nix
     │   ├── langs.nix
-    │   ├── rclone.nix
-    │   └── terminal.nix
+    │   └── rclone.nix
     └── sops/
         ├── .sops.yaml
         └── default.yaml
 #+end_example
 
-配置 lingyu 用户的个人 home-manager 模块, 包含 email, git, keyring, langs, terminal 等用户级配置.
+配置 lingyu 用户的个人 home-manager 模块, 包含 cloud-server, email, git, keyring, langs, rclone 等用户级配置.
 
 =modules/users/lingyu/hm/home/.local/bin/= 放置个人脚本:
-- =org=: 进入 =~/org= 目录并准备 make 函数, 支持 --texlive 调用 TeX Live 工具.
+- =org=: 进入 =~/org= 目录并准备使用 =~/org/config/Makefile= 的 make 函数.
 - =rc=: rclone 同步包装器, 支持 push/pull 子命令, 限制传输并发并显示进度.
 - =ssha=: 启动 =ssh-agent= 并加载默认 ed25519 私钥.
 
@@ -377,7 +438,7 @@ NixOS-WSL host, hostname =nixos-wsl=.
 最小用户 profile, 不提供私有 HM 模块, 但仍可以接收最终配置启用的公共 HM features.
 
 * 测试
-=tests/= 通过 =perSystem.checks= 接入 flake, 覆盖自定义类型、=existModule= 断言、按 UID 聚合 HM imports、secret 生成函数, 以及 user/host/feature 的负向组合约束.
+=tests/= 通过 =perSystem.checks= 接入 flake, 覆盖自定义类型、=existModule= 断言、按 UID 聚合 HM imports、SOPS 相关函数, 以及 user/host/feature 的负向组合约束.
 
 #+begin_src sh
 nix flake check
