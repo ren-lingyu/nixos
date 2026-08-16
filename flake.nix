@@ -53,6 +53,11 @@
       url = "git+https://github.com/Mic92/sops-nix.git?ref=refs/heads/master&shallow=1";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+    emarccs = {
+      url = "git+https://github.com/ren-lingyu/emarccs.git?ref=refs/heads/main&shallow=1";
+      inputs.nixpkgs.follows = "nixpkgs";
+      inputs.flake-parts.follows = "flake-parts";
+    };
     nixvim = {
       # the main branch of nixvim must be use in nixos-unstable
       url = "git+https://github.com/nix-community/nixvim.git?ref=refs/heads/main&shallow=1";
@@ -60,10 +65,6 @@
     };
     lem = {
       url = "git+https://github.com/lem-project/lem.git?ref=refs/heads/main&shallow=1";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
-    nixos-wsl = {
-      url = "git+https://github.com/nix-community/NixOS-WSL.git?ref=refs/heads/main&shallow=1";
       inputs.nixpkgs.follows = "nixpkgs";
     };
     niri-flake = {
@@ -77,10 +78,9 @@
     nix-flatpak = {
       url = "git+https://github.com/gmodena/nix-flatpak.git?ref=refs/tags/latest&shallow=1";
     };
-    emarccs = {
-      url = "git+https://github.com/ren-lingyu/emarccs.git?ref=refs/heads/main&shallow=1";
+    nixos-wsl = {
+      url = "git+https://github.com/nix-community/NixOS-WSL.git?ref=refs/heads/main&shallow=1";
       inputs.nixpkgs.follows = "nixpkgs";
-      inputs.flake-parts.follows = "flake-parts";
     };
     nixos-anywhere = {
       url = "git+https://github.com/nix-community/nixos-anywhere.git?ref=refs/heads/main&shallow=1";
