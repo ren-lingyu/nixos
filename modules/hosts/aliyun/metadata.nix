@@ -20,7 +20,7 @@ host_ : { config, pkgs, lib, llib, ... } : {
         path = "/etc/ssh/ssh_host_ed25519_key.pub";
       };
       private = {
-        key = null;
+        key = ./ssh.private.age;
         path = "/etc/ssh/ssh_host_ed25519_key";
       };
     };
