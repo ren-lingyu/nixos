@@ -59,7 +59,6 @@
     nixvim = {
       # the main branch of nixvim must be use in nixos-unstable
       url = "git+https://github.com/nix-community/nixvim.git?ref=refs/heads/main&shallow=1";
-      # inputs.nixpkgs.follows = "nixpkgs";
     };
     lem = {
       url = "git+https://github.com/lem-project/lem.git?ref=refs/heads/main&shallow=1";
