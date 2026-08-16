@@ -427,15 +427,12 @@
         inherit pkgs lib;
       };
 
-      apps = {
-        nixos-anywhere = {
-          type = "app";
-          program = (pkgs.lib.getExe' inputs'.nixos-anywhere.packages.default "nixos-anywhere");
-          meta.description = "Run nixos-anywhere from this flake";
-        };
-      };
-
       devShells = {
+        deploy = pkgs.mkShell {
+          nativeBuildInputs = [
+            inputs'.nixos-anywhere.packages.default
+          ];
+        };
         agenix = pkgs.mkShell {
           nativeBuildInputs = [
             config.agenix-rekey.package
