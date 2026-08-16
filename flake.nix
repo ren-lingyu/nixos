@@ -55,8 +55,6 @@
     };
     emarccs = {
       url = "git+https://github.com/ren-lingyu/emarccs.git?ref=refs/heads/main&shallow=1";
-      inputs.nixpkgs.follows = "nixpkgs";
-      inputs.flake-parts.follows = "flake-parts";
     };
     nixvim = {
       # the main branch of nixvim must be use in nixos-unstable
