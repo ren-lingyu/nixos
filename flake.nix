@@ -433,7 +433,7 @@
             inputs'.nixos-anywhere.packages.default
           ];
         };
-        agenix = pkgs.mkShell {
+        secret = pkgs.mkShell {
           nativeBuildInputs = [
             config.agenix-rekey.package
           ];
