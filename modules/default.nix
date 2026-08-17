@@ -53,6 +53,11 @@
       ];
     };
 
+    networking = {
+      nftables.enable = true;
+      firewall.enable = true;
+    };
+
     services.userborn = {
       enable = true;
       package = pkgs.userborn;
