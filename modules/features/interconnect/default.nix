@@ -13,20 +13,26 @@
 
     claimantNames_ = claimantNamesOf_ netName_ nodeName_;
 
-  in {
+  in (lib.mergeAttrsList [
 
-    claimed = (
-      builtins.elem nodeName_ (lib.attrByPath
-        [ "intranetClaims" netName_ ]
-        []
-        enabledHost_
-      )
-    );
+    {
 
-  } // (lib.optionalAttrs
-    ((builtins.length claimantNames_) == 1)
-    (derive_ hosts_.${builtins.head claimantNames_})
-  );
+      claimed = (
+        builtins.elem nodeName_ (lib.attrByPath
+          [ "intranetClaims" netName_ ]
+          []
+          enabledHost_
+        )
+      );
+
+    }
+
+    (lib.optionalAttrs
+      ((builtins.length claimantNames_) == 1)
+      (derive_ hosts_.${builtins.head claimantNames_})
+    )
+
+  ]);
 
 in {
 
@@ -45,20 +51,21 @@ in {
 
       intranets.ingress = {
 
-        hub = {
-
-          constraints.claimantCount = {
-            min = 1;
-            max = 1;
-          };
-
-        } // (mkNode_
-          "ingress"
-          "hub"
-          (claimantHost_ : {
-            ip = claimantHost_.publicIpAddress;
-          })
-        );
+        hub = lib.mergeAttrsList [
+          {
+            constraints.claimantCount = {
+              min = 1;
+              max = 1;
+            };
+          }
+          (mkNode_
+            "ingress"
+            "hub"
+            (claimantHost_ : {
+              ip = claimantHost_.publicIpAddress;
+            })
+          )
+        ];
 
         spoke = (mkNode_
           "ingress"
