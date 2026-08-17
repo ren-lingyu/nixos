@@ -29,6 +29,10 @@ in {
           allowedUDPPorts = [
             51820
           ];
+          allowedTCPPorts = [
+            80
+            443
+          ];
         };
 
         wireguard = {
