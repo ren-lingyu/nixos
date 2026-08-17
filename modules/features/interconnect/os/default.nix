@@ -25,6 +25,24 @@ in {
 
       networking = {
 
+        nftables = {
+          tables = {
+            interconnect-ingress-hub = {
+              family = "inet";
+              content = "chain output {${
+                (builtins.concatStringsSep
+                  "\n"
+                  [
+                    "type filter hook output priority filter; policy accept;"
+                    "oifname \"wg0\" ip daddr 10.100.0.2 meta skuid ${builtins.toString config.ids.uids.caddy} accept;"
+                    "oifname \"wg0\" reject;"
+                  ]
+                )
+              }}";
+            };
+          };
+        };
+
         firewall = {
           allowedUDPPorts = [
             51820
