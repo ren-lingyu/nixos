@@ -62,7 +62,7 @@ in {
             "ingress"
             "hub"
             (claimantHost_ : {
-              ip = claimantHost_.publicIpAddress;
+              publicIpAddress = claimantHost_.publicIpAddress;
             })
           )
         ];
@@ -182,7 +182,7 @@ in {
             [
               (!cfg.enable)
               ((builtins.length (claimantNamesOf_ "ingress" "hub")) != 1)
-              (cfg.intranets.ingress.hub.ip != null)
+              (cfg.intranets.ingress.hub.publicIpAddress != null)
             ]
           );
           message = "The host claiming the ingress `hub` node must provide `publicIpAddress`.";

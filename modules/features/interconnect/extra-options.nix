@@ -44,9 +44,9 @@ feature_ : { options, config, pkgs, lib, llib, ... } : {
                     ]
                   )
                   {
-                    ip = lib.mkOption {
+                    publicIpAddress = lib.mkOption {
                       type = lib.types.unique {
-                        message = "`modules.features.${feature_}.intranets.ingress.hub.ip` can only be defined once.";
+                        message = "`modules.features.${feature_}.intranets.ingress.hub.publicIpAddress` can only be defined once.";
                       } (lib.types.nullOr lib.types.str);
                       default = null;
                       description = "Public IP address derived from the host claiming the ingress hub node.";

@@ -91,7 +91,7 @@ in {
                   allowedIPs = [
                     "10.100.0.1/32"
                   ];
-                  endpoint = "${cfg.intranets.ingress.hub.ip}:51820";
+                  endpoint = "${cfg.intranets.ingress.hub.publicIpAddress}:51820";
                   persistentKeepalive = 25;
                 }
               ];
