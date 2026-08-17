@@ -63,6 +63,7 @@ in {
             "hub"
             (claimantHost_ : {
               publicIpAddress = claimantHost_.publicIpAddress;
+              principalUid = config.ids.uids.caddy;
             })
           )
         ];

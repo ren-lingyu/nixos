@@ -45,6 +45,12 @@ feature_ : { options, config, pkgs, lib, llib, ... } : {
                       default = null;
                       description = "Public IP address derived from the host claiming the ${net_} ${node_} node.";
                     };
+                    principalUid = lib.mkOption {
+                      type = lib.types.unique {
+                        message = "`modules.features.${feature_}.intranets.${net_}.${node_}.principalUid` can only be defined once.";
+                      } lib.types.ints.u32;
+                      description = "UID of the local principal for the ${net_} ${node_} node.";
+                    };
                   }
                 )
               ];
