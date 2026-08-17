@@ -85,7 +85,13 @@ in {
               (netName_ : nodeNames_ : builtins.concatLists [
                 [
                   {
-                    assertion = !cfg.enable || builtins.hasAttr netName_ cfg.intranets;
+                    assertion = (builtins.any
+                      (x_ : x_)
+                      [
+                        (!cfg.enable)
+                        (builtins.hasAttr netName_ cfg.intranets)
+                      ]
+                    );
                     message = "Host `${hostName_}` claims the unknown `${netName_}` intranet.";
                   }
                 ]
@@ -93,7 +99,13 @@ in {
                   (builtins.hasAttr netName_ cfg.intranets)
                   (builtins.map
                     (nodeName_ : {
-                      assertion = !cfg.enable || builtins.hasAttr nodeName_ cfg.intranets.${netName_};
+                      assertion = (builtins.any
+                        (x_ : x_)
+                        [
+                          (!cfg.enable)
+                          (builtins.hasAttr nodeName_ cfg.intranets.${netName_})
+                        ]
+                      );
                       message = "Host `${hostName_}` claims the unknown `${netName_}.${nodeName_}` node.";
                     })
                     nodeNames_
@@ -116,13 +128,41 @@ in {
                 constraints_ = node_.constraints.claimantCount;
               in [
                   {
-                    assertion = constraints_.min == 0 || constraints_.max == 0 || constraints_.min <= constraints_.max;
+                    assertion = (builtins.any
+                      (x_ : x_)
+                      [
+                        (constraints_.min == 0)
+                        (constraints_.max == 0)
+                        (constraints_.min <= constraints_.max)
+                      ]
+                    );
                     message = "The minimum claimant count of `${netName_}.${nodeName_}` cannot exceed its maximum claimant count.";
                   }
                   {
-                    assertion = !cfg.enable || (
-                      (constraints_.min == 0 || claimantCount_ >= constraints_.min)
-                      && (constraints_.max == 0 || claimantCount_ <= constraints_.max)
+                    assertion = (builtins.any
+                      (x_ : x_)
+                      [
+                        (!cfg.enable)
+                        (builtins.all
+                          (x_ : x_)
+                          [
+                            (builtins.any
+                              (x_ : x_)
+                              [
+                                (constraints_.min == 0)
+                                (claimantCount_ >= constraints_.min)
+                              ]
+                            )
+                            (builtins.any
+                              (x_ : x_)
+                              [
+                                (constraints_.max == 0)
+                                (claimantCount_ <= constraints_.max)
+                              ]
+                            )
+                          ]
+                        )
+                      ]
                     );
                     message = "The `${netName_}.${nodeName_}` node has ${builtins.toString claimantCount_} claimant(s), outside its configured range; zero means no limit (min: ${builtins.toString constraints_.min}, max: ${builtins.toString constraints_.max}).";
                   }
@@ -137,7 +177,14 @@ in {
 
       [
         {
-          assertion = (!cfg.enable) || ((builtins.length (claimantNamesOf_ "ingress" "hub")) != 1) || (cfg.intranets.ingress.hub.ip != null);
+          assertion = (builtins.any
+            (x_ : x_)
+            [
+              (!cfg.enable)
+              ((builtins.length (claimantNamesOf_ "ingress" "hub")) != 1)
+              (cfg.intranets.ingress.hub.ip != null)
+            ]
+          );
           message = "The host claiming the ingress `hub` node must provide `publicIpAddress`.";
         }
       ]

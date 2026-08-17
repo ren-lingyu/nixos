@@ -9,7 +9,13 @@ in {
 
     assertions = [
       {
-        assertion = !cfg.fileChooser.enable || config.xdg.terminal-exec.enable;
+        assertion = (builtins.any
+          (x_ : x_)
+          [
+            (!cfg.fileChooser.enable)
+            config.xdg.terminal-exec.enable
+          ]
+        );
         message = "`modules.features.file-manager.fileChooser.enable = true` requires `xdg.terminal-exec.enable = true`.";
       }
     ];

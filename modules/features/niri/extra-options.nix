@@ -9,9 +9,13 @@ feature_ : { options, config, pkgs, lib, llib, ... } : {
 
   waybar.enable = lib.mkOption {
     type = lib.types.bool;
-    default =
-      !config.modules.features.${feature_}.noctalia.enable
-      && config.modules.features.${feature_}.enable;
+    default = (builtins.all
+      (x_ : x_)
+      [
+        (!config.modules.features.${feature_}.noctalia.enable)
+        config.modules.features.${feature_}.enable
+      ]
+    );
     example = false;
     description = "Whether to enable the Waybar status bar for Niri.";
   };

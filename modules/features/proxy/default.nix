@@ -15,19 +15,43 @@ in {
     };
     assertions = [
       {
-        assertion = !cfg.clash-verge.enable || cfg.enable;
+        assertion = (builtins.any
+          (x_ : x_)
+          [
+            (!cfg.clash-verge.enable)
+            cfg.enable
+          ]
+        );
         message = "`modules.features.proxy.clash-verge.enable = true` is only allowed when `modules.features.proxy.enable = true`.";
       }
       {
-        assertion = !cfg.throne.enable || cfg.enable;
+        assertion = (builtins.any
+          (x_ : x_)
+          [
+            (!cfg.throne.enable)
+            cfg.enable
+          ]
+        );
         message = "`modules.features.proxy.throne.enable = true` is only allowed when `modules.features.proxy.enable = true`.";
       }
       {
-        assertion = !cfg.mihomo.enable || cfg.enable;
+        assertion = (builtins.any
+          (x_ : x_)
+          [
+            (!cfg.mihomo.enable)
+            cfg.enable
+          ]
+        );
         message = "`modules.features.proxy.mihomo.enable = true` is only allowed when `modules.features.proxy.enable = true`.";
       }
       {
-        assertion = !cfg.v2raya.enable || cfg.enable;
+        assertion = (builtins.any
+          (x_ : x_)
+          [
+            (!cfg.v2raya.enable)
+            cfg.enable
+          ]
+        );
         message = "`modules.features.proxy.v2raya.enable = true` is only allowed when `modules.features.proxy.enable = true`.";
       }
       {

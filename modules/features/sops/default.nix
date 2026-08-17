@@ -6,7 +6,13 @@
     enabledUsersByUid_ = builtins.listToAttrs (builtins.map (user_ : {
       name = builtins.toString user_.uid;
       value = user_.username;
-    }) (builtins.attrValues (lib.filterAttrs (unused_userName_ : user_ : user_.enable && user_.uid != null) config.modules.users)));
+    }) (builtins.attrValues (lib.filterAttrs (unused_userName_ : user_ : (builtins.all
+      (x_ : x_)
+      [
+        user_.enable
+        (user_.uid != null)
+      ]
+    )) config.modules.users)));
   in (
     if builtins.hasAttr (builtins.toString uid_) enabledUsersByUid_
     then enabledUsersByUid_."${builtins.toString uid_}"

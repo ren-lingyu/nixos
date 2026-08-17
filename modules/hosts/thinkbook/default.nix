@@ -22,7 +22,13 @@ in {
 
     assertions = [
       {
-        assertion = !cfg.flatpak.enable || cfg.enable;
+        assertion = (builtins.any
+          (x_ : x_)
+          [
+            (!cfg.flatpak.enable)
+            cfg.enable
+          ]
+        );
         message = "`modules.hosts.${hostName_}.flatpak.enable = true` requires `modules.hosts.${hostName_}.enable = true`.";
       }
     ];

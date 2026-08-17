@@ -1,9 +1,21 @@
 { options, config, pkgs, lib, llib, ... } : let
 
-  featureList_ = builtins.attrNames (lib.filterAttrs (name_ : type_ : ((type_ == "directory") && (builtins.pathExists (./. + "/${name_}/default.nix")))) (builtins.readDir ./.));
+  featureList_ = builtins.attrNames (lib.filterAttrs (name_ : type_ : (builtins.all
+    (x_ : x_)
+    [
+      (type_ == "directory")
+      (builtins.pathExists (./. + "/${name_}/default.nix"))
+    ]
+  )) (builtins.readDir ./.));
   enabledUserUids_ = builtins.map
     (user_ : user_.uid)
-    (builtins.attrValues (lib.filterAttrs (unused_userName_ : user_ : user_.enable && user_.uid != null) config.modules.users));
+    (builtins.attrValues (lib.filterAttrs (unused_userName_ : user_ : (builtins.all
+      (x_ : x_)
+      [
+        user_.enable
+        (user_.uid != null)
+      ]
+    )) config.modules.users));
 
   lmf = llib.moduleFunctions.features.default;
 
@@ -72,7 +84,13 @@ in {
         hmModulePath = ./. + "/${featureName_}/hm/default.nix";
         enabledMessage = "`modules.features.${featureName_}.enable = true` requires the feature module to be imported and declare `existModule.os` and `existModule.hm`.";
       })
-      (lib.optionals (feature_.enable && (feature_.existModule.hm == true)) [
+      (lib.optionals (builtins.all
+        (x_ : x_)
+        [
+          feature_.enable
+          (feature_.existModule.hm == true)
+        ]
+      ) [
         {
           assertion = (builtins.length feature_.allowUidList) == (builtins.length (lib.unique feature_.allowUidList));
           message = "`modules.features.${featureName_}.allowUidList` must not contain duplicate UIDs.";
@@ -90,7 +108,13 @@ in {
     }) (lmf.groupImportsByUid
       (unused_featureName_ : feature_ : (
         lib.optionals
-          (feature_.enable && (feature_.existModule.hm == true))
+          (builtins.all
+            (x_ : x_)
+            [
+              feature_.enable
+              (feature_.existModule.hm == true)
+            ]
+          )
           feature_.allowUidList
         )
       )

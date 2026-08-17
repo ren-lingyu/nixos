@@ -1,6 +1,12 @@
 { config, pkgs, lib, llib, ... } : let
 
-  userList_ = builtins.attrNames (lib.filterAttrs (name_ : type_ : ((type_ == "directory") && (builtins.pathExists (./. + "/${name_}/default.nix")))) (builtins.readDir ./.));
+  userList_ = builtins.attrNames (lib.filterAttrs (name_ : type_ : (builtins.all
+    (x_ : x_)
+    [
+      (type_ == "directory")
+      (builtins.pathExists (./. + "/${name_}/default.nix"))
+    ]
+  )) (builtins.readDir ./.));
 
 in {
 
@@ -73,15 +79,33 @@ in {
       (builtins.concatLists (lib.mapAttrsToList (userName_ : user_ : builtins.concatLists [
         [
           {
-            assertion = !user_.enable || user_.uid != null;
+            assertion = (builtins.any
+              (x_ : x_)
+              [
+                (!user_.enable)
+                (user_.uid != null)
+              ]
+            );
             message = "`modules.users.${userName_}.enable = true` requires `modules.users.${userName_}.uid` to be assigned by the final flake composition.";
           }
           {
-            assertion = user_.uid == null || user_.uid >= 1000;
+            assertion = (builtins.any
+              (x_ : x_)
+              [
+                (user_.uid == null)
+                (user_.uid >= 1000)
+              ]
+            );
             message = "`modules.users.${userName_}.uid` must be greater than or equal to 1000 when assigned.";
           }
           {
-            assertion = !user_.enable || lib.hasPrefix "/" user_.homeDirectory;
+            assertion = (builtins.any
+              (x_ : x_)
+              [
+                (!user_.enable)
+                (lib.hasPrefix "/" user_.homeDirectory)
+              ]
+            );
             message = "`modules.users.${userName_}.homeDirectory` must be an absolute path when this user is enabled.";
           }
         ]
@@ -115,7 +139,13 @@ in {
         createHome = lib.mkForce true;
         home = lib.mkForce user_.homeDirectory;
       };
-    }) (lib.filterAttrs (unused_name_ : user_ : user_.enable && user_.uid != null) config.modules.users));
+    }) (lib.filterAttrs (unused_name_ : user_ : (builtins.all
+      (x_ : x_)
+      [
+        user_.enable
+        (user_.uid != null)
+      ]
+    )) config.modules.users));
 
     home-manager.users = builtins.listToAttrs (lib.mapAttrsToList (userName_ : user_ : {
       name = builtins.toString user_.uid;
@@ -129,7 +159,13 @@ in {
           homeDirectory = lib.mkForce user_.homeDirectory;
         };
       };
-    }) (lib.filterAttrs (unused_name_ : user_ : user_.enable && user_.uid != null) config.modules.users));
+    }) (lib.filterAttrs (unused_name_ : user_ : (builtins.all
+      (x_ : x_)
+      [
+        user_.enable
+        (user_.uid != null)
+      ]
+    )) config.modules.users));
 
   };
 

@@ -36,7 +36,13 @@ feature_ : { options, config, pkgs, lib, llib, ... } : {
                   };
                 }
                 (lib.optionalAttrs
-                  (net_ == "ingress" && node_ == "hub")
+                  (builtins.all
+                    (x_ : x_)
+                    [
+                      (net_ == "ingress")
+                      (node_ == "hub")
+                    ]
+                  )
                   {
                     ip = lib.mkOption {
                       type = lib.types.unique {

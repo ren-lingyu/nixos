@@ -58,11 +58,14 @@ in {
           then
             if cfg.session-wrapper == null
             then false
-            else builtins.all (condition_ : condition_) [
-              (cfg.session-wrapper ? meta)
-              (cfg.session-wrapper.meta ? mainProgram)
-              (cfg.session-wrapper.meta.mainProgram != "")
-            ]
+            else (builtins.all
+              (x_ : x_)
+              [
+                (cfg.session-wrapper ? meta)
+                (cfg.session-wrapper.meta ? mainProgram)
+                (cfg.session-wrapper.meta.mainProgram != "")
+              ]
+            )
           else cfg.session-wrapper == null
         );
 

@@ -4,7 +4,13 @@
 
 in {
 
-  config = lib.mkIf (cfg.enable && cfg.flatpak.enable) {
+  config = lib.mkIf (builtins.all
+    (x_ : x_)
+    [
+      cfg.enable
+      cfg.flatpak.enable
+    ]
+  ) {
 
     xdg.portal.enable = lib.mkIf config.services.flatpak.enable (lib.mkForce true);
 

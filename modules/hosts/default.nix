@@ -1,7 +1,13 @@
 { options, config, pkgs, lib, llib, ... } : let
 
   cfg = config.modules.hosts;
-  hostList_ = builtins.attrNames (lib.filterAttrs (name_ : type_ : ((type_ == "directory") && (builtins.pathExists (./. + "/${name_}/default.nix")))) (builtins.readDir ./.));
+  hostList_ = builtins.attrNames (lib.filterAttrs (name_ : type_ : (builtins.all
+    (x_ : x_)
+    [
+      (type_ == "directory")
+      (builtins.pathExists (./. + "/${name_}/default.nix"))
+    ]
+  )) (builtins.readDir ./.));
 
 in {
 
@@ -220,7 +226,13 @@ in {
             message = "`modules.hosts.${hostName_}.users.${uidKey_}` must use a numeric UID string as its attribute name, like `modules.hosts.${hostName_}.users.\"1000\"`.";
           }
           {
-            assertion = (builtins.match "^[0-9]+$" uidKey_ != null) && (uidKey_ == builtins.toString uid_);
+            assertion = (builtins.all
+              (x_ : x_)
+              [
+                (builtins.match "^[0-9]+$" uidKey_ != null)
+                (uidKey_ == builtins.toString uid_)
+              ]
+            );
             message = "`modules.hosts.${hostName_}.users.${uidKey_}` must use the canonical decimal representation of UID ${builtins.toString uid_}.";
           }
         ]) host_.users))
@@ -228,7 +240,13 @@ in {
     ]);
 
     home-manager.sharedModules = builtins.concatLists (lib.mapAttrsToList (hostName_ : host_ :
-      lib.optionals (host_.enable && host_.existModule.hm == true) [
+      lib.optionals (builtins.all
+        (x_ : x_)
+        [
+          host_.enable
+          (host_.existModule.hm == true)
+        ]
+      ) [
         (./. + "/${hostName_}/hm")
       ]
     ) cfg);

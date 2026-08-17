@@ -8,7 +8,13 @@ in {
     ./settings.nix
   ];
 
-  config = lib.mkIf (cfg.enable && cfg.waybar.enable) {
+  config = lib.mkIf (builtins.all
+    (x_ : x_)
+    [
+      cfg.enable
+      cfg.waybar.enable
+    ]
+  ) {
     programs.waybar = {
         enable = cfg.waybar.enable;
         package = pkgs.waybar;

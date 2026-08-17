@@ -37,7 +37,13 @@ in {
             (lib.attrByPath [ providerName_ "session-wrapper" ] null options.modules.features) != null
           );
           sessionWrapper_ = config.modules.features.${providerName_}.session-wrapper;
-        in lib.optionals (hasSessionWrapperOption_ && sessionWrapper_ != null) [
+        in lib.optionals (builtins.all
+          (x_ : x_)
+          [
+            hasSessionWrapperOption_
+            (sessionWrapper_ != null)
+          ]
+        ) [
           sessionWrapper_
         ]
       ) [
@@ -55,11 +61,23 @@ in {
               monitor_.role == "default"
             )) enabledHost_.monitors)
           );
-        in (!cfg.enable || (builtins.length defaultMonitors_) == 1);
+        in (builtins.any
+          (x_ : x_)
+          [
+            (!cfg.enable)
+            ((builtins.length defaultMonitors_) == 1)
+          ]
+        );
         message = "`modules.features.greeter.enable = true` requires exactly one monitor in the enabled host's `monitors` to set `role = \"default\"`.";
       }
       {
-        assertion = !cfg.enable || cfg.sessionPackages != [];
+        assertion = (builtins.any
+          (x_ : x_)
+          [
+            (!cfg.enable)
+            (cfg.sessionPackages != [])
+          ]
+        );
         message = "`modules.features.greeter.enable = true` requires at least one session provider.";
       }
     ];

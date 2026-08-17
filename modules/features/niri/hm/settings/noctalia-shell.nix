@@ -1,6 +1,12 @@
 { config, lib, pkgs, osConfig, ... } : let
 
-  noctaliaNiriSettingsEnable = config.programs.niri.enable && config.programs.noctalia-shell.enable;
+  noctaliaNiriSettingsEnable = (builtins.all
+    (x_ : x_)
+    [
+      config.programs.niri.enable
+      config.programs.noctalia-shell.enable
+    ]
+  );
 
   noctaliaShellCommand = [ "noctalia-shell" ];
 

@@ -4,7 +4,13 @@
 
 in {
 
-  config = lib.mkIf (cfg.enable && cfg.noctalia.enable) {
+  config = lib.mkIf (builtins.all
+    (x_ : x_)
+    [
+      cfg.enable
+      cfg.noctalia.enable
+    ]
+  ) {
 
     programs.noctalia-shell = {
       enable = cfg.noctalia.enable;

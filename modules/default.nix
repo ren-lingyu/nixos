@@ -156,7 +156,13 @@
                       })
                       (builtins.attrNames
                         (lib.filterAttrs
-                          (name_ : type_ : ((type_ == "directory") && (builtins.pathExists (./. + "/${moduleType_}/${name_}/default.nix"))))
+                          (name_ : type_ : (builtins.all
+                            (x_ : x_)
+                            [
+                              (type_ == "directory")
+                              (builtins.pathExists (./. + "/${moduleType_}/${name_}/default.nix"))
+                            ]
+                          ))
                           (builtins.readDir (./. + "/${moduleType_}"))
                         )
                       )
@@ -165,7 +171,13 @@
                 })
                 (builtins.attrNames
                   (lib.filterAttrs
-                    (name_ : type_ : ((type_ == "directory") && (builtins.pathExists (./. + "/${name_}/default.nix"))))
+                    (name_ : type_ : (builtins.all
+                      (x_ : x_)
+                      [
+                        (type_ == "directory")
+                        (builtins.pathExists (./. + "/${name_}/default.nix"))
+                      ]
+                    ))
                     (builtins.readDir ./.)
                   )
                 )

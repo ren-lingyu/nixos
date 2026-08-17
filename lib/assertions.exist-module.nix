@@ -8,12 +8,24 @@
 } : [
 
   {
-    assertion = value.os == null || value.os == builtins.pathExists osModulePath;
+    assertion = (builtins.any
+      (x_ : x_)
+      [
+        (value.os == null)
+        (value.os == builtins.pathExists osModulePath)
+      ]
+    );
     message = "`${optionPath}.os` must match whether `${builtins.toString osModulePath}` exists.";
   }
 
   {
-    assertion = value.hm == null || value.hm == builtins.pathExists hmModulePath;
+    assertion = (builtins.any
+      (x_ : x_)
+      [
+        (value.hm == null)
+        (value.hm == builtins.pathExists hmModulePath)
+      ]
+    );
     message = "`${optionPath}.hm` must match whether `${builtins.toString hmModulePath}` exists.";
   }
 
@@ -23,7 +35,19 @@
   }
 
   {
-    assertion = !enable || (value.os != null && value.hm != null);
+    assertion = (builtins.any
+      (x_ : x_)
+      [
+        (!enable)
+        (builtins.all
+          (x_ : x_)
+          [
+            (value.os != null)
+            (value.hm != null)
+          ]
+        )
+      ]
+    );
     message = enabledMessage;
   }
 
