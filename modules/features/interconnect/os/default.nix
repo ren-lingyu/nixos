@@ -74,6 +74,8 @@ in {
 
       networking = {
 
+        firewall.extraInputRules = "iifname \"wg0\" ip saddr 10.100.0.1 accept";
+
         wireguard = {
           interfaces = {
             wg0 = {
