@@ -5,10 +5,6 @@
   hosts_ = config.modules.hosts;
   enabledHost_ = llib.moduleFunctions.hosts.default.getUniqueEnabledHost hosts_;
 
-  netIds_ = {
-    ingress = 0;
-  };
-
   claimantNamesOf_ = netName_ : nodeName_ : builtins.attrNames (lib.filterAttrs (unused_name_ : host_ : (
     builtins.elem nodeName_ (lib.attrByPath [ "intranetClaims" netName_ ] [] host_)
   )) hosts_);
@@ -31,7 +27,7 @@
         claimantHost_ = hosts_.${builtins.head claimantNames_};
       in (lib.mergeAttrsList [
         {
-          intraIpAddress = "10.100.${builtins.toString netIds_.${netName_}}.${builtins.toString claimantHost_.number}";
+          intraIpAddress = "10.100.${builtins.toString cfg.intranetDefs.${netName_}.number}.${builtins.toString claimantHost_.number}";
         }
         (derive_ claimantHost_)
       ]))

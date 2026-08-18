@@ -1,10 +1,41 @@
-feature_ : { options, config, pkgs, lib, llib, ... } : {
+feature_ : { options, config, pkgs, lib, llib, ... } : let
+
+  cfg = config.modules.features.${feature_};
+
+in {
+
+  intranetDefs = lib.mkOption {
+    type = lib.types.attrsOf (lib.types.submodule {
+      options = {
+        number = lib.mkOption {
+          type = lib.types.ints.between 0 255;
+          description = "Stable number assigned to this intranet.";
+        };
+        nodes = lib.mkOption {
+          type = lib.types.listOf lib.types.nonEmptyStr;
+          description = "Node names declared by this intranet.";
+        };
+      };
+    });
+    internal = true;
+    readOnly = true;
+    default = {
+      ingress = {
+        number = 0;
+        nodes = [
+          "hub"
+          "spoke"
+        ];
+      };
+    };
+    description = "Internal definitions of interconnect intranets.";
+  };
 
   intranets = lib.mkOption {
 
     type = lib.types.submodule {
       options = (lib.mapAttrs
-        (net_ : nodes_ : (builtins.listToAttrs
+        (net_ : netDef_ : (builtins.listToAttrs
           (builtins.map
             (node_ : {
               name = node_;
@@ -61,15 +92,10 @@ feature_ : { options, config, pkgs, lib, llib, ... } : {
                 )
               ];
             })
-            nodes_
+            netDef_.nodes
           )
         ))
-        {
-          ingress = [
-            "hub"
-            "spoke"
-          ];
-        }
+        cfg.intranetDefs
       );
     };
     internal = true;
