@@ -79,6 +79,25 @@ in {
     };
 
     assertions = builtins.concatLists [
+      [
+        {
+          assertion = let
+            netNumbers_ = builtins.map
+              (netDef_ : netDef_.number)
+              (builtins.attrValues cfg.intranetDefs);
+          in ((builtins.length netNumbers_) == (builtins.length (lib.unique netNumbers_)));
+          message = "`modules.features.interconnect.intranetDefs` must assign a unique number to each intranet.";
+        }
+      ]
+
+      (lib.mapAttrsToList
+        (netName_ : netDef_ : {
+          assertion = ((builtins.length netDef_.nodes) == (builtins.length (lib.unique netDef_.nodes)));
+          message = "Node names in `modules.features.interconnect.intranetDefs.${netName_}.nodes` must be unique.";
+        })
+        cfg.intranetDefs
+      )
+
       (builtins.concatLists
         (lib.mapAttrsToList
           (hostName_ : host_ : (builtins.concatLists
@@ -90,21 +109,21 @@ in {
                       (x_ : x_)
                       [
                         (!cfg.enable)
-                        (builtins.hasAttr netName_ cfg.intranets)
+                        (builtins.hasAttr netName_ cfg.intranetDefs)
                       ]
                     );
                     message = "Host `${hostName_}` claims the unknown `${netName_}` intranet.";
                   }
                 ]
                 (lib.optionals
-                  (builtins.hasAttr netName_ cfg.intranets)
+                  (builtins.hasAttr netName_ cfg.intranetDefs)
                   (builtins.map
                     (nodeName_ : {
                       assertion = (builtins.any
                         (x_ : x_)
                         [
                           (!cfg.enable)
-                          (builtins.hasAttr nodeName_ cfg.intranets.${netName_})
+                          (builtins.elem nodeName_ cfg.intranetDefs.${netName_}.nodes)
                         ]
                       );
                       message = "Host `${hostName_}` claims the unknown `${netName_}.${nodeName_}` node.";
