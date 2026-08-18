@@ -10,13 +10,9 @@
   )) hosts_);
 
   mkNode_ = netName_ : nodeName_ : derive_ : let
-
     claimantNames_ = claimantNamesOf_ netName_ nodeName_;
-
   in (lib.mergeAttrsList [
-
     {
-
       claimed = (
         builtins.elem nodeName_ (lib.attrByPath
           [ "intranetClaims" netName_ ]
@@ -24,14 +20,11 @@
           enabledHost_
         )
       );
-
     }
-
     (lib.optionalAttrs
       ((builtins.length claimantNames_) == 1)
       (derive_ hosts_.${builtins.head claimantNames_})
     )
-
   ]);
 
 in {
