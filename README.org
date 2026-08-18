@@ -5,13 +5,13 @@
 这是一个基于 Flake 的 NixOS 配置仓库.
 
 * 架构约定
-=flake.nix= 是最终组装层, 统一管理 flake inputs、外部 NixOS/Home Manager modules、overlays 和 =nixosConfigurations=. 具体配置由三类平级 profile 提供:
+=flake.nix= 是最终组装层, 统一管理 flake inputs, 外部 NixOS/Home Manager modules, overlays 和 =nixosConfigurations=. 具体配置由三类平级 profile 提供:
 
-- =modules/hosts/= 描述主机身份、硬件和主机拥有的资源. host 只通过 UID registry 声明可管理的用户, 不声明用户名或 user profile.
+- =modules/hosts/= 描述主机身份, 硬件和主机拥有的资源. host 只通过 UID registry 声明可管理的用户, 不声明用户名或 user profile.
 - =modules/users/= 描述 user profile 和个人 Home Manager 配置. user 不决定自己属于哪台 host.
 - =modules/features/= 描述可复用的功能实现, 可同时提供 OS 和 HM 模块.
 
-三类 profile 只决定各自负责的事务. profile 选择、UID 绑定与外部依赖注入由 =flake.nix= 负责. =lib/= 则提供公共类型、断言生成器和模块聚合函数, 在模块参数中名为 =llib=.
+三类 profile 只决定各自负责的事务. profile 选择, UID 绑定与外部依赖注入由 =flake.nix= 负责. =lib/= 则提供公共类型, 断言生成器和模块聚合函数, 在模块参数中名为 =llib=.
 
 * Option 和组装协议
 ** =enable= 与 =existModule=
@@ -31,7 +31,7 @@
 modules.users.lingyu.uid = config.modules.hosts.thinkbook.users."1000";
 #+end_src
 
-断言保证启用的 user 已绑定 UID、启用用户的用户名和 UID 各自唯一, 且 UID 已在启用 host 中登记. host registry 可以包含尚未绑定给当前 user profile 的 UID.
+断言保证启用的 user 已绑定 UID, 启用用户的用户名和 UID 各自唯一, 且 UID 已在启用 host 中登记. host registry 可以包含尚未绑定给当前 user profile 的 UID.
 
 ** Feature 的 HM 送达
 =modules.features.<name>.allowUidList= 指定应向哪些 Home Manager 用户导入该 feature 的 =hm/default.nix=. 当 feature 存在 HM 模块时, 它默认包含所有已启用且已绑定 UID 的 user; 否则默认为空. 列表不能包含重复 UID, 也不能引用未分配给启用 user 的 UID.
@@ -42,7 +42,7 @@ modules.users.lingyu.uid = config.modules.hosts.thinkbook.users."1000";
 ** 导入时机
 NixOS =imports= 无法根据 =config= 动态决定. host 和 feature 根入口由 =self.modules.*= wrapper 在 =flake.nix= 中静态导入; user 根入口由 =modules/users/default.nix= 统一静态导入. wrapper 同时引入所需 flake inputs, 避免外部依赖和 =inputs.<name>= 命名散落到 profile 实现中.
 
-Home Manager 模块可以通过 =home-manager.users.<uid>.imports= 合并, 因此 HM 实现可根据 =enable=、=existModule.hm= 和 =allowUidList= 进行条件送达. =self.modules.base= 通过 =_module.args.llib= 向 NixOS 模块传递本地函数库, 并通过 =home-manager.extraSpecialArgs= 将它传递给 Home Manager 模块.
+Home Manager 模块可以通过 =home-manager.users.<uid>.imports= 合并, 因此 HM 实现可根据 =enable=, =existModule.hm= 和 =allowUidList= 进行条件送达. =self.modules.base= 通过 =_module.args.llib= 向 NixOS 模块传递本地函数库, 并通过 =home-manager.extraSpecialArgs= 将它传递给 Home Manager 模块.
 
 * 结构
 ** [[file:./][/]]
@@ -341,9 +341,9 @@ Home Manager 模块可以通过 =home-manager.users.<uid>.imports= 合并, 因�
 └── wsl/
 #+end_example
 
-[[file:./modules/hosts/default.nix][modules/hosts/default.nix]] 按目录名自动定义 host profile options, 统一提供 UID registry、monitor 和 =existModule= 接口, 并确保恰好启用一个 host.
+[[file:./modules/hosts/default.nix][modules/hosts/default.nix]] 按目录名自动定义 host profile options, 统一提供 UID registry, monitor 和 =existModule= 接口, 并确保恰好启用一个 host.
 
-各 host 的 =metadata.nix= 由 [[file:./modules/hosts/default.nix][modules/hosts/default.nix]] 自动导入, 用于声明 UID registry、monitor、intranet claims、public IP 和 identity key metadata. =ssh.private.age= 保存该 host 的加密 SSH host private key, 并由 =metadata.nix= 引用.
+各 host 的 =metadata.nix= 由 [[file:./modules/hosts/default.nix][modules/hosts/default.nix]] 自动导入, 用于声明 UID registry, monitor, intranet claims, public IP 和 identity key metadata. =ssh.private.age= 保存该 host 的加密 SSH host private key, 并由 =metadata.nix= 引用.
 
 ***** [[file:./modules/hosts/aliyun/][/modules/hosts/aliyun]]
 #+begin_example
@@ -438,7 +438,7 @@ NixOS-WSL host, hostname =nixos-wsl=.
 最小用户 profile, 不提供私有 HM 模块, 但仍可以接收最终配置启用的公共 HM features.
 
 * 测试
-=tests/= 通过 =perSystem.checks= 接入 flake, 覆盖自定义类型、=existModule= 断言、按 UID 聚合 HM imports、SOPS 相关函数, 以及 user/host/feature 的负向组合约束.
+=tests/= 通过 =perSystem.checks= 接入 flake, 覆盖自定义类型, =existModule= 断言, 按 UID 聚合 HM imports, SOPS 相关函数, 以及 user/host/feature 的负向组合约束.
 
 #+begin_src sh
 nix flake check
