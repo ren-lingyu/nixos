@@ -32,6 +32,14 @@ feature_ : { options, config, pkgs, lib, llib, ... } : {
                     } lib.types.bool;
                     description = "Whether the enabled host claims the ${node_} node of the ${net_} intranet.";
                   };
+                  intraIpAddress = lib.mkOption {
+                    type = lib.types.unique {
+                      message = "`modules.features.${feature_}.intranets.${net_}.${node_}.intraIpAddress` can only be defined once.";
+                    } (lib.types.nullOr lib.types.str);
+                    default = null;
+                    example = "10.100.0.1";
+                    description = "Internal IP address derived from the host claiming the ${net_} ${node_} node.";
+                  };
                 }
                 (lib.optionalAttrs
                   ([ net_ node_ ] == [ "ingress" "hub" ])

@@ -34,7 +34,7 @@ in {
                   "\n"
                   [
                     "type filter hook output priority filter; policy accept;"
-                    "oifname \"wg0\" ip daddr 10.100.0.2 meta skuid ${builtins.toString cfg.intranets.ingress.hub.principalUid} accept;"
+                    "oifname \"wg0\" ip daddr ${cfg.intranets.ingress.spoke.intraIpAddress} meta skuid ${builtins.toString cfg.intranets.ingress.hub.principalUid} accept;"
                     "oifname \"wg0\" reject;"
                   ]
                 )
@@ -58,7 +58,7 @@ in {
             wg0 = {
               type = "wireguard";
               ips = [
-                "10.100.0.1/24"
+                "${cfg.intranets.ingress.hub.intraIpAddress}/24"
               ];
               listenPort = 51820;
               privateKeyFile = config.age.secrets.interconnect-wireguard-ingress-hub.path;
@@ -67,7 +67,7 @@ in {
                 {
                   publicKey = "XASMyK2E6Jluj1jjsWc4eNXOA5OwjW3E5HlCCocK/BE=";
                   allowedIPs = [
-                    "10.100.0.2/32"
+                    "${cfg.intranets.ingress.spoke.intraIpAddress}/32"
                   ];
                 }
               ];
@@ -92,14 +92,14 @@ in {
 
       networking = {
 
-        firewall.extraInputRules = "iifname \"wg0\" ip saddr 10.100.0.1 accept";
+        firewall.extraInputRules = "iifname \"wg0\" ip saddr ${cfg.intranets.ingress.hub.intraIpAddress} accept";
 
         wireguard = {
           interfaces = {
             wg0 = {
               type = "wireguard";
               ips = [
-                "10.100.0.2/24"
+                "${cfg.intranets.ingress.spoke.intraIpAddress}/24"
               ];
               privateKeyFile = config.age.secrets.interconnect-wireguard-ingress-spoke.path;
               generatePrivateKeyFile = false;
@@ -107,7 +107,7 @@ in {
                 {
                   publicKey = "NR1Zb8NAO2TpywtE9uZsftU8EWytnUWwOlVMDppZuww=";
                   allowedIPs = [
-                    "10.100.0.1/32"
+                    "${cfg.intranets.ingress.hub.intraIpAddress}/32"
                   ];
                   endpoint = "${cfg.intranets.ingress.hub.publicIpAddress}:51820";
                   persistentKeepalive = 25;
