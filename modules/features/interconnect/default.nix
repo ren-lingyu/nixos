@@ -51,22 +51,14 @@ in {
 
       intranets.ingress = {
 
-        hub = lib.mergeAttrsList [
-          {
-            constraints.claimantCount = {
-              min = 1;
-              max = 1;
-            };
-          }
-          (mkNode_
-            "ingress"
-            "hub"
-            (claimantHost_ : {
-              publicIpAddress = claimantHost_.publicIpAddress;
-              principalUid = config.ids.uids.caddy;
-            })
-          )
-        ];
+        hub = (mkNode_
+          "ingress"
+          "hub"
+          (claimantHost_ : {
+            publicIpAddress = claimantHost_.publicIpAddress;
+            principalUid = config.ids.uids.caddy;
+          })
+        );
 
         spoke = (mkNode_
           "ingress"

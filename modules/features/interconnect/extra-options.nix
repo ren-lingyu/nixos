@@ -46,14 +46,16 @@ in {
                       type = lib.types.unique {
                         message = "`modules.features.${feature_}.intranets.${net_}.${node_}.constraints.claimantCount.min` can only be defined once.";
                       } lib.types.ints.unsigned;
-                      default = 0;
+                      readOnly = true;
+                      default = 1;
                       description = "Minimum number of hosts allowed to claim this node; zero means no lower limit.";
                     };
                     max = lib.mkOption {
                       type = lib.types.unique {
                         message = "`modules.features.${feature_}.intranets.${net_}.${node_}.constraints.claimantCount.max` can only be defined once.";
                       } lib.types.ints.unsigned;
-                      default = 0;
+                      readOnly = true;
+                      default = 1;
                       description = "Maximum number of hosts allowed to claim this node; zero means no upper limit.";
                     };
                   };
