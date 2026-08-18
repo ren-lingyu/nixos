@@ -28,7 +28,6 @@ in {
             message = "Conflicting UID assignments for `modules.users.${user_}.uid`.";
           } (lib.types.nullOr lib.types.ints.unsigned);
           default = null;
-          internal = true;
           example = 1000;
           description = "UID assigned to the ${user_} user profile by the final flake composition.";
         };
