@@ -1,5 +1,7 @@
 host_ : { config, pkgs, lib, llib, ... } : {
 
+  number = 1;
+
   users = {
     "1000" = 1000;
   };
@@ -7,8 +9,6 @@ host_ : { config, pkgs, lib, llib, ... } : {
   monitors = {};
 
   intranetClaims = {};
-
-  intraIpAddress = "10.100.0.1";
 
   publicIpAddress = null;
 

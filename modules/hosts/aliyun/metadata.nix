@@ -1,5 +1,7 @@
 host_ : { config, pkgs, lib, llib, ... } : {
 
+  number = 3;
+
   users = {
     "1000" = 1000;
   };
@@ -9,8 +11,6 @@ host_ : { config, pkgs, lib, llib, ... } : {
   intranetClaims = {
     ingress = [ "hub" ];
   };
-
-  intraIpAddress = "10.100.0.3";
 
   publicIpAddress = "39.97.244.246";
 

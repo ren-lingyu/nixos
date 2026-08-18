@@ -1,5 +1,7 @@
 host_ : { config, pkgs, lib, llib, ... } : {
 
+  number = 2;
+
   users = {
     "1000" = 1000;
   };
@@ -26,8 +28,6 @@ host_ : { config, pkgs, lib, llib, ... } : {
   intranetClaims = {
     ingress = [ "spoke" ];
   };
-
-  intraIpAddress = "10.100.0.2";
 
   publicIpAddress = null;
 

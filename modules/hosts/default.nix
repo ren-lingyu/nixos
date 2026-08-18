@@ -24,6 +24,13 @@ in {
             example = true;
             description = "Whether to enable this host profile.";
           };
+          number = lib.mkOption {
+            type = lib.types.nullOr lib.types.ints.positive;
+            internal = true;
+            readOnly = true;
+            example = 1;
+            description = "Stable number assigned to this host.";
+          };
           users = lib.mkOption {
             type = lib.types.attrsOf (lib.types.unique {
               message = "Each `modules.hosts.${host_}.users.<uid>` can only be defined once.";
@@ -70,13 +77,6 @@ in {
             readOnly = true;
             example = "203.0.113.10";
             description = "Public IP address assigned to this host.";
-          };
-          intraIpAddress = lib.mkOption {
-            type = lib.types.nullOr lib.types.str;
-            internal = true;
-            readOnly = true;
-            example = "10.100.0.1";
-            description = "Internal IP address assigned to this host.";
           };
           identityKeys = lib.mkOption {
             type = lib.types.submodule {
