@@ -27,6 +27,8 @@ host_ : { config, pkgs, lib, llib, ... } : {
     ingress = [ "spoke" ];
   };
 
+  intraIpAddress = "10.100.0.2";
+
   publicIpAddress = null;
 
   identityKeys = {

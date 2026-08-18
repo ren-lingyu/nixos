@@ -8,6 +8,8 @@ host_ : { config, pkgs, lib, llib, ... } : {
 
   intranetClaims = {};
 
+  intraIpAddress = "10.100.0.1";
+
   publicIpAddress = null;
 
   identityKeys = {

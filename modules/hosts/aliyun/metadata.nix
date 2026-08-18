@@ -10,6 +10,8 @@ host_ : { config, pkgs, lib, llib, ... } : {
     ingress = [ "hub" ];
   };
 
+  intraIpAddress = "10.100.0.3";
+
   publicIpAddress = "39.97.244.246";
 
   identityKeys = {

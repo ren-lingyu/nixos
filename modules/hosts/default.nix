@@ -71,6 +71,13 @@ in {
             example = "203.0.113.10";
             description = "Public IP address assigned to this host.";
           };
+          intraIpAddress = lib.mkOption {
+            type = lib.types.nullOr lib.types.str;
+            internal = true;
+            readOnly = true;
+            example = "10.100.0.1";
+            description = "Internal IP address assigned to this host.";
+          };
           identityKeys = lib.mkOption {
             type = lib.types.submodule {
               options = builtins.listToAttrs (builtins.map (keyFormat_ : {
