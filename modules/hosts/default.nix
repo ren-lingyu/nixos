@@ -16,149 +16,147 @@ in {
       name = host_;
       value = let
         possibleExtraOptionsPath_ = ./. + "/${builtins.toString host_}/extra-options.nix";
-      in {
-        enable = lib.mkOption {
-          type = lib.types.bool;
-          default = false;
-          example = true;
-          description = "Whether to enable this host profile.";
-        };
-        users = lib.mkOption {
-          type = lib.types.attrsOf (lib.types.unique {
-            message = "Each `modules.hosts.${host_}.users.<uid>` can only be defined once.";
-          } lib.types.ints.unsigned);
-          internal = true;
-          default = {};
-          example = {
-            "1000" = 1000;
+      in lib.mergeAttrsList [
+        {
+          enable = lib.mkOption {
+            type = lib.types.bool;
+            default = false;
+            example = true;
+            description = "Whether to enable this host profile.";
           };
-          description = "UID-keyed declarations of managed users registered for this host.";
-        };
-        monitors = lib.mkOption {
-          type = lib.types.attrsOf (lib.types.unique {
-            message = "Each `modules.hosts.${host_}.monitors.<name>` can only be defined once.";
-          } llib.types.monitor);
-          internal = true;
-          default = {};
-          example = {
-            "eDP-1" = {
-              name = "eDP-1";
-              role = "default";
-              mode = {
-                width = 3072;
-                height = 1920;
-                refresh = 60.0;
-              };
-              scale = 1.6;
+          users = lib.mkOption {
+            type = lib.types.attrsOf (lib.types.unique {
+              message = "Each `modules.hosts.${host_}.users.<uid>` can only be defined once.";
+            } lib.types.ints.unsigned);
+            internal = true;
+            default = {};
+            example = {
+              "1000" = 1000;
             };
+            description = "UID-keyed declarations of managed users registered for this host.";
           };
-          description = "Monitor declarations for this host.";
-        };
-        intranetClaims = lib.mkOption {
-          type = lib.types.unique {
-            message = "`modules.hosts.${host_}.intranetClaims` can only be defined once.";
-          } (lib.types.attrsOf (lib.types.listOf lib.types.nonEmptyStr));
-          internal = true;
-          example = {
-            ingress = [ "hub" ];
+          monitors = lib.mkOption {
+            type = lib.types.attrsOf (lib.types.unique {
+              message = "Each `modules.hosts.${host_}.monitors.<name>` can only be defined once.";
+            } llib.types.monitor);
+            internal = true;
+            default = {};
+            example = {
+              "eDP-1" = {
+                name = "eDP-1";
+                role = "default";
+                mode = {
+                  width = 3072;
+                  height = 1920;
+                  refresh = 60.0;
+                };
+                scale = 1.6;
+              };
+            };
+            description = "Monitor declarations for this host.";
           };
-          description = "Interconnect nodes claimed by this host, grouped by intranet name.";
-        };
-        publicIpAddress = lib.mkOption {
-          type = lib.types.unique {
-            message = "`modules.hosts.${host_}.publicIpAddress` can only be defined once.";
-          } (lib.types.nullOr lib.types.str);
-          internal = true;
-          default = null;
-          example = "203.0.113.10";
-          description = "Public IP address assigned to this host.";
-        };
-        identityKeys = lib.mkOption {
-          type = lib.types.unique {
-            message = "`modules.hosts.${host_}.identityKeys` can only be defined once.";
-          } (lib.types.submodule {
-            options = builtins.listToAttrs (builtins.map (keyFormat_ : {
-              name = keyFormat_;
-              value = lib.mkOption {
-                type = lib.types.submodule {
-                  options = {
-                    public = lib.mkOption {
-                      type = lib.types.submodule {
-                        options = {
-                          key = lib.mkOption {
-                            type = lib.types.nullOr lib.types.nonEmptyStr;
-                            default = null;
-                            description = "Public ${keyFormat_} key material for this host.";
-                          };
-                          ageRecipient = lib.mkOption {
-                            type = lib.types.nullOr lib.types.nonEmptyStr;
-                            default = null;
-                            description = "Age recipient derived from the public ${keyFormat_} key for this host.";
-                          };
-                          path = lib.mkOption {
-                            type = lib.types.nullOr lib.types.nonEmptyStr;
-                            default = null;
-                            description = "Runtime path of the public ${keyFormat_} key on this host.";
+          intranetClaims = lib.mkOption {
+            type = lib.types.attrsOf (lib.types.listOf lib.types.nonEmptyStr);
+            internal = true;
+            readOnly = true;
+            example = {
+              ingress = [ "hub" ];
+            };
+            description = "Interconnect nodes claimed by this host, grouped by intranet name.";
+          };
+          publicIpAddress = lib.mkOption {
+            type = lib.types.nullOr lib.types.str;
+            internal = true;
+            readOnly = true;
+            example = "203.0.113.10";
+            description = "Public IP address assigned to this host.";
+          };
+          identityKeys = lib.mkOption {
+            type = lib.types.submodule {
+              options = builtins.listToAttrs (builtins.map (keyFormat_ : {
+                name = keyFormat_;
+                value = lib.mkOption {
+                  type = lib.types.submodule {
+                    options = {
+                      public = lib.mkOption {
+                        type = lib.types.submodule {
+                          options = {
+                            key = lib.mkOption {
+                              type = lib.types.nullOr lib.types.nonEmptyStr;
+                              default = null;
+                              description = "Public ${keyFormat_} key material for this host.";
+                            };
+                            ageRecipient = lib.mkOption {
+                              type = lib.types.nullOr lib.types.nonEmptyStr;
+                              default = null;
+                              description = "Age recipient derived from the public ${keyFormat_} key for this host.";
+                            };
+                            path = lib.mkOption {
+                              type = lib.types.nullOr lib.types.nonEmptyStr;
+                              default = null;
+                              description = "Runtime path of the public ${keyFormat_} key on this host.";
+                            };
                           };
                         };
+                        default = {};
+                        description = "Public ${keyFormat_} identity key metadata for this host.";
                       };
-                      default = {};
-                      description = "Public ${keyFormat_} identity key metadata for this host.";
-                    };
-                    private = lib.mkOption {
-                      type = lib.types.submodule {
-                        options = {
-                          key = lib.mkOption {
-                            type = lib.types.nullOr (lib.types.either lib.types.path lib.types.nonEmptyStr);
-                            default = null;
-                            description = "Private ${keyFormat_} key material for this host. Path values point to a repository file containing the key material; string values contain the key material inline. Stored private key material should be encrypted.";
-                          };
-                          path = lib.mkOption {
-                            type = lib.types.nullOr lib.types.nonEmptyStr;
-                            default = null;
-                            description = "Runtime path of the private ${keyFormat_} key on this host.";
+                      private = lib.mkOption {
+                        type = lib.types.submodule {
+                          options = {
+                            key = lib.mkOption {
+                              type = lib.types.nullOr (lib.types.either lib.types.path lib.types.nonEmptyStr);
+                              default = null;
+                              description = "Private ${keyFormat_} key material for this host. Path values point to a repository file containing the key material; string values contain the key material inline. Stored private key material should be encrypted.";
+                            };
+                            path = lib.mkOption {
+                              type = lib.types.nullOr lib.types.nonEmptyStr;
+                              default = null;
+                              description = "Runtime path of the private ${keyFormat_} key on this host.";
+                            };
                           };
                         };
+                        default = {};
+                        description = "Private ${keyFormat_} identity key metadata for this host.";
                       };
-                      default = {};
-                      description = "Private ${keyFormat_} identity key metadata for this host.";
                     };
                   };
                 };
-              };
-            }) [ "age" "ssh" ]);
-          });
-          internal = true;
-          default = {};
-          example = {
-            ssh = {
-              public = {
-                key = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAA...";
-                ageRecipient = "age1...";
-                path = "/etc/ssh/ssh_host_ed25519_key.pub";
-              };
-              private.path = "/etc/ssh/ssh_host_ed25519_key";
+              }) [ "age" "ssh" ]);
             };
+            internal = true;
+            readOnly = true;
+            example = {
+              ssh = {
+                public = {
+                  key = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAA...";
+                  ageRecipient = "age1...";
+                  path = "/etc/ssh/ssh_host_ed25519_key.pub";
+                };
+                private.path = "/etc/ssh/ssh_host_ed25519_key";
+              };
+            };
+            description = "Identity keys for this host, grouped by key format.";
           };
-          description = "Identity keys for this host, grouped by key format.";
-        };
-        existModule = lib.mkOption {
-          type = llib.types.existModule {
-            optionPath = "modules.hosts.${host_}.existModule";
+          existModule = lib.mkOption {
+            type = llib.types.existModule {
+              optionPath = "modules.hosts.${host_}.existModule";
+            };
+            internal = true;
+            default = {};
+            description = "Module availability declared by the ${host_} host profile.";
           };
-          internal = true;
-          default = {};
-          description = "Module availability declared by the ${host_} host profile.";
-        };
-      } // (lib.optionalAttrs (builtins.pathExists possibleExtraOptionsPath_) (
-        (import possibleExtraOptionsPath_) host_ {
-          inherit options;
-          inherit config;
-          inherit pkgs;
-          inherit lib;
-          inherit llib;
         }
-      ));
+        (lib.optionalAttrs (builtins.pathExists possibleExtraOptionsPath_) (
+          (import possibleExtraOptionsPath_) host_ {
+            inherit options;
+            inherit config;
+            inherit pkgs;
+            inherit lib;
+            inherit llib;
+          }
+        ))
+      ];
     }) hostList_));
   };
 

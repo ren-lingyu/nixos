@@ -27,6 +27,8 @@ host_ : { config, pkgs, lib, llib, ... } : {
     ingress = [ "spoke" ];
   };
 
+  publicIpAddress = null;
+
   identityKeys = {
     ssh = {
       public = {

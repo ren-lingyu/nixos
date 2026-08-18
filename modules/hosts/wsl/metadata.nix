@@ -8,6 +8,8 @@ host_ : { config, pkgs, lib, llib, ... } : {
 
   intranetClaims = {};
 
+  publicIpAddress = null;
+
   identityKeys = {
     ssh = {
       public = {

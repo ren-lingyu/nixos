@@ -2,9 +2,7 @@ feature_ : { options, config, pkgs, lib, llib, ... } : {
 
   intranets = lib.mkOption {
 
-    type = lib.types.unique {
-      message = "`modules.features.${feature_}.intranets` can only be defined once.";
-    } (lib.types.submodule {
+    type = lib.types.submodule {
       options = (lib.mapAttrs
         (net_ : nodes_ : (builtins.listToAttrs
           (builtins.map
@@ -65,8 +63,9 @@ feature_ : { options, config, pkgs, lib, llib, ... } : {
           ];
         }
       );
-    });
+    };
     internal = true;
+    readOnly = true;
     description = "Interconnect intranets and their derived node state.";
 
   };

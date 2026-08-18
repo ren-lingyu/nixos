@@ -1,9 +1,7 @@
 feature_ : { options, config, osConfig, pkgs, lib, llib, ... } : {
 
   secretsInput = lib.mkOption {
-    type = lib.types.unique {
-      message = "Conflicting definitions for `moduleInterfaces.features.${feature_}.secretsInput`.";
-    } (lib.types.listOf (lib.types.submodule {
+    type = lib.types.listOf (lib.types.submodule {
       options = {
         template = lib.mkOption {
           type = lib.types.enum [
@@ -14,37 +12,37 @@ feature_ : { options, config, osConfig, pkgs, lib, llib, ... } : {
         };
         structure = lib.mkOption {
           type = lib.types.attrsOf (
-            lib.fix (self : (lib.types.either
-              (lib.types.nonEmptyListOf lib.types.nonEmptyStr)
-              (lib.types.attrsOf self)
-            ) // {
-              description = "a non-empty list of strings or a nested attribute set";
-            })
+            lib.fix (self : lib.mergeAttrsList [
+              (lib.types.either
+                (lib.types.nonEmptyListOf lib.types.nonEmptyStr)
+                (lib.types.attrsOf self)
+              )
+              {
+                description = "a non-empty list of strings or a nested attribute set";
+              }
+            ])
           );
           default = {};
           description = "Nested secret-key structure converted into individual sops-nix secret declarations.";
         };
       };
-    }));
-    default = [];
+    });
     internal = true;
+    readOnly = true;
     description = "Per-user inputs consumed by the ${feature_} feature to generate Home Manager sops-nix secrets.";
   };
 
   defaultSopsFormat = lib.mkOption {
-    type = lib.types.unique {
-      message = "Conflicting definitions for `moduleInterfaces.features.${feature_}.defaultSopsFormat`.";
-    } lib.types.str;
-    default = "yaml";
+    type = lib.types.str;
     internal = true;
+    readOnly = true;
     description = "Default SOPS format used by the ${feature_} feature for this Home Manager user.";
   };
 
   defaultSopsFile = lib.mkOption {
-    type = lib.types.unique {
-      message = "Conflicting definitions for `moduleInterfaces.features.${feature_}.defaultSopsFile`.";
-    } lib.types.path;
+    type = lib.types.path;
     internal = true;
+    readOnly = true;
     description = "Encrypted SOPS file containing secrets for this Home Manager user.";
   };
 

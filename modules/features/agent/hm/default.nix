@@ -1,8 +1,30 @@
-{ config, lib, pkgs, osConfig, ... } : let
+{ options, config, lib, pkgs, osConfig, ... } : let
 
   cfg = osConfig.modules.features.agent;
 
-  mif = config.moduleInterfaces.features.agent;
+  mifOptions_ = options.moduleInterfaces.features.agent;
+  rawMif_ = config.moduleInterfaces.features.agent;
+
+  normalizeProvider_ = agent_ : provider_ : providerConfig_ : lib.mergeAttrsList [
+    (builtins.removeAttrs providerConfig_ [ "enable" ])
+    {
+      enable =
+        if mifOptions_.${agent_}.providers.${provider_}.enable.isDefined
+        then providerConfig_.enable
+        else false;
+    }
+  ];
+
+  mif = lib.mapAttrs
+    (agent_ : agentConfig_ : lib.mergeAttrsList [
+      (builtins.removeAttrs agentConfig_ [ "providers" ])
+      {
+        providers = lib.mapAttrs
+          (provider_ : normalizeProvider_ agent_ provider_)
+          agentConfig_.providers;
+      }
+    ])
+    rawMif_;
 
 in {
 
@@ -15,53 +37,55 @@ in {
       enableMcpIntegration = false;
       extraPackages = [];
 
-      settings = (lib.optionalAttrs
-        mif.opencode.providers.deepseek.enable
+      settings = lib.mergeAttrsList [
+        (lib.optionalAttrs mif.opencode.providers.deepseek.enable
+          {
+            model = "deepseek/deepseek-v4-pro";
+            small_model = "deepseek/deepseek-v4-flash";
+          }
+        )
         {
-          model = "deepseek/deepseek-v4-pro";
-          small_model = "deepseek/deepseek-v4-flash";
-        }
-      ) // {
 
-        permission = "ask";
-        autoupdate = false;
+          permission = "ask";
+          autoupdate = false;
 
-        enabled_providers = (builtins.attrNames
-          (lib.filterAttrs
-            (name_ : value_ : value_.enable == true)
-            mif.opencode.providers
-          )
-        );
+          enabled_providers = (builtins.attrNames
+            (lib.filterAttrs
+              (name_ : value_ : value_.enable == true)
+              mif.opencode.providers
+            )
+          );
 
-        provider = {
+          provider = {
 
-          deepseek = lib.mkIf mif.opencode.providers.deepseek.enable {
-            name = "DeepSeek";
-            options = {
-              baseURL = "https://api.deepseek.com";
-              apiKey = "{file:${mif.opencode.providers.deepseek.apiKey}}";
-            };
-            models = {
-              deepseek-v4-pro = {
-                name = "DeepSeek-V4-Pro";
-                limit = {
-                  context = 1000000;
-                  output = 384000;
-                };
+            deepseek = lib.mkIf mif.opencode.providers.deepseek.enable {
+              name = "DeepSeek";
+              options = {
+                baseURL = "https://api.deepseek.com";
+                apiKey = "{file:${mif.opencode.providers.deepseek.apiKey}}";
               };
-              deepseek-v4-flash = {
-                name = "DeepSeek-V4-Flash";
-                limit = {
-                  context = 1000000;
-                  output = 384000;
+              models = {
+                deepseek-v4-pro = {
+                  name = "DeepSeek-V4-Pro";
+                  limit = {
+                    context = 1000000;
+                    output = 384000;
+                  };
+                };
+                deepseek-v4-flash = {
+                  name = "DeepSeek-V4-Flash";
+                  limit = {
+                    context = 1000000;
+                    output = 384000;
+                  };
                 };
               };
             };
+
           };
 
-        };
-
-      };
+        }
+      ];
 
       context = ./context.md;
       agents = {};
@@ -94,8 +118,9 @@ in {
 
       in prev_.overrideAttrs (oldAttrs: {
 
-        nativeBuildInputs = (oldAttrs.nativeBuildInputs or []) ++ [
-          pkgs.makeWrapper
+        nativeBuildInputs = builtins.concatLists [
+          (oldAttrs.nativeBuildInputs or [])
+          [ pkgs.makeWrapper ]
         ];
         postFixup = builtins.concatStringsSep "\n" [
           (oldAttrs.postFixup or "")
@@ -152,6 +177,21 @@ in {
       context = ./context.md;
       skills = ./skills;
     };
+
+    assertions = builtins.concatLists (lib.mapAttrsToList
+      (agent_ : agentConfig_ : lib.mapAttrsToList
+        (provider_ : providerConfig_ : {
+          assertion = (builtins.any
+            (x_ : x_)
+            [
+              (!providerConfig_.enable)
+              mifOptions_.${agent_}.providers.${provider_}.apiKey.isDefined
+            ]
+          );
+          message = "`moduleInterfaces.features.agent.${agent_}.providers.${provider_}.enable = true` requires `moduleInterfaces.features.agent.${agent_}.providers.${provider_}.apiKey` to be defined.";
+        })
+        agentConfig_.providers)
+      mif);
 
   };
 

@@ -36,19 +36,22 @@ in {
 
       monitors = enabledHost_.monitors;
 
-      session-wrapper = lib.mkIf cfg.enable (let
-        commandName_ = "Niri";
-      in pkgs.runCommand "niri-session-wrapper" {
-        meta.mainProgram = "${commandName_}";
-      } (builtins.concatStringsSep "\n" [
-        "mkdir -p $out/bin"
-        "cat > $out/bin/${commandName_} <<'EOF'"
-        "#!${lib.getExe pkgs.bash}"
-        "export SYSTEMD_LOG_LEVEL=err"
-        "exec ${lib.getExe' config.programs.niri.package "niri-session"}"
-        "EOF"
-        "chmod +x $out/bin/${commandName_}"
-      ]));
+      session-wrapper =
+        if cfg.enable
+        then (let
+          commandName_ = "Niri";
+        in pkgs.runCommand "niri-session-wrapper" {
+          meta.mainProgram = "${commandName_}";
+        } (builtins.concatStringsSep "\n" [
+          "mkdir -p $out/bin"
+          "cat > $out/bin/${commandName_} <<'EOF'"
+          "#!${lib.getExe pkgs.bash}"
+          "export SYSTEMD_LOG_LEVEL=err"
+          "exec ${lib.getExe' config.programs.niri.package "niri-session"}"
+          "EOF"
+          "chmod +x $out/bin/${commandName_}"
+        ]))
+        else null;
 
     };
 

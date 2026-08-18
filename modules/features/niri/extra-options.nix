@@ -21,20 +21,16 @@ feature_ : { options, config, pkgs, lib, llib, ... } : {
   };
 
   session-wrapper = lib.mkOption {
-    type = lib.types.unique {
-      message = "Only one module may define `modules.features.${feature_}.session-wrapper.package`.";
-    } (lib.types.nullOr lib.types.package);
-    default = null;
+    type = lib.types.nullOr lib.types.package;
     internal = true;
+    readOnly = true;
     description = "Internal package providing the niri session command for greeters.";
   };
 
   monitors = lib.mkOption {
-    type = lib.types.unique {
-      message = "Only one module may define `modules.features.${feature_}.monitors`.";
-    } llib.types.monitors;
+    type = llib.types.monitors;
     internal = true;
-    default = {};
+    readOnly = true;
     description = "Monitor declarations used by Niri.";
   };
 

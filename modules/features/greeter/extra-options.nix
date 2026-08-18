@@ -1,18 +1,14 @@
 feature_ : { config, pkgs, lib, llib, ... } : {
 
   sessionPackages = lib.mkOption {
-    type = lib.types.unique {
-      message = "Conflicting definitions for `modules.features.${feature_}.sessionPackages`.";
-    } (lib.types.listOf lib.types.package);
+    type = lib.types.listOf lib.types.package;
     internal = true;
-    default = [];
+    readOnly = true;
     description = "Internal session packages provided to the greeter.";
   };
 
   monitor = lib.mkOption {
-    type = lib.types.unique {
-      message = "Conflicting definitions for `modules.features.${feature_}.monitor`.";
-    } (lib.types.submodule ({ name, config, ... } : {
+    type = lib.types.submodule ({ name, config, ... } : {
       options = {
         name = lib.mkOption {
           type =  lib.types.nullOr lib.types.str;
@@ -21,9 +17,9 @@ feature_ : { config, pkgs, lib, llib, ... } : {
           description = "Name of the default monitor.";
         };
       };
-    }));
+    });
     internal = true;
-    default = { };
+    readOnly = true;
     example = {
       name = "eDP-1";
     };

@@ -6,19 +6,16 @@ feature_ : { options, config, osConfig, pkgs, lib, llib, ... } : {
         (provider_ : unused_ : {
 
           enable = lib.mkOption {
-            type = lib.types.unique {
-              message = "Conflicting definitions for `moduleInterfaces.features.${feature_}.${agent_}.providers.${provider_}.enable`.";
-            } lib.types.bool;
-            default = false;
+            type = lib.types.bool;
             internal = true;
+            readOnly = true;
             description = "Whether to enable the ${provider_} provider for ${agent_}.";
           };
 
           apiKey = lib.mkOption {
-            type = lib.types.unique {
-              message = "Conflicting definitions for `moduleInterfaces.features.${feature_}.${agent_}.providers.${provider_}.apiKey`.";
-            } lib.types.nonEmptyStr;
+            type = lib.types.nonEmptyStr;
             internal = true;
+            readOnly = true;
             description = "Path to the file containing the ${provider_} API key used by ${agent_}.";
           };
 

@@ -1,11 +1,9 @@
 feature_ : { config, pkgs, lib, llib, ... } : {
 
   session-wrapper = lib.mkOption {
-    type = lib.types.unique {
-      message = "Only one module may define `modules.features.${feature_}.session-wrapper`.";
-    } (lib.types.nullOr lib.types.package);
-    default = null;
+    type = lib.types.nullOr lib.types.package;
     internal = true;
+    readOnly = true;
     description = "Internal package providing the X11 session command for greeters.";
   };
 
