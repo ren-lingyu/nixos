@@ -8,9 +8,14 @@ host_ : { config, pkgs, lib, llib, ... } : {
 
   monitors = {};
 
-  intranetClaims = {};
-
   publicIpAddress = null;
+
+  wireguard = {
+    publicKey = "E8VcIYOgkRsmqZtrWSknRKO0xUGeAYlFDt4XMTHGK3M=";
+    privateKey = ./wireguard.private.age;
+    listenPort = null;
+    endpoint = null;
+  };
 
   identityKeys = {
     ssh = {

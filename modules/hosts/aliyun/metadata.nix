@@ -1,4 +1,4 @@
-host_ : { config, pkgs, lib, llib, ... } : {
+host_ : { config, pkgs, lib, llib, ... } : rec {
 
   number = 3;
 
@@ -8,11 +8,17 @@ host_ : { config, pkgs, lib, llib, ... } : {
 
   monitors = {};
 
-  intranetClaims = {
-    ingress = [ "hub" ];
-  };
-
   publicIpAddress = "39.97.244.246";
+
+  wireguard = {
+    publicKey = "NR1Zb8NAO2TpywtE9uZsftU8EWytnUWwOlVMDppZuww=";
+    privateKey = ./wireguard.private.age;
+    listenPort = 51820;
+    endpoint = {
+      address = publicIpAddress;
+      port = wireguard.listenPort;
+    };
+  };
 
   identityKeys = {
     ssh = {

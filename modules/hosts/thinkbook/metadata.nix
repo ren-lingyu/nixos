@@ -25,11 +25,14 @@ host_ : { config, pkgs, lib, llib, ... } : {
     };
   };
 
-  intranetClaims = {
-    ingress = [ "spoke" ];
-  };
-
   publicIpAddress = null;
+
+  wireguard = {
+    publicKey = "XASMyK2E6Jluj1jjsWc4eNXOA5OwjW3E5HlCCocK/BE=";
+    privateKey = ./wireguard.private.age;
+    listenPort = null;
+    endpoint = null;
+  };
 
   identityKeys = {
     ssh = {
