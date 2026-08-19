@@ -16,24 +16,23 @@
     default = [];
   };
 
-  integrationOptions_ = {
-    options = {
-      assertions = assertionOption_;
-      home-manager = {
-        users = lib.mkOption {
-          type = lib.types.attrsOf lib.types.anything;
-          default = {};
-        };
-        sharedModules = lib.mkOption {
-          type = lib.types.listOf lib.types.anything;
-          default = [];
-        };
-      };
-      users.users = lib.mkOption {
-        type = lib.types.attrsOf lib.types.anything;
-        default = {};
-      };
-    };
+  assertionOptions_ = {
+    options.assertions = assertionOption_;
+  };
+
+  assertionOnlyModule_ = modulePath_ : args_ : let
+    module_ = import modulePath_ args_;
+  in {
+    inherit (module_) options;
+    config.assertions = module_.config.assertions;
+  };
+
+  testHostMetadata_ = { options, ... } : {
+    config.modules.hosts = builtins.mapAttrs
+      (unused_name_ : unused_hostOptions_ : {
+        wireguard = null;
+      })
+      options.modules.hosts;
   };
 
   evalHostUserAssertions_ = config_ : (lib.evalModules {
@@ -41,9 +40,10 @@
       inherit pkgs llib;
     };
     modules = [
-      integrationOptions_
-      ../../modules/hosts
-      ../../modules/users
+      assertionOptions_
+      (assertionOnlyModule_ ../../modules/hosts)
+      (assertionOnlyModule_ ../../modules/users)
+      testHostMetadata_
       { config = config_; }
     ];
   }).config.assertions;
@@ -53,7 +53,7 @@
       inherit pkgs llib;
     };
     modules = [
-      integrationOptions_
+      assertionOptions_
       {
         options.modules.users = lib.mkOption {
           type = lib.types.attrsOf (lib.types.submodule {
@@ -71,7 +71,7 @@
           default = {};
         };
       }
-      ../../modules/features
+      (assertionOnlyModule_ ../../modules/features)
       { config = config_; }
     ];
   }).config.assertions;
