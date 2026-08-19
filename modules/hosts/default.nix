@@ -297,17 +297,18 @@ in {
       ])) cfg))
     ]);
 
-    home-manager.sharedModules = builtins.concatLists (lib.mapAttrsToList (hostName_ : host_ :
-      lib.optionals (builtins.all
+    home-manager.sharedModules = builtins.concatLists (lib.mapAttrsToList (hostName_ : host_ : (lib.optionals
+      (builtins.all
         (x_ : x_)
         [
           host_.enable
           (host_.existModule.hm == true)
         ]
-      ) [
+      )
+      [
         (./. + "/${hostName_}/hm")
       ]
-    ) cfg);
+    )) cfg);
 
   };
 
