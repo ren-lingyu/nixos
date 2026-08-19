@@ -354,8 +354,8 @@
                   };
                   features = {
                     interconnect.enable = true;
-                    sops.enable = true;
                     shell.enable = true;
+                    sops.enable = true;
                   };
                   users = {
                     lingyu-minimal.uid = config.modules.hosts.aliyun.users."1000";
