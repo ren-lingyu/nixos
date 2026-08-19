@@ -245,6 +245,13 @@ in {
       };
     };
 
+    networking = mif.mkWireGuardNetworking {
+      registry = cfg;
+      privateKeyFile = config.age.secrets.wireguard.path;
+      wgIpRule = (x_ : y_ : "10.100.${builtins.toString x_}.${builtins.toString y_}");
+      wgNameRule = (x_ : "wg${builtins.toString x_}");
+    };
+
     assertions = let
       enabledHosts_ = lib.filterAttrs (unused_name_ : host_ : host_.enable) cfg;
       enabledHostNames_ = builtins.attrNames enabledHosts_;
@@ -263,6 +270,20 @@ in {
         hmModulePath = ./. + "/${hostName_}/hm/default.nix";
         enabledMessage = "`modules.hosts.${hostName_}.enable = true` requires the host profile to declare `existModule.os` and `existModule.hm`.";
       }) cfg))
+      (lib.mapAttrsToList
+        (hostName_ : host_ : {
+          assertion = (builtins.any
+            (x_ : x_)
+            [
+              (host_.wireguard == null)
+              (host_.wireguard.endpoint == null)
+              (host_.wireguard.listenPort != null)
+            ]
+          );
+          message = "Host `${hostName_}` with a WireGuard endpoint must provide `wireguard.listenPort`.";
+        })
+        cfg
+      )
       (builtins.concatLists (lib.mapAttrsToList (hostName_ : host_ : (builtins.concatLists [
         (let
           monitors_ = builtins.attrValues host_.monitors;
