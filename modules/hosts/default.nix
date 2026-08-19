@@ -2,6 +2,8 @@
 
   cfg = config.modules.hosts;
 
+  mif = llib.moduleFunctions.hosts.default;
+
   hostList_ = builtins.attrNames (lib.filterAttrs (name_ : type_ : (builtins.all
     (x_ : x_)
     [
@@ -10,7 +12,7 @@
     ]
   )) (builtins.readDir ./.));
 
-  enabledHost_ = llib.moduleFunctions.hosts.default.getUniqueEnabledHost config.modules.hosts;
+  enabledHost_ = mif.getUniqueEnabledHost config.modules.hosts;
 
 in {
 
