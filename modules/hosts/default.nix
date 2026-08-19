@@ -1,6 +1,7 @@
 { options, config, pkgs, lib, llib, ... } : let
 
   cfg = config.modules.hosts;
+
   hostList_ = builtins.attrNames (lib.filterAttrs (name_ : type_ : (builtins.all
     (x_ : x_)
     [
@@ -8,6 +9,7 @@
       (builtins.pathExists (./. + "/${name_}/default.nix"))
     ]
   )) (builtins.readDir ./.));
+
   enabledHost_ = llib.moduleFunctions.hosts.default.getUniqueEnabledHost config.modules.hosts;
 
 in {

@@ -1,6 +1,7 @@
 { config, osConfig, lib, pkgs, ... } : let
 
   cfg = osConfig.modules.features.file-manager;
+
   niriCfg = osConfig.modules.features.niri;
 
 in {

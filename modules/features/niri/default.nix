@@ -1,6 +1,7 @@
 { config, pkgs, lib, llib, ... } : let
 
   cfg = config.modules.features.niri;
+
   enabledHost_ = llib.moduleFunctions.hosts.default.getUniqueEnabledHost config.modules.hosts;
 
   noctaliaEnable = (builtins.all

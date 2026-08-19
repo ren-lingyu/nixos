@@ -3,6 +3,7 @@
   cfg = osConfig.modules.features.agent;
 
   mifOptions_ = options.moduleInterfaces.features.agent;
+
   rawMif_ = config.moduleInterfaces.features.agent;
 
   normalizeProvider_ = agent_ : provider_ : providerConfig_ : lib.mergeAttrsList [

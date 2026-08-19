@@ -7,6 +7,7 @@
       (builtins.pathExists (./. + "/${name_}/default.nix"))
     ]
   )) (builtins.readDir ./.));
+
   enabledUserUids_ = builtins.map
     (user_ : user_.uid)
     (builtins.attrValues (lib.filterAttrs (unused_userName_ : user_ : (builtins.all

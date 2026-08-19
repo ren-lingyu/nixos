@@ -1,6 +1,7 @@
 { options, config, pkgs, lib, llib, ... } : let
 
   cfg = config.modules.features.greeter;
+
   enabledHost_ = llib.moduleFunctions.hosts.default.getUniqueEnabledHost config.modules.hosts;
 
 in {

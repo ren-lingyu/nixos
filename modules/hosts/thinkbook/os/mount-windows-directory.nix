@@ -10,6 +10,7 @@
     "chown-ignore"
     "chgrp-ignore"
   ];
+
   bindfsFontMountOptions = builtins.concatStringsSep "," [
     "ro"
     "force-user=${nixosRootName}"
@@ -17,11 +18,17 @@
     "perms=a=rX"
     "allow_other"
   ];
+
   nixosUserName = config.users.users."${builtins.toString cfg.users."1000"}".name;
+
   nixosUserHome = config.users.users."${builtins.toString cfg.users."1000"}".home;
+
   nixosRootName = config.users.users.root.name;
+
   windowsUserHome = "/mnt/c/Users/Lingyu";
+
   windowsSystemFonts = "/mnt/c/Windows/Fonts";
+
   nixosSystemFonts = "/usr/local/share/fonts";
 
 in {

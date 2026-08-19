@@ -3,6 +3,7 @@
   cfg = osConfig.modules.features.sops;
 
   mif = config.moduleInterfaces.features.sops;
+
   mifOptions_ = options.moduleInterfaces.features.sops;
 
   secretsInput_ =
