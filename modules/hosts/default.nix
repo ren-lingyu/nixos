@@ -30,7 +30,7 @@ in {
             description = "Whether to enable this host profile.";
           };
           number = lib.mkOption {
-            type = lib.types.nullOr lib.types.ints.positive;
+            type = lib.types.ints.positive;
             internal = true;
             readOnly = true;
             example = 1;
