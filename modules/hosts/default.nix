@@ -261,6 +261,15 @@ in {
           assertion = (builtins.length enabledHostNames_) == 1;
           message = "Exactly one host in `modules.hosts` must set `enable = true`. Enabled hosts: ${builtins.concatStringsSep ", " enabledHostNames_}.";
         }
+        {
+          assertion = let
+            hostNumbers_ = (builtins.map
+              (host_ : host_.number)
+              (builtins.attrValues cfg)
+            );
+          in ((builtins.length hostNumbers_) == (builtins.length (lib.unique hostNumbers_)));
+          message = "Host numbers must be globally unique.";
+        }
       ]
       (builtins.concatLists (lib.mapAttrsToList (hostName_ : host_ : llib.assertions.existModule {
         enable = host_.enable;
