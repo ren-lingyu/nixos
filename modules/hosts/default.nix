@@ -8,6 +8,7 @@
       (builtins.pathExists (./. + "/${name_}/default.nix"))
     ]
   )) (builtins.readDir ./.));
+  enabledHost_ = llib.moduleFunctions.hosts.default.getUniqueEnabledHost config.modules.hosts;
 
 in {
 
@@ -230,6 +231,15 @@ in {
         hostList_
       )
     );
+
+    age.secrets = lib.mkIf (enabledHost_.wireguard != null) {
+      wireguard = {
+        rekeyFile = enabledHost_.wireguard.privateKey;
+        owner = "root";
+        group = "root";
+        mode = "0400";
+      };
+    };
 
     assertions = let
       enabledHosts_ = lib.filterAttrs (unused_name_ : host_ : host_.enable) cfg;
