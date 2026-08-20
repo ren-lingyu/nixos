@@ -1,16 +1,15 @@
 { lib } : rec {
 
   getUniqueEnabledHost = hosts_ : let
-    enabledHostValues_ = builtins.attrValues (
-      (lib.filterAttrs
-        (unused_name_ : host_ : (host_.enable or false) == true)
-        hosts_
-      )
+    enabledHosts_ = (lib.filterAttrs
+      (unused_name_ : host_ : (host_.enable or false) == true)
+      hosts_
     );
+    enabledHostNames_ = builtins.attrNames enabledHosts_;
   in (
-    if (builtins.length enabledHostValues_) == 1
-    then builtins.head enabledHostValues_
-    else {}
+    if (builtins.length enabledHostNames_) == 1
+    then enabledHosts_.${builtins.head enabledHostNames_}
+    else builtins.throw "getUniqueEnabledHost requires exactly one enabled host. Enabled hosts: ${builtins.concatStringsSep ", " enabledHostNames_}."
   );
 
   mkWireGuardNetworking = { registry, privateKeyFile, wgIpRule, wgNameRule } : let

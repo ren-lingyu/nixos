@@ -23,8 +23,8 @@
   };
 
 in assert (hostFunctions_.getUniqueEnabledHost hosts_).value == "enabled";
-   assert hostFunctions_.getUniqueEnabledHost noEnabledHosts_ == {};
-   assert hostFunctions_.getUniqueEnabledHost multipleEnabledHosts_ == {};
+   assert (builtins.tryEval (hostFunctions_.getUniqueEnabledHost noEnabledHosts_)).success == false;
+   assert (builtins.tryEval (hostFunctions_.getUniqueEnabledHost multipleEnabledHosts_)).success == false;
 pkgs.runCommand "nixos-host-functions" {} ''
   touch $out
 ''
