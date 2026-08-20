@@ -90,10 +90,6 @@
       };
     };
 
-    programs = {
-      extra-container.enable = true;
-    };
-
     home-manager = {
 
       useGlobalPkgs = true;
