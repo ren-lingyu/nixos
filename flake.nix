@@ -229,6 +229,38 @@
           };
         };
 
+        workloads = {
+          caddy = { config, pkgs, lib, ... } : {
+            imports = [
+              self.modules.base
+              ./modules/workloads/caddy
+            ];
+            config = {
+              modules.workloads.caddy = {
+                enable = true;
+                ip = "10.100.3.2";
+                port = 18000;
+                networkInterface = "wg3";
+              };
+            };
+          };
+          wbo = { config, pkgs, lib, ... } : {
+            imports = [
+              self.modules.base
+              ./modules/workloads/wbo
+            ];
+            config = {
+              modules.workloads.wbo = {
+                enable = true;
+                ip = "10.100.3.2";
+                port = 18000;
+                networkInterface = "wg3";
+                allowedSourceIp = "10.100.3.3";
+              };
+            };
+          };
+        };
+
         hosts = {
           wsl = { config, pkgs, lib, ... } : {
             imports = [
@@ -240,6 +272,7 @@
           thinkbook = { config, pkgs, lib, ... } : {
             imports = [
               self.modules.base
+              self.modules.workloads.wbo
               inputs.nix-flatpak.nixosModules.nix-flatpak
               ./modules/hosts/thinkbook
             ];
@@ -253,6 +286,7 @@
           aliyun = { config, pkgs, lib, ... } : {
             imports = [
               self.modules.base
+              self.modules.workloads.caddy
               inputs.disko.nixosModules.disko
               ./modules/hosts/aliyun
             ];
