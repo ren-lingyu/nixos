@@ -86,12 +86,14 @@
     hm = false;
   };
 
+  uniqueEnabledHostAssertionMessage_ = "Exactly one host in `modules.hosts` must set `enable = true`.";
+
   noEnabledHostAssertion_ = assertionByMessage_
-    "Exactly one host in `modules.hosts` must set `enable = true`. Enabled hosts: ."
+    uniqueEnabledHostAssertionMessage_
     (evalHostUserAssertions_ {});
 
   oneEnabledHostAssertion_ = assertionByMessage_
-    "Exactly one host in `modules.hosts` must set `enable = true`. Enabled hosts: thinkbook."
+    uniqueEnabledHostAssertionMessage_
     (evalHostUserAssertions_ {
       modules.hosts.thinkbook = {
         enable = true;
@@ -100,7 +102,7 @@
     });
 
   multipleEnabledHostAssertion_ = assertionByMessage_
-    "Exactly one host in `modules.hosts` must set `enable = true`. Enabled hosts: aliyun, thinkbook."
+    uniqueEnabledHostAssertionMessage_
     (evalHostUserAssertions_ {
       modules.hosts = {
         aliyun = {

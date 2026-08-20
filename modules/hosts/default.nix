@@ -252,14 +252,11 @@ in {
       wgNameRule = (x_ : "wg${builtins.toString x_}");
     };
 
-    assertions = let
-      enabledHosts_ = lib.filterAttrs (unused_name_ : host_ : host_.enable) cfg;
-      enabledHostNames_ = builtins.attrNames enabledHosts_;
-    in (builtins.concatLists [
+    assertions = (builtins.concatLists [
       [
         {
-          assertion = (builtins.length enabledHostNames_) == 1;
-          message = "Exactly one host in `modules.hosts` must set `enable = true`. Enabled hosts: ${builtins.concatStringsSep ", " enabledHostNames_}.";
+          assertion = (builtins.tryEval enabledHost_).success;
+          message = "Exactly one host in `modules.hosts` must set `enable = true`.";
         }
         {
           assertion = let
