@@ -18,6 +18,12 @@ in {
     networking = {
       hostName = "nixos-server";
       useDHCP = lib.mkDefault true;
+      firewall = {
+        allowedTCPPorts = [
+          80
+          443
+        ];
+      };
     };
 
     time.timeZone = "Asia/Shanghai";
