@@ -4,6 +4,7 @@
     ./hosts
     ./users
     ./features
+    ./workloads
   ];
 
   options = {
