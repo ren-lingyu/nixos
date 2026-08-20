@@ -278,7 +278,6 @@
             ];
             config.modules = {
               hosts.thinkbook = {
-                packageGroups.tencent.enable = false;
                 flatpak.enable = true;
               };
             };
@@ -314,10 +313,6 @@
                       "github-copilot-cli"
                       "microsoft-edge"
                       "feishu"
-                      "libwemeetwrap"
-                      "wemeet"
-                      "wechat"
-                      "qq"
                       "zoom"
                     ];
                     createXdgUserDirectories = true;

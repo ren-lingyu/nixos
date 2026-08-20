@@ -106,11 +106,6 @@ in {
               xournalpp
               rnote
             ]
-            (lib.optionals cfg.packageGroups.tencent.enable [
-              wechat
-              wemeet
-              qq
-            ])
           ]);
         };
       };
