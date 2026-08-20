@@ -37,7 +37,7 @@ in {
 
       monitors = enabledHost_.monitors;
 
-      session-wrapper =
+      session-wrapper = (
         if cfg.enable
         then (let
           commandName_ = "Niri";
@@ -52,7 +52,8 @@ in {
           "EOF"
           "chmod +x $out/bin/${commandName_}"
         ]))
-        else null;
+        else null
+      );
 
     };
 
