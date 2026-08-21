@@ -228,6 +228,13 @@ in {
             assertion = (builtins.length monitorNames_) == (builtins.length (lib.unique monitorNames_));
             message = "Monitor names in `modules.hosts.${hostName_}.monitors` must be unique.";
           }
+          {
+            assertion = (builtins.all
+              (monitor_ : (monitor_.role != "default") || (monitor_.mode != null))
+              monitors_
+            );
+            message = "`modules.hosts.${hostName_}.monitors.<name>` with `role = \"default\"` must provide a non-null `mode`.";
+          }
         ])
         (builtins.concatLists (lib.mapAttrsToList (uidKey_ : uid_ : [
           {
