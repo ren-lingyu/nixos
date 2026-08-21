@@ -16,6 +16,10 @@
 
 in {
 
+  imports = [
+    ./wireguard.nix
+  ];
+
   options = {
     modules.hosts = (builtins.listToAttrs (builtins.map (host_ : {
       name = host_;
@@ -235,22 +239,6 @@ in {
         hostList_
       )
     );
-
-    age.secrets = lib.mkIf (enabledHost_.wireguard != null) {
-      wireguard = {
-        rekeyFile = enabledHost_.wireguard.privateKey;
-        owner = "root";
-        group = "root";
-        mode = "0400";
-      };
-    };
-
-    networking = mif.mkWireGuardNetworking {
-      registry = cfg;
-      privateKeyFile = config.age.secrets.wireguard.path;
-      wgIpRule = (x_ : y_ : "10.100.${builtins.toString x_}.${builtins.toString y_}");
-      wgNameRule = (x_ : "wg${builtins.toString x_}");
-    };
 
     assertions = (builtins.concatLists [
       [
