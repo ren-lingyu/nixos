@@ -18,6 +18,8 @@
 
   moduleFunctions = {
 
+    default = import ./moduleFunctions.default.nix { inherit lib; };
+
     hosts = {
 
       default = import ./moduleFunctions.hosts.default.nix { inherit lib; };
