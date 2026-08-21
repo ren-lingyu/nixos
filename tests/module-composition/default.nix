@@ -21,11 +21,27 @@
   };
 
   assertionOnlyModule_ = modulePath_ : args_ : let
-    module_ = import modulePath_ args_;
-  in {
-    inherit (module_) options;
-    config.assertions = module_.config.assertions;
-  };
+
+    loadModule_ = module_ :
+      if lib.isFunction module_ then
+        module_ args_
+      else if lib.isAttrs module_ then
+        module_
+      else
+        loadModule_ (import module_);
+
+    stripModule_ = module_ : let
+      attrs_ = loadModule_ module_;
+    in {
+      imports =
+        builtins.map stripModule_
+          (attrs_.imports or []);
+      options = attrs_.options or {};
+      config.assertions =
+        (attrs_.config or {}).assertions or [];
+    };
+
+  in stripModule_ modulePath_;
 
   testHostMetadata_ = { options, ... } : {
     config.modules.hosts = builtins.mapAttrs
