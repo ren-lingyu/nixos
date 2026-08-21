@@ -4,33 +4,28 @@
     path_,
     commonSchema_,
     extraSchema_,
-  } : (builtins.listToAttrs
-    (builtins.map
-      (module_ : {
-        name = module_;
-        value = (lib.mergeAttrsList [
-          (commonSchema_
-            module_
-          )
-          (extraSchema_
-            module_
-            (path_ + "/${builtins.toString module_}/extra-options.nix")
-          )
-        ]);
-      })
-      (builtins.attrNames
-        (lib.filterAttrs
-          (name_ : type_ : (builtins.all
-            (x_ : x_)
-            [
-              (type_ == "directory")
-              (builtins.pathExists (path_ + "/${name_}/default.nix"))
-            ]
-          ))
-          (builtins.readDir path_)
-        )
+  } : (lib.genAttrs
+    (builtins.attrNames
+      (lib.filterAttrs
+        (name_ : type_ : (builtins.all
+          (x_ : x_)
+          [
+            (type_ == "directory")
+            (builtins.pathExists (path_ + "/${name_}/default.nix"))
+          ]
+        ))
+        (builtins.readDir path_)
       )
     )
+    (module_ : (lib.mergeAttrsList [
+      (commonSchema_
+        module_
+      )
+      (extraSchema_
+        module_
+        (path_ + "/${builtins.toString module_}/extra-options.nix")
+      )
+    ]))
   );
 
 in {
