@@ -18,6 +18,7 @@ in {
 
   imports = [
     ./boot-manager.nix
+    ./identity-keys.nix
     ./wireguard.nix
   ];
 
@@ -81,74 +82,6 @@ in {
           readOnly = true;
           example = "203.0.113.10";
           description = "Public IP address assigned to this host.";
-        };
-
-        identityKeys = lib.mkOption {
-          type = lib.types.submodule {
-            options = builtins.listToAttrs (builtins.map (keyFormat_ : {
-              name = keyFormat_;
-              value = lib.mkOption {
-                type = lib.types.submodule {
-                  options = {
-                    public = lib.mkOption {
-                      type = lib.types.submodule {
-                        options = {
-                          key = lib.mkOption {
-                            type = lib.types.nullOr lib.types.nonEmptyStr;
-                            default = null;
-                            description = "Public ${keyFormat_} key material for this host.";
-                          };
-                          ageRecipient = lib.mkOption {
-                            type = lib.types.nullOr lib.types.nonEmptyStr;
-                            default = null;
-                            description = "Age recipient derived from the public ${keyFormat_} key for this host.";
-                          };
-                          path = lib.mkOption {
-                            type = lib.types.nullOr lib.types.nonEmptyStr;
-                            default = null;
-                            description = "Runtime path of the public ${keyFormat_} key on this host.";
-                          };
-                        };
-                      };
-                      default = {};
-                      description = "Public ${keyFormat_} identity key metadata for this host.";
-                    };
-                    private = lib.mkOption {
-                      type = lib.types.submodule {
-                        options = {
-                          key = lib.mkOption {
-                            type = lib.types.nullOr (lib.types.either lib.types.path lib.types.nonEmptyStr);
-                            default = null;
-                            description = "Private ${keyFormat_} key material for this host. Path values point to a repository file containing the key material; string values contain the key material inline. Stored private key material should be encrypted.";
-                          };
-                          path = lib.mkOption {
-                            type = lib.types.nullOr lib.types.nonEmptyStr;
-                            default = null;
-                            description = "Runtime path of the private ${keyFormat_} key on this host.";
-                          };
-                        };
-                      };
-                      default = {};
-                      description = "Private ${keyFormat_} identity key metadata for this host.";
-                    };
-                  };
-                };
-              };
-            }) [ "age" "ssh" ]);
-          };
-          internal = true;
-          readOnly = true;
-          example = {
-            ssh = {
-              public = {
-                key = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAA...";
-                ageRecipient = "age1...";
-                path = "/etc/ssh/ssh_host_ed25519_key.pub";
-              };
-              private.path = "/etc/ssh/ssh_host_ed25519_key";
-            };
-          };
-          description = "Identity keys for this host, grouped by key format.";
         };
 
         existModule = lib.mkOption {
