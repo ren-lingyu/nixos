@@ -82,60 +82,6 @@ in {
           description = "Public IP address assigned to this host.";
         };
 
-        wireguard = lib.mkOption {
-          type = lib.types.nullOr (lib.types.submodule {
-            options = {
-
-              publicKey = lib.mkOption {
-                type = lib.types.nonEmptyStr;
-                description = "WireGuard public key for this host.";
-              };
-
-              privateKey = lib.mkOption {
-                type = (lib.types.either
-                  lib.types.path
-                  lib.types.nonEmptyStr
-                );
-                description = (builtins.concatStringsSep
-                  "\n"
-                  [
-                    "WireGuard private key material for this host."
-                    "Path values point to a repository file containing the key material; string values contain the key material inline."
-                    "Stored private key material should be encrypted."
-                  ]
-                );
-              };
-
-              listenPort = lib.mkOption {
-                type = lib.types.nullOr lib.types.port;
-                default = null;
-                description = "Local UDP port on which WireGuard listens on this host.";
-              };
-
-              endpoint = lib.mkOption {
-                type = lib.types.nullOr (lib.types.submodule {
-                  options = {
-                    address = lib.mkOption {
-                      type = lib.types.nonEmptyStr;
-                      description = "Reachable address of this WireGuard endpoint.";
-                    };
-                    port = lib.mkOption {
-                      type = lib.types.port;
-                      description = "Reachable UDP port of this WireGuard endpoint.";
-                    };
-                  };
-                });
-                default = null;
-                description = "WireGuard endpoint through which this host can be reached by other hosts.";
-              };
-
-            };
-          });
-          internal = true;
-          readOnly = true;
-          description = "Static WireGuard metadata for this host.";
-        };
-
         identityKeys = lib.mkOption {
           type = lib.types.submodule {
             options = builtins.listToAttrs (builtins.map (keyFormat_ : {
@@ -268,20 +214,6 @@ in {
         hmModulePath = ./. + "/${hostName_}/hm/default.nix";
         enabledMessage = "`modules.hosts.${hostName_}.enable = true` requires the host profile to declare `existModule.os` and `existModule.hm`.";
       }) cfg))
-      (lib.mapAttrsToList
-        (hostName_ : host_ : {
-          assertion = (builtins.any
-            (x_ : x_)
-            [
-              (host_.wireguard == null)
-              (host_.wireguard.endpoint == null)
-              (host_.wireguard.listenPort != null)
-            ]
-          );
-          message = "Host `${hostName_}` with a WireGuard endpoint must provide `wireguard.listenPort`.";
-        })
-        cfg
-      )
       (builtins.concatLists (lib.mapAttrsToList (hostName_ : host_ : (builtins.concatLists [
         (let
           monitors_ = builtins.attrValues host_.monitors;
