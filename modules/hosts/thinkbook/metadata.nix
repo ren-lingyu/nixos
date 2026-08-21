@@ -2,6 +2,10 @@ host_ : { config, pkgs, lib, llib, ... } : {
 
   number = 2;
 
+  bootManager = {
+    enable = true;
+  };
+
   users = {
     "1000" = 1000;
   };

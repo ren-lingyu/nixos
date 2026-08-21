@@ -11,7 +11,6 @@ in {
     ./hardware-configuration.nix
     ./mount-windows-directory.nix
     ./virtual-terminal.nix
-    ./boot-manager.nix
     ./flatpak.nix
   ];
 
@@ -27,6 +26,27 @@ in {
         "psmouse.synaptics_intertouch=0"
       ];
       kernelModules = [ "uinput" ];
+      loader = {
+        systemd-boot = {
+          enable = false;
+        };
+        efi = {
+          canTouchEfiVariables = true;
+        };
+        limine = {
+          enable = true;
+          extraEntries = builtins.concatStringsSep "\n" [
+            (builtins.concatStringsSep "\n\t" [
+              "/Windows 11"
+              "protocol: efi_chainload"
+              "image_path: guid(12a55262-6360-11f1-ae85-806e6f6e6963):/EFI/Microsoft/Boot/bootmgfw.efi"
+            ])
+          ];
+          secureBoot = {
+            enable = true;
+          };
+        };
+      };
     };
 
     hardware = {

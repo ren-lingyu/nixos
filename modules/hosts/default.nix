@@ -17,6 +17,7 @@
 in {
 
   imports = [
+    ./boot-manager.nix
     ./wireguard.nix
   ];
 
