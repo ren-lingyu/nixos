@@ -6,6 +6,12 @@ host_ : { config, pkgs, lib, llib, ... } : {
     enable = true;
   };
 
+  shared = {
+    networkmanager.enable = true;
+    bluetooth.enable = true;
+    power.enable = true;
+  };
+
   users = {
     "1000" = 1000;
   };
