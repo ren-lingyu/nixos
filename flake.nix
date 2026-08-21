@@ -290,6 +290,12 @@
               ./modules/hosts/aliyun
             ];
           };
+          matebook = { config, pkgs, lib, ... } : {
+            imports = [
+              self.modules.base
+              ./modules/hosts/matebook
+            ];
+          };
         };
 
       };
@@ -358,6 +364,70 @@
                   };
                   users = {
                     lingyu.uid = config.modules.hosts.thinkbook.users."1000";
+                  };
+                };
+              };
+            })
+          ];
+        };
+
+        nixos-matebook = inputs.nixpkgs.lib.nixosSystem {
+          system = "x86_64-linux";
+          modules = [
+            self.modules.features.share
+            self.modules.features.editor
+            self.modules.features.niri
+            self.modules.features.sops
+            self.modules.hosts.matebook
+            self.modules.users.lingyu
+            ({ config, pkgs, lib, ... } : {
+              config = {
+                modules = {
+                  base = {
+                    allowUnfreePredicateList = [
+                      "github-copilot-cli"
+                    ];
+                    createXdgUserDirectories = true;
+                  };
+                  features = {
+                    agent.enable = true;
+                    diagnostics.enable = true;
+                    editor = {
+                      enable = true;
+                      defaultEditor = "neovim";
+                      vim.enable = false;
+                      neovim.enable = true;
+                      emacs = {
+                        enable = true;
+                        programs.package = pkgs.emacs31-pgtk;
+                        services.package = pkgs.emacs-pgtk-twist;
+                      };
+                      lem = {
+                        enable = true;
+                        package = pkgs.lem-webview;
+                      };
+                    };
+                    file-manager.enable = true;
+                    font.enable = true;
+                    greeter.enable = true;
+                    media.enable = true;
+                    niri = {
+                      enable = true;
+                      noctalia.enable = true;
+                      waybar.enable = false;
+                    };
+                    proxy = {
+                      enable = true;
+                      clash-verge.enable = true;
+                      throne.enable = false;
+                    };
+                    sops.enable = true;
+                    shell.enable = true;
+                    terminal.enable = true;
+                    texlive.enable = true;
+                  };
+                  users = {
+                    lingyu.uid = config.modules.hosts.matebook.users."1000";
                   };
                 };
               };
