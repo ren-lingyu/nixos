@@ -138,56 +138,46 @@
         # Register interfaces for every HM user; their values still merge per user.
         ({ options, config, osConfig, pkgs, lib, llib, ... } : {
           options = {
-            moduleInterfaces = (builtins.listToAttrs
-              (builtins.map
-                (moduleType_ : {
-                  name = moduleType_;
-                  value = (builtins.listToAttrs
-                    (builtins.map
-                      (module_ : {
-                        name = module_;
-                        value = let
-                          possibleInterfaceOptionsPath_ = ./. + "/${moduleType_}/${module_}/hm/interface-options.nix";
-                        in (lib.optionalAttrs
-                          (builtins.pathExists possibleInterfaceOptionsPath_)
-                          ((import possibleInterfaceOptionsPath_) module_ {
-                            inherit options;
-                            inherit config;
-                            inherit osConfig;
-                            inherit pkgs;
-                            inherit lib;
-                            inherit llib;
-                          })
-                        );
-                      })
-                      (builtins.attrNames
-                        (lib.filterAttrs
-                          (name_ : type_ : (builtins.all
-                            (x_ : x_)
-                            [
-                              (type_ == "directory")
-                              (builtins.pathExists (./. + "/${moduleType_}/${name_}/default.nix"))
-                            ]
-                          ))
-                          (builtins.readDir (./. + "/${moduleType_}"))
-                        )
-                      )
-                    )
-                  );
-                })
+            moduleInterfaces = (lib.genAttrs
+              (builtins.attrNames
+                (lib.filterAttrs
+                  (name_ : type_ : (builtins.all
+                    (x_ : x_)
+                    [
+                      (type_ == "directory")
+                      (builtins.pathExists (./. + "/${name_}/default.nix"))
+                    ]
+                  ))
+                  (builtins.readDir ./.)
+                )
+              )
+              (moduleType_ : (lib.genAttrs
                 (builtins.attrNames
                   (lib.filterAttrs
                     (name_ : type_ : (builtins.all
                       (x_ : x_)
                       [
                         (type_ == "directory")
-                        (builtins.pathExists (./. + "/${name_}/default.nix"))
+                        (builtins.pathExists (./. + "/${moduleType_}/${name_}/default.nix"))
                       ]
                     ))
-                    (builtins.readDir ./.)
+                    (builtins.readDir (./. + "/${moduleType_}"))
                   )
                 )
-              )
+                (module_ : let
+                  possibleInterfaceOptionsPath_ = ./. + "/${moduleType_}/${module_}/hm/interface-options.nix";
+                in (lib.optionalAttrs
+                  (builtins.pathExists possibleInterfaceOptionsPath_)
+                  ((import possibleInterfaceOptionsPath_) module_ {
+                    inherit options;
+                    inherit config;
+                    inherit osConfig;
+                    inherit pkgs;
+                    inherit lib;
+                    inherit llib;
+                  })
+                ))
+              ))
             );
           };
         })

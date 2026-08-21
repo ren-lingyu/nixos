@@ -101,27 +101,22 @@ in {
 
   config = {
 
-    modules.hosts = (builtins.listToAttrs
-      (builtins.map
-        (host_ : {
-          name = host_;
-          value = let
-            possibleMetadataPath_ = ./. + "/${builtins.toString host_}/metadata.nix";
-          in (lib.optionalAttrs
-            (builtins.pathExists possibleMetadataPath_)
-            ((import possibleMetadataPath_)
-              host_
-              {
-                inherit config;
-                inherit pkgs;
-                inherit lib;
-                inherit llib;
-              }
-            )
-          );
-        })
-        hostList_
-      )
+    modules.hosts = (lib.genAttrs
+      hostList_
+      (host_ : let
+        possibleMetadataPath_ = ./. + "/${builtins.toString host_}/metadata.nix";
+      in (lib.optionalAttrs
+        (builtins.pathExists possibleMetadataPath_)
+        ((import possibleMetadataPath_)
+          host_
+          {
+            inherit config;
+            inherit pkgs;
+            inherit lib;
+            inherit llib;
+          }
+        )
+      ))
     );
 
     assertions = (builtins.concatLists [

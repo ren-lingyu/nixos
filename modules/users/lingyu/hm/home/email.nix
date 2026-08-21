@@ -180,11 +180,9 @@
 
       profiles = let
 
-        fromList = list : builtins.listToAttrs (
-          builtins.map (x : {
-            name = builtins.toString x;
-            value = {};
-          }) list
+        fromList = list : (lib.genAttrs
+          (builtins.map builtins.toString list)
+          (unused_name_ : {})
         );
 
       in {
