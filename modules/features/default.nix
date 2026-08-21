@@ -1,12 +1,4 @@
-{ options, config, pkgs, lib, llib, ... } : let
-
-  featureList_ = builtins.attrNames (lib.filterAttrs (name_ : type_ : (builtins.all
-    (x_ : x_)
-    [
-      (type_ == "directory")
-      (builtins.pathExists (./. + "/${name_}/default.nix"))
-    ]
-  )) (builtins.readDir ./.));
+{ options, config, pkgs, lib, llib, ... }@args : let
 
   enabledUserUids_ = builtins.map
     (user_ : user_.uid)
@@ -24,15 +16,9 @@ in {
 
   options = {
 
-    modules.features = (builtins.listToAttrs (builtins.map (feature_ : {
-
-      name = feature_;
-
-      value = let
-
-        possibleExtraOptionsPath_ = ./. + "/${builtins.toString feature_}/extra-options.nix";
-
-      in {
+    modules.features = llib.moduleFunctions.default.mkModuleOptions.default {
+      path = ./.;
+      commonSchema = (feature_ : {
 
         enable = lib.mkOption {
           type = lib.types.bool;
@@ -60,17 +46,9 @@ in {
           description = "Module availability declared by the ${feature_} feature.";
         };
 
-      } // (lib.optionalAttrs (builtins.pathExists possibleExtraOptionsPath_) (
-        (import possibleExtraOptionsPath_) feature_ {
-          inherit options;
-          inherit config;
-          inherit pkgs;
-          inherit lib;
-          inherit llib;
-        }
-      ));
-
-    }) featureList_));
+      });
+      extraScope = args;
+    };
 
   };
 

@@ -1,4 +1,4 @@
-{ config, pkgs, lib, llib, ... } : let
+{ options, config, pkgs, lib, llib, ... }@args : let
 
   userList_ = builtins.attrNames (lib.filterAttrs (name_ : type_ : (builtins.all
     (x_ : x_)
@@ -14,15 +14,17 @@ in {
   imports = builtins.map (user_ : ./. + "/${user_}") userList_;
 
   options = {
-    modules.users = builtins.listToAttrs (builtins.map (user_ : {
-      name = user_;
-      value = {
+    modules.users = llib.moduleFunctions.default.mkModuleOptions.default {
+      path = ./.;
+      commonSchema = (user_ : {
+
         enable = lib.mkOption {
           type = lib.types.bool;
           default = false;
           example = true;
           description = "Whether to enable the ${user_} user profile.";
         };
+
         uid = lib.mkOption {
           type = lib.types.unique {
             message = "Conflicting UID assignments for `modules.users.${user_}.uid`.";
@@ -31,18 +33,21 @@ in {
           example = 1000;
           description = "UID assigned to the ${user_} user profile by the final flake composition.";
         };
+
         username = lib.mkOption {
           type = lib.types.nonEmptyStr;
           default = user_;
           example = "jane.doe";
           description = "Login name of the ${user_} user profile.";
         };
+
         homeDirectory = lib.mkOption {
           type = lib.types.str;
           default = "/home/${config.modules.users.${user_}.username}";
           example = "/home/jane.doe";
           description = "Home directory of the ${user_} user profile. Must be an absolute path.";
         };
+
         existModule = lib.mkOption {
           type = llib.types.existModule {
             optionPath = "modules.users.${user_}.existModule";
@@ -51,8 +56,11 @@ in {
           default = {};
           description = "Module availability declared by the ${user_} user profile.";
         };
-      };
-    }) userList_);
+
+      });
+      extraScope = args;
+    };
+
   };
 
   config = {

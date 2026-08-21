@@ -1,48 +1,29 @@
-{ options, config, pkgs, lib, llib, ... } : let
-
-  workloadList_ = builtins.attrNames (lib.filterAttrs (name_ : type_ : (builtins.all
-    (x_ : x_)
-    [
-      (type_ == "directory")
-      (builtins.pathExists (./. + "/${name_}/default.nix"))
-    ]
-  )) (builtins.readDir ./.));
-
-in {
+{ options, config, pkgs, lib, llib, ... }@args : {
 
   options = {
-    modules.workloads = builtins.listToAttrs (builtins.map (workload_ : {
-      name = workload_;
-      value = let
-        possibleExtraOptionsPath_ = ./. + "/${builtins.toString workload_}/extra-options.nix";
-      in (lib.mergeAttrsList [
-        {
-          enable = lib.mkOption {
-            type = lib.types.bool;
-            default = false;
-            example = true;
-            description = "Whether to enable the ${workload_} workload.";
+    modules.workloads = llib.moduleFunctions.default.mkModuleOptions.default {
+      path = ./.;
+      commonSchema = (workload_ : {
+
+        enable = lib.mkOption {
+          type = lib.types.bool;
+          default = false;
+          example = true;
+          description = "Whether to enable the ${workload_} workload.";
+        };
+
+        existModule = lib.mkOption {
+          type = llib.types.existModule {
+            optionPath = "modules.workloads.${workload_}.existModule";
           };
-          existModule = lib.mkOption {
-            type = llib.types.existModule {
-              optionPath = "modules.workloads.${workload_}.existModule";
-            };
-            internal = true;
-            default = {};
-            description = "Module availability declared by the ${workload_} workload.";
-          };
-        }
-        (lib.optionalAttrs (builtins.pathExists possibleExtraOptionsPath_) (
-          (import possibleExtraOptionsPath_) workload_ {
-            inherit options;
-            inherit config;
-            inherit pkgs;
-            inherit lib;
-            inherit llib;
-          }
-        ))
-      ]);
-    }) workloadList_);
+          internal = true;
+          default = {};
+          description = "Module availability declared by the ${workload_} workload.";
+        };
+
+      });
+      extraScope = args;
+    };
   };
 
   config = {
