@@ -84,12 +84,12 @@ in {
       };
     };
 
-    networking = mif.mkWireGuardNetworking {
+    networking = (mif.mkWireGuardNetworks {
       registry = cfg;
       privateKeyFile = config.age.secrets.wireguard.path;
       wgIpRule = (x_ : y_ : "10.100.${builtins.toString x_}.${builtins.toString y_}");
       wgNameRule = (x_ : "wg${builtins.toString x_}");
-    };
+    }).config;
 
     assertions = (lib.mapAttrsToList
       (hostName_ : host_ : {
