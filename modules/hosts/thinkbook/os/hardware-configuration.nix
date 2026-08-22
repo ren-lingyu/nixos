@@ -36,12 +36,7 @@ in {
         options = [ "nofail" "x-systemd.device-timeout=2s" ];
       };
 
-    swapDevices = [
-      {
-        device = "/var/lib/swapfile";
-        size = 16*1024;
-      }
-    ];
+    swapDevices = [ ];
 
     nixpkgs.hostPlatform = lib.mkDefault "x86_64-linux";
     hardware.cpu.intel.npu.enable = true;
