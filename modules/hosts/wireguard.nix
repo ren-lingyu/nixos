@@ -10,6 +10,21 @@ in {
 
   options = {
 
+    networking.wireguard.topology = lib.mkOption {
+      type = lib.types.attrsOf (lib.types.submodule {
+        options = {
+          name = lib.mkOption {
+            type = lib.types.str;
+          };
+          nodes = lib.mkOption {
+            type = lib.types.attrsOf lib.types.str;
+          };
+        };
+      });
+      internal = true;
+      readOnly = true;
+    };
+
     modules.hosts = llib.moduleFunctions.default.mkModuleOptions.withoutExtra {
       path = ./.;
       commonSchema = (host_ : {
@@ -84,12 +99,21 @@ in {
       };
     };
 
-    networking = (mif.mkWireGuardNetworks {
-      registry = cfg;
-      privateKeyFile = config.age.secrets.wireguard.path;
-      wgIpRule = (x_ : y_ : "10.100.${builtins.toString x_}.${builtins.toString y_}");
-      wgNameRule = (x_ : "wg${builtins.toString x_}");
-    }).config;
+    networking = let
+      wireguardNetworks_ = (mif.mkWireGuardNetworks {
+        registry = cfg;
+        privateKeyFile = config.age.secrets.wireguard.path;
+        wgIpRule = (x_ : y_ : "10.100.${builtins.toString x_}.${builtins.toString y_}");
+        wgNameRule = (x_ : "wg${builtins.toString x_}");
+      });
+    in (lib.mkMerge
+      [
+        wireguardNetworks_.config
+        {
+          wireguard.topology = wireguardNetworks_.topology;
+        }
+      ]
+    );
 
     assertions = (lib.mapAttrsToList
       (hostName_ : host_ : {
