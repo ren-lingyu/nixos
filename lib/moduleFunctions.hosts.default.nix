@@ -37,16 +37,16 @@
     );
 
     networks_ = (lib.mapAttrs'
-      (unused_name_ : hubHost_ : {
-        name = builtins.toString hubHost_.number;
+      (unused_name_ : endpointHost_ : {
+        name = builtins.toString endpointHost_.number;
         value = {
-          name = wgNameRule_ hubHost_.number;
+          name = wgNameRule_ endpointHost_.number;
           nodes = (lib.mapAttrs'
             (unused_name_ : host_ : {
               name = builtins.toString host_.number;
               value = {
                 ip = wgIpRule_
-                  hubHost_.number
+                  endpointHost_.number
                   host_.number;
                 publicKey = host_.wireguard.publicKey;
                 listenPort = host_.wireguard.listenPort;
@@ -70,7 +70,7 @@
         name = network_.name;
         nodes = (lib.mapAttrs
           (unused_hostNumber_ : node_ :
-          node_.ip
+            node_.ip
           )
           network_.nodes
         );
@@ -84,36 +84,46 @@
 
         enabledHostNumber_ = builtins.toString enabledHost_.number;
 
-        endpointOf_ = endpoint_ : let
-          address_ = (
-            if (builtins.match ".*:.*" endpoint_.address) != null
-            then "[${endpoint_.address}]"
-            else endpoint_.address
-          );
-        in "${address_}:${builtins.toString endpoint_.port}";
+        wgConfigRule_ = self_ : peers_ : {
 
-        peerOf_ = networkNumber_ : peerNumber_ : peerNode_ :
-        (lib.mergeAttrsList
-          [
+          ips = [
+            "${self_.ip}/24"
+          ];
 
-            ({
-              publicKey = peerNode_.publicKey;
+          listenPort = self_.listenPort;
+
+          peers = (builtins.map
+            (peer_ : {
+
+              publicKey = peer_.publicKey;
 
               allowedIPs = [
-                "${peerNode_.ip}/32"
+                "${peer_.ip}/32"
               ];
+
+              endpoint = (
+                if peer_.endpoint == null
+                then null
+                else let
+                  address_ = (
+                    if (builtins.match ".*:.*" peer_.endpoint.address) != null
+                    then "[${peer_.endpoint.address}]"
+                    else peer_.endpoint.address
+                  );
+                in "${address_}:${builtins.toString peer_.endpoint.port}"
+              );
+
+              persistentKeepalive = (
+                if peer_.endpoint == null
+                then null
+                else 25
+              );
+
             })
+            peers_
+          );
 
-            (lib.optionalAttrs
-              (peerNumber_ == networkNumber_)
-              {
-                endpoint = endpointOf_ peerNode_.endpoint;
-                persistentKeepalive = 25;
-              }
-            )
-
-          ]
-        );
+        };
 
         interfaceOf_ = networkNumber_ : network_ : let
 
@@ -125,7 +135,7 @@
             if enabledHostNumber_ == networkNumber_
             then (lib.filterAttrs
               (hostNumber_ : unused_node_ :
-              hostNumber_ != enabledHostNumber_
+                hostNumber_ != enabledHostNumber_
               )
               network_.nodes
             )
@@ -137,38 +147,43 @@
             }
           );
 
+          self_ = {
+            ip = selfNode_.ip;
+
+            listenPort = (
+              if enabledHostNumber_ == networkNumber_
+              then selfNode_.listenPort
+              else null
+            );
+          };
+
+          peers_ = (lib.mapAttrsToList
+            (peerNumber_ : peerNode_ : {
+              ip = peerNode_.ip;
+
+              publicKey = peerNode_.publicKey;
+
+              endpoint = (
+                if peerNumber_ == networkNumber_
+                then peerNode_.endpoint
+                else null
+              );
+            })
+            peerNodes_
+          );
+
         in (lib.mergeAttrsList
           [
 
             ({
               type = "wireguard";
-              ips = [
-                "${selfNode_.ip}/24"
-              ];
               privateKeyFile = privateKeyFile_;
               generatePrivateKeyFile = false;
-              peers = (lib.mapAttrsToList
-                (peerNumber_ : peerNode_ :
-                peerOf_
-                  networkNumber_
-                  peerNumber_
-                  peerNode_
-                )
-                peerNodes_
-              );
             })
 
-            (lib.optionalAttrs
-              (builtins.all
-                (x_ : x_)
-                [
-                  (enabledHostNumber_ == networkNumber_)
-                  (selfNode_.listenPort != null)
-                ]
-              )
-              {
-                listenPort = selfNode_.listenPort;
-              }
+            (wgConfigRule_
+              self_
+              peers_
             )
 
           ]
