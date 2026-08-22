@@ -117,6 +117,8 @@ in {
               calibre
               xournalpp
               rnote
+              rar
+              unrar
             ]
           ]);
         };
