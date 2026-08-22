@@ -235,29 +235,12 @@
               self.modules.base
               ./modules/workloads/caddy
             ];
-            config = {
-              modules.workloads.caddy = {
-                enable = true;
-                ip = "10.100.3.2";
-                port = 18000;
-                networkInterface = "wg3";
-              };
-            };
           };
           wbo = { config, pkgs, lib, ... } : {
             imports = [
               self.modules.base
               ./modules/workloads/wbo
             ];
-            config = {
-              modules.workloads.wbo = {
-                enable = true;
-                ip = "10.100.3.2";
-                port = 18000;
-                networkInterface = "wg3";
-                allowedSourceIp = "10.100.3.3";
-              };
-            };
           };
         };
 
@@ -280,6 +263,13 @@
               hosts.thinkbook = {
                 flatpak.enable = true;
               };
+              workloads.wbo = {
+                enable = true;
+                ip = config.networking.wireguard.topology."3".nodes."2";
+                port = 18000;
+                networkInterface = config.networking.wireguard.topology."3".name;
+                allowedSourceIp = config.networking.wireguard.topology."3".nodes."3";
+              };
             };
           };
           aliyun = { config, pkgs, lib, ... } : {
@@ -289,6 +279,14 @@
               inputs.disko.nixosModules.disko
               ./modules/hosts/aliyun
             ];
+            config.modules = {
+              workloads.caddy = {
+                enable = true;
+                ip = config.networking.wireguard.topology."3".nodes."2";
+                port = 18000;
+                networkInterface = config.networking.wireguard.topology."3".name;
+              };
+            };
           };
           matebook = { config, pkgs, lib, ... } : {
             imports = [
