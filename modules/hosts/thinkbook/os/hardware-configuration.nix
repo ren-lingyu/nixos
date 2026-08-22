@@ -19,22 +19,28 @@ in {
     boot.kernelModules = [ "kvm-intel" ];
     boot.extraModulePackages = [ ];
 
-    fileSystems."/" =
-      { device = "/dev/disk/by-uuid/1a6219c7-681d-43ee-944d-9c8e5cda7460";
+    fileSystems = {
+      "/" = {
+        enable = true;
+        mountPoint = "/";
+        device = "/dev/disk/by-uuid/1a6219c7-681d-43ee-944d-9c8e5cda7460";
         fsType = "ext4";
       };
-
-    fileSystems."/boot" =
-      { device = "/dev/disk/by-uuid/87B6-19CE";
+      "/boot" = {
+        enable = true;
+        mountPoint = "/boot";
+        device = "/dev/disk/by-uuid/87B6-19CE";
         fsType = "vfat";
         options = [ "fmask=0022" "dmask=0022" ];
       };
-
-    fileSystems."/mnt/c" =
-      { device = "/dev/disk/by-partuuid/12a5524f-6360-11f1-ae85-806e6f6e6963";
+      "/mnt/c" = {
+        enable = true;
+        mountPoint = "/mnt/c";
+        device = "/dev/disk/by-partuuid/12a5524f-6360-11f1-ae85-806e6f6e6963";
         fsType = "ntfs3";
         options = [ "nofail" "x-systemd.device-timeout=2s" ];
       };
+    };
 
     swapDevices = [ ];
 
