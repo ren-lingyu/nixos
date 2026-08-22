@@ -320,6 +320,8 @@
                       "microsoft-edge"
                       "feishu"
                       "zoom"
+                      "rar"
+                      "unrar"
                     ];
                     createXdgUserDirectories = true;
                   };
