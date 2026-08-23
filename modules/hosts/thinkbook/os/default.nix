@@ -9,9 +9,9 @@ in {
 
   imports = [
     ./hardware-configuration.nix
-    ./mount-windows-directory.nix
     ./virtual-terminal.nix
     ./flatpak.nix
+    ./windows
   ];
 
   config = lib.mkIf cfg.enable {
