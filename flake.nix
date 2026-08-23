@@ -261,6 +261,7 @@
               self.modules.base
               self.modules.workloads.wbo
               inputs.nix-flatpak.nixosModules.nix-flatpak
+              inputs.nixvirt.nixosModules.default
               ./modules/hosts/thinkbook
             ];
             config.modules = {
