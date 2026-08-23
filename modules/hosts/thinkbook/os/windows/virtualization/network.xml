@@ -1,0 +1,18 @@
+<network>
+  <name>default</name>
+  <uuid>660f0b61-1b50-4d10-b457-81634738a957</uuid>
+
+  <forward mode='nat'/>
+
+  <bridge name='virbr0' stp='on' delay='0'/>
+  <mac address='52:54:00:e8:92:60'/>
+
+  <ip address='192.168.122.1' netmask='255.255.255.0'>
+    <dhcp>
+      <range start='192.168.122.100' end='192.168.122.254'/>
+      <host mac='52:54:00:8f:14:c8'
+            name='windows'
+            ip='192.168.122.10'/>
+    </dhcp>
+  </ip>
+</network>

@@ -19,6 +19,15 @@ host_ : { options, config, pkgs, lib, llib, ... } : {
         description = "Whether to mount windows directory.";
       };
     };
+    virtualisation = {
+      enable = lib.mkOption {
+        type = lib.types.bool;
+        internal = true;
+        readOnly = true;
+        example = true;
+        description = "Whether to virtualize windows.";
+      };
+    };
   };
 
 }

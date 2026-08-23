@@ -60,6 +60,7 @@ host_ : { config, pkgs, lib, llib, ... } : {
 
   windows = {
     mount.enable = false;
+    virtualisation.enable = true;
   };
 
 }
