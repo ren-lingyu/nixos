@@ -9,4 +9,16 @@ host_ : { options, config, pkgs, lib, llib, ... } : {
     };
   };
 
+  windows = {
+    mount = {
+      enable = lib.mkOption {
+        type = lib.types.bool;
+        internal = true;
+        readOnly = true;
+        example = true;
+        description = "Whether to mount windows directory.";
+      };
+    };
+  };
+
 }

@@ -33,7 +33,7 @@
 
 in {
 
-  config = lib.mkIf cfg.enable {
+  config = lib.mkIf (cfg.enable && cfg.windows.mount.enable) {
 
     environment.systemPackages = with pkgs; [
       bindfs

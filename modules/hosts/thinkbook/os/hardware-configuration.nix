@@ -34,7 +34,7 @@ in {
         options = [ "fmask=0022" "dmask=0022" ];
       };
       "/mnt/c" = {
-        enable = true;
+        enable = cfg.windows.mount.enable;
         mountPoint = "/mnt/c";
         device = "/dev/disk/by-partuuid/12a5524f-6360-11f1-ae85-806e6f6e6963";
         fsType = "ntfs3";
