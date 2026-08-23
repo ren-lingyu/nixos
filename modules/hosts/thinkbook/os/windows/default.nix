@@ -2,7 +2,7 @@
 
   imports = [
     ./mount
-    ./virtualization
+    ./virtualisation
   ];
 
 }
