@@ -14,6 +14,7 @@ in {
 
     environment.systemPackages = with pkgs; [
       freerdp
+      virt-viewer
     ];
 
     networking.firewall.interfaces = {
