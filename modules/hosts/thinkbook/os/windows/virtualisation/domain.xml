@@ -2,7 +2,7 @@
   <name>windows</name>
   <uuid>8f14c89e-3311-489a-9a3f-c306f00ca840</uuid>
 
-  <memory unit='GiB'>16</memory>
+  <memory unit='GiB'>12</memory>
   <vcpu placement='static'>8</vcpu>
 
   <os firmware='efi'>
