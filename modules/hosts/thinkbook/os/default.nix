@@ -126,6 +126,20 @@ in {
       };
     };
 
+    home-manager.users = {
+      "${builtins.toString cfg.users."1000"}" = {
+        xdg.configFile = {
+          "freerdp/sdl-freerdp.json" = {
+            enable = cfg.windows.virtualisation.enable;
+            target = "freerdp/sdl-freerdp.json";
+            text = builtins.toJSON {
+              SDL_KeyModMask = [ "SDL_KMOD_NONE" ];
+            };
+          };
+        };
+      };
+    };
+
     i18n = {
       defaultLocale = "en_US.UTF-8";
       extraLocales = [
