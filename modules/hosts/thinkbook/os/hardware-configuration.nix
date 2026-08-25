@@ -38,7 +38,14 @@ in {
         mountPoint = "/mnt/c";
         device = "/dev/disk/by-partuuid/12a5524f-6360-11f1-ae85-806e6f6e6963";
         fsType = "ntfs3";
-        options = [ "nofail" "x-systemd.device-timeout=2s" ];
+        options = [
+          "nofail"
+          "x-systemd.device-timeout=5s"
+          "uid=0"
+          "gid=0"
+          "umask=0077"
+          "windows_names"
+        ];
       };
       "/mnt/s" = {
         enable = true;
