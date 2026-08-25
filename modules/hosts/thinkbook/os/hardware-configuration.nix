@@ -39,6 +39,7 @@ in {
         device = "/dev/disk/by-partuuid/12a5524f-6360-11f1-ae85-806e6f6e6963";
         fsType = "ntfs3";
         options = [
+          "ro"
           "nofail"
           "x-systemd.device-timeout=5s"
           "uid=0"
