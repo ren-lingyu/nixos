@@ -48,7 +48,6 @@ in {
           "d ${nixosSystemFonts}/windows 0555 ${nixosRootName} root - -"
           "d ${nixosUserHome}/knowhub 0755 ${nixosUserName} users - -"
           "d ${nixosUserHome}/ren 0755 ${nixosUserName} users - -"
-          "d ${nixosUserHome}/Desktop 0755 ${nixosUserName} users - -"
           "d ${nixosUserHome}/Downloads 0755 ${nixosUserName} users - -"
           "d ${nixosUserHome}/Documents 0755 ${nixosUserName} users - -"
           "d ${nixosUserHome}/Pictures 0755 ${nixosUserName} users - -"
