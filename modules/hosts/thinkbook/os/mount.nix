@@ -41,6 +41,7 @@ in {
     };
 
     systemd = {
+
       tmpfiles = {
         rules = [
           "d ${config.fileSystems.windows.mountPoint} 0700 ${nixosRootName} root - -"
@@ -55,6 +56,7 @@ in {
           "d ${nixosUserHome}/Music 0755 ${nixosUserName} users - -"
         ];
       };
+
       mounts = builtins.concatLists [
 
         (lib.optionals
@@ -105,6 +107,7 @@ in {
         )
 
       ];
+
     };
 
   };
