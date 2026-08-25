@@ -40,6 +40,20 @@ in {
         fsType = "ntfs3";
         options = [ "nofail" "x-systemd.device-timeout=2s" ];
       };
+      "/mnt/s" = {
+        enable = true;
+        mountPoint = "/mnt/s";
+        device = "/dev/disk/by-partuuid/b36cadc4-6d89-4b5f-817d-5ba74d6d89e2";
+        fsType = "ntfs3";
+        options = [
+          "nofail"
+          "x-systemd.device-timeout=5s"
+          "uid=0"
+          "gid=0"
+          "umask=0077"
+          "windows_names"
+        ];
+      };
     };
 
     swapDevices = [ ];
