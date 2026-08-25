@@ -9,7 +9,7 @@ in {
 
   imports = [
     ./hardware-configuration.nix
-    ./mount-windows-directory.nix
+    ./mount.nix
     ./virtual-terminal.nix
     ./flatpak.nix
   ];
