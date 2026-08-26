@@ -117,6 +117,17 @@
                version='2.0'/>
     </tpm>
 
+    <hostdev mode='subsystem'
+             type='pci'
+             managed='yes'>
+      <source>
+        <address domain='@domain_devices_hostdevs_gpu_source_address_domain@'
+                 bus='@domain_devices_hostdevs_gpu_source_address_bus@'
+                 slot='@domain_devices_hostdevs_gpu_source_address_slot@'
+                 function='@domain_devices_hostdevs_gpu_source_address_function@'/>
+      </source>
+    </hostdev>
+
     <graphics type='spice'
               autoport='yes'>
       <listen type='address'

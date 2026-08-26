@@ -26,6 +26,15 @@
       windows = {
         name = "windows";
         devices = {
+          hostdevs.gpu = {
+            physicalFunction.address = "0000:00:02.0";
+            source.address = {
+              domain = "0x0000";
+              bus = "0x00";
+              slot = "0x02";
+              function = "0x1";
+            };
+          };
           disks = {
             system.source = {
               pool = pools.windows.name;
@@ -72,6 +81,18 @@ in {
       freerdp
       virt-viewer
     ];
+
+    services.udev.extraRules = (builtins.concatStringsSep
+      ",${builtins.fromJSON "\"\\u0020\""}"
+      [
+        "ACTION==\"bind\""
+        "SUBSYSTEM==\"pci\""
+        "KERNEL==\"${vm.domains.windows.devices.hostdevs.gpu.physicalFunction.address}\""
+        "DRIVER==\"xe\""
+        "ATTR{sriov_numvfs}==\"0\""
+        "ATTR{sriov_numvfs}=\"1\""
+      ]
+    );
 
     systemd.tmpfiles.rules = [
       "d ${vm.media.directory} 0755 root root - -"
@@ -168,6 +189,10 @@ in {
                       domain_devices_disks_system_source_volume = vm.domains.windows.devices.disks.system.source.volume;
                       domain_devices_interfaces_default_mac_address = vm.domains.windows.devices.interfaces.default.mac.address;
                       domain_devices_interfaces_default_source_network = vm.domains.windows.devices.interfaces.default.source.network;
+                      domain_devices_hostdevs_gpu_source_address_domain = vm.domains.windows.devices.hostdevs.gpu.source.address.domain;
+                      domain_devices_hostdevs_gpu_source_address_bus = vm.domains.windows.devices.hostdevs.gpu.source.address.bus;
+                      domain_devices_hostdevs_gpu_source_address_slot = vm.domains.windows.devices.hostdevs.gpu.source.address.slot;
+                      domain_devices_hostdevs_gpu_source_address_function = vm.domains.windows.devices.hostdevs.gpu.source.address.function;
                       domain_os_boot_cdrom = "";
                       domain_devices_disks_windows = "";
                       domain_devices_disks_virtio = "";
