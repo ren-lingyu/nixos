@@ -23,6 +23,7 @@
 !modules/**/*.css
 !modules/**/*.md
 !modules/**/*.nix
+!modules/**/*.scm
 !modules/**/*.sh
 !modules/**/*.xml
 !modules/**/*.yaml
