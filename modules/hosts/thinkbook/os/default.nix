@@ -107,6 +107,7 @@ in {
             [ "wheel" "video" "render" "input" ]
             (lib.optionals config.networking.networkmanager.enable [ "networkmanager" ])
             (lib.optionals config.services.seatd.enable [ config.services.seatd.group ])
+            (lib.optionals config.virtualisation.libvirtd.enable [ "libvirtd" ])
           ];
           packages = with pkgs; (builtins.concatLists [
             [
