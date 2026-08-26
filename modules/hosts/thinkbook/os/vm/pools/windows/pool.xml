@@ -1,0 +1,9 @@
+<pool type='dir'>
+  <name>@pool_name@</name>
+
+  <uuid>ce65ab8a-90b2-422f-8bec-732c623b0a4f</uuid>
+
+  <target>
+    <path>@pool_target_path@</path>
+  </target>
+</pool>

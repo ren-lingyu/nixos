@@ -1,0 +1,25 @@
+<network>
+  <name>@network_name@</name>
+
+  <uuid>a20cb6e1-e71d-40ac-a7b9-d1168cd6d662</uuid>
+
+  <forward mode='nat'/>
+
+  <bridge name='@network_bridge_name@'
+          stp='on'
+          delay='0'/>
+
+  <ip address='192.168.122.1'
+      netmask='255.255.255.0'>
+
+    <dhcp>
+      <range start='192.168.122.100'
+             end='192.168.122.254'/>
+
+      <host mac='@network_hosts_windows_mac@'
+            name='@network_hosts_windows_name@'
+            ip='@network_hosts_windows_ip@'/>
+    </dhcp>
+
+  </ip>
+</network>

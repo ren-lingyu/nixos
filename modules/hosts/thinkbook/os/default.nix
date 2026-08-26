@@ -12,6 +12,7 @@ in {
     ./mount.nix
     ./virtual-terminal.nix
     ./flatpak.nix
+    ./vm
   ];
 
   config = lib.mkIf cfg.enable {

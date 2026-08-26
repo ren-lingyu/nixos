@@ -1,0 +1,137 @@
+<domain type='kvm'>
+  <name>@domain_name@</name>
+
+  <uuid>42932b75-94cb-4319-bf5b-81f41cfc3ba7</uuid>
+
+  <memory unit='GiB'>8</memory>
+  <vcpu placement='static'>8</vcpu>
+
+  <os firmware='efi'>
+    <type arch='x86_64' machine='q35'>hvm</type>
+
+    <firmware>
+      <feature enabled='no' name='enrolled-keys'/>
+      <feature enabled='yes' name='secure-boot'/>
+    </firmware>
+
+    @domain_os_boot_cdrom@
+    <boot dev='hd'/>
+  </os>
+
+  <features>
+    <acpi/>
+    <apic/>
+
+    <hyperv mode='custom'>
+      <relaxed state='on'/>
+      <vapic state='on'/>
+      <spinlocks state='on' retries='8191'/>
+      <vpindex state='on'/>
+      <synic state='on'/>
+      <stimer state='on'>
+        <direct state='on'/>
+      </stimer>
+      <reset state='on'/>
+      <frequencies state='on'/>
+      <tlbflush state='on'/>
+      <ipi state='on'/>
+    </hyperv>
+
+    <vmport state='off'/>
+    <smm state='on'/>
+  </features>
+
+  <cpu mode='host-passthrough'
+       check='none'
+       migratable='off'>
+    <topology sockets='1'
+              dies='1'
+              cores='8'
+              threads='1'/>
+  </cpu>
+
+  <clock offset='localtime'>
+    <timer name='hypervclock'
+           present='yes'/>
+  </clock>
+
+  <on_poweroff>destroy</on_poweroff>
+  <on_reboot>restart</on_reboot>
+  <on_crash>restart</on_crash>
+
+  <devices>
+
+    <disk type='volume'
+          device='disk'>
+      <driver name='qemu'
+              type='qcow2'
+              discard='unmap'/>
+
+      <source pool='@domain_devices_disks_system_source_pool@'
+              volume='@domain_devices_disks_system_source_volume@'/>
+
+      <target dev='vda'
+              bus='virtio'/>
+    </disk>
+
+    @domain_devices_disks_windows@
+
+    @domain_devices_disks_virtio@
+
+    <controller type='usb'
+                index='0'
+                model='qemu-xhci'/>
+
+    <controller type='sata'
+                index='0'/>
+
+    <controller type='virtio-serial'
+                index='0'/>
+
+    <interface type='network'>
+      <mac address='@domain_devices_interfaces_default_mac_address@'/>
+
+      <source network='@domain_devices_interfaces_default_source_network@'/>
+
+      <model type='virtio'/>
+    </interface>
+
+    <channel type='unix'>
+      <target type='virtio'
+              name='org.qemu.guest_agent.0'/>
+    </channel>
+
+    <channel type='spicevmc'>
+      <target type='virtio'
+              name='com.redhat.spice.0'/>
+    </channel>
+
+    <input type='tablet'
+           bus='usb'/>
+
+    <input type='keyboard'
+           bus='usb'/>
+
+    <tpm model='tpm-crb'>
+      <backend type='emulator'
+               version='2.0'/>
+    </tpm>
+
+    <graphics type='spice'
+              autoport='yes'>
+      <listen type='address'
+              address='127.0.0.1'/>
+      <!--   <listen type='socket'/> -->
+
+      <clipboard copypaste='yes'/>
+      <mouse mode='client'/>
+    </graphics>
+
+    <video>
+      <model type='virtio'
+             heads='1'
+             primary='yes'/>
+    </video>
+
+  </devices>
+</domain>
