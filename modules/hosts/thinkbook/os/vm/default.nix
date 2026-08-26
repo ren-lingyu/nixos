@@ -82,11 +82,54 @@ in {
     networking.firewall.interfaces.${vm.networks.default.bridge.name} = {
       allowedTCPPorts = [
         53
+        445
       ];
       allowedUDPPorts = [
         53
         67
       ];
+    };
+
+    services.samba = {
+      enable = config.fileSystems.shared.enable;
+      openFirewall = false;
+      nmbd.enable = false;
+      winbindd.enable = false;
+      settings = {
+        global = {
+          "server role" = "standalone server";
+          "interfaces" = [
+            "lo"
+            vm.networks.default.bridge.name
+          ];
+          "bind interfaces only" = "yes";
+          "hosts allow" = [
+            "127.0.0.1"
+            vm.networks.default.hosts.windows.ip
+          ];
+          "hosts deny" = [
+            "0.0.0.0/0"
+          ];
+          "smb ports" = 445;
+        };
+        Shared = {
+          path = config.fileSystems.shared.mountPoint;
+          browseable = "no";
+          "read only" = "no";
+          "valid users" = [
+            "vm-shared"
+          ];
+          "force user" = "root";
+        };
+      };
+    };
+
+    users = {
+      groups.vm-shared = {};
+      users.vm-shared = {
+        isSystemUser = true;
+        group = "vm-shared";
+      };
     };
 
     virtualisation = {
