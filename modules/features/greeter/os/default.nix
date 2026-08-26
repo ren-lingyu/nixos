@@ -51,7 +51,7 @@ in {
           vt = 1;
         };
         default_session = lib.mkForce (let
-          concatWords_ = builtins.concatStringsSep (builtins.fromJSON ''"\u0020"'');
+          concatWords_ = builtins.concatStringsSep (builtins.fromJSON "\"\\u0020\"");
           concatLines_ = builtins.concatStringsSep "\n";
           greeterOutput_ = cfg.monitor.name;
           swayGreetConfig_ = let

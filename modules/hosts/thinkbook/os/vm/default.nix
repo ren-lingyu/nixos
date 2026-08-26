@@ -171,7 +171,7 @@ in {
             {
               definition = let
                 hasInitialized_ = true;
-                mkMediaDiskBlock_ = x_ : y_ : builtins.concatStringsSep "\n${builtins.fromJSON ''"\u0020\u0020\u0020\u0020"''}" [
+                mkMediaDiskBlock_ = x_ : y_ : builtins.concatStringsSep "\n${builtins.fromJSON "\"\\u0020\\u0020\\u0020\\u0020\""}" [
                   "<disk type='file' device='cdrom'>"
                   "    <driver name='qemu' type='raw'/>"
                   "    <source file='${x_}'/>"
