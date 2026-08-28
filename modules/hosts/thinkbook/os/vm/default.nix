@@ -182,9 +182,9 @@ in {
                     "</disk>"
                   ]
                 );
-              in (pkgs.replaceVars
-                ./domain/windows.xml
-                (lib.mergeAttrsList
+              in (pkgs.replaceVarsWith {
+                src = ./domain/windows.xml;
+                replacements = (lib.mergeAttrsList
                   [
                     {
                       domain_name = vm.domains.windows.name;
@@ -215,8 +215,8 @@ in {
                       }
                     )
                   ]
-                )
-              );
+                );
+              });
               restart = false;
               active = null;
             }
@@ -224,16 +224,16 @@ in {
 
           networks = [
             {
-              definition = (pkgs.replaceVars
-                ./networks/default.xml
-                {
+              definition = (pkgs.replaceVarsWith {
+                src = ./networks/default.xml;
+                replacements = {
                   network_name = vm.networks.default.name;
                   network_bridge_name = vm.networks.default.bridge.name;
                   network_hosts_windows_name = vm.networks.default.hosts.windows.name;
                   network_hosts_windows_mac = vm.networks.default.hosts.windows.mac;
                   network_hosts_windows_ip = vm.networks.default.hosts.windows.ip;
-                }
-              );
+                };
+              });
               restart = false;
               active = true;
             }
@@ -241,23 +241,23 @@ in {
 
           pools = [
             {
-              definition = (pkgs.replaceVars
-                ./pools/windows/pool.xml
-                {
+              definition = (pkgs.replaceVarsWith {
+                src = ./pools/windows/pool.xml;
+                replacements = {
                   pool_name = vm.pools.windows.name;
                   pool_target_path = vm.pools.windows.target.path;
-                }
-              );
+                };
+              });
               restart = false;
               active = true;
               volumes = [
                 {
-                  definition = (pkgs.replaceVars
-                    ./pools/windows/volume/system.xml
-                    {
+                  definition = (pkgs.replaceVarsWith {
+                    src = ./pools/windows/volume/system.xml;
+                    replacements = {
                       volume_name = vm.pools.windows.volumes.system.name;
-                    }
-                  );
+                    };
+                  });
                   present = true;
                 }
               ];
