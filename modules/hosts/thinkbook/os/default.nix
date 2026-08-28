@@ -25,6 +25,7 @@ in {
       kernelPackages = pkgs.linuxPackages_latest;
       kernelParams = [
         "psmouse.synaptics_intertouch=0"
+        "udmabuf.list_limit=16384"
       ];
       kernelModules = [ "uinput" ];
       loader = {
