@@ -199,6 +199,8 @@ in {
                       domain_os_boot_cdrom = "";
                       domain_devices_disks_windows = "";
                       domain_devices_disks_virtio = "";
+                      XDG_RUNTIME_DIR = "/run/user/${builtins.toString cfg.users."1000"}";
+                      WAYLAND_DISPLAY = "wayland-1";
                     }
                     (lib.optionalAttrs
                       (hasInitialized_ == false)
