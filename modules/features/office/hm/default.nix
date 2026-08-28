@@ -7,7 +7,7 @@ in {
   config = lib.mkIf cfg.enable {
 
     home.packages = with pkgs; [
-      libreoffice-qt-fresh
+      libreoffice-qt-stable
     ];
 
     programs.onlyoffice = {
