@@ -107,6 +107,15 @@
               name='org.qemu.guest_agent.0'/>
     </channel>
 
+    <channel type='qemu-vdagent'>
+      <source>
+        <clipboard copypaste='yes'/>
+        <mouse mode='server'/>
+      </source>
+      <target type='virtio'
+              name='com.redhat.spice.0'/>
+    </channel>
+
     <input type='tablet'
            bus='usb'/>
 
@@ -140,7 +149,7 @@
 
   <qemu:commandline>
     <qemu:arg value='-display'/>
-    <qemu:arg value='gtk,gl=on'/>
+    <qemu:arg value='gtk,gl=on,clipboard=on'/>
 
     <qemu:env name='XDG_RUNTIME_DIR'
               value='@XDG_RUNTIME_DIR@'/>
