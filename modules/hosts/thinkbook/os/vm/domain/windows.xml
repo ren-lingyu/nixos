@@ -1,5 +1,4 @@
-<domain type='kvm'
-        xmlns:qemu='http://libvirt.org/schemas/domain/qemu/1.0'>
+<domain type='kvm'>
   <name>@domain_name@</name>
 
   <uuid>42932b75-94cb-4319-bf5b-81f41cfc3ba7</uuid>
@@ -107,11 +106,7 @@
               name='org.qemu.guest_agent.0'/>
     </channel>
 
-    <channel type='qemu-vdagent'>
-      <source>
-        <clipboard copypaste='yes'/>
-        <mouse mode='server'/>
-      </source>
+    <channel type='spicevmc'>
       <target type='virtio'
               name='com.redhat.spice.0'/>
     </channel>
@@ -140,20 +135,18 @@
 
     <video>
       <model type='virtio'
-             heads='4'
+             heads='1'
              primary='yes'
              blob='on'/>
     </video>
 
+    <graphics type='spice'
+              autoport='yes'>
+      <listen type='address'
+              address='127.0.0.1'/>
+
+      <clipboard copypaste='yes'/>
+      <mouse mode='client'/>
+    </graphics>
   </devices>
-
-  <qemu:commandline>
-    <qemu:arg value='-display'/>
-    <qemu:arg value='gtk,gl=on,clipboard=on'/>
-
-    <qemu:env name='XDG_RUNTIME_DIR'
-              value='@XDG_RUNTIME_DIR@'/>
-    <qemu:env name='WAYLAND_DISPLAY'
-              value='@WAYLAND_DISPLAY@'/>
-  </qemu:commandline>
 </domain>
