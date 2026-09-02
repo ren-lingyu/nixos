@@ -5,13 +5,14 @@
 这是一个基于 Flake 的 NixOS 配置仓库.
 
 * 架构约定
-=flake.nix= 是最终组装层, 统一管理 flake inputs, 外部 NixOS/Home Manager modules, overlays 和 =nixosConfigurations=. 具体配置由三类平级 profile 提供:
+=flake.nix= 是最终组装层, 统一管理 flake inputs, 外部 NixOS/Home Manager modules, overlays 和 =nixosConfigurations=. 具体配置由四类平级 profile 提供:
 
 - =modules/hosts/= 描述主机身份, 硬件和主机拥有的资源. host 只通过 UID registry 声明可管理的用户, 不声明用户名或 user profile.
 - =modules/users/= 描述 user profile 和个人 Home Manager 配置. user 不决定自己属于哪台 host.
 - =modules/features/= 描述可复用的功能实现, 可同时提供 OS 和 HM 模块.
+- =modules/workloads/= 描述按 host 需要启用的服务型 workload.
 
-三类 profile 只决定各自负责的事务. profile 选择, UID 绑定与外部依赖注入由 =flake.nix= 负责. =lib/= 则提供公共类型, 断言生成器和模块聚合函数, 在模块参数中名为 =llib=.
+四类 profile 只决定各自负责的事务. profile 选择, UID 绑定与外部依赖注入由 =flake.nix= 负责. =lib/= 则提供公共类型, 断言生成器和模块聚合函数, 在模块参数中名为 =llib=.
 
 * Option 和组装协议
 ** =enable= 与 =existModule=
@@ -72,6 +73,7 @@ Home Manager 模块可以通过 =home-manager.users.<uid>.imports= 合并, 因�
 - =nixvim= 和 =lem=: 注入 editor feature 所需的 Home Manager module 与 overlay.
 - =niri-flake= 和 =noctalia=: 注入 niri feature 所需的 overlay 和 Home Manager modules.
 - =nix-flatpak=: 注入 thinkbook host 的 Flatpak module.
+- =nixvirt=: 注入 thinkbook host 的 NixVirt module.
 - =nixos-wsl=: 注入 wsl host 的 NixOS-WSL module.
 - =nixos-anywhere= 和 =disko=: 提供部署 devShell 与 aliyun host 的 disko module; =disko= 通过 =follows= 复用 =nixos-anywhere/disko=.
 
@@ -92,10 +94,11 @@ Home Manager 模块可以通过 =home-manager.users.<uid>.imports= 合并, 因�
 ├── default.nix
 ├── features/
 ├── hosts/
-└── users/
+├── users/
+└── workloads/
 #+end_example
 
-[[file:./modules/default.nix][modules/default.nix]] 是仓库模块入口, 汇总 features, hosts 和 users, 定义通用 Nix/NixOS 与 Home Manager 基础配置, 并向每个 Home Manager 用户注册 =moduleInterfaces= options.
+[[file:./modules/default.nix][modules/default.nix]] 是仓库模块入口, 汇总 features, hosts, users 和 workloads, 定义通用 Nix/NixOS 与 Home Manager 基础配置, 并向每个 Home Manager 用户注册 =moduleInterfaces= options.
 
 **** [[file:./modules/features/][/modules/features]]
 #+begin_example
@@ -107,7 +110,6 @@ Home Manager 模块可以通过 =home-manager.users.<uid>.imports= 合并, 因�
 ├── file-manager/
 ├── font/
 ├── greeter/
-├── interconnect/
 ├── media/
 ├── niri/
 ├── office/
@@ -196,19 +198,6 @@ Home Manager 模块可以通过 =home-manager.users.<uid>.imports= 合并, 因�
 #+end_example
 
 声明 greeter feature 的 OS 模块入口, 根据启用的 host 推导默认显示器, 并收集可用 session wrapper. =os/default.nix= 配置系统级 greeter 相关服务和 session 列表.
-
-***** [[file:./modules/features/interconnect/][/modules/features/interconnect]]
-#+begin_example
-/modules/features/interconnect/
-├── default.nix
-├── extra-options.nix
-└── os/
-    ├── default.nix
-    ├── ingress.hub.age
-    └── ingress.spoke.age
-#+end_example
-
-声明 interconnect feature 的 OS 模块入口. =default.nix= 根据 host 的 =intranetClaims= 推导 ingress hub/spoke 节点并检查声明数量; =os/default.nix= 配置 WireGuard, hub 侧 UDP 端口和节点私钥.
 
 ***** [[file:./modules/features/media/][/modules/features/media]]
 #+begin_example
@@ -332,18 +321,45 @@ Home Manager 模块可以通过 =home-manager.users.<uid>.imports= 合并, 因�
 
 声明 x11-session feature 的 OS 与 HM 模块入口, 并生成 IceWM/X11 session wrapper. =hm/default.nix= 配置用户级 Rofi; =os/default.nix= 配置系统级 X11 session 支持.
 
+**** [[file:./modules/workloads/][/modules/workloads]]
+#+begin_example
+/modules/workloads/
+├── default.nix
+├── caddy/
+│   ├── default.nix
+│   ├── extra-options.nix
+│   └── os/
+│       └── default.nix
+└── wbo/
+    ├── default.nix
+    ├── extra-options.nix
+    └── os/
+        └── default.nix
+#+end_example
+
+[[file:./modules/workloads/default.nix][modules/workloads/default.nix]] 按目录名自动定义 workload profile options, 并通过 =existModule= 断言核对 OS/HM 子模块结构.
+
+=caddy= workload 配置 Caddy container, 通过指定 network interface, upstream IP 和 port 反向代理服务, 并用 nftables 限制出站路径. =wbo= workload 配置 whitebophir container, 通过指定 listen IP, port, network interface 和 allowed source IP 暴露白板服务.
+
 **** [[file:./modules/hosts/][/modules/hosts]]
 #+begin_example
 /modules/hosts/
 ├── default.nix
+├── boot-manager.nix
+├── identity-keys.nix
+├── shared.nix
+├── wireguard.nix
 ├── aliyun/
+├── matebook/
 ├── thinkbook/
 └── wsl/
 #+end_example
 
-[[file:./modules/hosts/default.nix][modules/hosts/default.nix]] 按目录名自动定义 host profile options, 统一提供 UID registry, monitor 和 =existModule= 接口, 并确保恰好启用一个 host.
+[[file:./modules/hosts/default.nix][modules/hosts/default.nix]] 按目录名自动定义 host profile options, 导入 boot-manager, identity-keys, shared 和 WireGuard 相关通用模块, 统一提供 UID registry, monitor 和 =existModule= 接口, 并确保恰好启用一个 host.
 
-各 host 的 =metadata.nix= 由 [[file:./modules/hosts/default.nix][modules/hosts/default.nix]] 自动导入, 用于声明 UID registry, monitor, intranet claims, public IP 和 identity key metadata. =ssh.private.age= 保存该 host 的加密 SSH host private key, 并由 =metadata.nix= 引用.
+[[file:./modules/hosts/boot-manager.nix][modules/hosts/boot-manager.nix]], [[file:./modules/hosts/identity-keys.nix][modules/hosts/identity-keys.nix]], [[file:./modules/hosts/shared.nix][modules/hosts/shared.nix]] 和 [[file:./modules/hosts/wireguard.nix][modules/hosts/wireguard.nix]] 分别承载 host boot manager, identity key, shared capability 和 WireGuard topology/secret 的通用 option 与配置.
+
+各 host 的 =metadata.nix= 由 [[file:./modules/hosts/default.nix][modules/hosts/default.nix]] 自动导入, 用于声明 UID registry, monitor, public IP, WireGuard 和 identity key metadata. =ssh.private.age= 与 =wireguard.private.age= 分别保存该 host 的加密 SSH host private key 与 WireGuard private key, 并由 =metadata.nix= 引用.
 
 ***** [[file:./modules/hosts/aliyun/][/modules/hosts/aliyun]]
 #+begin_example
@@ -351,6 +367,7 @@ Home Manager 模块可以通过 =home-manager.users.<uid>.imports= 合并, 因�
 ├── default.nix
 ├── metadata.nix
 ├── ssh.private.age
+├── wireguard.private.age
 └── os/
     ├── default.nix
     ├── disk-config.nix
@@ -359,6 +376,20 @@ Home Manager 模块可以通过 =home-manager.users.<uid>.imports= 合并, 因�
 
 阿里云 ECS host, hostname =nixos-server=, 通过 =nixos-anywhere= + =disko= 远程部署和分区.
 
+***** [[file:./modules/hosts/matebook/][/modules/hosts/matebook]]
+#+begin_example
+/modules/hosts/matebook/
+├── default.nix
+├── metadata.nix
+├── ssh.private.age
+├── wireguard.private.age
+└── os/
+    ├── default.nix
+    └── hardware-configuration.nix
+#+end_example
+
+MateBook bare metal NixOS host, hostname =nixos-matebook=, 配置本机硬件, 启动, 图形栈和基础用户.
+
 ***** [[file:./modules/hosts/thinkbook/][/modules/hosts/thinkbook]]
 #+begin_example
 /modules/hosts/thinkbook/
@@ -366,16 +397,29 @@ Home Manager 模块可以通过 =home-manager.users.<uid>.imports= 合并, 因�
 ├── extra-options.nix
 ├── metadata.nix
 ├── ssh.private.age
+├── wireguard.private.age
 └── os/
     ├── default.nix
-    ├── boot-manager.nix
     ├── flatpak.nix
     ├── hardware-configuration.nix
-    ├── mount-windows-directory.nix
-    └── virtual-terminal.nix
+    ├── mount.nix
+    ├── virtual-terminal.nix
+    └── vm/
+        ├── default.nix
+        ├── domain/
+        │   └── windows.xml
+        ├── networks/
+        │   └── default.xml
+        └── pools/
+            └── windows/
+                ├── pool.xml
+                └── volume/
+                    └── system.xml
 #+end_example
 
-ThinkBook bare metal NixOS host, hostname =nixos=, 配置本机硬件, 启动, Flatpak, Windows 分区挂载和虚拟终端.
+ThinkBook bare metal NixOS host, hostname =nixos=, 配置本机硬件, 启动, Flatpak, Windows/共享分区挂载, 虚拟终端和 libvirt Windows VM.
+
+=os/vm/default.nix= 定义 Windows VM 的 domain, network, storage pool 和 volume, 生成 virtio ISO, 配置 GPU SR-IOV, FreeRDP/virt-viewer 工具, Samba 共享和 libvirt 资源. =domain/windows.xml= 是 Windows VM domain 模板, 包含 UEFI secure boot, Hyper-V enlightenment, virtio disk/network/channel/video, GPU hostdev, SPICE graphics 和 memfd memory backing.
 
 ***** [[file:./modules/hosts/wsl/][/modules/hosts/wsl]]
 #+begin_example
@@ -383,6 +427,7 @@ ThinkBook bare metal NixOS host, hostname =nixos=, 配置本机硬件, 启动, F
 ├── default.nix
 ├── metadata.nix
 ├── ssh.private.age
+├── wireguard.private.age
 └── os/
     └── default.nix
 #+end_example
