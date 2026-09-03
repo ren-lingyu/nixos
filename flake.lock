@@ -119,10 +119,10 @@
     "elpa-gnu": {
       "flake": false,
       "locked": {
-        "lastModified": 1786466209,
-        "narHash": "sha256-JokS/bCsrx57CDsxxjbrkkHNXrrrlhEbj2M7Q99MDY8=",
+        "lastModified": 1787776647,
+        "narHash": "sha256-gMB0uqmBs9X0rqsqeoAnYz4IKE/G+8MuEBI79fTMK/g=",
         "ref": "refs/heads/main",
-        "rev": "e0751d74948c9221dfe76e1f0789228a70081560",
+        "rev": "0d7d3f5281ba72d994b68a02f363e6e619ecce59",
         "shallow": true,
         "type": "git",
         "url": "https://git.savannah.gnu.org/git/elpa/gnu.git"
@@ -137,10 +137,10 @@
     "elpa-nongnu": {
       "flake": false,
       "locked": {
-        "lastModified": 1786568304,
-        "narHash": "sha256-Ze+9xIDJFynaITujT+kpN+vxOIyKWr9BaVLsOsT0hSQ=",
+        "lastModified": 1787550989,
+        "narHash": "sha256-gz0l0RlO9eJGdAvpgnDw8N900luAG4SMWSF9rA2ctNs=",
         "ref": "refs/heads/main",
-        "rev": "749fb48b3c318d9deb1941ea970afcd6d96d35dd",
+        "rev": "d3cba693ba67ab9d41bfa1df06ce8738d3c1292c",
         "shallow": true,
         "type": "git",
         "url": "https://git.savannah.gnu.org/git/elpa/nongnu.git"
@@ -163,10 +163,10 @@
         "twist": "twist"
       },
       "locked": {
-        "lastModified": 1786894874,
-        "narHash": "sha256-d3hqy/xr23G6VHpdRDY58oqznzCJZuiBtkZ/D2vAlUc=",
+        "lastModified": 1788369540,
+        "narHash": "sha256-G+p85OASAdFdC6GQoNDhYzFyQwV5CqnxpSK/qu1CoDU=",
         "ref": "refs/heads/main",
-        "rev": "ceb426c93b2b23de84512953611b9c338ce8601e",
+        "rev": "c1f4bab64f21806b956e907e2148648eca68a94e",
         "shallow": true,
         "type": "git",
         "url": "https://github.com/ren-lingyu/emarccs.git"
@@ -236,10 +236,10 @@
         "nixpkgs-lib": "nixpkgs-lib"
       },
       "locked": {
-        "lastModified": 1785627969,
-        "narHash": "sha256-4dtXQk/NMePegK/nWp5NSeuZKLATItOq61lpEvmXqGw=",
+        "lastModified": 1787559586,
+        "narHash": "sha256-onL0VLf9vPllmT0H/OlURIU5r5t5WIEl7t4tVNKT0Nw=",
         "ref": "refs/heads/main",
-        "rev": "427bf4bd9435fdf21321c8cc628c24efc14c0f7a",
+        "rev": "9d0d87172c374f89da73c1cfe6d81ae62feac1f1",
         "shallow": true,
         "type": "git",
         "url": "https://github.com/hercules-ci/flake-parts.git"
@@ -256,10 +256,10 @@
         "nixpkgs-lib": "nixpkgs-lib_2"
       },
       "locked": {
-        "lastModified": 1787559586,
-        "narHash": "sha256-onL0VLf9vPllmT0H/OlURIU5r5t5WIEl7t4tVNKT0Nw=",
+        "lastModified": 1788306937,
+        "narHash": "sha256-lbrI1UYVpFgKSsyrU9oeF7FHfnu8nLD9ja0ou9f2rxk=",
         "ref": "refs/heads/main",
-        "rev": "9d0d87172c374f89da73c1cfe6d81ae62feac1f1",
+        "rev": "f16b25b8c3d2809b87925d0b76652d7821a75c68",
         "shallow": true,
         "type": "git",
         "url": "https://github.com/hercules-ci/flake-parts.git"
@@ -355,10 +355,10 @@
         ]
       },
       "locked": {
-        "lastModified": 1787797243,
-        "narHash": "sha256-8+Q7NOB7RPajRjA4pbCDLzqH+MTjnG9x6LUPLfL2joA=",
+        "lastModified": 1788355065,
+        "narHash": "sha256-gAz5oTI7ur34CfuakQduiQd/2ZhO62Bn2XXg08nZYYQ=",
         "ref": "refs/heads/master",
-        "rev": "99c9ec63390f1d8c14d95d9e8b17cc29cfbd4e11",
+        "rev": "d9d750e4fc11c10cab2da677bdd31e427f3a3a71",
         "shallow": true,
         "type": "git",
         "url": "https://github.com/nix-community/home-manager.git"
@@ -378,10 +378,10 @@
         ]
       },
       "locked": {
-        "lastModified": 1786539395,
-        "narHash": "sha256-nkcaDt3DC5rlHzOa5iP8mhD5jtiq8Rq1JW30VzOlq8Q=",
+        "lastModified": 1788195571,
+        "narHash": "sha256-ZGahnYOYyA2hzvVjp2Qh9bk+RfFGiHrOo6mL3tisGWY=",
         "ref": "refs/heads/main",
-        "rev": "aa4d285b0aaa49ad215db5091ea614cfc73f52f3",
+        "rev": "68e85e08e05b183f5dba78a8a84cb97fc19fb681",
         "shallow": true,
         "type": "git",
         "url": "https://github.com/lem-project/lem.git"
@@ -396,10 +396,10 @@
     "melpa": {
       "flake": false,
       "locked": {
-        "lastModified": 1786892466,
-        "narHash": "sha256-WflI6VF/izB4QpbGmu2PCQJ0LvCZYskMUbQvbzrRzTo=",
+        "lastModified": 1788179688,
+        "narHash": "sha256-MPLYYgCx6TTpO7l3N9M24+CqU664kXqXLYngu2leo4E=",
         "ref": "refs/heads/master",
-        "rev": "6afc5e5a90df19a3f5d1abd41a37aba1f846d374",
+        "rev": "e1abef919510b4a1fa4571cf098dbb97caa8fbce",
         "shallow": true,
         "type": "git",
         "url": "https://github.com/melpa/melpa.git"
@@ -627,10 +627,10 @@
     },
     "nixpkgs": {
       "locked": {
-        "lastModified": 1786719841,
-        "narHash": "sha256-QcpQOT0NQEFkI77t+YXPZqDJc35iIodG7zinieOwFUg=",
+        "lastModified": 1787964612,
+        "narHash": "sha256-0N9nghg3nwzX6b6qc77EzjR9cu/Z+UR66FlfsCqiURs=",
         "ref": "refs/heads/nixpkgs-unstable",
-        "rev": "8be7bd0c83f12e2e3bbba07c9044d6fed9e66f7f",
+        "rev": "e8be7818e19ada32105a8af937a6a473b38167ca",
         "shallow": true,
         "type": "git",
         "url": "https://github.com/NixOS/nixpkgs.git"
@@ -659,11 +659,11 @@
     },
     "nixpkgs-lib_2": {
       "locked": {
-        "lastModified": 1785031560,
-        "narHash": "sha256-OmshNvn2vupOFpYinLUu+1Dnpu4n7Q5N3ggGVNHpkUI=",
+        "lastModified": 1788057806,
+        "narHash": "sha256-DTQSMxzDWmT0zhguthvegnVkn7CFqGCv4IHCzk5ZUpM=",
         "owner": "nix-community",
         "repo": "nixpkgs.lib",
-        "rev": "0e79af5e3d4dcfcd676ab5ba3f95d2e3352e078c",
+        "rev": "596e2e3940e09b2abbeb03f75fa1828c57fcd72c",
         "type": "github"
       },
       "original": {
@@ -721,10 +721,10 @@
     },
     "nixpkgs_3": {
       "locked": {
-        "lastModified": 1787736819,
-        "narHash": "sha256-cV5xEJJK3BvhU8rEd4mC9UsmDi5qscv/kzGPhBRC5WA=",
+        "lastModified": 1788179007,
+        "narHash": "sha256-hn1oU2rue2SYK8dAr8+WNZWtbsz1S2W5mnHlSEuh3bo=",
         "ref": "refs/heads/nixos-unstable",
-        "rev": "9fbb54b33e91ee4ca368e35a78e0613c720600b3",
+        "rev": "34ab99075ac4f7e40cf037eef32cb1c360bb85e9",
         "shallow": true,
         "type": "git",
         "url": "https://github.com/NixOS/nixpkgs"
@@ -759,10 +759,10 @@
         "systems": "systems_2"
       },
       "locked": {
-        "lastModified": 1787862710,
-        "narHash": "sha256-dL1Tv7LekaTWUJxHRckjbupWczDdc3QOgRuVCM+WAvQ=",
+        "lastModified": 1788190018,
+        "narHash": "sha256-59BAfH0txPAZrPBF4QJqwvUWppD+ICrcjA1LZAmPnrQ=",
         "ref": "refs/heads/main",
-        "rev": "8c096abcf376137527c134da4ee210332b08ccc0",
+        "rev": "41844750e55f17b1385d5b09ca7ade5f11f49506",
         "shallow": true,
         "type": "git",
         "url": "https://github.com/nix-community/nixvim.git"
@@ -893,10 +893,10 @@
         ]
       },
       "locked": {
-        "lastModified": 1784381926,
-        "narHash": "sha256-Of7jfZvoGwm9R0/WMTEc1ZGTaG4w0opmTp4snlrLwR4=",
+        "lastModified": 1787934617,
+        "narHash": "sha256-0FtL+V8DxEaQJSKH9qNQmIHnzOAO0qQiRyQlQrxOp9I=",
         "ref": "refs/heads/main",
-        "rev": "00c853c42c325cf7a3c5e0640c582e9c1921fbcd",
+        "rev": "8e8410b60c18866bfe4c63fbb525ddb3c0576116",
         "shallow": true,
         "type": "git",
         "url": "https://github.com/ren-lingyu/nixpkgs.git"
@@ -915,10 +915,10 @@
         ]
       },
       "locked": {
-        "lastModified": 1786629091,
-        "narHash": "sha256-gkig4nPi1CWc4Z50GBsjE4ygSE7hMpl/TwID2an2Cck=",
+        "lastModified": 1788337237,
+        "narHash": "sha256-gkSH8VUtCo6hnysNmb9DbTuDepH2t5pv+QWjP75xKAk=",
         "ref": "refs/heads/master",
-        "rev": "a8627b21b9107c5711c96b84f32a9a4b3d45295f",
+        "rev": "fbf759290e0cb0a98dfc813a4eb7d53ad1dacb57",
         "shallow": true,
         "type": "git",
         "url": "https://github.com/Mic92/sops-nix.git"
@@ -1046,10 +1046,10 @@
         "elisp-helpers": "elisp-helpers"
       },
       "locked": {
-        "lastModified": 1786888154,
-        "narHash": "sha256-G5XN4Ct5LqgphWauBZ8MPiA1zXuEPZNqHBzElzG7kLQ=",
+        "lastModified": 1786923958,
+        "narHash": "sha256-9TVA1sn+NvbJwYgPELWoN4KS8CQtpKnLwWN+OYynGA0=",
         "ref": "refs/heads/master",
-        "rev": "daae234306002ffdf35f9112c7daf981a1ab22b3",
+        "rev": "35b0bbe3356cecdbfb0e925ccd6f5c736209e2ba",
         "shallow": true,
         "type": "git",
         "url": "https://github.com/emacs-twist/twist.nix.git"
