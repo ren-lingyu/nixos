@@ -1,14 +1,14 @@
-{ config, lib, pkgs, osConfig, ... } : let
+{ config, lib, ... } : let
 
   noctaliaNiriSettingsEnable = (builtins.all
     (x_ : x_)
     [
       config.programs.niri.enable
-      config.programs.noctalia-shell.enable
+      config.programs.noctalia.enable
     ]
   );
 
-  noctaliaShellCommand = [ "noctalia-shell" ];
+  noctaliaCommand = [ (lib.getExe config.programs.noctalia.package) ];
 
 in {
 
@@ -17,69 +17,69 @@ in {
 
       spawn-at-startup = lib.mkAfter [
         {
-          argv = noctaliaShellCommand;
+          argv = noctaliaCommand;
         }
       ];
 
       binds = {
 
         "Mod+D" = lib.mkForce {
-          hotkey-overlay = { title = "Run an Application: Noctalia appLauncher"; };
+          hotkey-overlay = { title = "Run an Application: Noctalia Launcher"; };
           action.spawn = builtins.concatLists [
-            noctaliaShellCommand
-            [ "ipc" "call" "launcher" "toggle" ]
+            noctaliaCommand
+            [ "msg" "panel-toggle" "launcher" ]
           ];
         };
         "Mod+C" = lib.mkForce {
           hotkey-overlay = { title = "Open Noctalia Control Center"; };
           action.spawn = builtins.concatLists [
-            noctaliaShellCommand
-            [ "ipc" "call" "controlCenter" "toggle" ]
+            noctaliaCommand
+            [ "msg" "panel-toggle" "control-center" ]
           ];
         };
         "Mod+S" = lib.mkForce {
           hotkey-overlay = { title = "Open Noctalia Settings"; };
           action.spawn = builtins.concatLists [
-            noctaliaShellCommand
-            [ "ipc" "call" "settings" "toggle"]
+            noctaliaCommand
+            [ "msg" "settings-toggle" ]
           ];
         };
         "Mod+N" = lib.mkForce {
-          hotkey-overlay = { title = "Open Noctalia Settings"; };
+          hotkey-overlay = { title = "Open Noctalia Notification History"; };
           action.spawn = builtins.concatLists [
-            noctaliaShellCommand
-            [ "ipc" "call" "notifications" "toggleHistory"]
+            noctaliaCommand
+            [ "msg" "panel-toggle" "control-center" "notifications" ]
           ];
         };
 
         "XF86AudioRaiseVolume" = lib.mkForce {
           action.spawn = builtins.concatLists [
-            noctaliaShellCommand
-            [ "ipc" "call" "volume" "increase" ]
+            noctaliaCommand
+            [ "msg" "volume-up" ]
           ];
         };
         "XF86AudioLowerVolume" = lib.mkForce {
           action.spawn = builtins.concatLists [
-            noctaliaShellCommand
-            [ "ipc" "call" "volume" "decrease" ]
+            noctaliaCommand
+            [ "msg" "volume-down" ]
           ];
         };
         "XF86AudioMute" = lib.mkForce {
           action.spawn = builtins.concatLists [
-            noctaliaShellCommand
-            [ "ipc" "call" "volume" "muteOutput" ]
+            noctaliaCommand
+            [ "msg" "volume-mute" ]
           ];
         };
         "XF86MonBrightnessUp" = lib.mkForce {
           action.spawn = builtins.concatLists [
-            noctaliaShellCommand
-            [ "ipc" "call" "brightness" "increase" ]
+            noctaliaCommand
+            [ "msg" "brightness-up" ]
           ];
         };
         "XF86MonBrightnessDown" = lib.mkForce {
           action.spawn = builtins.concatLists [
-            noctaliaShellCommand
-            [ "ipc" "call" "brightness" "decrease" ]
+            noctaliaCommand
+            [ "msg" "brightness-down" ]
           ];
         };
 

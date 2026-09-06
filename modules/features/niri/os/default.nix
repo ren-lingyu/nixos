@@ -11,6 +11,13 @@ in {
       package = pkgs.niri;
     };
 
+    programs.noctalia = lib.mkIf cfg.noctalia.enable {
+      enable = true;
+      package = null;
+      recommendedServices.enable = true;
+      systemd.enable = false;
+    };
+
     environment.systemPackages = with pkgs; [
       xwayland-satellite
     ];

@@ -12,13 +12,8 @@
       environment = {
         QT_QPA_PLATFORM = "wayland";
       };
-      spawn-at-startup = builtins.concatLists [
-        # (lib.optionals config.programs.noctalia-shell.enable [
-        #   {
-        #     argv = [ "noctalia-shell" ];
-        #   }
-        # ])
-      ];
+      spawn-at-startup = [ ];
+      debug.honor-xdg-activation-with-invalid-serial = true;
       prefer-no-csd = true;
       screenshot-path = "~/Pictures/Screenshots/ScreenShot_%Y-%m-%d_%H%M%S.png";
       cursor = {

@@ -69,7 +69,7 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
     noctalia = {
-      url = "git+https://github.com/noctalia-dev/noctalia.git?ref=refs/tags/v4.7.7&shallow=1";
+      url = "git+https://github.com/noctalia-dev/noctalia.git?ref=refs/tags/v5.0.1&shallow=1";
       inputs.nixpkgs.follows = "nixpkgs";
     };
     nix-flatpak = {
@@ -147,6 +147,7 @@
           niri = { config, pkgs, lib, ... } : {
             imports = [
               self.modules.base
+              inputs.noctalia.nixosModules.default
               ./modules/features/niri
             ];
             config = {

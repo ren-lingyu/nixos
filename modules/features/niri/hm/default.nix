@@ -2,6 +2,29 @@
 
   cfg = osConfig.modules.features.niri;
 
+  noctaliaSettings = config.programs.noctalia.settings;
+
+  noctaliaIdleBehaviors = (
+    if builtins.isAttrs noctaliaSettings
+    then (noctaliaSettings.idle.behavior or { })
+    else { }
+  );
+
+  noctaliaIdleEnabled = (builtins.all
+    (x_ : x_)
+    [
+      config.programs.noctalia.enable
+      (builtins.any
+        (behavior_ : (
+          if builtins.isAttrs behavior_
+          then (behavior_.enabled or false)
+          else false
+        ))
+        (builtins.attrValues noctaliaIdleBehaviors)
+      )
+    ]
+  );
+
 in {
 
   imports = [
@@ -29,7 +52,7 @@ in {
       package = osConfig.programs.niri.package;
     };
 
-    programs.fuzzel = lib.mkIf (!config.programs.noctalia-shell.enable) {
+    programs.fuzzel = lib.mkIf (!config.programs.noctalia.enable) {
       enable = true;
       package = pkgs.fuzzel;
       settings = {
@@ -110,7 +133,7 @@ in {
       };
     };
 
-    services.mako = lib.mkIf (!config.programs.noctalia-shell.enable) {
+    services.mako = lib.mkIf (!config.programs.noctalia.enable) {
       enable = true; # notification daemon
       package = pkgs.mako;
       settings = {
@@ -129,7 +152,7 @@ in {
       };
     };
 
-    services.swayidle = lib.mkIf (!config.programs.noctalia-shell.settings.idle.enabled) {
+    services.swayidle = lib.mkIf (!noctaliaIdleEnabled) {
       enable = true; # idle management daemon
       package = pkgs.swayidle;
       systemdTargets = [

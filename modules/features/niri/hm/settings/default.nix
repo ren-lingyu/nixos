@@ -8,7 +8,7 @@
     ./animations.nix
     ./window-rules.nix
     ./binds.nix
-    ./noctalia-shell.nix
+    ./noctalia.nix
   ];
 
 }
