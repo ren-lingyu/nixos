@@ -52,6 +52,13 @@ in {
           ];
         };
 
+        "Mod+Shift+C" = lib.mkForce {
+          action.spawn = builtins.concatLists [
+            noctaliaCommand
+            [ "msg" "panel-toggle" "clipboard" ]
+          ];
+        };
+
         "XF86AudioRaiseVolume" = lib.mkForce {
           action.spawn = builtins.concatLists [
             noctaliaCommand
