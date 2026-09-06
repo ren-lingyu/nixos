@@ -24,28 +24,28 @@ in {
       binds = {
 
         "Mod+D" = lib.mkForce {
-          hotkey-overlay = { title = "Run an Application: Noctalia Launcher"; };
+          hotkey-overlay = { title = "Toggle Noctalia Launcher"; };
           action.spawn = builtins.concatLists [
             noctaliaCommand
             [ "msg" "panel-toggle" "launcher" ]
           ];
         };
         "Mod+C" = lib.mkForce {
-          hotkey-overlay = { title = "Open Noctalia Control Center"; };
+          hotkey-overlay = { title = "Toggle Noctalia Control Center"; };
           action.spawn = builtins.concatLists [
             noctaliaCommand
             [ "msg" "panel-toggle" "control-center" ]
           ];
         };
         "Mod+S" = lib.mkForce {
-          hotkey-overlay = { title = "Open Noctalia Settings"; };
+          hotkey-overlay = { title = "Toggle Noctalia Settings"; };
           action.spawn = builtins.concatLists [
             noctaliaCommand
             [ "msg" "settings-toggle" ]
           ];
         };
         "Mod+N" = lib.mkForce {
-          hotkey-overlay = { title = "Open Noctalia Notification History"; };
+          hotkey-overlay = { title = "Toggle Noctalia Notification"; };
           action.spawn = builtins.concatLists [
             noctaliaCommand
             [ "msg" "panel-toggle" "control-center" "notifications" ]
@@ -53,6 +53,9 @@ in {
         };
 
         "Mod+Shift+C" = lib.mkForce {
+          hotkey-overlay = {
+            title = "Toggle Noctalia Clipboard";
+          };
           action.spawn = builtins.concatLists [
             noctaliaCommand
             [ "msg" "panel-toggle" "clipboard" ]
