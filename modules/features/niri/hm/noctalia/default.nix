@@ -34,7 +34,7 @@ in {
           offline_mode = false;
           telemetry_enabled = false;
           niri_overview_type_to_launch_enabled = false;
-          polkit_agent = false;
+          polkit_agent = true;
           password_style = "default";
           settings_show_advanced = true;
           setup_wizard_enabled = false;
