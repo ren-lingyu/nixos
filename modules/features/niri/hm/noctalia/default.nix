@@ -2,6 +2,16 @@
 
   cfg = osConfig.modules.features.niri;
 
+  defaultMonitor_ = builtins.head (builtins.attrValues (lib.filterAttrs
+    (unusedName_ : monitor_ : monitor_.role == "default")
+    cfg.monitors
+  ));
+
+  defaultMonitorLogicalWidth_ = defaultMonitor_.mode.width / defaultMonitor_.scale;
+  defaultMonitorLogicalHeight_ = defaultMonitor_.mode.height / defaultMonitor_.scale;
+
+  lockscreenLoginBoxId_ = "lockscreen-login-box@${defaultMonitor_.name}";
+
 in {
 
   config = lib.mkIf (builtins.all
@@ -139,10 +149,17 @@ in {
                 countdown_seconds = 10.0;
               }
               {
-                action = "suspend";
+                action = "lock_and_suspend";
                 enabled = true;
                 variant = "default";
                 shortcut = "2";
+                countdown_seconds = 0.1;
+              }
+              {
+                action = "suspend";
+                enabled = true;
+                variant = "default";
+                shortcut = "3";
                 countdown_seconds = 10.0;
               }
               {
@@ -150,13 +167,6 @@ in {
                 enabled = true;
                 command = "${pkgs.systemd}/bin/systemctl hibernate";
                 label = "Hibernate";
-                variant = "default";
-                shortcut = "3";
-                countdown_seconds = 10.0;
-              }
-              {
-                action = "reboot";
-                enabled = true;
                 variant = "default";
                 shortcut = "4";
                 countdown_seconds = 10.0;
@@ -169,10 +179,17 @@ in {
                 countdown_seconds = 10.0;
               }
               {
+                action = "reboot";
+                enabled = true;
+                variant = "default";
+                shortcut = "6";
+                countdown_seconds = 10.0;
+              }
+              {
                 action = "shutdown";
                 enabled = true;
                 variant = "destructive";
-                shortcut = "6";
+                shortcut = "7";
                 countdown_seconds = 10.0;
               }
               {
@@ -181,7 +198,7 @@ in {
                 command = "${pkgs.systemd}/bin/systemctl reboot --firmware-setup";
                 label = "Reboot to UEFI";
                 variant = "default";
-                shortcut = "7";
+                shortcut = "8";
                 countdown_seconds = 10.0;
               }
             ];
@@ -541,7 +558,54 @@ in {
           blur_intensity = 0.8;
           tint_intensity = 0.8;
           wallpaper = "";
-          monitors = [ ];
+          monitors = [
+            defaultMonitor_.name
+          ];
+        };
+
+        # Keep the mandatory login box centered on the default monitor. Other
+        # outputs remain locked but only show Noctalia's black lock surface.
+        lockscreen_widgets = {
+          enabled = true;
+          schema_version = 2;
+          widget_order = [
+            lockscreenLoginBoxId_
+          ];
+          grid = {
+            cell_size = 16;
+            major_interval = 4;
+            visible = false;
+          };
+          widget = {
+            "${lockscreenLoginBoxId_}" = {
+              enabled = true;
+              type = "login_box";
+              output = defaultMonitor_.name;
+              cx = defaultMonitorLogicalWidth_ / 2;
+              cy = defaultMonitorLogicalHeight_ / 2;
+              placement_width = defaultMonitorLogicalWidth_;
+              placement_height = defaultMonitorLogicalHeight_;
+              box_width = 0.0;
+              box_height = 0.0;
+              rotation = 0.0;
+              settings = {
+                background_color = "surface_variant";
+                background_opacity = 0.0;
+                background_radius = 12;
+                center_password_text = true;
+                input_opacity = 0.35;
+                input_radius = 32;
+                layout = "regular";
+                show_caps_lock = true;
+                show_keyboard_layout = true;
+                show_login_button = true;
+                show_media = false;
+                show_session_buttons = true;
+                show_unlock_hint = true;
+                show_weather = false;
+              };
+            };
+          };
         };
 
         location = {
@@ -705,17 +769,17 @@ in {
           pre_action_fade_seconds = 5.0;
           behavior = {
             lock = {
-              enabled = false;
+              enabled = true;
               timeout = 300;
               action = "lock";
             };
             screen-off = {
-              enabled = false;
+              enabled = true;
               timeout = 600;
               action = "screen_off";
             };
             suspend = {
-              enabled = false;
+              enabled = true;
               timeout = 1800;
               action = "suspend";
               lock_before_suspend = true;

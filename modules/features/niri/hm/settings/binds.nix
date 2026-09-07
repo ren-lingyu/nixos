@@ -49,14 +49,6 @@
         hotkey-overlay = { title = "Lock the Screen: swaylock"; };
         action.spawn = [ "${lib.getExe config.programs.swaylock.package}" "-f" ];
       };
-      "Super+Alt+S" = lib.mkIf config.programs.swaylock.enable {
-        hotkey-overlay = { title = "Lock the Screen and Suspend"; };
-        action.spawn-sh = builtins.concatStringsSep " && " [
-          "${lib.getExe config.programs.swaylock.package} -f"
-          "${lib.getExe config.programs.niri.package} msg action power-off-monitors"
-          "${pkgs.systemd}/bin/systemctl suspend"
-        ];
-      };
       "XF86AudioRaiseVolume" = {
         allow-when-locked = true;
         action.spawn = [ "wpctl" "set-volume" "@DEFAULT_AUDIO_SINK@" "0.1+" "-l" "1.0" ];

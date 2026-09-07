@@ -1,4 +1,4 @@
-{ config, lib, ... } : let
+{ config, pkgs, lib, ... } : let
 
   noctaliaNiriSettingsEnable = (builtins.all
     (x_ : x_)
@@ -59,6 +59,14 @@ in {
           action.spawn = builtins.concatLists [
             noctaliaCommand
             [ "msg" "panel-toggle" "clipboard" ]
+          ];
+        };
+
+        "Super+Alt+S" = lib.mkForce {
+          hotkey-overlay = { title = "Suspend"; };
+          action.spawn-sh = builtins.concatStringsSep " && " [
+            "${lib.getExe config.programs.niri.package} msg action power-off-monitors"
+            "${pkgs.systemd}/bin/systemctl suspend"
           ];
         };
 
