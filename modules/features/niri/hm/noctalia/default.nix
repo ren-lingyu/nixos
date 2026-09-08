@@ -153,7 +153,7 @@ in {
                 enabled = true;
                 variant = "default";
                 shortcut = "2";
-                countdown_seconds = 0.1;
+                countdown_seconds = 10.0;
               }
               {
                 action = "suspend";
