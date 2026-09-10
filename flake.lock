@@ -793,28 +793,6 @@
         "url": "https://flakehub.com/f/AshleyYakeley/NixVirt/%2A.tar.gz"
       }
     },
-    "noctalia": {
-      "inputs": {
-        "nixpkgs": [
-          "nixpkgs"
-        ]
-      },
-      "locked": {
-        "lastModified": 1788454679,
-        "narHash": "sha256-diS3b69rt/IqehH/8Tsd8/JEQmogVc1ml6FP+iTwBzg=",
-        "ref": "refs/tags/v5.0.1",
-        "rev": "f95e95cafde8c23f1d3a62b969e2b5717c96d741",
-        "shallow": true,
-        "type": "git",
-        "url": "https://github.com/noctalia-dev/noctalia.git"
-      },
-      "original": {
-        "ref": "refs/tags/v5.0.1",
-        "shallow": true,
-        "type": "git",
-        "url": "https://github.com/noctalia-dev/noctalia.git"
-      }
-    },
     "pre-commit-hooks": {
       "inputs": {
         "flake-compat": "flake-compat",
@@ -857,7 +835,6 @@
         "nixpkgs": "nixpkgs_3",
         "nixvim": "nixvim",
         "nixvirt": "nixvirt",
-        "noctalia": "noctalia",
         "self-nixpkgs": "self-nixpkgs",
         "sops-nix": "sops-nix"
       }

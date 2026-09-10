@@ -25,6 +25,7 @@ in {
     programs.noctalia = {
 
       enable = cfg.noctalia.enable;
+      package = pkgs.noctalia;
       settings = {
 
         accessibility = {

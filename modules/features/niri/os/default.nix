@@ -13,7 +13,7 @@ in {
 
     programs.noctalia = lib.mkIf cfg.noctalia.enable {
       enable = true;
-      package = null;
+      package = pkgs.noctalia;
       recommendedServices.enable = true;
       systemd.enable = false;
     };
