@@ -66,6 +66,7 @@ in {
       limine = {
         enable = lib.mkDefault false;
         package = pkgs.limine;
+        efiInstallAsRemovable = config.boot.loader.limine.enable;
         resolution = defaultMonitorResolution_;
         efiSupport = true;
         validateChecksums = true;
