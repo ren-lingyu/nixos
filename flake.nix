@@ -28,6 +28,9 @@
       # url = "git+https://github.com/NixOS/nixpkgs?ref=refs/heads/nixos-unstable&rev=025c852a89be820b3117f604c8ace42e9b4caa08&shallow=1";
       # url = "git+https://mirrors.tuna.tsinghua.edu.cn/git/nixpkgs.git?ref=refs/heads/nixos-unstable&shallow=1";
     };
+    nixpkgs-zotero-fix = {
+      url = "git+https://github.com/NixOS/nixpkgs?rev=34ab99075ac4f7e40cf037eef32cb1c360bb85e9&shallow=1";
+    };
     self-nixpkgs = {
       url = "git+https://github.com/ren-lingyu/nixpkgs.git?ref=refs/heads/main&shallow=1";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -125,6 +128,11 @@
               overlays = [
                 inputs.self-nixpkgs.overlays.default
                 inputs.emarccs.overlays.default
+                (final : prev : {
+                  zotero = prev.zotero.override {
+                    firefox-esr-140-unwrapped = inputs.nixpkgs-zotero-fix.legacyPackages.${final.stdenv.hostPlatform.system}.firefox-esr-140-unwrapped;
+                  };
+                })
               ];
             };
             home-manager = {
