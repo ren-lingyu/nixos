@@ -56,6 +56,10 @@
       url = "git+https://github.com/Mic92/sops-nix.git?ref=refs/heads/master&shallow=1";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+    lean4-nix = {
+      url = "git+https://github.com/lenianiva/lean4-nix.git?ref=refs/heads/main&shallow=1";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
     emarccs = {
       url = "git+https://github.com/ren-lingyu/emarccs.git?ref=refs/heads/main&shallow=1";
     };
@@ -132,6 +136,7 @@
                   zotero = prev.zotero.override {
                     firefox-esr-140-unwrapped = inputs.nixpkgs-zotero-fix.legacyPackages.${final.stdenv.hostPlatform.system}.firefox-esr-140-unwrapped;
                   };
+                  lean4 = inputs.lean4-nix.packages.${final.stdenv.hostPlatform.system}.lean-bin;
                 })
               ];
             };
