@@ -88,7 +88,7 @@ in {
           openssh = {
             authorizedKeys = {
               keys = [
-                config.modules.hosts.thinkbook.identityKeys.ssh.public.key
+                config.modules.hosts.thinkbook.identity.keys.ssh.public.key
               ];
             };
           };

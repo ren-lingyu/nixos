@@ -18,7 +18,7 @@ in {
 
   imports = [
     ./boot-manager.nix
-    ./identity-keys.nix
+    ./identity.nix
     ./shared.nix
     ./wireguard.nix
   ];

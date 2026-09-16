@@ -68,7 +68,7 @@
       enabledHost_ = llib.moduleFunctions.hosts.default.getUniqueEnabledHost config.modules.hosts;
     in {
       identityPaths = [
-        enabledHost_.identityKeys.ssh.private.path
+        enabledHost_.identity.keys.ssh.private.path
       ];
       rekey = {
         storageMode = "derivation";
@@ -78,7 +78,7 @@
             pubkey = "age1zds7ax4umgu9wjwn7yvp4gndv6fl7h2f8ycwa0edx2pgcdqq53ds9jlxt9";
           }
         ];
-        hostPubkey = enabledHost_.identityKeys.ssh.public.key;
+        hostPubkey = enabledHost_.identity.keys.ssh.public.key;
       };
     };
 

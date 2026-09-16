@@ -44,16 +44,18 @@ host_ : { config, pkgs, lib, llib, ... } : {
     endpoint = null;
   };
 
-  identityKeys = {
-    ssh = {
-      public = {
-        key = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIGHXTx6ixiEtNlE+BbIuXipDEx0cSCeI8nAQig0PV3hn";
-        ageRecipient = "age1ej6d66ejr34rkeurfmq4ncw6xzq42pfww5x5stlk738xl4la059syqh8q7";
-        path = "/etc/ssh/ssh_host_ed25519_key.pub";
-      };
-      private = {
-        key = ./ssh.private.age;
-        path = "/etc/ssh/ssh_host_ed25519_key";
+  identity = {
+    keys = {
+      ssh = {
+        public = {
+          key = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIGHXTx6ixiEtNlE+BbIuXipDEx0cSCeI8nAQig0PV3hn";
+          ageRecipient = "age1ej6d66ejr34rkeurfmq4ncw6xzq42pfww5x5stlk738xl4la059syqh8q7";
+          path = "/etc/ssh/ssh_host_ed25519_key.pub";
+        };
+        private = {
+          key = ./ssh.private.age;
+          path = "/etc/ssh/ssh_host_ed25519_key";
+        };
       };
     };
   };
