@@ -163,10 +163,10 @@
         "twist": "twist"
       },
       "locked": {
-        "lastModified": 1789456508,
-        "narHash": "sha256-rKjVD8Cdximb2vvvjI72TNomuJdVa5EsHA5ZacMwbok=",
+        "lastModified": 1789534517,
+        "narHash": "sha256-fpqHhXcnCi2LHQydjBKxzWvZa7f0+QQYIdT/0mIZUME=",
         "ref": "refs/heads/main",
-        "rev": "7f8200061b2f4c7de3493f72d6ffe9dc863bebfa",
+        "rev": "bbc7e1fc8bf508dab945f8c973080d317a7d1c41",
         "shallow": true,
         "type": "git",
         "url": "https://github.com/ren-lingyu/emarccs.git"
@@ -419,10 +419,10 @@
         ]
       },
       "locked": {
-        "lastModified": 1789375407,
-        "narHash": "sha256-9eYKGrpGBs2bS8CMof5e2/8wOWWXCTyOj5UAcQK0yFw=",
+        "lastModified": 1789472523,
+        "narHash": "sha256-eae1p/9I0C08iqRp/AB23N0/97SK9gDkD9X0U8hkbsA=",
         "ref": "refs/heads/main",
-        "rev": "ef87a82ac50e4191d8ff5e39681b2d8cb12f2e3b",
+        "rev": "99b195dd1e7c6f74169c42e525123a7d0240fb0b",
         "shallow": true,
         "type": "git",
         "url": "https://github.com/lem-project/lem.git"
