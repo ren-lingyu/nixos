@@ -64,14 +64,16 @@ Home Manager 模块可以通过 =home-manager.users.<uid>.imports= 合并, 因�
 
 根 flake inputs 按使用位置集中传递:
 - =nixpkgs=: 提供最终系统与 =perSystem= 的 package set, 也是多个 inputs 的 =follows= 目标.
+- =nixpkgs-zotero-fix=: 固定 nixpkgs revision, 通过 overlay 为 =zotero= 覆盖 =firefox-esr-140-unwrapped= (待 nixpkgs 中相关修复合并进 =nixos-unstable= 后移除).
 - =self-nixpkgs=: 作为 overlay 和 Home Manager shared module 注入基础模块.
 - =emarccs=: 作为 overlay 注入基础模块.
+- =lean4-nix=: 通过 overlay 提供 =lean4= 二进制包.
 - =flake-parts=: 组装 flake outputs.
 - =home-manager=: 作为 NixOS module 导入基础模块, 并作为 =agenix= 的 =home-manager= follows 目标.
 - =agenix= 和 =agenix-rekey=: 提供 age secret 与 rekey module; =agenix-rekey.agePackage= 使用本仓库的 =rage-armored=.
 - =sops-nix=: 注入 sops feature 所需的 NixOS 与 Home Manager modules.
 - =nixvim= 和 =lem=: 注入 editor feature 所需的 Home Manager module 与 overlay.
-- =niri-flake= 和 =noctalia=: 注入 niri feature 所需的 overlay 和 Home Manager modules.
+- =niri-flake=: 注入 niri feature 所需的 overlay 和 Home Manager modules.
 - =nix-flatpak=: 注入 thinkbook host 的 Flatpak module.
 - =nixvirt=: 注入 thinkbook host 的 NixVirt module.
 - =nixos-wsl=: 注入 wsl host 的 NixOS-WSL module.
@@ -224,7 +226,7 @@ Home Manager 模块可以通过 =home-manager.users.<uid>.imports= 合并, 因�
 │   │   ├── binds.nix
 │   │   ├── input.nix
 │   │   ├── layout.nix
-│   │   ├── noctalia-shell.nix
+│   │   ├── noctalia.nix
 │   │   ├── outputs.nix
 │   │   ├── top-level.nix
 │   │   └── window-rules.nix
@@ -346,7 +348,7 @@ Home Manager 模块可以通过 =home-manager.users.<uid>.imports= 合并, 因�
 /modules/hosts/
 ├── default.nix
 ├── boot-manager.nix
-├── identity-keys.nix
+├── identity.nix
 ├── shared.nix
 ├── wireguard.nix
 ├── aliyun/
@@ -355,11 +357,11 @@ Home Manager 模块可以通过 =home-manager.users.<uid>.imports= 合并, 因�
 └── wsl/
 #+end_example
 
-[[file:./modules/hosts/default.nix][modules/hosts/default.nix]] 按目录名自动定义 host profile options, 导入 boot-manager, identity-keys, shared 和 WireGuard 相关通用模块, 统一提供 UID registry, monitor 和 =existModule= 接口, 并确保恰好启用一个 host.
+[[file:./modules/hosts/default.nix][modules/hosts/default.nix]] 按目录名自动定义 host profile options, 导入 boot-manager, identity, shared 和 WireGuard 相关通用模块, 统一提供 UID registry, monitor 和 =existModule= 接口, 并确保恰好启用一个 host.
 
-[[file:./modules/hosts/boot-manager.nix][modules/hosts/boot-manager.nix]], [[file:./modules/hosts/identity-keys.nix][modules/hosts/identity-keys.nix]], [[file:./modules/hosts/shared.nix][modules/hosts/shared.nix]] 和 [[file:./modules/hosts/wireguard.nix][modules/hosts/wireguard.nix]] 分别承载 host boot manager, identity key, shared capability 和 WireGuard topology/secret 的通用 option 与配置.
+[[file:./modules/hosts/boot-manager.nix][modules/hosts/boot-manager.nix]], [[file:./modules/hosts/identity.nix][modules/hosts/identity.nix]], [[file:./modules/hosts/shared.nix][modules/hosts/shared.nix]] 和 [[file:./modules/hosts/wireguard.nix][modules/hosts/wireguard.nix]] 分别承载 host boot manager, identity, shared capability 和 WireGuard topology/secret 的通用 option 与配置.
 
-各 host 的 =metadata.nix= 由 [[file:./modules/hosts/default.nix][modules/hosts/default.nix]] 自动导入, 用于声明 UID registry, monitor, public IP, WireGuard 和 identity key metadata. =ssh.private.age= 与 =wireguard.private.age= 分别保存该 host 的加密 SSH host private key 与 WireGuard private key, 并由 =metadata.nix= 引用.
+各 host 的 =metadata.nix= 由 [[file:./modules/hosts/default.nix][modules/hosts/default.nix]] 自动导入, 用于声明 UID registry, monitor, public IP, WireGuard 和 identity metadata. =ssh.private.age= 与 =wireguard.private.age= 分别保存该 host 的加密 SSH host private key 与 WireGuard private key, 并由 =metadata.nix= 引用.
 
 ***** [[file:./modules/hosts/aliyun/][/modules/hosts/aliyun]]
 #+begin_example
