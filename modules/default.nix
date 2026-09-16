@@ -77,6 +77,13 @@
             identity = "/var/lib/master-key";
             pubkey = "age1zds7ax4umgu9wjwn7yvp4gndv6fl7h2f8ycwa0edx2pgcdqq53ds9jlxt9";
           }
+          {
+            identity = (builtins.toFile
+              "yubikey-age-identity"
+              "AGE-PLUGIN-YUBIKEY-103W9VQ5ZGQSWUMG8DVKUQ"
+            );
+            pubkey = "age1yubikey1qd0j85pkw0a6zjt4xy7ez0t7ehc6u9dqwjgjj5hh55dftvzlk9hyuxgl6c9";
+          }
         ];
         hostPubkey = enabledHost_.identity.keys.ssh.public.key;
       };
