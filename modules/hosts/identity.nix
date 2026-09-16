@@ -1,4 +1,10 @@
-{ options, config, pkgs, lib, llib, ... } : {
+{ options, config, pkgs, lib, llib, ... } : let
+
+  mif = llib.moduleFunctions.hosts.default;
+
+  enabledHost_ = mif.getUniqueEnabledHost config.modules.hosts;
+
+in {
 
   options = {
 
@@ -9,6 +15,12 @@
         identity = lib.mkOption {
           type = lib.types.submodule {
             options = {
+
+              rootAccess = lib.mkOption {
+                type = lib.types.bool;
+                default = false;
+                description = "Whether this host has direct access to the root identity.";
+              };
 
               keys = lib.mkOption {
                 type = lib.types.submodule {
@@ -73,11 +85,24 @@
               };
               private.path = "/etc/ssh/ssh_host_ed25519_key";
             };
+            rootAccess = true;
           };
           description = "Identity configuration for this host.";
         };
 
       });
+    };
+
+  };
+
+  config = lib.mkIf enabledHost_.identity.rootAccess {
+
+    environment.systemPackages = with pkgs; [
+      yubikey-manager
+    ];
+
+    services.pcscd = {
+      enable = lib.mkDefault true;
     };
 
   };

@@ -28,6 +28,7 @@ host_ : { config, pkgs, lib, llib, ... } : {
   };
 
   identity = {
+    rootAccess = false;
     keys = {
       ssh = {
         public = {
