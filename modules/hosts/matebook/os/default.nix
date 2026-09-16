@@ -87,9 +87,7 @@ in {
           packages = with pkgs; [];
           openssh = {
             authorizedKeys = {
-              keys = [
-                config.modules.hosts.thinkbook.identity.keys.ssh.public.key
-              ];
+              keys = [ ];
             };
           };
         };
