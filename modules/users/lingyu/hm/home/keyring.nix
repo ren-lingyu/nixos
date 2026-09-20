@@ -58,6 +58,9 @@ in {
   programs.gpg = {
     enable = true;
     package = pkgs.gnupg;
+    scdaemonSettings = {
+      disable-ccid = true;
+    };
   };
 
   services.gpg-agent = {
