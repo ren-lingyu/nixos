@@ -79,7 +79,7 @@
           }
           {
             identity = (builtins.toFile
-              "yubikey-age-identity"
+              "yubikey-age-identity.pub"
               "AGE-PLUGIN-YUBIKEY-103W9VQ5ZGQSWUMG8DVKUQ"
             );
             pubkey = "age1yubikey1qd0j85pkw0a6zjt4xy7ez0t7ehc6u9dqwjgjj5hh55dftvzlk9hyuxgl6c9";
