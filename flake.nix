@@ -102,7 +102,6 @@
 
     imports = [
       inputs.agenix-rekey.flakeModule
-      inputs.flake-parts.flakeModules.easyOverlay
     ];
 
     flake = {
@@ -110,6 +109,14 @@
       lib = import ./lib;
 
       pkgs = import ./pkgs;
+
+      overlays = {
+        default = final : prev : (self.pkgs {
+          pkgs = prev;
+          lib = prev.lib;
+          llib = self.lib { lib = prev.lib; };
+        }).overlay final prev;
+      };
 
       modules = {
 
@@ -132,12 +139,12 @@
             };
             nixpkgs = {
               overlays = [
-                self.overlays.default
                 inputs.self-nixpkgs.overlays.default
                 inputs.emarccs.overlays.default
                 (final : prev : {
                   lean4 = inputs.lean4-nix.packages.${final.stdenv.hostPlatform.system}.lean-bin;
                 })
+                self.overlays.default
               ];
             };
             home-manager = {
@@ -570,8 +577,6 @@
     in {
 
       legacyPackages = lpkgs.legacyPackages;
-
-      overlayAttrs = lpkgs.overlay final pkgs;
 
       checks = import ./tests {
         inherit pkgs llib;
