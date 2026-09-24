@@ -88,36 +88,10 @@ in {
 
     };
 
-    programs.pi-coding-agent = let
-
-      final_ = (prev_ : let
-
-        prevExeOutput_ = lib.getBin prev_;
-        prevExeOutputVar_ = "$" + (prevExeOutput_.outputName or "out");
-        prevExePath_ = lib.getExe prev_;
-        prevExeRelPath_ = (
-          if lib.hasPrefix "${prevExeOutput_}/" prevExePath_
-          then lib.removePrefix "${prevExeOutput_}" prevExePath_
-          else builtins.throw "pi-coding-agent executable path ${prevExePath_} is not under ${prevExeOutput_}"
-        );
-
-      in prev_.overrideAttrs (oldAttrs: {
-
-        nativeBuildInputs = builtins.concatLists [
-          (oldAttrs.nativeBuildInputs or [])
-          [ pkgs.makeWrapper ]
-        ];
-        postFixup = builtins.concatStringsSep "\n" [
-          (oldAttrs.postFixup or "")
-          ''wrapProgram "${prevExeOutputVar_}${prevExeRelPath_}" --set PI_OFFLINE 1''
-        ];
-
-      })) pkgs.pi-coding-agent;
-
-    in {
+    programs.pi-coding-agent = {
 
       enable = true;
-      package = final_;
+      package = pkgs.pi-coding-agent;
 
       extraPackages = with pkgs; [
         fd
