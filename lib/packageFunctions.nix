@@ -42,7 +42,22 @@
     (self_ : mkLegacyPackages_ packagePath_ self_ root_)
   );
 
-  mkScopeOverlay_ = overlayPath_ : name_ : root_ : let
+  mkAttrsetOverlay_ = final_ : previous_ : overlay_ : let
+
+    scope_ = (lib.makeScope
+      final_.newScope
+      (self_ : (lib.mergeAttrsList [
+        previous_
+        (overlay_ self_ previous_)
+      ]))
+    );
+
+  in (lib.mergeAttrsList [
+    previous_
+    (overlay_ scope_ previous_)
+  ]);
+
+  mkNamespaceOverlay_ = overlayPath_ : name_ : root_ : let
 
     overlay_ = mkOverlay_ overlayPath_ root_;
 
@@ -55,15 +70,17 @@
         previous_ = builtins.getAttr name_ prev_;
 
       in (
-        if (builtins.all
-          (x_ : x_)
-          [
-            (builtins.isAttrs previous_)
-            (previous_ ? overrideScope)
-          ]
+        if builtins.isAttrs previous_
+        then (
+          if lib.isDerivation previous_
+          then builtins.throw "packageFunctions.mkOverlay: `${name_}` already exists and is a derivation"
+          else (
+            if previous_ ? overrideScope
+            then previous_.overrideScope overlay_
+            else mkAttrsetOverlay_ final_ previous_ overlay_
+          )
         )
-        then previous_.overrideScope overlay_
-        else builtins.throw "packageFunctions.mkOverlay: `${name_}` already exists and is not a package scope"
+        else builtins.throw "packageFunctions.mkOverlay: `${name_}` already exists and is not an attribute set"
       )
       else (lib.makeScope
         final_.newScope
@@ -76,7 +93,7 @@
 
     directories_ = getDirectories_ root_;
 
-    leafOverlays_ = (lib.mapAttrsToList
+    localOverlays_ = (lib.mapAttrsToList
       (unused_name_ : child_ : import (resolvePath_ overlayPath_ child_))
       (lib.filterAttrs
         (unused_name_ : child_ : hasPath_ overlayPath_ child_)
@@ -84,24 +101,18 @@
       )
     );
 
-    scopeOverlays_ = (lib.mapAttrsToList
-      (name_ : child_ : mkScopeOverlay_ overlayPath_ name_ child_)
+    namespaceOverlays_ = (lib.mapAttrsToList
+      (name_ : child_ : mkNamespaceOverlay_ overlayPath_ name_ child_)
       (lib.filterAttrs
-        (unused_name_ : child_ : (builtins.all
-          (x_ : x_)
-          [
-            (!(hasPath_ overlayPath_ child_))
-            (hasEntries_ overlayPath_ child_)
-          ]
-        ))
+        (unused_name_ : child_ : hasEntries_ overlayPath_ child_)
         directories_
       )
     );
 
   in (lib.composeManyExtensions
     (builtins.concatLists [
-      leafOverlays_
-      scopeOverlays_
+      localOverlays_
+      namespaceOverlays_
     ])
   );
 
