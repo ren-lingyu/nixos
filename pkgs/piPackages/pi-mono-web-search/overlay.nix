@@ -1,6 +1,5 @@
-final : prev : {
+final_ : unused_prev_ : {
 
-  pi-mono-web-search =
-    final.callPackage ./package.nix {};
+  pi-mono-web-search = final_.callPackage ./package.nix {};
 
 }

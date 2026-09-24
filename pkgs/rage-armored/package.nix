@@ -1,7 +1,8 @@
-{ rage
-, lib
-, guile
-, writeText
+{
+  rage,
+  lib,
+  guile,
+  writeText,
 } : (rage.overrideAttrs
   (old_ : {
     postInstall = (builtins.concatStringsSep
