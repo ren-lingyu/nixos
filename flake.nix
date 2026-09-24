@@ -110,6 +110,20 @@
 
       pkgs = import ./pkgs;
 
+      nixosModules = {
+        default = { config, pkgs, lib, ... } : (self.pkgs {
+          inherit pkgs lib;
+          llib = self.lib { inherit lib; };
+        }).nixosModule;
+      };
+
+      homeManagerModules = {
+        default = { config, pkgs, lib, ... } : (self.pkgs {
+          inherit pkgs lib;
+          llib = self.lib { inherit lib; };
+        }).homeManagerModule;
+      };
+
       overlays = {
         default = final : prev : (self.pkgs {
           pkgs = prev;
@@ -129,6 +143,7 @@
             inputs.agenix.nixosModules.default
             inputs.agenix-rekey.nixosModules.default
             inputs.home-manager.nixosModules.home-manager
+            self.nixosModules.default
             ./modules
           ];
           config = {
@@ -150,6 +165,7 @@
             home-manager = {
               sharedModules = [
                 inputs.self-nixpkgs.homeManagerModules.default
+                self.homeManagerModules.default
               ];
               extraSpecialArgs = {
                 inherit inputs;
