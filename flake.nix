@@ -109,6 +109,8 @@
 
       lib = import ./lib;
 
+      pkgs = import ./pkgs;
+
       modules = {
 
         base = { config, pkgs, lib, ... } : let
@@ -561,7 +563,7 @@
 
       llib = self.lib { inherit lib; };
 
-      lpkgs = import ./pkgs {
+      lpkgs = self.pkgs {
         inherit pkgs lib llib;
       };
 
