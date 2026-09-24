@@ -65,22 +65,6 @@ in {
                 baseURL = "https://api.deepseek.com";
                 apiKey = "{file:${mif.opencode.providers.deepseek.apiKey}}";
               };
-              models = {
-                deepseek-v4-pro = {
-                  name = "DeepSeek-V4-Pro";
-                  limit = {
-                    context = 1000000;
-                    output = 384000;
-                  };
-                };
-                deepseek-v4-flash = {
-                  name = "DeepSeek-V4-Flash";
-                  limit = {
-                    context = 1000000;
-                    output = 384000;
-                  };
-                };
-              };
             };
 
           };
