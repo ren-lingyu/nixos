@@ -119,6 +119,11 @@ in {
         skills = [
           "${./skills}"
         ];
+        packages = [
+          "${pkgs.piPackages.pi-mono-context}"
+          "${pkgs.piPackages.pi-mono-web-search}"
+          "${pkgs.piPackages.pi-agentic-search}"
+        ];
       };
 
     };
