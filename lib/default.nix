@@ -36,4 +36,6 @@
 
   };
 
+  packageFunctions = import ./packageFunctions.nix { inherit lib; };
+
 }

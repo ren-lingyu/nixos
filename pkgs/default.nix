@@ -1,5 +1,12 @@
-{ pkgs, lib } : {
+{ pkgs, lib, llib } : {
 
-  rage-armored = import ./rage-armored { inherit pkgs lib; };
+  legacyPackages = llib.packageFunctions.mkLegacyPackages {
+    root = ./.;
+    inherit pkgs;
+  };
+
+  overlay = llib.packageFunctions.mkOverlay {
+    root = ./.;
+  };
 
 }

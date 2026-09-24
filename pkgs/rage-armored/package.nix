@@ -1,4 +1,8 @@
-{ pkgs, lib } : (pkgs.rage.overrideAttrs
+{ rage
+, lib
+, guile
+, writeText
+} : (rage.overrideAttrs
   (old_ : {
     postInstall = (builtins.concatStringsSep
       "\n"
@@ -12,10 +16,10 @@
         (lib.escapeShellArgs [
           "install"
           "-Dm755"
-          (pkgs.writeText
+          (writeText
             "rage-armored-wrapper"
             (builtins.concatStringsSep "\n" [
-              "#!${lib.getExe pkgs.guile} --no-auto-compile"
+              "#!${lib.getExe guile} --no-auto-compile"
               "!#"
               "(define %rage-unwrapped \"@rage-unwrapped@\")"
               (builtins.readFile ./wrapper.scm)

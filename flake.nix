@@ -102,6 +102,7 @@
 
     imports = [
       inputs.agenix-rekey.flakeModule
+      inputs.flake-parts.flakeModules.easyOverlay
     ];
 
     flake = {
@@ -129,6 +130,7 @@
             };
             nixpkgs = {
               overlays = [
+                self.overlays.default
                 inputs.self-nixpkgs.overlays.default
                 inputs.emarccs.overlays.default
                 (final : prev : {
@@ -555,18 +557,22 @@
 
     };
 
-    perSystem = { inputs', config, pkgs, lib, ... } : let
+    perSystem = { inputs', config, pkgs, lib, final, ... } : let
 
       llib = self.lib { inherit lib; };
 
+      lpkgs = import ./pkgs {
+        inherit pkgs lib llib;
+      };
+
     in {
+
+      legacyPackages = lpkgs.legacyPackages;
+
+      overlayAttrs = lpkgs.overlay final pkgs;
 
       checks = import ./tests {
         inherit pkgs llib;
-      };
-
-      packages = import ./pkgs {
-        inherit pkgs lib;
       };
 
       devShells = {
@@ -583,7 +589,7 @@
         };
       };
 
-      agenix-rekey.agePackage = config.packages.rage-armored;
+      agenix-rekey.agePackage = config.legacyPackages.rage-armored;
 
     };
 
