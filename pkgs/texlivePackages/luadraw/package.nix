@@ -6,9 +6,9 @@
   src = fetchFromGitHub {
     owner = "pfradin";
     repo = "luadraw";
-    rev = "32bed27969eeff7e968622eaf29483d2846e792e";
+    rev = "eba63b144ba788209191a611f461cd65a5e8935a";
     fetchSubmodules = false;
-    hash = "sha256-BZ+tJ95pRpLXfCfw5WSBMkDkxvqlYivuXRZiXUR7M2s=";
+    hash = "sha256-PH74e2QhrmzrDrRb/5hz+PUjccWP0q3sG+fj17VGy4w=";
   };
 
   dontBuild = true;
