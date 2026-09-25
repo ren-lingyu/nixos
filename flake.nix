@@ -30,10 +30,6 @@
       # url = "git+https://github.com/NixOS/nixpkgs?ref=refs/heads/nixos-unstable&rev=025c852a89be820b3117f604c8ace42e9b4caa08&shallow=1";
       # url = "git+https://mirrors.tuna.tsinghua.edu.cn/git/nixpkgs.git?ref=refs/heads/nixos-unstable&shallow=1";
     };
-    self-nixpkgs = {
-      url = "git+https://github.com/ren-lingyu/nixpkgs.git?ref=refs/heads/main&shallow=1";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
     flake-parts = {
       url = "git+https://github.com/hercules-ci/flake-parts.git?ref=refs/heads/main&shallow=1";
     };
@@ -154,7 +150,6 @@
             };
             nixpkgs = {
               overlays = [
-                inputs.self-nixpkgs.overlays.default
                 inputs.emarccs.overlays.default
                 (final : prev : {
                   lean4 = inputs.lean4-nix.packages.${final.stdenv.hostPlatform.system}.lean-bin;
@@ -164,7 +159,6 @@
             };
             home-manager = {
               sharedModules = [
-                inputs.self-nixpkgs.homeManagerModules.default
                 self.homeManagerModules.default
               ];
               extraSpecialArgs = {

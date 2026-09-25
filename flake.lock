@@ -892,30 +892,7 @@
         "nixpkgs": "nixpkgs_3",
         "nixvim": "nixvim",
         "nixvirt": "nixvirt",
-        "self-nixpkgs": "self-nixpkgs",
         "sops-nix": "sops-nix"
-      }
-    },
-    "self-nixpkgs": {
-      "inputs": {
-        "nixpkgs": [
-          "nixpkgs"
-        ]
-      },
-      "locked": {
-        "lastModified": 1789959367,
-        "narHash": "sha256-vj91cmCkLT/9kyjxyYx3NmfTv+ZssJ933fYJfdFQn9k=",
-        "ref": "refs/heads/main",
-        "rev": "faf7ed63d00e6e342c7ac1cdd657f8517c53cd14",
-        "shallow": true,
-        "type": "git",
-        "url": "https://github.com/ren-lingyu/nixpkgs.git"
-      },
-      "original": {
-        "ref": "refs/heads/main",
-        "shallow": true,
-        "type": "git",
-        "url": "https://github.com/ren-lingyu/nixpkgs.git"
       }
     },
     "sops-nix": {
