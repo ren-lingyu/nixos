@@ -43,7 +43,6 @@
     };
 
     environment = {
-      enableAllTerminfo = lib.mkDefault true;
       systemPackages = with pkgs; [
         git
         vim
@@ -51,6 +50,10 @@
         wget
         gnutar
         gzip
+        ncurses
+        kitty.terminfo
+        foot.terminfo
+        tmux.terminfo
       ];
     };
 
