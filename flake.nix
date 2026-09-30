@@ -40,8 +40,6 @@
     agenix = {
       url = "git+https://github.com/ryantm/agenix.git?ref=refs/heads/main&shallow=1";
       inputs.nixpkgs.follows = "nixpkgs";
-      inputs.home-manager.follows = "home-manager";
-      inputs.darwin.follows = "";
     };
     agenix-rekey = {
       url = "git+https://github.com/oddlama/agenix-rekey.git?ref=refs/heads/main&shallow=1";
