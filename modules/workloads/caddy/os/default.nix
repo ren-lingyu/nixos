@@ -38,7 +38,6 @@ in {
         };
       };
       config = {
-        environment.enableAllTerminfo = true;
         services.caddy = {
           enable = true;
           package = pkgs.caddy;

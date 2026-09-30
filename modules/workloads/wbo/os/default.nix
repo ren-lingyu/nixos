@@ -15,7 +15,6 @@ in {
       autoStart = false;
       restartIfChanged = false;
       config = {
-        environment.enableAllTerminfo = true;
         services.whitebophir = {
           enable = true;
           package = pkgs.whitebophir;
