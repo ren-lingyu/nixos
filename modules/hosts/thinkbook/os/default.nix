@@ -301,6 +301,14 @@ in {
       printing = {
         enable = true;
       };
+      udev = {
+        enable = true;
+        extraHwdb = builtins.concatStringsSep "\n" [
+          "# Huion Inspiroy Frego M (L610), Bluetooth."
+          "evdev:input:b0005v256Cp8251*"
+          " KEYBOARD_KEY_d0043=btn_stylus2"
+        ];
+      };
       libinput = {
         enable = true;
         touchpad = {
