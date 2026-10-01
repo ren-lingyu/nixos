@@ -49,10 +49,6 @@
       url = "git+https://github.com/Mic92/sops-nix.git?ref=refs/heads/master&shallow=1";
       inputs.nixpkgs.follows = "nixpkgs";
     };
-    lean4-nix = {
-      url = "git+https://github.com/lenianiva/lean4-nix.git?ref=refs/heads/main&shallow=1";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
     emarccs = {
       url = "git+https://github.com/ren-lingyu/emarccs.git?ref=refs/heads/main&shallow=1";
     };
@@ -85,6 +81,10 @@
     disko = {
       # url = "git+https://github.com/nix-community/disko.git?ref=refs/heads/master&shallow=1";
       follows = "nixos-anywhere/disko";
+    };
+    lean4-nix = {
+      url = "git+https://github.com/lenianiva/lean4-nix.git?ref=refs/heads/main&shallow=1";
+      inputs.nixpkgs.follows = "nixpkgs";
     };
   };
 
