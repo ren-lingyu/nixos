@@ -66,12 +66,11 @@ in {
     programs.starship = {
       enable = true;
       package = pkgs.starship;
-      enableZshIntegration = true;
+      enableBashIntegration = !osConfig.programs.zsh.enable;
+      enableZshIntegration = osConfig.programs.zsh.enable;
       settings = {
         scan_timeout = 10000;
         add_newline = false;
-        aws.disabled = true;
-        gcloud.disabled = true;
         line_break.disabled = true;
       };
     };
