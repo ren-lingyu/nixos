@@ -123,6 +123,7 @@ in {
           "${pkgs.piPackages.pi-mono-context}"
           "${pkgs.piPackages.pi-mono-web-search}"
           "${pkgs.piPackages.pi-agentic-search}"
+          "${pkgs.piPackages.pi-workspace-history}"
         ];
       };
 
