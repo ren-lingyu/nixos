@@ -48,6 +48,22 @@
       (lib.escapeShellArgs [ "runHook" "preInstall" ])
       ""
       (lib.escapeShellArgs [
+        "patch"
+        "-p1"
+        "-i"
+        "${./disable-auto-install-peers.patch}"
+      ])
+      ""
+      (lib.escapeShellArgs [
+        "pnpm"
+        "config"
+        "set"
+        "--location=project"
+        "auto-install-peers"
+        "false"
+      ])
+      ""
+      (lib.escapeShellArgs [
         "pnpm"
         "config"
         "set"
@@ -65,6 +81,21 @@
       ])
       ""
       (lib.escapeShellArgs [ "runHook" "postInstall" ])
+      ""
+    ];
+
+    doInstallCheck = true;
+
+    installCheckPhase = builtins.concatStringsSep "\n" [
+      (lib.escapeShellArgs [ "runHook" "preInstallCheck" ])
+      ""
+      (lib.escapeShellArgs [
+        (lib.getExe' nodejs "node")
+        "${./install-check.mjs}"
+        (builtins.placeholder "out")
+      ])
+      ""
+      (lib.escapeShellArgs [ "runHook" "postInstallCheck" ])
       ""
     ];
 

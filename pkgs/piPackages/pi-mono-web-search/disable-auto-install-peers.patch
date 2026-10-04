@@ -1,0 +1,48 @@
+diff --git a/pnpm-lock.yaml b/pnpm-lock.yaml
+--- a/pnpm-lock.yaml
++++ b/pnpm-lock.yaml
+@@ -1,7 +1,7 @@
+ lockfileVersion: '9.0'
+
+ settings:
+-  autoInstallPeers: true
++  autoInstallPeers: false
+   excludeLinksFromLockfile: false
+
+ overrides:
+@@ -172,14 +172,4 @@ importers:
+
+-  extensions/common:
+-    dependencies:
+-      '@earendil-works/pi-coding-agent':
+-        specifier: '*'
+-        version: 0.74.0(ws@8.20.0)(zod@4.3.6)
+-      '@earendil-works/pi-tui':
+-        specifier: '*'
+-        version: 0.74.0
+-      '@sinclair/typebox':
+-        specifier: '*'
+-        version: 0.34.49
++  extensions/common: {}
+
+   extensions/context:
+@@ -352,19 +342,13 @@ importers:
+
+   extensions/web-search:
+     dependencies:
+-      '@earendil-works/pi-coding-agent':
+-        specifier: '*'
+-        version: 0.74.0(ws@8.20.0)(zod@4.3.6)
+       '@mozilla/readability':
+         specifier: ^0.6.0
+         version: 0.6.0
+-      '@sinclair/typebox':
+-        specifier: '*'
+-        version: 0.34.49
+       jsdom:
+         specifier: ^29.1.1
+         version: 29.1.1
+       pi-common:
+         specifier: workspace:*
+         version: link:../common
+     devDependencies:
