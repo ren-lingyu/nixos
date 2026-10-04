@@ -86,6 +86,10 @@
       url = "git+https://github.com/lenianiva/lean4-nix.git?ref=refs/heads/main&shallow=1";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+    git-agent-workflow = {
+      url = "git+https://github.com/ren-lingyu/git-agent-workflow.git?ref=refs/heads/main&shallow=1";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
   outputs = { self, ... }@inputs : inputs.flake-parts.lib.mkFlake { inherit inputs; } {
@@ -152,6 +156,7 @@
                 (final : prev : {
                   lean4 = inputs.lean4-nix.packages.${final.stdenv.hostPlatform.system}.lean-bin;
                 })
+                inputs.git-agent-workflow.overlays.default
                 self.overlays.default
               ];
             };
