@@ -13,6 +13,7 @@
 
 !pkgs/
 !pkgs/**/
+!pkgs/**/*.mjs
 !pkgs/**/*.nix
 !pkgs/**/*.patch
 !pkgs/**/*.scm
