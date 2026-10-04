@@ -31,8 +31,24 @@ in {
 
   config = lib.mkIf cfg.enable {
 
-    home = {
-      packages = lib.optional config.programs.git.enable pkgs.git-agent-workflow;
+    home = let
+      packages_ = lib.optional config.programs.git.enable pkgs.git-agent-workflow;
+    in {
+      packages = packages_;
+      file = {
+        ".agents/skills" = {
+          enable = true;
+          source = pkgs.buildEnv {
+            name = "agents-skills";
+            paths = (builtins.map
+              (package_ : "${package_}/share/skills/${package_.pname}")
+              packages_
+            );
+            checkCollisionContents = false;
+          };
+          recursive = true;
+        };
+      };
     };
 
     programs.opencode = {
