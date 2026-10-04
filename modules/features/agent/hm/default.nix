@@ -31,6 +31,10 @@ in {
 
   config = lib.mkIf cfg.enable {
 
+    home = {
+      packages = lib.optional config.programs.git.enable pkgs.git-agent-workflow;
+    };
+
     programs.opencode = {
 
       enable = true;
