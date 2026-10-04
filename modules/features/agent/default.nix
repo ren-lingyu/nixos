@@ -1,9 +1,13 @@
 { ... } : {
 
+  imports = [
+    ./os
+  ];
+
   config = {
 
     modules.features.agent.existModule = {
-      os = false;
+      os = true;
       hm = true;
     };
 
