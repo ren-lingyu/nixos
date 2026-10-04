@@ -44,7 +44,6 @@
 
     environment = {
       systemPackages = with pkgs; [
-        git
         vim
         curl
         wget
@@ -99,6 +98,11 @@
         ];
         overrideStrategy = "asDropin";
       };
+    };
+
+    programs.git = {
+      enable = true;
+      package = pkgs.gitFull;
     };
 
     home-manager = {

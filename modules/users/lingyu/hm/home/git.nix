@@ -1,4 +1,4 @@
-{ config, lib, pkgs, ... } : {
+{ config, osConfig, lib, pkgs, ... } : {
 
   home.packages = with pkgs; [
     git-filter-repo
@@ -23,8 +23,8 @@
   };
 
   programs.git = {
-    enable = true;
-    package = pkgs.gitFull;
+    enable = osConfig.programs.git.enable or true;
+    package = osConfig.programs.git.package;
     signing = {
       key = "65F85A2624D239F0!";
       format = "openpgp";
