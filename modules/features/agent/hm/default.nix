@@ -97,6 +97,8 @@ in {
         fd
         ripgrep
         convco
+        wl-clipboard
+        xclip
       ];
 
       context = ./context.md;
