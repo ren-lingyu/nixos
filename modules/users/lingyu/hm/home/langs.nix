@@ -7,6 +7,8 @@
     go
     gopls                             # Go
     guile
+    ghc                               # Haskell
+    cabal-install                     # Haskell
     haskell-language-server           # Haskell
     jdk
     jdt-language-server               # Java
