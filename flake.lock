@@ -944,7 +944,8 @@
         "nixpkgs": "nixpkgs_3",
         "nixvim": "nixvim",
         "nixvirt": "nixvirt",
-        "sops-nix": "sops-nix"
+        "sops-nix": "sops-nix",
+        "zotero-fix-nixpkgs": "zotero-fix-nixpkgs"
       }
     },
     "sops-nix": {
@@ -1079,6 +1080,23 @@
         "owner": "Supreeeme",
         "repo": "xwayland-satellite",
         "type": "github"
+      }
+    },
+    "zotero-fix-nixpkgs": {
+      "locked": {
+        "lastModified": 1789322069,
+        "narHash": "sha256-eaIzbbImStaHMgxftbumWoZuMC+Xm7TraQSsf6da+VI=",
+        "ref": "refs/heads/master",
+        "rev": "363fdbe57ed052c76e816e6270206b0cb348e53a",
+        "shallow": true,
+        "type": "git",
+        "url": "https://github.com/NixOS/nixpkgs.git"
+      },
+      "original": {
+        "rev": "363fdbe57ed052c76e816e6270206b0cb348e53a",
+        "shallow": true,
+        "type": "git",
+        "url": "https://github.com/NixOS/nixpkgs.git"
       }
     }
   },

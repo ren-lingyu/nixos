@@ -86,6 +86,9 @@
       url = "git+https://github.com/lenianiva/lean4-nix.git?ref=refs/heads/main&shallow=1";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+    zotero-fix-nixpkgs = {
+      url = "git+https://github.com/NixOS/nixpkgs.git?rev=363fdbe57ed052c76e816e6270206b0cb348e53a&shallow=1";
+    };
     git-agent-workflow = {
       url = "git+https://github.com/ren-lingyu/git-agent-workflow.git?ref=refs/heads/main&shallow=1";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -155,6 +158,7 @@
                 inputs.emarccs.overlays.default
                 (final : prev : {
                   lean4 = inputs.lean4-nix.packages.${final.stdenv.hostPlatform.system}.lean-bin;
+                  zotero = inputs.zotero-fix-nixpkgs.legacyPackages.${final.stdenv.hostPlatform.system}.zotero;
                 })
                 inputs.git-agent-workflow.overlays.default
                 self.overlays.default
