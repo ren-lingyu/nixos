@@ -32,7 +32,10 @@ in {
   config = lib.mkIf cfg.enable {
 
     home = let
-      packages_ = lib.optional config.programs.git.enable pkgs.git-agent-workflow;
+      packages_ = lib.optionals config.programs.git.enable (with pkgs; [
+        git-agent-workflow
+        git-maintenance
+      ]);
     in {
       packages = packages_;
       file = {
@@ -95,7 +98,6 @@ in {
       context = ./context.md;
       agents = {};
       commands = {};
-      # skills = ./skills;
       tools = {};
       themes = {};
       tui = {};
@@ -138,9 +140,6 @@ in {
       settings = {
         defaultProjectTrust = "ask";
         enableInstallTelemetry = false;
-        # skills = [
-        #   "${./skills}"
-        # ];
         packages = [
           "${pkgs.piPackages.pi-mono-context}"
           "${pkgs.piPackages.pi-mono-web-search}"
@@ -155,14 +154,12 @@ in {
       enable = true;
       package = pkgs.codex;
       context = ./context.md;
-      # skills = ./skills;
     };
 
     programs.github-copilot-cli = {
       enable = true;
       package = pkgs.github-copilot-cli;
       context = ./context.md;
-      # skills = ./skills;
     };
 
     assertions = builtins.concatLists (lib.mapAttrsToList
