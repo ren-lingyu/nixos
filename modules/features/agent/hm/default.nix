@@ -27,6 +27,15 @@
     ])
     rawMif_;
 
+  context_ = import ./context {
+    inherit pkgs lib;
+    git = (
+      if config.programs.git.package == null
+      then pkgs.git
+      else config.programs.git.package
+    );
+  };
+
 in {
 
   config = lib.mkIf cfg.enable {
@@ -39,6 +48,10 @@ in {
     in {
       packages = packages_;
       file = {
+        ".agents/AGENTS.md" = {
+          enable = true;
+          text = context_;
+        };
         ".agents/skills" = {
           enable = true;
           source = pkgs.buildEnv {
@@ -95,7 +108,7 @@ in {
         }
       ];
 
-      context = ./context.md;
+      context = context_;
       agents = {};
       commands = {};
       tools = {};
@@ -123,7 +136,7 @@ in {
         xclip
       ];
 
-      context = ./context.md;
+      context = context_;
 
       models = let
         cat_ = x_ : "!${lib.getExe' pkgs.coreutils "cat"} ${lib.escapeShellArg x_}";
@@ -153,13 +166,13 @@ in {
     programs.codex = {
       enable = true;
       package = pkgs.codex;
-      context = ./context.md;
+      context = context_;
     };
 
     programs.github-copilot-cli = {
       enable = true;
       package = pkgs.github-copilot-cli;
-      context = ./context.md;
+      context = context_;
     };
 
     assertions = builtins.concatLists (lib.mapAttrsToList
