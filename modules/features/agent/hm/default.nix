@@ -34,6 +34,7 @@
       then pkgs.git
       else config.programs.git.package
     );
+    git-agent-workflow = pkgs.git-agent-workflow;
   };
 
 in {
