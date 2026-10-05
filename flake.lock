@@ -365,10 +365,10 @@
         ]
       },
       "locked": {
-        "lastModified": 1791137411,
-        "narHash": "sha256-QTCVgl0/zjAdjBQfQPe9xcAzy1/HbYOMQxe6qPoNdRo=",
+        "lastModified": 1791185456,
+        "narHash": "sha256-R2cqzpqbJKY9eGpjXKr20AGneAmv+e5ZwiwxcOE1jss=",
         "ref": "refs/heads/main",
-        "rev": "fa020cb581444e257c473a47e409150183238f99",
+        "rev": "df2d1d36c2aa690bbcb01baa191fdfcbbc58316c",
         "shallow": true,
         "type": "git",
         "url": "https://github.com/ren-lingyu/git-agent-workflow.git"
