@@ -156,10 +156,10 @@
         "twist": "twist"
       },
       "locked": {
-        "lastModified": 1790643238,
-        "narHash": "sha256-YZ7tjTvC7Sb9UZghVjNRb/Tm/9RGX36oZHcMG6QhRVo=",
+        "lastModified": 1791212499,
+        "narHash": "sha256-lk8zG1kD6YFvNMUVnn7SdaVgm1JQn5FG9XE0PfhqXZI=",
         "ref": "refs/heads/main",
-        "rev": "aca4acb2a25ac31dd08e9d20cded5e87da7b9111",
+        "rev": "5204f04991a2b64ad56dd75b2c3677a1bdb51a52",
         "shallow": true,
         "type": "git",
         "url": "https://github.com/ren-lingyu/emarccs.git"
@@ -328,11 +328,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1788450739,
-        "narHash": "sha256-glZLQlzIn1fXH6PazR2iUmTo7kzzyYSshrWhLS9TqCU=",
+        "lastModified": 1790898470,
+        "narHash": "sha256-zTwuwezD0w3hpga6a6P8emidzAZFyWqlNeRBlpWOOl8=",
         "owner": "hercules-ci",
         "repo": "flake-parts",
-        "rev": "31729ca8cbdb4fa927b34e5f4353e6a83f39e993",
+        "rev": "024633cd702b10285db5cb19b40ad48d2399ba60",
         "type": "github"
       },
       "original": {
@@ -365,10 +365,10 @@
         ]
       },
       "locked": {
-        "lastModified": 1791185456,
-        "narHash": "sha256-R2cqzpqbJKY9eGpjXKr20AGneAmv+e5ZwiwxcOE1jss=",
+        "lastModified": 1791271554,
+        "narHash": "sha256-ZZ07Av+jsBtir8a97yBHMSl9ZgLeJLeSRhu7BvCRA38=",
         "ref": "refs/heads/main",
-        "rev": "df2d1d36c2aa690bbcb01baa191fdfcbbc58316c",
+        "rev": "79d64fdda6328c4fbe647121b8f30115298cca57",
         "shallow": true,
         "type": "git",
         "url": "https://github.com/ren-lingyu/git-agent-workflow.git"
@@ -409,10 +409,10 @@
         ]
       },
       "locked": {
-        "lastModified": 1791123389,
-        "narHash": "sha256-4ln1QbTLlSC6Wo0Jus/YZuueOBBNhTSa9KMSnco+j8M=",
+        "lastModified": 1791293500,
+        "narHash": "sha256-3hwJd2/vG/VYV1P/g7oDgdbNsWODhN5F//Od+hPMm2k=",
         "ref": "refs/heads/master",
-        "rev": "8cfa9c9514e86f3b88856958b4692e7312b96598",
+        "rev": "0e11b7bcba1d74ef8ea10bfdfb1e1a5811a21087",
         "shallow": true,
         "type": "git",
         "url": "https://github.com/nix-community/home-manager.git"
@@ -455,10 +455,10 @@
         ]
       },
       "locked": {
-        "lastModified": 1791044196,
-        "narHash": "sha256-L3VwYWi9/3YcwSRLmZIss2Ni0e890wyWAggZaK9+SQ0=",
+        "lastModified": 1791287351,
+        "narHash": "sha256-0sk3oWu4Ctis7wbaipiX6fhkTyB2W3WkwAbLge0eLKg=",
         "ref": "refs/heads/main",
-        "rev": "da26ca8443a17b9e681f191491c453dbf24e3dd9",
+        "rev": "2c882dee4a511b76c2b007ad8a05024c8d0801b0",
         "shallow": true,
         "type": "git",
         "url": "https://github.com/lem-project/lem.git"
@@ -828,10 +828,10 @@
     },
     "nixpkgs_3": {
       "locked": {
-        "lastModified": 1791048980,
-        "narHash": "sha256-KgItSKML8Xvte0B7/uGnBDsYzSnnKHcOaiUbgWBXLXw=",
+        "lastModified": 1791260994,
+        "narHash": "sha256-Miqqk/ammqnTUxaoCyvtwoPeLbI1ksFyLxi/CazZpWY=",
         "ref": "refs/heads/nixos-unstable",
-        "rev": "a7868a727837f3c09cee2ce0ca671c76b1589fed",
+        "rev": "151fa4e8ddfdd8dd25d945ad94ed54a13de9f6e4",
         "shallow": true,
         "type": "git",
         "url": "https://github.com/NixOS/nixpkgs"
@@ -845,11 +845,11 @@
     },
     "nixpkgs_4": {
       "locked": {
-        "lastModified": 1789724158,
-        "narHash": "sha256-nlKgrm0dsVhOSopKheVBCcOpiIticufPPVLdVOI0euA=",
+        "lastModified": 1790981744,
+        "narHash": "sha256-sm6DclXJudZfP/pcDBQQsRqyMxBcQsuw+7yQr4rBBLE=",
         "owner": "NixOS",
         "repo": "nixpkgs",
-        "rev": "0a3468a402c449992505b6a9fc5b06580141b750",
+        "rev": "55ba7f49ef2962b42cbd126522b7df5f95037679",
         "type": "github"
       },
       "original": {
@@ -866,10 +866,10 @@
         "systems": "systems"
       },
       "locked": {
-        "lastModified": 1790928658,
-        "narHash": "sha256-EeMn6SmrBe4gnxaMyb3NZYMXG8FPF9PY0OCcbPDFFNI=",
+        "lastModified": 1791235629,
+        "narHash": "sha256-ySIbhYpjg8CnfuJTs/cfkEQuGpk02IzT+a3VDz7Cec0=",
         "ref": "refs/heads/main",
-        "rev": "1cdfef1a6eb583d65b606b04fc97687491479d62",
+        "rev": "8fbc7d3ff1154fab898895e7c4e71a4d06936ce3",
         "shallow": true,
         "type": "git",
         "url": "https://github.com/nix-community/nixvim.git"
