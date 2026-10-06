@@ -1,4 +1,8 @@
-{ config, lib, pkgs, osConfig, ... } : {
+{ config, lib, pkgs, osConfig, ... } : let
+
+  cfg = osConfig.modules.features.niri;
+
+in {
 
   config = lib.mkIf config.programs.niri.enable {
 
@@ -25,6 +29,13 @@
         enable = true;
         natural-scroll = true;
         accel-profile = "flat";
+      };
+      tablet = {
+        enable = true;
+        map-to-output = (builtins.head (builtins.attrValues (lib.filterAttrs
+          (_ : monitor_ : monitor_.role == "default")
+          cfg.monitors
+        ))).name;
       };
     };
 
