@@ -1,4 +1,4 @@
-{ config, osConfig, lib, pkgs, ... } : {
+{ config, osConfig, pkgs, lib, ... } : {
 
   home.packages = with pkgs; [
     git-filter-repo

@@ -1,4 +1,4 @@
-{ config, lib, pkgs, utils, ... } : let
+{ config, pkgs, lib, utils, ... } : let
 
   cfg = config.modules.hosts.thinkbook;
 

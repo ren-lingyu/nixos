@@ -1,4 +1,4 @@
-{ options, config, lib, pkgs, osConfig, ... } : let
+{ options, config, osConfig, pkgs, lib, ... } : let
 
   cfg = osConfig.modules.features.agent;
 

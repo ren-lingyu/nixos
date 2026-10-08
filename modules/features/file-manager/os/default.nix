@@ -1,4 +1,4 @@
-{ config, lib, ... } : let
+{ config, pkgs, lib, ... } : let
 
   cfg = config.modules.features.file-manager;
 

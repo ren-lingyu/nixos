@@ -1,4 +1,4 @@
-{ config, lib, pkgs, ... } : let
+{ config, pkgs, lib, ... } : let
 
   cfg = config.modules.features.shell;
 

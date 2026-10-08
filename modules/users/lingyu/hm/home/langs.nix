@@ -1,4 +1,4 @@
-{ config, lib, pkgs, ... } : {
+{ config, pkgs, lib, ... } : {
 
   home.packages = with pkgs; [
     bash-language-server              # Shell

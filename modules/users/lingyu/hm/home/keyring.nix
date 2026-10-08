@@ -1,4 +1,4 @@
-{ config, lib, pkgs, ... } : let
+{ config, pkgs, lib, ... } : let
 
   keepassxcPureDeclarative = {
     enable = false;

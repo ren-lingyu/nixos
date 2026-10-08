@@ -1,4 +1,4 @@
-{ options, config, pkgs, lib, osConfig, llib, ... } : let
+{ options, config, osConfig, pkgs, lib, llib, ... } : let
 
   cfg = osConfig.modules.features.sops;
 

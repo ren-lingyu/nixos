@@ -1,4 +1,4 @@
-{ config, lib, pkgs, osConfig, ... } : {
+{ config, osConfig, pkgs, lib, ... } : {
 
   config = lib.mkIf config.programs.niri.enable {
     programs.niri.settings.binds = {

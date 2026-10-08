@@ -1,4 +1,4 @@
-{ config, pkgs, lib, osConfig, ... } : let
+{ config, osConfig, pkgs, lib, ... } : let
 
   cfg = osConfig.modules.features.font;
 
