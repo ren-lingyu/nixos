@@ -6,3 +6,7 @@ creation_rules:
     key_groups:
     - age:
       - *age_user_key
+
+stores:
+  yaml:
+    indent: 2
