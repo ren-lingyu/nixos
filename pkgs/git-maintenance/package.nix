@@ -2,16 +2,15 @@
   lib,
   stdenvNoCC,
   installAgentSkills,
-} : stdenvNoCC.mkDerivation {
+}:
+stdenvNoCC.mkDerivation {
 
   pname = "git-maintenance";
   version = "0.3.0";
 
   src = ./.;
 
-  nativeBuildInputs = [
-    installAgentSkills
-  ];
+  nativeBuildInputs = [ installAgentSkills ];
 
   dontConfigure = true;
   dontBuild = true;

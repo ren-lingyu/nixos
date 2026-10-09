@@ -1,4 +1,5 @@
-{ pkgs, llib } : let
+{ pkgs, llib }:
+let
 
   hostFunctions_ = llib.moduleFunctions.hosts.default;
 
@@ -22,9 +23,11 @@
     second.enable = true;
   };
 
-in assert (hostFunctions_.getUniqueEnabledHost hosts_).value == "enabled";
-   assert (builtins.tryEval (hostFunctions_.getUniqueEnabledHost noEnabledHosts_)).success == false;
-   assert (builtins.tryEval (hostFunctions_.getUniqueEnabledHost multipleEnabledHosts_)).success == false;
-pkgs.runCommand "nixos-host-functions" {} ''
+in
+assert (hostFunctions_.getUniqueEnabledHost hosts_).value == "enabled";
+assert (builtins.tryEval (hostFunctions_.getUniqueEnabledHost noEnabledHosts_)).success == false;
+assert
+  (builtins.tryEval (hostFunctions_.getUniqueEnabledHost multipleEnabledHosts_)).success == false;
+pkgs.runCommand "nixos-host-functions" { } ''
   touch $out
 ''

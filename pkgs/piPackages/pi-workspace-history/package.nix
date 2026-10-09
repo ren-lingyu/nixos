@@ -6,7 +6,8 @@
   jq,
   nodejs_22,
   replaceVarsWith,
-} : let
+}:
+let
 
   postPatch_ = builtins.readFile (replaceVarsWith {
     src = ./fetch-npm-deps-post-patch.sh;
@@ -15,79 +16,84 @@
     };
   });
 
-in (buildNpmPackage
-  (finalAttrs_ : {
+in
+(buildNpmPackage (finalAttrs_: {
 
-    pname = "pi-workspace-history";
-    version = "0.4.8";
+  pname = "pi-workspace-history";
+  version = "0.4.8";
 
-    src = fetchFromGitHub {
-      owner = "wcldyx";
-      repo = "pi-workspace-history";
-      rev = "4c51d3cad723bd8733c73fb36f4b971efb2eb53a";
-      hash = "sha256-1sy/2t1aD6B3iTTNNUTrSzsxxfPuqTtQekXv/U5FECE=";
-    };
+  src = fetchFromGitHub {
+    owner = "wcldyx";
+    repo = "pi-workspace-history";
+    rev = "4c51d3cad723bd8733c73fb36f4b971efb2eb53a";
+    hash = "sha256-1sy/2t1aD6B3iTTNNUTrSzsxxfPuqTtQekXv/U5FECE=";
+  };
 
-    nodejs = nodejs_22;
+  nodejs = nodejs_22;
+
+  postPatch = postPatch_;
+
+  npmDeps = fetchNpmDeps {
+    inherit (finalAttrs_) src;
+
+    hash = "sha256-5qkoYPFYYodiYe+V2IDKUFdSF0W8Fftmt1q1SeBgLzg=";
 
     postPatch = postPatch_;
+  };
 
-    npmDeps = fetchNpmDeps {
-      inherit (finalAttrs_) src;
+  npmInstallFlags = [
+    "--omit=dev"
+    "--omit=peer"
+  ];
 
-      hash = "sha256-5qkoYPFYYodiYe+V2IDKUFdSF0W8Fftmt1q1SeBgLzg=";
+  dontNpmBuild = true;
 
-      postPatch = postPatch_;
-    };
+  installPhase = builtins.concatStringsSep "\n" [
+    (lib.escapeShellArgs [
+      "runHook"
+      "preInstall"
+    ])
+    ""
+    (lib.escapeShellArgs [
+      "mkdir"
+      "-p"
+      "${builtins.placeholder "out"}/.pi"
+    ])
+    ""
+    (lib.escapeShellArgs [
+      "cp"
+      "-r"
+      ".pi/extensions"
+      "${builtins.placeholder "out"}/.pi/"
+    ])
+    ""
+    (lib.escapeShellArgs [
+      "cp"
+      "package.json"
+      "README.md"
+      "README.zh-CN.md"
+      (builtins.placeholder "out")
+    ])
+    ""
+    (lib.escapeShellArgs [
+      "cp"
+      "-r"
+      "node_modules"
+      (builtins.placeholder "out")
+    ])
+    ""
+    (lib.escapeShellArgs [
+      "runHook"
+      "postInstall"
+    ])
+    ""
+  ];
 
-    npmInstallFlags = [
-      "--omit=dev"
-      "--omit=peer"
-    ];
+  meta = {
+    description = "Real workspace undo/redo for Pi";
+    homepage = "https://github.com/wcldyx/pi-workspace-history";
+    license = lib.licenses.mit;
+    platforms = lib.platforms.unix;
+  };
 
-    dontNpmBuild = true;
-
-    installPhase = builtins.concatStringsSep "\n" [
-      (lib.escapeShellArgs [ "runHook" "preInstall" ])
-      ""
-      (lib.escapeShellArgs [
-        "mkdir"
-        "-p"
-        "${builtins.placeholder "out"}/.pi"
-      ])
-      ""
-      (lib.escapeShellArgs [
-        "cp"
-        "-r"
-        ".pi/extensions"
-        "${builtins.placeholder "out"}/.pi/"
-      ])
-      ""
-      (lib.escapeShellArgs [
-        "cp"
-        "package.json"
-        "README.md"
-        "README.zh-CN.md"
-        (builtins.placeholder "out")
-      ])
-      ""
-      (lib.escapeShellArgs [
-        "cp"
-        "-r"
-        "node_modules"
-        (builtins.placeholder "out")
-      ])
-      ""
-      (lib.escapeShellArgs [ "runHook" "postInstall" ])
-      ""
-    ];
-
-    meta = {
-      description = "Real workspace undo/redo for Pi";
-      homepage = "https://github.com/wcldyx/pi-workspace-history";
-      license = lib.licenses.mit;
-      platforms = lib.platforms.unix;
-    };
-
-  })
-)
+}))

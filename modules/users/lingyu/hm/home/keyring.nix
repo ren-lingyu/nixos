@@ -1,4 +1,10 @@
-{ config, pkgs, lib, ... } : let
+{
+  config,
+  pkgs,
+  lib,
+  ...
+}:
+let
 
   keepassxcPureDeclarative = {
     enable = false;
@@ -53,7 +59,8 @@
     };
   };
 
-in {
+in
+{
 
   programs.gpg = {
     enable = true;

@@ -1,8 +1,15 @@
-{ config, lib, pkgs, ... } : let
+{
+  config,
+  lib,
+  pkgs,
+  ...
+}:
+let
 
   cfg = config.modules.features.diagnostics;
 
-in {
+in
+{
 
   config = {
 

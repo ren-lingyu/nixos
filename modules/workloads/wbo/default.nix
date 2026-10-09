@@ -1,8 +1,12 @@
-{ config, pkgs, lib, ... } : {
+{
+  config,
+  pkgs,
+  lib,
+  ...
+}:
+{
 
-  imports = [
-    ./os
-  ];
+  imports = [ ./os ];
 
   config = {
     modules.workloads.wbo.existModule = {

@@ -1,8 +1,16 @@
-{ config, osConfig, pkgs, lib, ... } : let
+{
+  config,
+  osConfig,
+  pkgs,
+  lib,
+  ...
+}:
+let
 
   cfg = osConfig.modules.features.diagnostics;
 
-in {
+in
+{
 
   config = lib.mkIf cfg.enable {
 
@@ -19,8 +27,8 @@ in {
     programs.btop = {
       enable = true;
       package = pkgs.btop;
-      settings = {};
-      themes = {};
+      settings = { };
+      themes = { };
     };
 
   };

@@ -1,11 +1,18 @@
 # Edit this configuration file to define what should be installed on
 # your system. Help is available in the configuration.nix(5) man page, on
 # https://search.nixos.org/options and in the NixOS manual (`nixos-help`).
-{ config, pkgs, lib, ... } : let
+{
+  config,
+  pkgs,
+  lib,
+  ...
+}:
+let
 
   cfg = config.modules.hosts.thinkbook;
 
-in {
+in
+{
 
   imports = [
     ./hardware-configuration.nix
@@ -18,7 +25,10 @@ in {
   config = lib.mkIf cfg.enable {
 
     nix.settings = {
-      trusted-users = [ "@wheel" "root" ];
+      trusted-users = [
+        "@wheel"
+        "root"
+      ];
     };
 
     boot = {
@@ -75,12 +85,12 @@ in {
       hostName = "nixos";
       firewall = {
         enable = true;
-        allowedTCPPorts = [];
-        allowedUDPPorts = [];
+        allowedTCPPorts = [ ];
+        allowedUDPPorts = [ ];
       };
       proxy = {
-        default = ""; #"http://user:password@proxy:port/";
-        noProxy = ""; #"127.0.0.1,localhost,internal.domain";
+        default = ""; # "http://user:password@proxy:port/";
+        noProxy = ""; # "127.0.0.1,localhost,internal.domain";
       };
     };
 
@@ -106,24 +116,31 @@ in {
           hashedPassword = "$y$j9T$HZvnP.0ZR5uBiDAviT9xA.$MSExGgePZwjIDZq2n3fOUGGguWKEgvjuIKImW4uf7p4";
           linger = true;
           extraGroups = builtins.concatLists [
-            [ "wheel" "video" "render" "input" ]
+            [
+              "wheel"
+              "video"
+              "render"
+              "input"
+            ]
             (lib.optionals config.networking.networkmanager.enable [ "networkmanager" ])
             (lib.optionals config.services.seatd.enable [ config.services.seatd.group ])
             (lib.optionals config.virtualisation.libvirtd.enable [ "libvirtd" ])
           ];
-          packages = with pkgs; (builtins.concatLists [
-            [
-              microsoft-edge
-              zoom-us
-              feishu
-              zotero
-              calibre
-              xournalpp
-              rnote
-              rar
-              unrar
-            ]
-          ]);
+          packages =
+            with pkgs;
+            (builtins.concatLists [
+              [
+                microsoft-edge
+                zoom-us
+                feishu
+                zotero
+                calibre
+                xournalpp
+                rnote
+                rar
+                unrar
+              ]
+            ]);
         };
       };
     };
@@ -134,9 +151,7 @@ in {
           "freerdp/sdl-freerdp.json" = {
             enable = config.virtualisation.libvirtd.enable;
             target = "freerdp/sdl-freerdp.json";
-            text = builtins.toJSON {
-              SDL_KeyModMask = [ "SDL_KMOD_NONE" ];
-            };
+            text = builtins.toJSON { SDL_KeyModMask = [ "SDL_KMOD_NONE" ]; };
           };
         };
       };
@@ -156,27 +171,21 @@ in {
           waylandFrontend = true;
           addons = with pkgs; [
             fcitx5-gtk
-            (fcitx5-rime.override {
-              rimeDataPkgs = [
-                pkgs.rime-ice
-              ];
-            })
+            (fcitx5-rime.override { rimeDataPkgs = [ pkgs.rime-ice ]; })
           ];
-          quickPhrase = {};
-          quickPhraseFiles = {};
+          quickPhrase = { };
+          quickPhraseFiles = { };
           settings = {
-            addons = {};
-            globalOptions = {};
-            inputMethod = {};
+            addons = { };
+            globalOptions = { };
+            inputMethod = { };
           };
         };
       };
     };
 
     environment = {
-      systemPackages = with pkgs; [
-        usbutils
-      ];
+      systemPackages = with pkgs; [ usbutils ];
       usrbinenv = lib.mkForce "${pkgs.coreutils}/bin/env";
       etc = {
         "libinput/local-overrides.quirks" = {
@@ -224,18 +233,20 @@ in {
 
     xdg.mime = {
       enable = true;
-      defaultApplications = let
-        defaultBrowser = "microsoft-edge.desktop";
-      in {
-        "x-scheme-handler/https" = defaultBrowser;
-        "x-scheme-handler/http" = defaultBrowser;
-        "text/html" = defaultBrowser;
-        "text/xml" = defaultBrowser;
-        "application/xhtml+xml" = defaultBrowser;
-        "application/pdf" = defaultBrowser;
-        "x-scheme-handler/about" = defaultBrowser;
-        "x-scheme-handler/unknown" = defaultBrowser;
-      };
+      defaultApplications =
+        let
+          defaultBrowser = "microsoft-edge.desktop";
+        in
+        {
+          "x-scheme-handler/https" = defaultBrowser;
+          "x-scheme-handler/http" = defaultBrowser;
+          "text/html" = defaultBrowser;
+          "text/xml" = defaultBrowser;
+          "application/xhtml+xml" = defaultBrowser;
+          "application/pdf" = defaultBrowser;
+          "x-scheme-handler/about" = defaultBrowser;
+          "x-scheme-handler/unknown" = defaultBrowser;
+        };
     };
 
     programs = {
@@ -247,18 +258,17 @@ in {
       };
       ssh = {
         package = pkgs.openssh;
-        pubkeyAcceptedKeyTypes = [
-          "ssh-ed25519"
-        ];
+        pubkeyAcceptedKeyTypes = [ "ssh-ed25519" ];
         knownHosts = {
           "github.com" = {
-            hostNames = [ "github.com" "ssh.github.com" ];
+            hostNames = [
+              "github.com"
+              "ssh.github.com"
+            ];
             publicKey = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIOMqqnkVzrm0SdG6UOoqKLsabgH5C9okWi0dh2l9GKJl";
           };
           nixos-server = {
-            hostNames = [
-              "39.97.244.246"
-            ];
+            hostNames = [ "39.97.244.246" ];
             publicKey = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAILI3dfdpwVhrRohWXLm694Y21dS2JeIpWN8CJcwURtl5";
           };
         };
@@ -288,7 +298,10 @@ in {
       };
       xserver = {
         enable = true;
-        videoDrivers = [ "intel" "modesetting" ];
+        videoDrivers = [
+          "intel"
+          "modesetting"
+        ];
         xkb = {
           layout = "us";
           options = "eurosign:e,caps:escape";
@@ -323,7 +336,7 @@ in {
     swapDevices = [
       {
         device = "/var/lib/swapfile";
-        size = 16*1024;
+        size = 16 * 1024;
       }
     ];
 

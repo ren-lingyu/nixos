@@ -1,14 +1,20 @@
-{ config, osConfig, pkgs, lib, ... } : let
+{
+  config,
+  osConfig,
+  pkgs,
+  lib,
+  ...
+}:
+let
 
   cfg = osConfig.modules.features.editor;
 
-in {
+in
+{
 
   config = lib.mkIf cfg.enable {
 
-    home.packages = lib.optionals cfg.lem.enable [
-      cfg.lem.package
-    ];
+    home.packages = lib.optionals cfg.lem.enable [ cfg.lem.package ];
 
     programs.nixvim = {
       enable = cfg.neovim.enable;
@@ -99,7 +105,7 @@ in {
       startWithUserSession = false;
       client = {
         enable = false;
-        arguments = ["-c"];
+        arguments = [ "-c" ];
       };
     };
 

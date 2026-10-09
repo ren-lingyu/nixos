@@ -1,7 +1,7 @@
 #!/usr/bin/env sh
 
 show_help() {
-    cat << EOF
+  cat <<EOF
 Usage:
     $(basename "$0") [OPTION]...
 
@@ -16,15 +16,15 @@ EOF
 }
 
 case "$1" in
-    "-h"|"--help")
-	show_help
-	exit 0
-	;;
-    "-m"|"--make")
-	make() { command make -f ~/org/config/Makefile $@; }
-	;;
-    *)
-	cd ~/org
-	make() { command make -f ~/org/config/Makefile $@; }
-	;;
+"-h" | "--help")
+  show_help
+  exit 0
+  ;;
+"-m" | "--make")
+  make() { command make -f ~/org/config/Makefile $@; }
+  ;;
+*)
+  cd ~/org
+  make() { command make -f ~/org/config/Makefile $@; }
+  ;;
 esac

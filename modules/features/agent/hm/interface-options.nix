@@ -1,9 +1,19 @@
-feature_ : { options, config, osConfig, pkgs, lib, llib, ... } : {
+feature_:
+{
+  options,
+  config,
+  osConfig,
+  pkgs,
+  lib,
+  llib,
+  ...
+}:
+{
 
-  inherit (lib.mapAttrs
-    (agent_ : providers_ : {
-      providers = lib.mapAttrs
-        (provider_ : unused_ : {
+  inherit
+    (lib.mapAttrs
+      (agent_: providers_: {
+        providers = lib.mapAttrs (provider_: unused_: {
 
           enable = lib.mkOption {
             type = lib.types.bool;
@@ -19,17 +29,19 @@ feature_ : { options, config, osConfig, pkgs, lib, llib, ... } : {
             description = "Path to the file containing the ${provider_} API key used by ${agent_}.";
           };
 
-        })
-        providers_;
-    })
-    {
-      opencode = {
-        deepseek = {};
-      };
-      pi = {
-        deepseek = {};
-      };
-    }
-  ) opencode pi;
+        }) providers_;
+      })
+      {
+        opencode = {
+          deepseek = { };
+        };
+        pi = {
+          deepseek = { };
+        };
+      }
+    )
+    opencode
+    pi
+    ;
 
 }

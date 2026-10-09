@@ -1,4 +1,9 @@
-{ stdenvNoCC, fetchFromGitHub, lib } : stdenvNoCC.mkDerivation rec {
+{
+  stdenvNoCC,
+  fetchFromGitHub,
+  lib,
+}:
+stdenvNoCC.mkDerivation rec {
 
   pname = "luadraw";
   version = "3.4";
@@ -14,18 +19,23 @@
   dontBuild = true;
   dontStrip = true;
 
-  outputs = [ "out" "tex" "texdoc" ];
+  outputs = [
+    "out"
+    "tex"
+    "texdoc"
+  ];
 
   passthru = {
     tlType = "run";
-    tlDeps = ps_ : with ps_; [
-      latex
-      iftex
-      luacode
-      tools
-      xkeyval
-      pgf
-    ];
+    tlDeps =
+      ps_: with ps_; [
+        latex
+        iftex
+        luacode
+        tools
+        xkeyval
+        pgf
+      ];
   };
 
   installPhase = lib.concatStringsSep "\n" [

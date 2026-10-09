@@ -1,4 +1,11 @@
-{ config, osConfig, pkgs, lib, ... } :  {
+{
+  config,
+  osConfig,
+  pkgs,
+  lib,
+  ...
+}:
+{
 
   imports = [
     ./top-level.nix

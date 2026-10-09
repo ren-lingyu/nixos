@@ -1,8 +1,15 @@
-{ config, lib, pkgs, ... } : let
+{
+  config,
+  lib,
+  pkgs,
+  ...
+}:
+let
 
   cfg = config.programs.wayfile;
 
-in {
+in
+{
 
   options.programs.wayfile = {
 
@@ -25,9 +32,7 @@ in {
     mimeTypes = lib.mkOption {
       type = lib.types.nullOr (lib.types.listOf lib.types.str);
       default = null;
-      example = [
-        "inode/directory"
-      ];
+      example = [ "inode/directory" ];
       description = "MIME types to associate with Wayfile when `programs.wayfile.mimeTypes` is not null.";
     };
 
@@ -39,16 +44,16 @@ in {
 
     (lib.mkIf cfg.enable {
 
-      home.packages = [
-        cfg.package
-      ];
+      home.packages = [ cfg.package ];
 
       xdg.mimeApps = lib.mkIf (cfg.mimeTypes != null) {
         enable = true;
-        defaultApplications = builtins.listToAttrs (builtins.map (mimeType : {
-          name = mimeType;
-          value = cfg.desktopFileName;
-        }) cfg.mimeTypes);
+        defaultApplications = builtins.listToAttrs (
+          builtins.map (mimeType: {
+            name = mimeType;
+            value = cfg.desktopFileName;
+          }) cfg.mimeTypes
+        );
       };
 
     })

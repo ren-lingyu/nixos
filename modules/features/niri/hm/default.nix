@@ -1,31 +1,31 @@
-{ config, osConfig, pkgs, lib, ... } : let
+{
+  config,
+  osConfig,
+  pkgs,
+  lib,
+  ...
+}:
+let
 
   cfg = osConfig.modules.features.niri;
 
   noctaliaSettings = config.programs.noctalia.settings;
 
   noctaliaIdleBehaviors = (
-    if builtins.isAttrs noctaliaSettings
-    then (noctaliaSettings.idle.behavior or { })
-    else { }
+    if builtins.isAttrs noctaliaSettings then (noctaliaSettings.idle.behavior or { }) else { }
   );
 
-  noctaliaIdleEnabled = (builtins.all
-    (x_ : x_)
-    [
+  noctaliaIdleEnabled = (
+    builtins.all (x_: x_) [
       config.programs.noctalia.enable
-      (builtins.any
-        (behavior_ : (
-          if builtins.isAttrs behavior_
-          then (behavior_.enabled or false)
-          else false
-        ))
-        (builtins.attrValues noctaliaIdleBehaviors)
-      )
+      (builtins.any (
+        behavior_: (if builtins.isAttrs behavior_ then (behavior_.enabled or false) else false)
+      ) (builtins.attrValues noctaliaIdleBehaviors))
     ]
   );
 
-in {
+in
+{
 
   imports = [
     ./settings
@@ -35,16 +35,12 @@ in {
 
   config = lib.mkIf cfg.enable {
 
-    home.packages = with pkgs; [
-      adwaita-icon-theme
-    ];
+    home.packages = with pkgs; [ adwaita-icon-theme ];
 
     xdg.portal = {
       enable = true;
       xdgOpenUsePortal = true;
-      extraPortals = [
-        pkgs.xdg-desktop-portal-gtk
-      ];
+      extraPortals = [ pkgs.xdg-desktop-portal-gtk ];
     };
 
     programs.niri = {
@@ -57,9 +53,7 @@ in {
       package = pkgs.fuzzel;
       settings = {
         main = {
-          terminal = lib.mkIf config.xdg.terminal-exec.enable (
-            lib.getExe config.xdg.terminal-exec.package
-          );
+          terminal = lib.mkIf config.xdg.terminal-exec.enable (lib.getExe config.xdg.terminal-exec.package);
           icon-theme = "Adwaita";
           layer = "overlay";
         };
@@ -155,12 +149,8 @@ in {
     services.swayidle = lib.mkIf (!noctaliaIdleEnabled) {
       enable = true; # idle management daemon
       package = pkgs.swayidle;
-      systemdTargets = [
-        config.wayland.systemd.target
-      ];
-      extraArgs = [
-        "-w"
-      ];
+      systemdTargets = [ config.wayland.systemd.target ];
+      extraArgs = [ "-w" ];
       events = {
         after-resume = "${lib.getExe config.programs.niri.package} msg action power-on-monitors";
         before-sleep = builtins.concatStringsSep "&&" [
@@ -221,7 +211,7 @@ in {
           scaleX = 9;
           scaleY = 9;
         };
-        keyBindings = {};
+        keyBindings = { };
       };
       theme = {
         useCustomTheme = false;

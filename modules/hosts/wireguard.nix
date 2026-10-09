@@ -1,4 +1,12 @@
-{ options, config, pkgs, lib, llib, ... } : let
+{
+  options,
+  config,
+  pkgs,
+  lib,
+  llib,
+  ...
+}:
+let
 
   cfg = config.modules.hosts;
 
@@ -6,84 +14,85 @@
 
   enabledHost_ = mif.getUniqueEnabledHost config.modules.hosts;
 
-in {
+in
+{
 
   options = {
 
     networking.wireguard.topology = lib.mkOption {
-      type = lib.types.attrsOf (lib.types.submodule {
-        options = {
-          name = lib.mkOption {
-            type = lib.types.str;
+      type = lib.types.attrsOf (
+        lib.types.submodule {
+          options = {
+            name = lib.mkOption { type = lib.types.str; };
+            nodes = lib.mkOption { type = lib.types.attrsOf lib.types.str; };
           };
-          nodes = lib.mkOption {
-            type = lib.types.attrsOf lib.types.str;
-          };
-        };
-      });
+        }
+      );
       internal = true;
       readOnly = true;
     };
 
     modules.hosts = llib.moduleFunctions.default.mkModuleOptions.withoutExtra {
       path = ./.;
-      commonSchema = (host_ : {
+      commonSchema = (
+        host_: {
 
-        wireguard = lib.mkOption {
-          type = lib.types.nullOr (lib.types.submodule {
-            options = {
+          wireguard = lib.mkOption {
+            type = lib.types.nullOr (
+              lib.types.submodule {
+                options = {
 
-              publicKey = lib.mkOption {
-                type = lib.types.nonEmptyStr;
-                description = "WireGuard public key for this host.";
-              };
-
-              privateKey = lib.mkOption {
-                type = (lib.types.either
-                  lib.types.path
-                  lib.types.nonEmptyStr
-                );
-                description = (builtins.concatStringsSep
-                  "\n"
-                  [
-                    "WireGuard private key material for this host."
-                    "Path values point to a repository file containing the key material; string values contain the key material inline."
-                    "Stored private key material should be encrypted."
-                  ]
-                );
-              };
-
-              listenPort = lib.mkOption {
-                type = lib.types.nullOr lib.types.port;
-                default = null;
-                description = "Local UDP port on which WireGuard listens on this host.";
-              };
-
-              endpoint = lib.mkOption {
-                type = lib.types.nullOr (lib.types.submodule {
-                  options = {
-                    address = lib.mkOption {
-                      type = lib.types.nonEmptyStr;
-                      description = "Reachable address of this WireGuard endpoint.";
-                    };
-                    port = lib.mkOption {
-                      type = lib.types.port;
-                      description = "Reachable UDP port of this WireGuard endpoint.";
-                    };
+                  publicKey = lib.mkOption {
+                    type = lib.types.nonEmptyStr;
+                    description = "WireGuard public key for this host.";
                   };
-                });
-                default = null;
-                description = "WireGuard endpoint through which this host can be reached by other hosts.";
-              };
 
-            };
-          });
-          internal = true;
-          readOnly = true;
-          description = "Static WireGuard metadata for this host.";
-        };
+                  privateKey = lib.mkOption {
+                    type = (lib.types.either lib.types.path lib.types.nonEmptyStr);
+                    description = (
+                      builtins.concatStringsSep "\n" [
+                        "WireGuard private key material for this host."
+                        "Path values point to a repository file containing the key material; string values contain the key material inline."
+                        "Stored private key material should be encrypted."
+                      ]
+                    );
+                  };
 
-      });
+                  listenPort = lib.mkOption {
+                    type = lib.types.nullOr lib.types.port;
+                    default = null;
+                    description = "Local UDP port on which WireGuard listens on this host.";
+                  };
+
+                  endpoint = lib.mkOption {
+                    type = lib.types.nullOr (
+                      lib.types.submodule {
+                        options = {
+                          address = lib.mkOption {
+                            type = lib.types.nonEmptyStr;
+                            description = "Reachable address of this WireGuard endpoint.";
+                          };
+                          port = lib.mkOption {
+                            type = lib.types.port;
+                            description = "Reachable UDP port of this WireGuard endpoint.";
+                          };
+                        };
+                      }
+                    );
+                    default = null;
+                    description = "WireGuard endpoint through which this host can be reached by other hosts.";
+                  };
+
+                };
+              }
+            );
+            internal = true;
+            readOnly = true;
+            description = "Static WireGuard metadata for this host.";
+          };
+
+        }
+      );
     };
 
   };
@@ -99,35 +108,33 @@ in {
       };
     };
 
-    networking = let
-      wireguardNetworks_ = (mif.mkWireGuardNetworks {
-        registry = cfg;
-        privateKeyFile = config.age.secrets.wireguard.path;
-        wgIpRule = (x_ : y_ : "10.100.${builtins.toString x_}.${builtins.toString y_}");
-        wgNameRule = (x_ : "wg${builtins.toString x_}");
-      });
-    in (lib.mkMerge
-      [
+    networking =
+      let
+        wireguardNetworks_ = (
+          mif.mkWireGuardNetworks {
+            registry = cfg;
+            privateKeyFile = config.age.secrets.wireguard.path;
+            wgIpRule = (x_: y_: "10.100.${builtins.toString x_}.${builtins.toString y_}");
+            wgNameRule = (x_: "wg${builtins.toString x_}");
+          }
+        );
+      in
+      (lib.mkMerge [
         wireguardNetworks_.config
-        {
-          wireguard.topology = wireguardNetworks_.topology;
-        }
-      ]
-    );
+        { wireguard.topology = wireguardNetworks_.topology; }
+      ]);
 
-    assertions = (lib.mapAttrsToList
-      (hostName_ : host_ : {
-        assertion = (builtins.any
-          (x_ : x_)
-          [
+    assertions = (
+      lib.mapAttrsToList (hostName_: host_: {
+        assertion = (
+          builtins.any (x_: x_) [
             (host_.wireguard == null)
             (host_.wireguard.endpoint == null)
             (host_.wireguard.listenPort != null)
           ]
         );
         message = "Host `${hostName_}` with a WireGuard endpoint must provide `wireguard.listenPort`.";
-      })
-      cfg
+      }) cfg
     );
 
   };

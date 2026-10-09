@@ -1,8 +1,16 @@
-{ config, osConfig, pkgs, lib, ... } : let
+{
+  config,
+  osConfig,
+  pkgs,
+  lib,
+  ...
+}:
+let
 
   cfg = osConfig.modules.features.niri;
 
-in {
+in
+{
 
   config = lib.mkIf config.programs.niri.enable {
 
@@ -32,10 +40,10 @@ in {
       };
       tablet = {
         enable = true;
-        map-to-output = (builtins.head (builtins.attrValues (lib.filterAttrs
-          (_ : monitor_ : monitor_.role == "default")
-          cfg.monitors
-        ))).name;
+        map-to-output =
+          (builtins.head (
+            builtins.attrValues (lib.filterAttrs (_: monitor_: monitor_.role == "default") cfg.monitors)
+          )).name;
       };
     };
 

@@ -1,4 +1,13 @@
-workload_ : { options, config, pkgs, lib, llib, ... } : {
+workload_:
+{
+  options,
+  config,
+  pkgs,
+  lib,
+  llib,
+  ...
+}:
+{
 
   ip = lib.mkOption {
     type = lib.types.nullOr lib.types.nonEmptyStr;

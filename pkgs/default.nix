@@ -1,4 +1,9 @@
-{ pkgs, lib, llib } : {
+{
+  pkgs,
+  lib,
+  llib,
+}:
+{
 
   legacyPackages = llib.packageFunctions.mkLegacyPackages {
     root = ./.;

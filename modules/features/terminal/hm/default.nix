@@ -1,8 +1,16 @@
-{ config, osConfig, pkgs, lib, ... } : let
+{
+  config,
+  osConfig,
+  pkgs,
+  lib,
+  ...
+}:
+let
 
   cfg = osConfig.modules.features.terminal;
 
-in {
+in
+{
 
   config = lib.mkIf cfg.enable {
 
@@ -35,9 +43,7 @@ in {
       enable = true;
       package = pkgs.xdg-terminal-exec;
       settings = {
-        default = [
-          "kitty.desktop"
-        ];
+        default = [ "kitty.desktop" ];
       };
     };
 

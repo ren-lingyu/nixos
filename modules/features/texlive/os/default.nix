@@ -1,15 +1,24 @@
-{ config, pkgs, lib, ... } : let
+{
+  config,
+  pkgs,
+  lib,
+  ...
+}:
+let
 
   cfg = config.modules.features.texlive;
 
-in {
+in
+{
 
   config = lib.mkIf cfg.enable {
     environment.systemPackages = with pkgs; [
-      (texliveFull.withPackages (ps_ : with ps_; [
-        dvisvgm
-        luadraw
-      ]))
+      (texliveFull.withPackages (
+        ps_: with ps_; [
+          dvisvgm
+          luadraw
+        ]
+      ))
       ghostscript
       mupdf
     ];

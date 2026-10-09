@@ -1,4 +1,10 @@
-{ config, pkgs, lib, ... } : {
+{
+  config,
+  pkgs,
+  lib,
+  ...
+}:
+{
 
   programs.ssh.settings = lib.mkIf config.programs.ssh.enable {
     "aliyun" = {

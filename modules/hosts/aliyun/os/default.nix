@@ -1,8 +1,15 @@
-{ config, pkgs, lib, ... } : let
+{
+  config,
+  pkgs,
+  lib,
+  ...
+}:
+let
 
   cfg = config.modules.hosts.aliyun;
 
-in {
+in
+{
 
   imports = [
     ./hardware-configuration.nix
@@ -12,7 +19,10 @@ in {
   config = lib.mkIf cfg.enable {
 
     nix.settings = {
-      trusted-users = [ "@wheel" "root" ];
+      trusted-users = [
+        "@wheel"
+        "root"
+      ];
     };
 
     networking = {
@@ -39,9 +49,7 @@ in {
         enable = true;
         efiSupport = true;
         efiInstallAsRemovable = true;
-        devices = [
-          "nodev"
-        ];
+        devices = [ "nodev" ];
       };
     };
 
@@ -57,9 +65,7 @@ in {
         "${builtins.toString cfg.users."1000"}" = {
           uid = cfg.users."1000";
           isNormalUser = true;
-          extraGroups = [
-            "wheel"
-          ];
+          extraGroups = [ "wheel" ];
           openssh.authorizedKeys.keys = config.users.users.root.openssh.authorizedKeys.keys;
           hashedPassword = "$y$j9T$1J6tPBiaxfJB6.VP/3CJa.$/LrO/IUrSNylYEWrgQ7EJMhyCnP8aHrDu5C13T.UnF0";
         };

@@ -1,8 +1,16 @@
-{ config, osConfig, pkgs, lib, ... } : let
+{
+  config,
+  osConfig,
+  pkgs,
+  lib,
+  ...
+}:
+let
 
   cfg = osConfig.modules.features.x11-session;
 
-in {
+in
+{
 
   config = lib.mkIf cfg.enable {
 

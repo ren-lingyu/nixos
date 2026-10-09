@@ -1,6 +1,6 @@
 @jq@ \
-   'del(.devDependencies, .peerDependencies)' \
-   package.json > package.json.new
+  'del(.devDependencies, .peerDependencies)' \
+  package.json >package.json.new
 mv package.json.new package.json
 
 @jq@ '
@@ -11,5 +11,5 @@ mv package.json.new package.json
   | .packages |= with_entries(
       select(.key == "" or .value.dev != true)
     )
-' package-lock.json > package-lock.json.new
+' package-lock.json >package-lock.json.new
 mv package-lock.json.new package-lock.json

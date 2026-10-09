@@ -1,4 +1,10 @@
-{ config, pkgs, lib, ... } : {
+{
+  config,
+  pkgs,
+  lib,
+  ...
+}:
+{
 
   imports = [
     ./keyring.nix
@@ -36,9 +42,7 @@
         BIBINPUTS = "$HOME/org/texmf//:";
         BSTINPUTS = "$HOME/org/texmf//:";
       };
-      sessionPath = [
-        "${config.xdg.binHome}"
-      ];
+      sessionPath = [ "${config.xdg.binHome}" ];
       file = {
         ".local/bin/rc" = {
           enable = true;
@@ -96,15 +100,15 @@
     programs.zathura = {
       enable = true;
       package = pkgs.zathura;
-      options = {};
-      mappings = {};
+      options = { };
+      mappings = { };
     };
 
     xdg = {
       autostart = {
         enable = false;
         readOnly = true;
-        entries = [];
+        entries = [ ];
       };
       mimeApps = {
         enable = true;

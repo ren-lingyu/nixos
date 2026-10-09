@@ -1,14 +1,19 @@
-{ config, pkgs, lib, ... } : let
+{
+  config,
+  pkgs,
+  lib,
+  ...
+}:
+let
 
   cfg = config.modules.features.agent;
 
-in {
+in
+{
 
   config = lib.mkIf cfg.enable {
 
-    environment.pathsToLink = [
-      "/share/skills"
-    ];
+    environment.pathsToLink = [ "/share/skills" ];
 
   };
 

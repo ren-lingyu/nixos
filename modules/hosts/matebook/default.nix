@@ -1,12 +1,17 @@
-{ config, pkgs, lib, ... } : let
+{
+  config,
+  pkgs,
+  lib,
+  ...
+}:
+let
 
   cfg = config.modules.hosts.matebook;
 
-in {
+in
+{
 
-  imports = [
-    ./os
-  ];
+  imports = [ ./os ];
 
   config = {
 

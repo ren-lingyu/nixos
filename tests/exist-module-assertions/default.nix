@@ -1,14 +1,11 @@
-{ pkgs, llib } : let
+{ pkgs, llib }:
+let
 
-  assertEqual = name_ : expected_ : actual_ :
-    if actual_ == expected_
-    then true
-    else throw "Test `${name_}` failed: values differ.";
+  assertEqual =
+    name_: expected_: actual_:
+    if actual_ == expected_ then true else throw "Test `${name_}` failed: values differ.";
 
-  assertTrue = name_ : value_ :
-    if value_
-    then true
-    else throw "Test `${name_}` failed: expected true.";
+  assertTrue = name_: value_: if value_ then true else throw "Test `${name_}` failed: expected true.";
 
   validAssertions_ = llib.assertions.existModule {
     enable = true;
@@ -35,11 +32,17 @@
   };
 
   tests_ = [
-    (assertTrue "matching paths" (builtins.all (assertion_ : assertion_.assertion) validAssertions_))
-    (assertEqual "enabled profiles require declarations" false (builtins.elemAt invalidAssertions_ 3).assertion)
-    (assertEqual "enabled message passthrough" "Both module declarations are required." (builtins.elemAt invalidAssertions_ 3).message)
+    (assertTrue "matching paths" (builtins.all (assertion_: assertion_.assertion) validAssertions_))
+    (assertEqual "enabled profiles require declarations" false
+      (builtins.elemAt invalidAssertions_ 3).assertion
+    )
+    (assertEqual "enabled message passthrough" "Both module declarations are required."
+      (builtins.elemAt invalidAssertions_ 3).message
+    )
   ];
 
-in assert builtins.deepSeq tests_ true; pkgs.runCommand "nixos-exist-module-assertions" {} ''
+in
+assert builtins.deepSeq tests_ true;
+pkgs.runCommand "nixos-exist-module-assertions" { } ''
   touch $out
 ''

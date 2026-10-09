@@ -1,4 +1,12 @@
-host_ : { config, pkgs, lib, llib, ... } : {
+host_:
+{
+  config,
+  pkgs,
+  lib,
+  llib,
+  ...
+}:
+{
 
   number = 4;
 

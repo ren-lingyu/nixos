@@ -1,4 +1,12 @@
-feature_ : { config, pkgs, lib, llib, ... } : {
+feature_:
+{
+  config,
+  pkgs,
+  lib,
+  llib,
+  ...
+}:
+{
 
   allowUsernameList = lib.mkOption {
     type = lib.types.listOf lib.types.nonEmptyStr;

@@ -1,4 +1,12 @@
-host_ : { config, pkgs, lib, llib, ... } : rec {
+host_:
+{
+  config,
+  pkgs,
+  lib,
+  llib,
+  ...
+}:
+rec {
 
   number = 3;
 
@@ -16,7 +24,7 @@ host_ : { config, pkgs, lib, llib, ... } : rec {
     "1000" = 1000;
   };
 
-  monitors = {};
+  monitors = { };
 
   publicIpAddress = "39.97.244.246";
 

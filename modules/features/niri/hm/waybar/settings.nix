@@ -1,8 +1,16 @@
-{ config, osConfig, pkgs, lib, ... } : let
+{
+  config,
+  osConfig,
+  pkgs,
+  lib,
+  ...
+}:
+let
 
   cfg = osConfig.modules.features.niri;
 
-in {
+in
+{
 
   config = lib.mkIf cfg.waybar.enable {
 
@@ -17,13 +25,9 @@ in {
         margin-right = 0;
         fixed-center = false;
 
-        modules-left = [
-          "niri/workspaces"
-        ];
+        modules-left = [ "niri/workspaces" ];
 
-        modules-center = [
-          "niri/window"
-        ];
+        modules-center = [ "niri/window" ];
 
         modules-right = [
           "idle_inhibitor"
@@ -105,12 +109,22 @@ in {
         temperature = {
           critical-threshold = 80;
           format = "{temperatureC}°C";
-          format-icons = [];
+          format-icons = [ ];
         };
 
         backlight = {
           format = "{percent}% {icon}";
-          format-icons = [ "" "" "" "" "" "" "" "" "" ];
+          format-icons = [
+            ""
+            ""
+            ""
+            ""
+            ""
+            ""
+            ""
+            ""
+            ""
+          ];
         };
 
         battery = {
@@ -123,7 +137,13 @@ in {
           format-charging = "{capacity}% 󰃨";
           format-plugged = "{capacity}% ";
           format-alt = "{time} {icon}";
-          format-icons = [ "" "" "" "" "" ];
+          format-icons = [
+            ""
+            ""
+            ""
+            ""
+            ""
+          ];
         };
 
         "battery#bat2" = {
@@ -165,13 +185,17 @@ in {
             phone = "";
             portable = "";
             car = "";
-            default = [ "" "" "" ];
+            default = [
+              ""
+              ""
+              ""
+            ];
           };
           on-click = "pavucontrol";
         };
 
         "custom/power" = {
-          format = ( " " + "⏻ " + " " );
+          format = (" " + "⏻ " + " ");
           tooltip = false;
           menu = "on-click";
           menu-file = "${config.xdg.configHome}/waybar/power-menu.xml";

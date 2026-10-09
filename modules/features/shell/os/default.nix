@@ -1,20 +1,21 @@
-{ config, pkgs, lib, ... } : let
+{
+  config,
+  pkgs,
+  lib,
+  ...
+}:
+let
 
   cfg = config.modules.features.shell;
 
-in {
+in
+{
 
   config = lib.mkIf cfg.enable {
 
     users = {
       defaultUserShell = (
-        if (config.programs.zsh.enable == true)
-        then (
-          cfg.zsh.package
-        )
-        else (
-          cfg.bash.package
-        )
+        if (config.programs.zsh.enable == true) then (cfg.zsh.package) else (cfg.bash.package)
       );
     };
 

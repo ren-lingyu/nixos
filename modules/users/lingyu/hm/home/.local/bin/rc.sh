@@ -1,14 +1,14 @@
 #!/usr/bin/env sh
 
 case "$0" in
-    sh|bash|dash|ksh|zsh|-sh|-bash)
-        echo "Do not source this script. Execute it as a normal program." >&2
-        return 1 2>/dev/null || exit 1
-        ;;
+sh | bash | dash | ksh | zsh | -sh | -bash)
+  echo "Do not source this script. Execute it as a normal program." >&2
+  return 1 2>/dev/null || exit 1
+  ;;
 esac
 
 show_help_info() {
-    cat << EOF
+  cat <<EOF
 Usage:
     $(basename "$0") push LOCAL_PATH REMOTE_PATH [RCLONE_OPTIONS...]
     $(basename "$0") pull REMOTE_PATH LOCAL_PATH [RCLONE_OPTIONS...]
@@ -35,92 +35,92 @@ EOF
 }
 
 show_error_info() {
-    echo "[ERROR] Invalid Command!"
-    echo
-    show_help_info
+  echo "[ERROR] Invalid Command!"
+  echo
+  show_help_info
 }
 
-rclone_sync () {
-    source="$1"
-    destination="$2"
-    shift 2
-    rclone sync "$source" "$destination" \
-           --create-empty-src-dirs \
-           --transfers 1 \
-           --checkers 1 \
-           --tpslimit 1 \
-           --order-by "size,ascending" \
-           --fast-list \
-           --retries 5 \
-           --retries-sleep 30s \
-           --low-level-retries 5 \
-           --timeout 2m \
-           --progress "$@"
+rclone_sync() {
+  source="$1"
+  destination="$2"
+  shift 2
+  rclone sync "$source" "$destination" \
+    --create-empty-src-dirs \
+    --transfers 1 \
+    --checkers 1 \
+    --tpslimit 1 \
+    --order-by "size,ascending" \
+    --fast-list \
+    --retries 5 \
+    --retries-sleep 30s \
+    --low-level-retries 5 \
+    --timeout 2m \
+    --progress "$@"
 }
 
 case "${1:-}" in
-    "-h"|"--help")
-	    show_help_info
-	    exit 0
-	    ;;
+"-h" | "--help")
+  show_help_info
+  exit 0
+  ;;
+"")
+  show_error_info
+  exit 1
+  ;;
+"push")
+  case "${2:-}" in
+  "-h" | "--help")
+    show_help_info
+    exit 0
+    ;;
+  "")
+    show_error_info
+    exit 1
+    ;;
+  *)
+    case "${3:-}" in
     "")
-        show_error_info
-	    exit 1
-	    ;;
-    "push")
-        case "${2:-}" in
-            "-h"|"--help")
-	            show_help_info
-	            exit 0
-	            ;;
-            "")
-                show_error_info
-	            exit 1
-	            ;;
-            *)
-                case "${3:-}" in
-                    "")
-                        show_error_info
-	                    exit 1
-	                    ;;
-                    *)
-                        local_path="$2"
-                        remote_path="$3"
-                        shift 3
-                        rclone_sync "$local_path" "$remote_path" "$@"
-	                    ;;
-                esac
-	            ;;
-        esac
-        ;;
-    "pull")
-        case "${2:-}" in
-            "-h"|"--help")
-	            show_help_info
-	            exit 0
-	            ;;
-            "")
-                show_error_info
-	            exit 1
-	            ;;
-            *)
-                case "${3:-}" in
-                    "")
-                        show_error_info
-	                    exit 1
-	                    ;;
-                    *)
-                        remote_path="$2"
-                        local_path="$3"
-                        shift 3
-	                    rclone_sync "$remote_path" "$local_path" "$@"
-	                    ;;
-                esac
-	            ;;
-        esac
-        ;;
+      show_error_info
+      exit 1
+      ;;
     *)
-        show_error_info
-	    exit 1
-        ;;
+      local_path="$2"
+      remote_path="$3"
+      shift 3
+      rclone_sync "$local_path" "$remote_path" "$@"
+      ;;
+    esac
+    ;;
+  esac
+  ;;
+"pull")
+  case "${2:-}" in
+  "-h" | "--help")
+    show_help_info
+    exit 0
+    ;;
+  "")
+    show_error_info
+    exit 1
+    ;;
+  *)
+    case "${3:-}" in
+    "")
+      show_error_info
+      exit 1
+      ;;
+    *)
+      remote_path="$2"
+      local_path="$3"
+      shift 3
+      rclone_sync "$remote_path" "$local_path" "$@"
+      ;;
+    esac
+    ;;
+  esac
+  ;;
+*)
+  show_error_info
+  exit 1
+  ;;
 esac

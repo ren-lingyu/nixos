@@ -1,4 +1,12 @@
-feature_ : { config, pkgs, lib, llib, ... } : {
+feature_:
+{
+  config,
+  pkgs,
+  lib,
+  llib,
+  ...
+}:
+{
 
   sessionPackages = lib.mkOption {
     type = lib.types.listOf lib.types.package;
@@ -8,16 +16,18 @@ feature_ : { config, pkgs, lib, llib, ... } : {
   };
 
   monitor = lib.mkOption {
-    type = lib.types.submodule ({ name, config, ... } : {
-      options = {
-        name = lib.mkOption {
-          type =  lib.types.nullOr lib.types.str;
-          default = null;
-          example = "eDP-1";
-          description = "Name of the default monitor.";
+    type = lib.types.submodule (
+      { name, config, ... }: {
+        options = {
+          name = lib.mkOption {
+            type = lib.types.nullOr lib.types.str;
+            default = null;
+            example = "eDP-1";
+            description = "Name of the default monitor.";
+          };
         };
-      };
-    });
+      }
+    );
     internal = true;
     readOnly = true;
     example = {

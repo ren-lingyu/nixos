@@ -1,14 +1,19 @@
-{ config, pkgs, lib, ... } : let
+{
+  config,
+  pkgs,
+  lib,
+  ...
+}:
+let
 
   cfg = config.modules.hosts.thinkbook;
 
   hostName_ = "thinkbook";
 
-in {
+in
+{
 
-  imports = [
-    ./os
-  ];
+  imports = [ ./os ];
 
   config = {
 
@@ -22,9 +27,8 @@ in {
 
     assertions = [
       {
-        assertion = (builtins.any
-          (x_ : x_)
-          [
+        assertion = (
+          builtins.any (x_: x_) [
             (!cfg.flatpak.enable)
             cfg.enable
           ]

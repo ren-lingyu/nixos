@@ -1,19 +1,22 @@
-{ config, osConfig, pkgs, lib, ... } : {
+{
+  config,
+  osConfig,
+  pkgs,
+  lib,
+  ...
+}:
+{
 
   config = lib.mkIf config.programs.niri.enable {
 
     programs.niri.settings.window-rules = [
       {
-        matches = [
-          { app-id = "Emacs"; }
-        ];
+        matches = [ { app-id = "Emacs"; } ];
         open-floating = false;
         open-maximized = true;
       }
       {
-        matches = [
-          { app-id = "^dev[.]noctalia[.]Noctalia$"; }
-        ];
+        matches = [ { app-id = "^dev[.]noctalia[.]Noctalia$"; } ];
         open-floating = true;
         default-column-width = {
           fixed = 1080;

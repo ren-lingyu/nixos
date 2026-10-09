@@ -1,4 +1,11 @@
-{ config, osConfig, pkgs, lib, ... } : {
+{
+  config,
+  osConfig,
+  pkgs,
+  lib,
+  ...
+}:
+{
 
   config = lib.mkIf config.programs.niri.enable {
 
@@ -53,9 +60,15 @@
         gap = 5;
         corner-radius = 0.0;
         position = "left";
-        active = { color = "#7fc8ff"; };
-        inactive = { color = "#505050"; };
-        urgent = { color = "#9b0000"; };
+        active = {
+          color = "#7fc8ff";
+        };
+        inactive = {
+          color = "#505050";
+        };
+        urgent = {
+          color = "#9b0000";
+        };
       };
       center-focused-column = "never";
       insert-hint = {

@@ -1,4 +1,10 @@
-{ config, pkgs, lib, ... } : let
+{
+  config,
+  pkgs,
+  lib,
+  ...
+}:
+let
 
   cfg = config.modules.hosts.thinkbook;
 
@@ -73,7 +79,8 @@
 
   };
 
-in {
+in
+{
 
   config = lib.mkIf cfg.enable {
 
@@ -82,9 +89,8 @@ in {
       virt-viewer
     ];
 
-    services.udev.extraRules = (builtins.concatStringsSep
-      ",${builtins.fromJSON "\"\\u0020\""}"
-      [
+    services.udev.extraRules = (
+      builtins.concatStringsSep ",${builtins.fromJSON "\"\\u0020\""}" [
         "ACTION==\"bind\""
         "SUBSYSTEM==\"pci\""
         "KERNEL==\"${vm.domains.windows.devices.hostdevs.gpu.physicalFunction.address}\""
@@ -128,25 +134,21 @@ in {
             "127.0.0.1"
             vm.networks.default.hosts.windows.ip
           ];
-          "hosts deny" = [
-            "0.0.0.0/0"
-          ];
+          "hosts deny" = [ "0.0.0.0/0" ];
           "smb ports" = 445;
         };
         Shared = {
           path = config.fileSystems.shared.mountPoint;
           browseable = "no";
           "read only" = "no";
-          "valid users" = [
-            "vm-shared"
-          ];
+          "valid users" = [ "vm-shared" ];
           "force user" = "root";
         };
       };
     };
 
     users = {
-      groups.vm-shared = {};
+      groups.vm-shared = { };
       users.vm-shared = {
         isSystemUser = true;
         group = "vm-shared";
@@ -169,54 +171,56 @@ in {
 
           domains = [
             {
-              definition = let
-                hasInitialized_ = true;
-                mkMediaDiskBlock_ = x_ : y_ : (builtins.concatStringsSep
-                  "\n${builtins.fromJSON "\"\\u0020\\u0020\\u0020\\u0020\""}"
-                  [
-                    "<disk type='file' device='cdrom'>"
-                    "    <driver name='qemu' type='raw'/>"
-                    "    <source file='${x_}'/>"
-                    "    <target dev='${y_}' bus='sata'/>"
-                    "    <readonly/>"
-                    "</disk>"
-                  ]
-                );
-              in (pkgs.replaceVarsWith {
-                src = ./domain/windows.xml;
-                replacements = (lib.mergeAttrsList
-                  [
-                    {
-                      domain_name = vm.domains.windows.name;
-                      domain_devices_disks_system_source_pool = vm.domains.windows.devices.disks.system.source.pool;
-                      domain_devices_disks_system_source_volume = vm.domains.windows.devices.disks.system.source.volume;
-                      domain_devices_interfaces_default_mac_address = vm.domains.windows.devices.interfaces.default.mac.address;
-                      domain_devices_interfaces_default_source_network = vm.domains.windows.devices.interfaces.default.source.network;
-                      domain_devices_hostdevs_gpu_source_address_domain = vm.domains.windows.devices.hostdevs.gpu.source.address.domain;
-                      domain_devices_hostdevs_gpu_source_address_bus = vm.domains.windows.devices.hostdevs.gpu.source.address.bus;
-                      domain_devices_hostdevs_gpu_source_address_slot = vm.domains.windows.devices.hostdevs.gpu.source.address.slot;
-                      domain_devices_hostdevs_gpu_source_address_function = vm.domains.windows.devices.hostdevs.gpu.source.address.function;
-                      domain_os_boot_cdrom = "";
-                      domain_devices_disks_windows = "";
-                      domain_devices_disks_virtio = "";
-                    }
-                    (lib.optionalAttrs
-                      (hasInitialized_ == false)
+              definition =
+                let
+                  hasInitialized_ = true;
+                  mkMediaDiskBlock_ =
+                    x_: y_:
+                    (builtins.concatStringsSep "\n${builtins.fromJSON "\"\\u0020\\u0020\\u0020\\u0020\""}" [
+                      "<disk type='file' device='cdrom'>"
+                      "    <driver name='qemu' type='raw'/>"
+                      "    <source file='${x_}'/>"
+                      "    <target dev='${y_}' bus='sata'/>"
+                      "    <readonly/>"
+                      "</disk>"
+                    ]);
+                in
+                (pkgs.replaceVarsWith {
+                  src = ./domain/windows.xml;
+                  replacements = (
+                    lib.mergeAttrsList [
                       {
-                        domain_os_boot_cdrom = "<boot dev='cdrom'/>";
-                        domain_devices_disks_windows = (mkMediaDiskBlock_
-                          vm.domains.windows.devices.disks.windows.source.file
-                          "sda"
-                        );
-                        domain_devices_disks_virtio = (mkMediaDiskBlock_
-                          vm.domains.windows.devices.disks.virtio.source.file
-                          "sdb"
-                        );
+                        domain_name = vm.domains.windows.name;
+                        domain_devices_disks_system_source_pool = vm.domains.windows.devices.disks.system.source.pool;
+                        domain_devices_disks_system_source_volume = vm.domains.windows.devices.disks.system.source.volume;
+                        domain_devices_interfaces_default_mac_address =
+                          vm.domains.windows.devices.interfaces.default.mac.address;
+                        domain_devices_interfaces_default_source_network =
+                          vm.domains.windows.devices.interfaces.default.source.network;
+                        domain_devices_hostdevs_gpu_source_address_domain =
+                          vm.domains.windows.devices.hostdevs.gpu.source.address.domain;
+                        domain_devices_hostdevs_gpu_source_address_bus =
+                          vm.domains.windows.devices.hostdevs.gpu.source.address.bus;
+                        domain_devices_hostdevs_gpu_source_address_slot =
+                          vm.domains.windows.devices.hostdevs.gpu.source.address.slot;
+                        domain_devices_hostdevs_gpu_source_address_function =
+                          vm.domains.windows.devices.hostdevs.gpu.source.address.function;
+                        domain_os_boot_cdrom = "";
+                        domain_devices_disks_windows = "";
+                        domain_devices_disks_virtio = "";
                       }
-                    )
-                  ]
-                );
-              });
+                      (lib.optionalAttrs (hasInitialized_ == false) {
+                        domain_os_boot_cdrom = "<boot dev='cdrom'/>";
+                        domain_devices_disks_windows = (
+                          mkMediaDiskBlock_ vm.domains.windows.devices.disks.windows.source.file "sda"
+                        );
+                        domain_devices_disks_virtio = (
+                          mkMediaDiskBlock_ vm.domains.windows.devices.disks.virtio.source.file "sdb"
+                        );
+                      })
+                    ]
+                  );
+                });
               restart = false;
               active = null;
             }
@@ -224,16 +228,18 @@ in {
 
           networks = [
             {
-              definition = (pkgs.replaceVarsWith {
-                src = ./networks/default.xml;
-                replacements = {
-                  network_name = vm.networks.default.name;
-                  network_bridge_name = vm.networks.default.bridge.name;
-                  network_hosts_windows_name = vm.networks.default.hosts.windows.name;
-                  network_hosts_windows_mac = vm.networks.default.hosts.windows.mac;
-                  network_hosts_windows_ip = vm.networks.default.hosts.windows.ip;
-                };
-              });
+              definition = (
+                pkgs.replaceVarsWith {
+                  src = ./networks/default.xml;
+                  replacements = {
+                    network_name = vm.networks.default.name;
+                    network_bridge_name = vm.networks.default.bridge.name;
+                    network_hosts_windows_name = vm.networks.default.hosts.windows.name;
+                    network_hosts_windows_mac = vm.networks.default.hosts.windows.mac;
+                    network_hosts_windows_ip = vm.networks.default.hosts.windows.ip;
+                  };
+                }
+              );
               restart = false;
               active = true;
             }
@@ -241,23 +247,27 @@ in {
 
           pools = [
             {
-              definition = (pkgs.replaceVarsWith {
-                src = ./pools/windows/pool.xml;
-                replacements = {
-                  pool_name = vm.pools.windows.name;
-                  pool_target_path = vm.pools.windows.target.path;
-                };
-              });
+              definition = (
+                pkgs.replaceVarsWith {
+                  src = ./pools/windows/pool.xml;
+                  replacements = {
+                    pool_name = vm.pools.windows.name;
+                    pool_target_path = vm.pools.windows.target.path;
+                  };
+                }
+              );
               restart = false;
               active = true;
               volumes = [
                 {
-                  definition = (pkgs.replaceVarsWith {
-                    src = ./pools/windows/volume/system.xml;
-                    replacements = {
-                      volume_name = vm.pools.windows.volumes.system.name;
-                    };
-                  });
+                  definition = (
+                    pkgs.replaceVarsWith {
+                      src = ./pools/windows/volume/system.xml;
+                      replacements = {
+                        volume_name = vm.pools.windows.volumes.system.name;
+                      };
+                    }
+                  );
                   present = true;
                 }
               ];

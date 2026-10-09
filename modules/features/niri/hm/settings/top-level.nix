@@ -1,12 +1,19 @@
-{ config, osConfig, pkgs, lib, ... } : {
+{
+  config,
+  osConfig,
+  pkgs,
+  lib,
+  ...
+}:
+{
 
   config = lib.mkIf config.programs.niri.enable {
 
-    home.packages = with pkgs; [
-      adwaita-icon-theme
-    ];
+    home.packages = with pkgs; [ adwaita-icon-theme ];
 
-    systemd.user.sessionVariables = (builtins.mapAttrs (x: y: (lib.mkForce y)) config.programs.niri.settings.environment);
+    systemd.user.sessionVariables = (
+      builtins.mapAttrs (x: y: (lib.mkForce y)) config.programs.niri.settings.environment
+    );
 
     programs.niri.settings = {
       environment = {

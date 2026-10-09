@@ -1,14 +1,20 @@
-{ config, osConfig, pkgs, lib, ... } : let
+{
+  config,
+  osConfig,
+  pkgs,
+  lib,
+  ...
+}:
+let
 
   cfg = osConfig.modules.features.office;
 
-in {
+in
+{
 
   config = lib.mkIf cfg.enable {
 
-    home.packages = with pkgs; [
-      libreoffice-qt-stable
-    ];
+    home.packages = with pkgs; [ libreoffice-qt-stable ];
 
     programs.onlyoffice = {
       enable = false;

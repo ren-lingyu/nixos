@@ -4,24 +4,23 @@
   makeWrapper,
   python3,
   codex,
-} : symlinkJoin {
+}:
+symlinkJoin {
 
   name = codex.name;
 
-  paths = [
-    codex
-  ];
+  paths = [ codex ];
 
-  nativeBuildInputs = [
-    makeWrapper
-  ];
+  nativeBuildInputs = [ makeWrapper ];
 
   postBuild = builtins.concatStringsSep "\n" [
-    "wrapProgram \"$out/bin/codex\" --prefix PATH : ${lib.makeBinPath [
-      (python3.withPackages (pythonPackages_ : [
-        pythonPackages_.pyyaml
-      ]))
-    ]}"
+    "wrapProgram \"$out/bin/codex\" --prefix PATH : ${
+      lib.makeBinPath [
+        (python3.withPackages (pythonPackages_: [
+          pythonPackages_.pyyaml
+        ]))
+      ]
+    }"
   ];
 
   meta = codex.meta;

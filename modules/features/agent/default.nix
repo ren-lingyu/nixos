@@ -1,8 +1,6 @@
-{ ... } : {
+{ ... }: {
 
-  imports = [
-    ./os
-  ];
+  imports = [ ./os ];
 
   config = {
 

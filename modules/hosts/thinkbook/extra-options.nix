@@ -1,4 +1,13 @@
-host_ : { options, config, pkgs, lib, llib, ... } : {
+host_:
+{
+  options,
+  config,
+  pkgs,
+  lib,
+  llib,
+  ...
+}:
+{
 
   flatpak = {
     enable = lib.mkOption {

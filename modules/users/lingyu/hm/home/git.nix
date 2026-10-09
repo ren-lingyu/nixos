@@ -1,26 +1,31 @@
-{ config, osConfig, pkgs, lib, ... } : {
+{
+  config,
+  osConfig,
+  pkgs,
+  lib,
+  ...
+}:
+{
 
-  home.packages = with pkgs; [
-    git-filter-repo
-  ];
+  home.packages = with pkgs; [ git-filter-repo ];
 
-  programs.ssh.settings = lib.mkIf (builtins.all
-    (x_ : x_)
-    [
-      config.programs.ssh.enable
-      config.programs.git.enable
-    ]
-  ) {
-    "github.com" = {
-      # hostname = "github.com";
-      hostname = "ssh.github.com";
-      # port = 22;
-      port = 443;
-      user = "git";
-      serverAliveInterval = 60;
-      serverAliveCountMax = 3;
-    };
-  };
+  programs.ssh.settings =
+    lib.mkIf
+      (builtins.all (x_: x_) [
+        config.programs.ssh.enable
+        config.programs.git.enable
+      ])
+      {
+        "github.com" = {
+          # hostname = "github.com";
+          hostname = "ssh.github.com";
+          # port = 22;
+          port = 443;
+          user = "git";
+          serverAliveInterval = 60;
+          serverAliveCountMax = 3;
+        };
+      };
 
   programs.git = {
     enable = osConfig.programs.git.enable or true;
@@ -42,7 +47,8 @@
       alias = {
         ipv4 = ''!git -c core.sshCommand="ssh -4"'';
       };
-    } // (lib.optionalAttrs config.programs.difftastic.git.enable {
+    }
+    // (lib.optionalAttrs config.programs.difftastic.git.enable {
       difftool.prompt = false;
       pager.difftool = true;
     });

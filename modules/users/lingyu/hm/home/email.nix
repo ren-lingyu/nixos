@@ -1,4 +1,11 @@
-{ config, osConfig, pkgs, lib, ... } : {
+{
+  config,
+  osConfig,
+  pkgs,
+  lib,
+  ...
+}:
+{
 
   config = {
 
@@ -14,9 +21,7 @@
         realName = "Lingyu Ren";
         userName = "Ren_Lingyu@outlook.com";
 
-        aliases = [
-          "aRen_Coco@outlook.com"
-        ];
+        aliases = [ "aRen_Coco@outlook.com" ];
 
         imap = lib.mkForce {
           host = "outlook.office365.com";
@@ -41,20 +46,14 @@
         signature = {
           showSignature = "append";
           command = null;
-          text = builtins.concatStringsSep "\n" [
-            "Lingyu"
-          ];
-          delimiter = builtins.concatStringsSep "\n" [
-            "--"
-          ];
+          text = builtins.concatStringsSep "\n" [ "Lingyu" ];
+          delimiter = builtins.concatStringsSep "\n" [ "--" ];
         };
 
         thunderbird = {
           # https://support.microsoft.com/en-us/topic/set-up-email-in-mozilla-thunderbird-8-0-f4726a9e-64d3-4494-9260-5762597fd1a6
           enable = config.programs.thunderbird.enable;
-          profiles = [
-            "${config.home.username}"
-          ];
+          profiles = [ "${config.home.username}" ];
         };
 
       };
@@ -68,7 +67,7 @@
         realName = "Lingyu Ren";
         userName = "lingyurenmail@gmail.com";
 
-        aliases = [];
+        aliases = [ ];
 
         imap = {
           host = "imap.gmail.com";
@@ -93,19 +92,13 @@
         signature = {
           showSignature = "append";
           command = null;
-          text = builtins.concatStringsSep "\n" [
-            "Lingyu"
-          ];
-          delimiter = builtins.concatStringsSep "\n" [
-            "--"
-          ];
+          text = builtins.concatStringsSep "\n" [ "Lingyu" ];
+          delimiter = builtins.concatStringsSep "\n" [ "--" ];
         };
 
         thunderbird = {
           enable = config.programs.thunderbird.enable;
-          profiles = [
-            "${config.home.username}"
-          ];
+          profiles = [ "${config.home.username}" ];
         };
 
       };
@@ -119,7 +112,7 @@
         realName = "Coco Ren";
         userName = "ah.renn.coco@gmail.com";
 
-        aliases = [];
+        aliases = [ ];
 
         imap = {
           host = "imap.gmail.com";
@@ -144,19 +137,13 @@
         signature = {
           showSignature = "append";
           command = null;
-          text = builtins.concatStringsSep "\n" [
-            "aRenCoco"
-          ];
-          delimiter = builtins.concatStringsSep "\n" [
-            "--"
-          ];
+          text = builtins.concatStringsSep "\n" [ "aRenCoco" ];
+          delimiter = builtins.concatStringsSep "\n" [ "--" ];
         };
 
         thunderbird = {
           enable = config.programs.thunderbird.enable;
-          profiles = [
-            "${config.home.username}"
-          ];
+          profiles = [ "${config.home.username}" ];
         };
 
       };
@@ -167,7 +154,7 @@
 
       enable = osConfig.programs.thunderbird.enable;
       package = pkgs.thunderbird;
-      nativeMessagingHosts = [];
+      nativeMessagingHosts = [ ];
       languagePacks = [
         "zh-CN"
         "en-US"
@@ -178,74 +165,61 @@
         "mail.shell.checkDefaultClient" = false;
       };
 
-      profiles = let
+      profiles =
+        let
 
-        fromList = list : (lib.genAttrs
-          (builtins.map builtins.toString list)
-          (unused_name_ : {})
-        );
+          fromList = list: (lib.genAttrs (builtins.map builtins.toString list) (unused_name_: { }));
 
-      in {
+        in
+        {
 
-        "${config.home.username}" = rec {
-          isDefault = true;
-          withExternalGnupg = true;
-          feedAccounts = fromList [
-            "Blog"
-            "arXiv"
-            "Git"
-            "Maillist"
-          ];
-          accountsOrder = builtins.attrNames config.accounts.email.accounts;
-          calendarAccountsOrder = accountsOrder;
-          search = {
-            force = true;
-            default = "bing";
-            privateDefault = "ddg";
-            order = builtins.attrNames search.engines;
-            engines = {
-              bing = {
-                name = "Bing";
-                urls = [
-                  {
-                    template = "https://www.bing.com/search?q={searchTerms}";
-                  }
-                ];
-                definedAliases = [ "@b" ];
-              };
-              google = {
-                name = "Google";
-                urls = [
-                  {
-                    template = "https://www.google.com/search?q={searchTerms}";
-                  }
-                ];
-                definedAliases = [ "@g" ];
-              };
-              ddg = {
-                name = "DuckDuckGo";
-                urls = [
-                  {
-                    template = "https://duckduckgo.com/?q={searchTerms}";
-                  }
-                ];
-                definedAliases = [ "@d" ];
+          "${config.home.username}" = rec {
+            isDefault = true;
+            withExternalGnupg = true;
+            feedAccounts = fromList [
+              "Blog"
+              "arXiv"
+              "Git"
+              "Maillist"
+            ];
+            accountsOrder = builtins.attrNames config.accounts.email.accounts;
+            calendarAccountsOrder = accountsOrder;
+            search = {
+              force = true;
+              default = "bing";
+              privateDefault = "ddg";
+              order = builtins.attrNames search.engines;
+              engines = {
+                bing = {
+                  name = "Bing";
+                  urls = [ { template = "https://www.bing.com/search?q={searchTerms}"; } ];
+                  definedAliases = [ "@b" ];
+                };
+                google = {
+                  name = "Google";
+                  urls = [ { template = "https://www.google.com/search?q={searchTerms}"; } ];
+                  definedAliases = [ "@g" ];
+                };
+                ddg = {
+                  name = "DuckDuckGo";
+                  urls = [ { template = "https://duckduckgo.com/?q={searchTerms}"; } ];
+                  definedAliases = [ "@d" ];
+                };
               };
             };
+            extensions = [ ];
+            settings = {
+              "extensions.autoDisableScopes" = 0;
+              "mail.ui.display.dateformat.thisweek" = 0;
+              "mail.openMessageBehavior" = 2;
+              "general.useragent.locale" = "zh-CN";
+            };
+            extraConfig = "";
+            userChrome = "";
+            userContent = "";
           };
-          extensions = [];
-          settings = {
-            "extensions.autoDisableScopes" = 0;
-            "mail.ui.display.dateformat.thisweek" = 0;
-            "mail.openMessageBehavior" = 2;
-            "general.useragent.locale" = "zh-CN";
-          };
-          extraConfig = "";
-          userChrome = "";
-          userContent = "";
-        };
 
-      };
+        };
 
     };
 

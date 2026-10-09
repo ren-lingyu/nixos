@@ -1,5 +1,5 @@
-final_ : unused_prev_ : {
+final_: unused_prev_: {
 
-  pi-mono-context = final_.callPackage ./package.nix {};
+  pi-mono-context = final_.callPackage ./package.nix { };
 
 }

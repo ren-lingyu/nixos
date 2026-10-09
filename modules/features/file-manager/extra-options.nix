@@ -1,4 +1,4 @@
-feature_ : { config, lib, ... } : {
+feature_: { config, lib, ... }: {
 
   fileChooser.enable = lib.mkOption {
     type = lib.types.bool;

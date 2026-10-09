@@ -22,10 +22,10 @@ Do not derive a commit message from unstaged changes as a fallback. Mention unst
 
 When the staged diff includes a lock file, read the complete current lock file and the complete relevant source manifest that declares its root dependencies, subject to the active file-size policy. Common pairs include:
 
-* `flake.lock` and the `inputs` declarations in `flake.nix`.
-* `package-lock.json` or `yarn.lock` and `package.json`.
-* `Cargo.lock` and the relevant `Cargo.toml` manifests.
-* `go.sum` and `go.mod`.
+- `flake.lock` and the `inputs` declarations in `flake.nix`.
+- `package-lock.json` or `yarn.lock` and `package.json`.
+- `Cargo.lock` and the relevant `Cargo.toml` manifests.
+- `go.sum` and `go.mod`.
 
 Use the manifest and lock graph to distinguish direct or root dependency changes from transitive changes. Do not describe a transitive update as a newly added or directly updated root dependency. If the repository tracks generated metadata alongside its source, verify their relationship before judging coherence.
 
@@ -33,12 +33,12 @@ Use the manifest and lock graph to distinguish direct or root dependency changes
 
 Before writing a message, decide whether the staged diff is suitable as one commit. Check:
 
-* The staged files serve one coherent goal.
-* Added, removed, renamed, and moved files have their corresponding references or imports staged when required.
-* A partial stage has not separated a producer from a required consumer.
-* Generated or lock-file changes agree with their source declarations.
-* Documentation staged with implementation describes that same staged state.
-* The diff does not contain unrelated formatting, cleanup, or configuration changes that would obscure review or complicate a future revert.
+- The staged files serve one coherent goal.
+- Added, removed, renamed, and moved files have their corresponding references or imports staged when required.
+- A partial stage has not separated a producer from a required consumer.
+- Generated or lock-file changes agree with their source declarations.
+- Documentation staged with implementation describes that same staged state.
+- The diff does not contain unrelated formatting, cleanup, or configuration changes that would obscure review or complicate a future revert.
 
 If the user says "if suitable" or otherwise conditions message generation on readiness, do not overwrite `tmp/commit.md` when the staged change is unsuitable. Report the concrete issue and a split or staging recommendation without changing Git state.
 
@@ -62,17 +62,17 @@ The body and footer are optional. Prefer a body when the staged change has multi
 
 Choose the type from the staged change's primary semantic effect, then check it against recent repository usage:
 
-* `feat`: add an externally meaningful capability, option, integration, or behavior.
-* `fix`: correct behavior or a claim that is demonstrably wrong. Do not use `fix` merely because a value changed or the new state is preferable.
-* `docs`: change repository-descriptive documentation, such as README, without changing executable instructions or primary content.
-* `style`: change presentation or formatting without changing intended behavior.
-* `refactor`: restructure implementation or configuration while preserving intended behavior.
-* `test`: add or change tests.
-* `chore`: perform intentional maintenance or configuration adjustment that fits no more specific semantic type.
-* `build`: change the build system, packaging process, dependency wiring, or generated build metadata as the primary effect.
-* `ci`: change CI or automation workflows.
-* `perf`: improve performance without otherwise changing external behavior.
-* `revert`: intentionally reverse an earlier commit as the primary purpose.
+- `feat`: add an externally meaningful capability, option, integration, or behavior.
+- `fix`: correct behavior or a claim that is demonstrably wrong. Do not use `fix` merely because a value changed or the new state is preferable.
+- `docs`: change repository-descriptive documentation, such as README, without changing executable instructions or primary content.
+- `style`: change presentation or formatting without changing intended behavior.
+- `refactor`: restructure implementation or configuration while preserving intended behavior.
+- `test`: add or change tests.
+- `chore`: perform intentional maintenance or configuration adjustment that fits no more specific semantic type.
+- `build`: change the build system, packaging process, dependency wiring, or generated build metadata as the primary effect.
+- `ci`: change CI or automation workflows.
+- `perf`: improve performance without otherwise changing external behavior.
+- `revert`: intentionally reverse an earlier commit as the primary purpose.
 
 A touched lock file does not by itself require `build`. In configuration repositories, routine locked-input refreshes are commonly `chore`; reserve `build` for changes whose primary meaning is build, packaging, or dependency wiring. If a change partially undoes an earlier commit but retains a new coherent state, classify that resulting change rather than automatically using `revert`.
 
@@ -82,11 +82,11 @@ Prompt, command, agent, and skill files can change agent behavior. Choose `feat`
 
 Choose scope from the conceptual owner or driver of the change, not mechanically from every touched path.
 
-* Prefer the repository's recent scope vocabulary and granularity.
-* A slash-separated path-like scope such as `modules/features/niri` is valid when established by repository history.
-* Use a shared library scope when a library API or function signature drives coordinated consumer changes.
-* Use a feature or module scope when the change is primarily owned by that feature, even if supporting files elsewhere also change.
-* Omit scope when no single scope is more informative than the subject.
+- Prefer the repository's recent scope vocabulary and granularity.
+- A slash-separated path-like scope such as `modules/features/niri` is valid when established by repository history.
+- Use a shared library scope when a library API or function signature drives coordinated consumer changes.
+- Use a feature or module scope when the change is primarily owned by that feature, even if supporting files elsewhere also change.
+- Omit scope when no single scope is more informative than the subject.
 
 Keep scope lowercase. Do not use `*` unless the repository consistently does so.
 
@@ -96,25 +96,25 @@ Write an English imperative present-tense phrase. Do not capitalize its first wo
 
 The subject is the primary information in the message. Name the main semantic action directly:
 
-* Say what was added, removed, migrated, exposed, renamed, or replaced.
-* If removal is the defining effect, make the removal visible in the subject rather than hiding it under `update` or `restructure`.
-* Avoid broad verbs such as `improve`, `adjust`, `update`, or `rework` when a more exact verb is supported by the diff.
-* Do not force implementation detail into the subject when the behavior-level action is clearer.
+- Say what was added, removed, migrated, exposed, renamed, or replaced.
+- If removal is the defining effect, make the removal visible in the subject rather than hiding it under `update` or `restructure`.
+- Avoid broad verbs such as `improve`, `adjust`, `update`, or `rework` when a more exact verb is supported by the diff.
+- Do not force implementation detail into the subject when the behavior-level action is clearer.
 
 ### Body
 
 Write the body in Chinese by default, while retaining established English technical terms. Follow the repository's language when it clearly differs.
 
-* Use `-` bullets with no blank lines between them.
-* End each bullet with an English period.
-* Wrap paths, options, attributes, functions, commands, and identifiers in backticks.
-* Cover every meaningful staged effect, but group mechanically related edits instead of narrating each changed line.
-* Prefer an explicit "从 ... 改为 ..." comparison when the old-to-new transformation is important to understanding the change.
-* Do not list unchanged behavior merely to say it was preserved.
-* Do not claim a feature section was updated if the diff only changes wording embedded in another section.
-* Avoid causal language unless the cause is visible in repository evidence or explicitly supplied by the user.
-* User-supplied motivation may be included when it explains the change accurately; phrase it as motivation, not as a diff-derived fact.
-* Do not mention unstaged changes, review commentary, or split assessment.
+- Use `-` bullets with no blank lines between them.
+- End each bullet with an English period.
+- Wrap paths, options, attributes, functions, commands, and identifiers in backticks.
+- Cover every meaningful staged effect, but group mechanically related edits instead of narrating each changed line.
+- Prefer an explicit "从 ... 改为 ..." comparison when the old-to-new transformation is important to understanding the change.
+- Do not list unchanged behavior merely to say it was preserved.
+- Do not claim a feature section was updated if the diff only changes wording embedded in another section.
+- Avoid causal language unless the cause is visible in repository evidence or explicitly supplied by the user.
+- User-supplied motivation may be included when it explains the change accurately; phrase it as motivation, not as a diff-derived fact.
+- Do not mention unstaged changes, review commentary, or split assessment.
 
 ### Footer
 
@@ -128,11 +128,11 @@ Write only the final message to `tmp/commit.md`. Do not include fences, alternat
 
 After writing, report:
 
-* Whether the staged diff is suitable as one commit.
-* The output path.
-* Whether unstaged changes exist.
-* Any material validation gap.
-* A split assessment.
+- Whether the staged diff is suitable as one commit.
+- The output path.
+- Whether unstaged changes exist.
+- Any material validation gap.
+- A split assessment.
 
 Use this split format:
 

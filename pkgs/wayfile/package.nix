@@ -27,7 +27,8 @@
   p7zip,
   libarchive,
 
-} : stdenv.mkDerivation rec {
+}:
+stdenv.mkDerivation rec {
 
   pname = "wayfile";
   version = "1.1.0";
@@ -65,39 +66,41 @@
   ];
 
   qtWrapperArgs = [
-    "--prefix PATH : ${lib.makeBinPath [
+    "--prefix PATH : ${
+      lib.makeBinPath [
 
-      # MIME and external application integration:
-      # - gio open
-      # - gtk-launch
-      # - xdg-mime / xdg-open
-      glib
-      gtk3
-      xdg-utils
+        # MIME and external application integration:
+        # - gio open
+        # - gtk-launch
+        # - xdg-mime / xdg-open
+        glib
+        gtk3
+        xdg-utils
 
-      # Used for git status badges / repository information.
-      git
+        # Used for git status badges / repository information.
+        git
 
-      # Runtime helpers used by Wayfile for search and file transfers.
-      fd
-      rsync
+        # Runtime helpers used by Wayfile for search and file transfers.
+        fd
+        rsync
 
-      # Optional Wayland clipboard helper. Wayfile can use wl-paste as a
-      # fallback when pasting image data copied from external applications.
-      wl-clipboard
+        # Optional Wayland clipboard helper. Wayfile can use wl-paste as a
+        # fallback when pasting image data copied from external applications.
+        wl-clipboard
 
-      # Archive support. Wayfile calls external tools for compressing and
-      # extracting common archive formats.
-      zip
-      unzip
-      gnutar
-      gzip
-      xz
-      bzip2
-      p7zip
-      libarchive
+        # Archive support. Wayfile calls external tools for compressing and
+        # extracting common archive formats.
+        zip
+        unzip
+        gnutar
+        gzip
+        xz
+        bzip2
+        p7zip
+        libarchive
 
-    ]}"
+      ]
+    }"
   ];
 
   cmakeFlags = [

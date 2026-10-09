@@ -1,4 +1,11 @@
-{ config, osConfig, pkgs, lib, ... } : let
+{
+  config,
+  osConfig,
+  pkgs,
+  lib,
+  ...
+}:
+let
 
   cfg = osConfig.modules.features.niri;
 
@@ -6,41 +13,48 @@
     "default" = [ "default" ];
   };
 
-in {
+in
+{
 
   config = lib.mkIf config.programs.niri.enable {
 
-    programs.niri.settings.outputs = lib.foldlAttrs (x_ : hostMonitorName_ : hostMonitor_ : (builtins.foldl' (y_ : niriOutput_ : (y_ // {
-      "${niriOutput_}" = lib.foldl' lib.recursiveUpdate { } [
-        {
-          name = hostMonitor_.name;
-          enable = true;
-          focus-at-startup = false;
-          transform = {
-            rotation = 0;
-            flipped = false;
-          };
-        }
-        (lib.optionalAttrs (hostMonitor_.mode != null) {
-          mode = {
-            width = hostMonitor_.mode.width;
-            height = hostMonitor_.mode.height;
-          } // lib.optionalAttrs (hostMonitor_.mode.refresh != null) {
-            refresh = hostMonitor_.mode.refresh;
-          };
-        })
-        (lib.optionalAttrs (hostMonitor_.scale != null) {
-          scale = hostMonitor_.scale;
-        })
-        (lib.optionalAttrs (hostMonitor_.role == "default") {
-          focus-at-startup = true;
-          position = {
-            x = 0;
-            y = 0;
-          };
-        })
-      ];
-    })) x_ ( [ hostMonitor_.name ] ))) { } cfg.monitors;
+    programs.niri.settings.outputs = lib.foldlAttrs (
+      x_: hostMonitorName_: hostMonitor_:
+      (builtins.foldl' (
+        y_: niriOutput_:
+        (
+          y_
+          // {
+            "${niriOutput_}" = lib.foldl' lib.recursiveUpdate { } [
+              {
+                name = hostMonitor_.name;
+                enable = true;
+                focus-at-startup = false;
+                transform = {
+                  rotation = 0;
+                  flipped = false;
+                };
+              }
+              (lib.optionalAttrs (hostMonitor_.mode != null) {
+                mode = {
+                  width = hostMonitor_.mode.width;
+                  height = hostMonitor_.mode.height;
+                }
+                // lib.optionalAttrs (hostMonitor_.mode.refresh != null) { refresh = hostMonitor_.mode.refresh; };
+              })
+              (lib.optionalAttrs (hostMonitor_.scale != null) { scale = hostMonitor_.scale; })
+              (lib.optionalAttrs (hostMonitor_.role == "default") {
+                focus-at-startup = true;
+                position = {
+                  x = 0;
+                  y = 0;
+                };
+              })
+            ];
+          }
+        )
+      ) x_ ([ hostMonitor_.name ]))
+    ) { } cfg.monitors;
 
   };
 

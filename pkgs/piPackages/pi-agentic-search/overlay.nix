@@ -1,5 +1,5 @@
-final_ : unused_prev_ : {
+final_: unused_prev_: {
 
-  pi-agentic-search = final_.callPackage ./package.nix {};
+  pi-agentic-search = final_.callPackage ./package.nix { };
 
 }

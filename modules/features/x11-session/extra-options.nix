@@ -1,4 +1,12 @@
-feature_ : { config, pkgs, lib, llib, ... } : {
+feature_:
+{
+  config,
+  pkgs,
+  lib,
+  llib,
+  ...
+}:
+{
 
   session-wrapper = lib.mkOption {
     type = lib.types.nullOr lib.types.package;

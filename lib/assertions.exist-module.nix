@@ -5,12 +5,12 @@
   osModulePath,
   hmModulePath,
   enabledMessage,
-} : [
+}:
+[
 
   {
-    assertion = (builtins.any
-      (x_ : x_)
-      [
+    assertion = (
+      builtins.any (x_: x_) [
         (value.os == null)
         (value.os == builtins.pathExists osModulePath)
       ]
@@ -19,9 +19,8 @@
   }
 
   {
-    assertion = (builtins.any
-      (x_ : x_)
-      [
+    assertion = (
+      builtins.any (x_: x_) [
         (value.hm == null)
         (value.hm == builtins.pathExists hmModulePath)
       ]
@@ -35,17 +34,13 @@
   }
 
   {
-    assertion = (builtins.any
-      (x_ : x_)
-      [
+    assertion = (
+      builtins.any (x_: x_) [
         (!enable)
-        (builtins.all
-          (x_ : x_)
-          [
-            (value.os != null)
-            (value.hm != null)
-          ]
-        )
+        (builtins.all (x_: x_) [
+          (value.os != null)
+          (value.hm != null)
+        ])
       ]
     );
     message = enabledMessage;

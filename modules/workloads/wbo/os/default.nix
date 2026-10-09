@@ -1,8 +1,15 @@
-{ config, pkgs, lib, ... } : let
+{
+  config,
+  pkgs,
+  lib,
+  ...
+}:
+let
 
   cfg = config.modules.workloads.wbo;
 
-in {
+in
+{
 
   config = lib.mkIf cfg.enable {
 

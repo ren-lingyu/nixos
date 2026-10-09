@@ -1,8 +1,15 @@
-{ config, pkgs, lib, ... } : let
+{
+  config,
+  pkgs,
+  lib,
+  ...
+}:
+let
 
   cfg = config.modules.workloads.caddy;
 
-in {
+in
+{
 
   config = lib.mkIf cfg.enable {
 
@@ -12,14 +19,11 @@ in {
           workload-caddy-egress = {
             family = "inet";
             content = "chain output {${
-              (builtins.concatStringsSep
-                "\n"
-                [
-                  "type filter hook output priority filter; policy accept;"
-                  "oifname \"${cfg.networkInterface}\" ip daddr ${cfg.ip} tcp dport ${builtins.toString cfg.port} meta skuid ${builtins.toString config.ids.uids.caddy} accept;"
-                  "oifname \"${cfg.networkInterface}\" reject;"
-                ]
-              )
+              (builtins.concatStringsSep "\n" [
+                "type filter hook output priority filter; policy accept;"
+                "oifname \"${cfg.networkInterface}\" ip daddr ${cfg.ip} tcp dport ${builtins.toString cfg.port} meta skuid ${builtins.toString config.ids.uids.caddy} accept;"
+                "oifname \"${cfg.networkInterface}\" reject;"
+              ])
             }}";
           };
         };

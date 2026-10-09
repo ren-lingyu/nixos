@@ -1,8 +1,13 @@
-{ config, pkgs, lib, ... } : let
+{
+  config,
+  pkgs,
+  lib,
+  ...
+}:
+let
 
-  noctaliaNiriSettingsEnable = (builtins.all
-    (x_ : x_)
-    [
+  noctaliaNiriSettingsEnable = (
+    builtins.all (x_: x_) [
       config.programs.niri.enable
       config.programs.noctalia.enable
     ]
@@ -10,45 +15,66 @@
 
   noctaliaCommand = [ (lib.getExe config.programs.noctalia.package) ];
 
-in {
+in
+{
 
   config = lib.mkIf noctaliaNiriSettingsEnable {
     programs.niri.settings = {
 
-      spawn-at-startup = lib.mkAfter [
-        {
-          argv = noctaliaCommand;
-        }
-      ];
+      spawn-at-startup = lib.mkAfter [ { argv = noctaliaCommand; } ];
 
       binds = {
 
         "Mod+D" = lib.mkForce {
-          hotkey-overlay = { title = "Toggle Noctalia Launcher"; };
+          hotkey-overlay = {
+            title = "Toggle Noctalia Launcher";
+          };
           action.spawn = builtins.concatLists [
             noctaliaCommand
-            [ "msg" "panel-toggle" "launcher" ]
+            [
+              "msg"
+              "panel-toggle"
+              "launcher"
+            ]
           ];
         };
         "Mod+C" = lib.mkForce {
-          hotkey-overlay = { title = "Toggle Noctalia Control Center"; };
+          hotkey-overlay = {
+            title = "Toggle Noctalia Control Center";
+          };
           action.spawn = builtins.concatLists [
             noctaliaCommand
-            [ "msg" "panel-toggle" "control-center" ]
+            [
+              "msg"
+              "panel-toggle"
+              "control-center"
+            ]
           ];
         };
         "Mod+S" = lib.mkForce {
-          hotkey-overlay = { title = "Toggle Noctalia Settings"; };
+          hotkey-overlay = {
+            title = "Toggle Noctalia Settings";
+          };
           action.spawn = builtins.concatLists [
             noctaliaCommand
-            [ "msg" "settings-toggle" ]
+            [
+              "msg"
+              "settings-toggle"
+            ]
           ];
         };
         "Mod+N" = lib.mkForce {
-          hotkey-overlay = { title = "Toggle Noctalia Notification"; };
+          hotkey-overlay = {
+            title = "Toggle Noctalia Notification";
+          };
           action.spawn = builtins.concatLists [
             noctaliaCommand
-            [ "msg" "panel-toggle" "control-center" "notifications" ]
+            [
+              "msg"
+              "panel-toggle"
+              "control-center"
+              "notifications"
+            ]
           ];
         };
 
@@ -58,12 +84,18 @@ in {
           };
           action.spawn = builtins.concatLists [
             noctaliaCommand
-            [ "msg" "panel-toggle" "clipboard" ]
+            [
+              "msg"
+              "panel-toggle"
+              "clipboard"
+            ]
           ];
         };
 
         "Super+Alt+S" = lib.mkForce {
-          hotkey-overlay = { title = "Suspend"; };
+          hotkey-overlay = {
+            title = "Suspend";
+          };
           action.spawn-sh = builtins.concatStringsSep " && " [
             "${lib.getExe config.programs.niri.package} msg action power-off-monitors"
             "${pkgs.systemd}/bin/systemctl suspend"
@@ -73,31 +105,46 @@ in {
         "XF86AudioRaiseVolume" = lib.mkForce {
           action.spawn = builtins.concatLists [
             noctaliaCommand
-            [ "msg" "volume-up" ]
+            [
+              "msg"
+              "volume-up"
+            ]
           ];
         };
         "XF86AudioLowerVolume" = lib.mkForce {
           action.spawn = builtins.concatLists [
             noctaliaCommand
-            [ "msg" "volume-down" ]
+            [
+              "msg"
+              "volume-down"
+            ]
           ];
         };
         "XF86AudioMute" = lib.mkForce {
           action.spawn = builtins.concatLists [
             noctaliaCommand
-            [ "msg" "volume-mute" ]
+            [
+              "msg"
+              "volume-mute"
+            ]
           ];
         };
         "XF86MonBrightnessUp" = lib.mkForce {
           action.spawn = builtins.concatLists [
             noctaliaCommand
-            [ "msg" "brightness-up" ]
+            [
+              "msg"
+              "brightness-up"
+            ]
           ];
         };
         "XF86MonBrightnessDown" = lib.mkForce {
           action.spawn = builtins.concatLists [
             noctaliaCommand
-            [ "msg" "brightness-down" ]
+            [
+              "msg"
+              "brightness-down"
+            ]
           ];
         };
 

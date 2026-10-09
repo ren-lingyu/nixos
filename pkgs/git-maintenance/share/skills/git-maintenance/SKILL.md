@@ -3,8 +3,8 @@ name: git-maintenance
 description: Prepare and review evidence-based Conventional Commit messages from staged changes, assess commit readiness, and audit or update repository-facing documentation against an explicit Git baseline. Use for staged diff review, tmp/commit.md maintenance, README synchronization, documentation audits, and changelog drafts; never use it to change Git state.
 license: MIT
 metadata:
-    domain: git
-    workflow: repository-maintenance
+  domain: git
+  workflow: repository-maintenance
 ---
 
 # Git Maintenance
@@ -15,34 +15,34 @@ This skill is repository-generic. Do not assume that the current repository is a
 
 ## Select a workflow
 
-* `commit`: inspect staged changes, decide whether they form a suitable commit, and prepare or review `tmp/commit.md`. Read [references/commit.md](references/commit.md) completely before acting.
-* `readme`: inspect or update README and other explicitly named repository-descriptive files. Read [references/readme.md](references/readme.md) completely before acting.
-* `audit`: compare repository-facing documentation with repository evidence without modifying files. Read [references/readme.md](references/readme.md) completely before acting.
-* `changelog`: draft a changelog-like summary without introducing release automation or modifying a changelog unless explicitly requested.
-* `help`: briefly explain the workflows above.
+- `commit`: inspect staged changes, decide whether they form a suitable commit, and prepare or review `tmp/commit.md`. Read [references/commit.md](references/commit.md) completely before acting.
+- `readme`: inspect or update README and other explicitly named repository-descriptive files. Read [references/readme.md](references/readme.md) completely before acting.
+- `audit`: compare repository-facing documentation with repository evidence without modifying files. Read [references/readme.md](references/readme.md) completely before acting.
+- `changelog`: draft a changelog-like summary without introducing release automation or modifying a changelog unless explicitly requested.
+- `help`: briefly explain the workflows above.
 
 When the intended workflow is ambiguous and the distinction changes what may be written, ask one concise question. Otherwise infer it from the requested output.
 
 ## Invariants
 
-* Prefer repository evidence over assumptions and filenames over repository nicknames.
-* Keep generated text objective, restrained, grammatical, and specific.
-* Do not invent features, commands, dependencies, modules, scripts, options, hosts, goals, or motivations.
-* A motivation explicitly supplied by the user is valid evidence, but distinguish it from effects visible in the diff.
-* Preserve the repository's established language, terminology, scope style, and document conventions when they remain accurate.
-* Do not treat Markdown, Org, prompt, command, agent, or skill files as `docs` merely because of their format. Classify their role and behavioral effect.
-* Do not run Git commands that change repository, worktree, index, branch, tag, remote, stash, or history state.
-* Do not create commits, stage or unstage files, rewrite history, fetch, pull, push, or update submodules.
-* Do not modify source code, manifests, lock files, tests, generated files, or project configuration as part of this skill.
+- Prefer repository evidence over assumptions and filenames over repository nicknames.
+- Keep generated text objective, restrained, grammatical, and specific.
+- Do not invent features, commands, dependencies, modules, scripts, options, hosts, goals, or motivations.
+- A motivation explicitly supplied by the user is valid evidence, but distinguish it from effects visible in the diff.
+- Preserve the repository's established language, terminology, scope style, and document conventions when they remain accurate.
+- Do not treat Markdown, Org, prompt, command, agent, or skill files as `docs` merely because of their format. Classify their role and behavioral effect.
+- Do not run Git commands that change repository, worktree, index, branch, tag, remote, stash, or history state.
+- Do not create commits, stage or unstage files, rewrite history, fetch, pull, push, or update submodules.
+- Do not modify source code, manifests, lock files, tests, generated files, or project configuration as part of this skill.
 
 ## Evidence and baselines
 
 Establish the source of truth before drafting text:
 
-* Commit messages use only the staged diff for change claims.
-* README work uses the baseline requested by the user, such as `HEAD`, the staged tree, or the current worktree.
-* If no README baseline is stated, inspect the worktree and its diff, then state which evidence was used when that distinction matters.
-* Unstaged changes may be inspected to detect overlap, but do not silently mix them into a staged commit message or a `HEAD`-based README audit.
+- Commit messages use only the staged diff for change claims.
+- README work uses the baseline requested by the user, such as `HEAD`, the staged tree, or the current worktree.
+- If no README baseline is stated, inspect the worktree and its diff, then state which evidence was used when that distinction matters.
+- Unstaged changes may be inspected to detect overlap, but do not silently mix them into a staged commit message or a `HEAD`-based README audit.
 
 Use only the evidence needed for the selected workflow. Relevant read-only commands include:
 

@@ -1,4 +1,12 @@
-host_ : { config, pkgs, lib, llib, ... } : {
+host_:
+{
+  config,
+  pkgs,
+  lib,
+  llib,
+  ...
+}:
+{
 
   number = 1;
 
@@ -16,7 +24,7 @@ host_ : { config, pkgs, lib, llib, ... } : {
     "1000" = 1000;
   };
 
-  monitors = {};
+  monitors = { };
 
   publicIpAddress = null;
 

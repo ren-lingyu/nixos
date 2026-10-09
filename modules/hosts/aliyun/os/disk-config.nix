@@ -1,8 +1,15 @@
-{ config, pkgs, lib, ... } : let
+{
+  config,
+  pkgs,
+  lib,
+  ...
+}:
+let
 
   cfg = config.modules.hosts.aliyun;
 
-in {
+in
+{
 
   config = lib.mkIf cfg.enable {
 
@@ -21,9 +28,7 @@ in {
                 type = "filesystem";
                 format = "vfat";
                 mountpoint = "/boot";
-                mountOptions = [
-                  "umask=0077"
-                ];
+                mountOptions = [ "umask=0077" ];
               };
             };
             root = {

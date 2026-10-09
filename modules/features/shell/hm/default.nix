@@ -1,8 +1,16 @@
-{ config, osConfig, pkgs, lib, ... } : let
+{
+  config,
+  osConfig,
+  pkgs,
+  lib,
+  ...
+}:
+let
 
   cfg = osConfig.modules.features.shell;
 
-in {
+in
+{
 
   config = lib.mkIf cfg.enable {
 
@@ -10,7 +18,7 @@ in {
       enable = !osConfig.programs.zsh.enable;
       package = cfg.bash.package;
       enableCompletion = true;
-      shellAliases = {};
+      shellAliases = { };
     };
 
     programs.zsh = {
@@ -36,20 +44,22 @@ in {
         findNoDups = true;
       };
       initContent = lib.mkMerge [
-        (lib.mkOrder 1000 (builtins.concatStringsSep "\n" [
-          "function delete-char-or-kill-region {"
-          "if [[ $REGION_ACTIVE -eq 1 ]]; then"
-          "zle kill-region"
-          "else"
-          "zle delete-char"
-          "fi"
-          "}"
-          "zle -N delete-char-or-kill-region"
-          "bindkey '^[[3~' delete-char-or-kill-region"
-          "export $(dbus-launch)"
-        ]))
+        (lib.mkOrder 1000 (
+          builtins.concatStringsSep "\n" [
+            "function delete-char-or-kill-region {"
+            "if [[ $REGION_ACTIVE -eq 1 ]]; then"
+            "zle kill-region"
+            "else"
+            "zle delete-char"
+            "fi"
+            "}"
+            "zle -N delete-char-or-kill-region"
+            "bindkey '^[[3~' delete-char-or-kill-region"
+            "export $(dbus-launch)"
+          ]
+        ))
       ];
-      shellAliases = {};
+      shellAliases = { };
       # 没有采用静态加载且暂时用不到插件功能故禁用 antidote
       antidote = {
         enable = false;

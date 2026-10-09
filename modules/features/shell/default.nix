@@ -1,8 +1,12 @@
-{ config, lib, pkgs, ... } : {
+{
+  config,
+  lib,
+  pkgs,
+  ...
+}:
+{
 
-  imports = [
-    ./os
-  ];
+  imports = [ ./os ];
 
   config = {
     modules.features.shell = {

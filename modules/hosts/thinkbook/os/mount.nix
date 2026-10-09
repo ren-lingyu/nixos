@@ -1,4 +1,11 @@
-{ config, pkgs, lib, utils, ... } : let
+{
+  config,
+  pkgs,
+  lib,
+  utils,
+  ...
+}:
+let
 
   cfg = config.modules.hosts.thinkbook;
 
@@ -27,13 +34,12 @@
 
   nixosSystemFonts = "/usr/local/share/fonts";
 
-in {
+in
+{
 
   config = lib.mkIf cfg.enable {
 
-    environment.systemPackages = with pkgs; [
-      bindfs
-    ];
+    environment.systemPackages = with pkgs; [ bindfs ];
 
     programs.fuse = {
       enable = true;
@@ -59,40 +65,28 @@ in {
 
       mounts = builtins.concatLists [
 
-        (lib.optionals
-          config.fileSystems.windows.enable
-          [
-            {
-              what = "${config.fileSystems.windows.mountPoint}/Windows/Fonts";
-              where = "${nixosSystemFonts}/windows";
-              type = "fuse.bindfs";
-              options = bindfsFontMountOptions;
-              wantedBy = [ "multi-user.target" ];
-              after = [
-                "${utils.escapeSystemdPath config.fileSystems.windows.mountPoint}.mount"
-              ];
-              requires = [
-                "${utils.escapeSystemdPath config.fileSystems.windows.mountPoint}.mount"
-              ];
-            }
-          ]
-        )
+        (lib.optionals config.fileSystems.windows.enable [
+          {
+            what = "${config.fileSystems.windows.mountPoint}/Windows/Fonts";
+            where = "${nixosSystemFonts}/windows";
+            type = "fuse.bindfs";
+            options = bindfsFontMountOptions;
+            wantedBy = [ "multi-user.target" ];
+            after = [ "${utils.escapeSystemdPath config.fileSystems.windows.mountPoint}.mount" ];
+            requires = [ "${utils.escapeSystemdPath config.fileSystems.windows.mountPoint}.mount" ];
+          }
+        ])
 
-        (lib.optionals
-          config.fileSystems.shared.enable
-          (lib.mapAttrsToList
-            (nixosDirName_ : sourceDirName_ : {
+        (lib.optionals config.fileSystems.shared.enable (
+          lib.mapAttrsToList
+            (nixosDirName_: sourceDirName_: {
               what = "${config.fileSystems.shared.mountPoint}/${sourceDirName_}";
               where = "${nixosUserHome}/${nixosDirName_}";
               type = "fuse.bindfs";
               options = bindfsUserMountOptions;
               wantedBy = [ "multi-user.target" ];
-              after = [
-                "${utils.escapeSystemdPath config.fileSystems.shared.mountPoint}.mount"
-              ];
-              requires = [
-                "${utils.escapeSystemdPath config.fileSystems.shared.mountPoint}.mount"
-              ];
+              after = [ "${utils.escapeSystemdPath config.fileSystems.shared.mountPoint}.mount" ];
+              requires = [ "${utils.escapeSystemdPath config.fileSystems.shared.mountPoint}.mount" ];
             })
             {
               ren = "ren";
@@ -103,8 +97,7 @@ in {
               Music = "Music";
               Videos = "Videos";
             }
-          )
-        )
+        ))
 
       ];
 

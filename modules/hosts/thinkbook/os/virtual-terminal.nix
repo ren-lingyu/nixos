@@ -1,49 +1,53 @@
-{ config, pkgs, lib, ... } : let
+{
+  config,
+  pkgs,
+  lib,
+  ...
+}:
+let
 
   cfg = config.modules.hosts.thinkbook;
 
-in {
+in
+{
 
   config = lib.mkIf cfg.enable {
 
-    environment.systemPackages = with pkgs; [
-      fbset
-    ];
+    environment.systemPackages = with pkgs; [ fbset ];
 
     systemd.services.fbset-xedrmfb = {
       enable = true;
       description = "Set the initial xe framebuffer geometry";
-      wantedBy = [
-        "display-manager.service"
-      ];
-      before = [
-        "display-manager.service"
-      ];
+      wantedBy = [ "display-manager.service" ];
+      before = [ "display-manager.service" ];
       serviceConfig = {
         Type = "oneshot";
-        ExecStart = (pkgs.writeShellScript
-          "force-fb0-3072x1920"
-          (builtins.concatStringsSep "\n" [
-            "set -eu"
-            "[ -r /sys/class/graphics/fb0/name ] || exit 0"
-            "IFS= read -r fbName < /sys/class/graphics/fb0/name"
-            "[ \"$fbName\" = xedrmfb ] || exit 0"
-            "exec ${pkgs.fbset}/bin/fbset -fb /dev/fb0 -g 3072 1920 3072 1920 32"
-          ])
+        ExecStart = (
+          pkgs.writeShellScript "force-fb0-3072x1920" (
+            builtins.concatStringsSep "\n" [
+              "set -eu"
+              "[ -r /sys/class/graphics/fb0/name ] || exit 0"
+              "IFS= read -r fbName < /sys/class/graphics/fb0/name"
+              "[ \"$fbName\" = xedrmfb ] || exit 0"
+              "exec ${pkgs.fbset}/bin/fbset -fb /dev/fb0 -g 3072 1920 3072 1920 32"
+            ]
+          )
         );
       };
     };
 
     services.udev = {
       enable = true;
-      extraRules = (builtins.concatStringsSep "," [
-        "ACTION==\"add\""
-        "SUBSYSTEM==\"graphics\""
-        "KERNEL==\"fb0\""
-        "ATTR{name}==\"xedrmfb\""
-        "TAG+=\"systemd\""
-        "ENV{SYSTEMD_WANTS}+=\"fbset-xedrmfb.service\""
-      ]);
+      extraRules = (
+        builtins.concatStringsSep "," [
+          "ACTION==\"add\""
+          "SUBSYSTEM==\"graphics\""
+          "KERNEL==\"fb0\""
+          "ATTR{name}==\"xedrmfb\""
+          "TAG+=\"systemd\""
+          "ENV{SYSTEMD_WANTS}+=\"fbset-xedrmfb.service\""
+        ]
+      );
     };
 
     console = {

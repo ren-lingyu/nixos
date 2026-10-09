@@ -1,4 +1,12 @@
-feature_ : { config, pkgs, lib, llib, ... } : {
+feature_:
+{
+  config,
+  pkgs,
+  lib,
+  llib,
+  ...
+}:
+{
 
   zsh = {
     package = lib.mkOption {

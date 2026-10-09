@@ -1,14 +1,6 @@
-import {
-  existsSync,
-  readFileSync,
-  readdirSync,
-} from "node:fs";
+import { existsSync, readFileSync, readdirSync } from "node:fs";
 
-import {
-  basename,
-  dirname,
-  join,
-} from "node:path";
+import { basename, dirname, join } from "node:path";
 
 const [out] = process.argv.slice(2);
 
@@ -26,8 +18,8 @@ const hostPackages = new Set([
 ]);
 
 const requiredPeerDependencies = new Map([
-  [ "@earendil-works/pi-coding-agent", "*" ],
-  [ "@sinclair/typebox", "*" ],
+  ["@earendil-works/pi-coding-agent", "*"],
+  ["@sinclair/typebox", "*"],
 ]);
 
 function readManifest(path) {
@@ -38,19 +30,17 @@ const manifest = readManifest(join(out, "package.json"));
 
 for (const name of hostPackages) {
   if (Object.hasOwn(manifest.dependencies ?? {}, name)) {
-    throw new Error(
-      `Pi host-provided package must not appear in dependencies: ${name}`,
-    );
+    throw new Error(`Pi host-provided package must not appear in dependencies: ${name}`);
   }
 }
 
-for (const [ name, range ] of requiredPeerDependencies) {
+for (const [name, range] of requiredPeerDependencies) {
   const actualRange = manifest.peerDependencies?.[name];
 
   if (actualRange !== range) {
     throw new Error(
-      `Expected peerDependencies.${name} to be ${JSON.stringify(range)}, `
-      + `got ${JSON.stringify(actualRange)}`,
+      `Expected peerDependencies.${name} to be ${JSON.stringify(range)}, ` +
+        `got ${JSON.stringify(actualRange)}`,
     );
   }
 }
@@ -64,10 +54,7 @@ function isPackageRoot(path) {
     return !name.startsWith(".") && !name.startsWith("@");
   }
 
-  return (
-    parentName.startsWith("@")
-    && basename(dirname(parent)) === "node_modules"
-  );
+  return parentName.startsWith("@") && basename(dirname(parent)) === "node_modules";
 }
 
 function checkPackage(path) {
@@ -80,9 +67,7 @@ function checkPackage(path) {
   const packageManifest = readManifest(manifestPath);
 
   if (hostPackages.has(packageManifest.name)) {
-    throw new Error(
-      `Pi host-provided package was bundled: ${packageManifest.name} at ${path}`,
-    );
+    throw new Error(`Pi host-provided package was bundled: ${packageManifest.name} at ${path}`);
   }
 }
 

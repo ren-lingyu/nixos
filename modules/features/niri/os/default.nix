@@ -1,8 +1,15 @@
-{ config, pkgs, lib, ... } : let
+{
+  config,
+  pkgs,
+  lib,
+  ...
+}:
+let
 
   cfg = config.modules.features.niri;
 
-in {
+in
+{
 
   config = lib.mkIf cfg.enable {
 
@@ -18,9 +25,7 @@ in {
       systemd.enable = false;
     };
 
-    environment.systemPackages = with pkgs; [
-      xwayland-satellite
-    ];
+    environment.systemPackages = with pkgs; [ xwayland-satellite ];
 
     services.desktopManager.gnome.enable = lib.mkForce false;
     services.gnome.gnome-keyring.enable = lib.mkForce false;

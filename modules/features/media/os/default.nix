@@ -1,8 +1,15 @@
-{ config, pkgs, lib, ... } : let
+{
+  config,
+  pkgs,
+  lib,
+  ...
+}:
+let
 
   cfg = config.modules.features.media;
 
-in {
+in
+{
 
   config = lib.mkIf cfg.enable {
 
@@ -41,9 +48,7 @@ in {
       enable = true;
       package = pkgs.obs-studio;
       enableVirtualCamera = true;
-      plugins = with pkgs.obs-studio-plugins; [
-        obs-composite-blur
-      ];
+      plugins = with pkgs.obs-studio-plugins; [ obs-composite-blur ];
     };
 
   };

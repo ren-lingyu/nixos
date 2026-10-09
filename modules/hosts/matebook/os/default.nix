@@ -1,20 +1,28 @@
 # Edit this configuration file to define what should be installed on
 # your system.  Help is available in the configuration.nix(5) man page
 # and in the NixOS manual (accessible by running ‘nixos-help’).
-{ config, pkgs, lib, ... } : let
+{
+  config,
+  pkgs,
+  lib,
+  ...
+}:
+let
 
   cfg = config.modules.hosts.matebook;
 
-in {
+in
+{
 
-  imports = [
-    ./hardware-configuration.nix
-  ];
+  imports = [ ./hardware-configuration.nix ];
 
   config = lib.mkIf cfg.enable {
 
     nix.settings = {
-      trusted-users = [ "@wheel" "root" ];
+      trusted-users = [
+        "@wheel"
+        "root"
+      ];
     };
 
     boot = {
@@ -58,9 +66,7 @@ in {
     };
 
     environment = {
-      systemPackages = with pkgs; [
-        usbutils
-      ];
+      systemPackages = with pkgs; [ usbutils ];
       usrbinenv = lib.mkForce "${pkgs.coreutils}/bin/env";
       variables = {
         EDITOR = "vim";
@@ -80,11 +86,16 @@ in {
           hashedPassword = "$y$j9T$ckTNGDz1gOk0jJWnABn0U0$8GnjsLLNYSeVRIwoFS9VusrMGKfNBQXNcyoQlGEJYMB";
           linger = true;
           extraGroups = builtins.concatLists [
-            [ "wheel" "video" "render" "input" ]
+            [
+              "wheel"
+              "video"
+              "render"
+              "input"
+            ]
             (lib.optionals config.networking.networkmanager.enable [ "networkmanager" ])
             (lib.optionals config.services.seatd.enable [ config.services.seatd.group ])
           ];
-          packages = with pkgs; [];
+          packages = with pkgs; [ ];
           openssh = {
             authorizedKeys = {
               keys = [ ];
@@ -132,18 +143,14 @@ in {
           waylandFrontend = true;
           addons = with pkgs; [
             fcitx5-gtk
-            (fcitx5-rime.override {
-              rimeDataPkgs = [
-                pkgs.rime-ice
-              ];
-            })
+            (fcitx5-rime.override { rimeDataPkgs = [ pkgs.rime-ice ]; })
           ];
-          quickPhrase = {};
-          quickPhraseFiles = {};
+          quickPhrase = { };
+          quickPhraseFiles = { };
           settings = {
-            addons = {};
-            globalOptions = {};
-            inputMethod = {};
+            addons = { };
+            globalOptions = { };
+            inputMethod = { };
           };
         };
       };
@@ -217,7 +224,7 @@ in {
     swapDevices = [
       {
         device = "/var/lib/swapfile";
-        size = 16*1024;
+        size = 16 * 1024;
       }
     ];
 

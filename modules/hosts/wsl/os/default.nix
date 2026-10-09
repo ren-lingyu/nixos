@@ -5,11 +5,18 @@
 # NixOS-WSL specific options are documented on the NixOS-WSL repository:
 # https://github.com/nix-community/NixOS-WSL
 
-{ config, pkgs, lib, ... } : let
+{
+  config,
+  pkgs,
+  lib,
+  ...
+}:
+let
 
   cfg = config.modules.hosts.wsl;
 
-in {
+in
+{
 
   # imports = [
   #   # include NixOS-WSL modules
@@ -19,7 +26,10 @@ in {
   config = lib.mkIf cfg.enable {
 
     nix.settings = {
-      trusted-users = [ "@wheel" "root" ];
+      trusted-users = [
+        "@wheel"
+        "root"
+      ];
     };
 
     networking.hostName = "nixos-wsl";
@@ -57,13 +67,18 @@ in {
     };
 
     users = {
-      groups.docker = {};
+      groups.docker = { };
       users = {
         "${builtins.toString cfg.users."1000"}" = {
           uid = cfg.users."1000";
           isNormalUser = true;
           linger = true;
-          extraGroups = [ "wheel" "docker" "video" "render" ];
+          extraGroups = [
+            "wheel"
+            "docker"
+            "video"
+            "render"
+          ];
           openssh = {
             authorizedKeys = {
               keys = [
@@ -76,7 +91,7 @@ in {
     };
 
     environment = {
-      systemPackages = with pkgs; [];
+      systemPackages = with pkgs; [ ];
       usrbinenv = lib.mkForce "${pkgs.coreutils}/bin/env";
       # binsh = "${pkgs.bash}/bin/sh";
       variables = {
@@ -101,19 +116,15 @@ in {
     xdg = {
       mime = {
         enable = true;
-        defaultApplications = {};
+        defaultApplications = { };
       };
       portal = {
         enable = false;
         xdgOpenUsePortal = true;
-        extraPortals = [
-          pkgs.xdg-desktop-portal-gtk
-        ];
+        extraPortals = [ pkgs.xdg-desktop-portal-gtk ];
         config = {
           common = {
-            default = [
-              "gtk"
-            ];
+            default = [ "gtk" ];
           };
         };
       };
@@ -128,12 +139,13 @@ in {
       };
       ssh = {
         package = pkgs.openssh;
-        pubkeyAcceptedKeyTypes = [
-          "ssh-ed25519"
-        ];
+        pubkeyAcceptedKeyTypes = [ "ssh-ed25519" ];
         knownHosts = {
           "github.com" = {
-            hostNames = [ "github.com" "ssh.github.com" ];
+            hostNames = [
+              "github.com"
+              "ssh.github.com"
+            ];
             publicKey = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIOMqqnkVzrm0SdG6UOoqKLsabgH5C9okWi0dh2l9GKJl";
           };
         };
@@ -150,7 +162,10 @@ in {
 
     services = {
       xserver = {
-        videoDrivers = [ "intel" "modesetting" ];
+        videoDrivers = [
+          "intel"
+          "modesetting"
+        ];
       };
       dbus = {
         enable = true;
@@ -223,7 +238,9 @@ in {
       tmpfiles.rules = [
         "L+ %t/wayland-0 - - - - ${config.wsl.wslConf.automount.root}/wslg/runtime-dir/wayland-0"
         "L+ %t/wayland-0.lock - - - - ${config.wsl.wslConf.automount.root}/wslg/runtime-dir/wayland-0.lock"
-        "L+ ${config.users.users."${builtins.toString cfg.users."1000"}".home}/ren - - - - ${config.wsl.wslConf.automount.root}/c/Users/Lingyu/Ren"
+        "L+ ${
+          config.users.users."${builtins.toString cfg.users."1000"}".home
+        }/ren - - - - ${config.wsl.wslConf.automount.root}/c/Users/Lingyu/Ren"
       ];
     };
 

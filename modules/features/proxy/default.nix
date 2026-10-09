@@ -1,12 +1,17 @@
-{ config, pkgs, lib, ... } : let
+{
+  config,
+  pkgs,
+  lib,
+  ...
+}:
+let
 
   cfg = config.modules.features.proxy;
 
-in {
+in
+{
 
-  imports = [
-    ./os
-  ];
+  imports = [ ./os ];
 
   config = {
     modules.features.proxy.existModule = {
@@ -15,9 +20,8 @@ in {
     };
     assertions = [
       {
-        assertion = (builtins.any
-          (x_ : x_)
-          [
+        assertion = (
+          builtins.any (x_: x_) [
             (!cfg.clash-verge.enable)
             cfg.enable
           ]
@@ -25,9 +29,8 @@ in {
         message = "`modules.features.proxy.clash-verge.enable = true` is only allowed when `modules.features.proxy.enable = true`.";
       }
       {
-        assertion = (builtins.any
-          (x_ : x_)
-          [
+        assertion = (
+          builtins.any (x_: x_) [
             (!cfg.throne.enable)
             cfg.enable
           ]
@@ -35,9 +38,8 @@ in {
         message = "`modules.features.proxy.throne.enable = true` is only allowed when `modules.features.proxy.enable = true`.";
       }
       {
-        assertion = (builtins.any
-          (x_ : x_)
-          [
+        assertion = (
+          builtins.any (x_: x_) [
             (!cfg.mihomo.enable)
             cfg.enable
           ]
@@ -45,9 +47,8 @@ in {
         message = "`modules.features.proxy.mihomo.enable = true` is only allowed when `modules.features.proxy.enable = true`.";
       }
       {
-        assertion = (builtins.any
-          (x_ : x_)
-          [
+        assertion = (
+          builtins.any (x_: x_) [
             (!cfg.v2raya.enable)
             cfg.enable
           ]
@@ -55,10 +56,11 @@ in {
         message = "`modules.features.proxy.v2raya.enable = true` is only allowed when `modules.features.proxy.enable = true`.";
       }
       {
-        assertion = (lib.count (x : x) [
-          cfg.clash-verge.enable
-          cfg.mihomo.enable
-        ]) <= 1;
+        assertion =
+          (lib.count (x: x) [
+            cfg.clash-verge.enable
+            cfg.mihomo.enable
+          ]) <= 1;
         message = "At most one of `modules.features.proxy.clash-verge.enable` and `modules.features.proxy.mihomo.enable` may be true.";
       }
     ];

@@ -1,31 +1,37 @@
-{ config, osConfig, pkgs, lib, ... } : let
+{
+  config,
+  osConfig,
+  pkgs,
+  lib,
+  ...
+}:
+let
 
   cfg = osConfig.modules.features.niri;
 
-in {
+in
+{
 
-  imports = [
-    ./settings.nix
-  ];
+  imports = [ ./settings.nix ];
 
-  config = lib.mkIf (builtins.all
-    (x_ : x_)
-    [
-      cfg.enable
-      cfg.waybar.enable
-    ]
-  ) {
-    programs.waybar = {
-        enable = cfg.waybar.enable;
-        package = pkgs.waybar;
-        systemd = {
-          enable = true;
-          targets = [ config.wayland.systemd.target ];
-          enableDebug = false;
-          enableInspect = false;
+  config =
+    lib.mkIf
+      (builtins.all (x_: x_) [
+        cfg.enable
+        cfg.waybar.enable
+      ])
+      {
+        programs.waybar = {
+          enable = cfg.waybar.enable;
+          package = pkgs.waybar;
+          systemd = {
+            enable = true;
+            targets = [ config.wayland.systemd.target ];
+            enableDebug = false;
+            enableInspect = false;
+          };
+          style = builtins.readFile ./style.css;
         };
-        style = builtins.readFile ./style.css;
       };
-  };
 
 }
