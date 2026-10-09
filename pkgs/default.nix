@@ -1,15 +1,12 @@
-{
-  pkgs,
-  lib,
-  llib,
-}:
-{
+{ llib }: {
 
-  legacyPackages = llib.packageFunctions.mkLegacyPackages {
-    root = ./.;
-    packagePath = "package.nix";
-    inherit pkgs;
-  };
+  mkLegacyPackages =
+    pkgs:
+    llib.packageFunctions.mkLegacyPackages {
+      root = ./.;
+      packagePath = "package.nix";
+      inherit pkgs;
+    };
 
   overlay = llib.packageFunctions.mkOverlay {
     root = ./.;

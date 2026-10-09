@@ -108,9 +108,9 @@
 
         inherit inputs;
 
-        specialArgs = {
+        specialArgs = rec {
           llib = import ./lib { lib = inputs.nixpkgs.lib; };
-          lpkgs = import ./pkgs;
+          lpkgs = import ./pkgs { inherit llib; };
         };
 
       }
@@ -129,37 +129,15 @@
             flake = {
 
               nixosModules = {
-                default =
-                  {
-                    config,
-                    pkgs,
-                    lib,
-                    ...
-                  }:
-                  (lpkgs { inherit pkgs lib llib; }).nixosModule;
+                default = lpkgs.nixosModule;
               };
 
               homeManagerModules = {
-                default =
-                  {
-                    config,
-                    pkgs,
-                    lib,
-                    ...
-                  }:
-                  (lpkgs { inherit pkgs lib llib; }).homeManagerModule;
+                default = lpkgs.homeManagerModule;
               };
 
               overlays = {
-                default =
-                  final: prev:
-                  (lpkgs {
-                    pkgs = prev;
-                    lib = prev.lib;
-                    inherit llib;
-                  }).overlay
-                    final
-                    prev;
+                default = lpkgs.overlay;
               };
 
               modules = {
@@ -726,7 +704,7 @@
               }:
               {
 
-                legacyPackages = (lpkgs { inherit pkgs lib llib; }).legacyPackages;
+                legacyPackages = lpkgs.mkLegacyPackages pkgs;
 
                 checks = import ./tests { inherit pkgs llib; };
 
