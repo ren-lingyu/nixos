@@ -150,6 +150,6 @@ in
 
   mkNixosModule = { root, modulePath }: (mkModule_ modulePath root);
 
-  mkHomeManagerModule = { root, modulePath }: (mkModule_ modulePath root);
+  mkHomeModule = { root, modulePath }: (mkModule_ modulePath root);
 
 }

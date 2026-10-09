@@ -18,7 +18,7 @@
     modulePath = "os/default.nix";
   };
 
-  homeManagerModule = llib.packageFunctions.mkHomeManagerModule {
+  homeModule = llib.packageFunctions.mkHomeModule {
     root = ./.;
     modulePath = "hm/default.nix";
   };

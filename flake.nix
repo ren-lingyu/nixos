@@ -132,8 +132,8 @@
                 default = lpkgs.nixosModule;
               };
 
-              homeManagerModules = {
-                default = lpkgs.homeManagerModule;
+              homeModules = {
+                default = lpkgs.homeModule;
               };
 
               overlays = {
@@ -177,7 +177,7 @@
                         ];
                       };
                       home-manager = {
-                        sharedModules = [ self.homeManagerModules.default ];
+                        sharedModules = [ self.homeModules.default ];
                         extraSpecialArgs = {
                           inherit inputs;
                           inherit llib;
