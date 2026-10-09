@@ -106,6 +106,7 @@
   outputs = { self, ... }@inputs : inputs.flake-parts.lib.mkFlake { inherit inputs; } {
 
     imports = [
+      inputs.treefmt-nix.flakeModule
       inputs.agenix-rekey.flakeModule
     ];
 
@@ -624,6 +625,44 @@
         };
 
         agenix-rekey.agePackage = config.legacyPackages.rage-armored;
+
+        treefmt = {
+          flakeFormatter = true;
+          flakeCheck = false;
+          enableDefaultExcludes = false;
+          projectRootFile = builtins.baseNameOf __curPos.file;
+          settings.excludes = [
+            "flake.lock"
+            "*.patch"
+            ".gitignore"
+            "LICENSE"
+          ];
+          programs = {
+            nixfmt = {
+              enable = true;
+              package = pkgs.nixfmt;
+              width = 100;
+              indent = 2;
+              strict = true;
+            };
+            shfmt = {
+              enable = true;
+              package = pkgs.shfmt;
+              indent_size = 2;
+              simplify = false;
+            };
+            prettier = {
+              enable = true;
+              package = pkgs.prettier;
+              settings = {
+                printWidth = 100;
+                tabWidth = 2;
+                proseWrap = "preserve";
+                endOfLine = "lf";
+              };
+            };
+          };
+        };
 
       };
 
