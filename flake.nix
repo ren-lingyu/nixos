@@ -47,7 +47,10 @@
     };
     agenix-rekey = {
       url = "git+https://github.com/oddlama/agenix-rekey.git?ref=refs/heads/main&shallow=1";
-      inputs.nixpkgs.follows = "nixpkgs";
+      inputs = {
+        nixpkgs.follows = "nixpkgs";
+        treefmt-nix.follows = "treefmt-nix";
+      };
     };
     sops-nix = {
       url = "git+https://github.com/Mic92/sops-nix.git?ref=refs/heads/master&shallow=1";
@@ -81,6 +84,7 @@
     };
     nixos-anywhere = {
       url = "git+https://github.com/nix-community/nixos-anywhere.git?ref=refs/heads/main&shallow=1";
+      inputs.treefmt-nix.follows = "treefmt-nix";
     };
     disko = {
       # url = "git+https://github.com/nix-community/disko.git?ref=refs/heads/master&shallow=1";
