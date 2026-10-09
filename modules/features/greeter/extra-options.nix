@@ -10,8 +10,8 @@ feature_:
 
   sessionPackages = lib.mkOption {
     type = lib.types.listOf lib.types.package;
+    default = [ ];
     internal = true;
-    readOnly = true;
     description = "Internal session packages provided to the greeter.";
   };
 

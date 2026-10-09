@@ -1,5 +1,4 @@
 {
-  options,
   config,
   pkgs,
   lib,
@@ -38,27 +37,6 @@ in
           name =
             if (builtins.length defaultMonitors_) == 1 then (builtins.head defaultMonitors_).name else null;
         };
-
-      sessionPackages = builtins.concatLists (
-        builtins.map
-          (
-            providerName_:
-            let
-              hasSessionWrapperOption_ = (
-                (lib.attrByPath [ providerName_ "session-wrapper" ] null options.modules.features) != null
-              );
-              sessionWrapper_ = config.modules.features.${providerName_}.session-wrapper;
-            in
-            lib.optionals (builtins.all (x_: x_) [
-              hasSessionWrapperOption_
-              (sessionWrapper_ != null)
-            ]) [ sessionWrapper_ ]
-          )
-          [
-            "niri"
-            "x11-session"
-          ]
-      );
 
     };
 

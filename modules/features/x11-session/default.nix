@@ -63,6 +63,8 @@ in
 
     };
 
+    modules.features.greeter.sessionPackages = lib.optionals cfg.enable [ cfg.session-wrapper ];
+
     assertions = [
       {
         assertion = (
