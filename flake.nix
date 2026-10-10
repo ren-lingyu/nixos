@@ -30,6 +30,7 @@
     };
     flake-parts = {
       url = "git+https://github.com/hercules-ci/flake-parts.git?ref=refs/heads/main&shallow=1";
+      inputs.nixpkgs-lib.follows = "nixpkgs";
     };
     treefmt-nix = {
       url = "git+https://github.com/numtide/treefmt-nix.git?ref=refs/heads/main&shallow=1";
