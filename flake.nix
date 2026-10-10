@@ -122,7 +122,7 @@
           lpkgs,
           config,
           ...
-        }@flakeParts:
+        }:
         {
 
           imports = [
