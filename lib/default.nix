@@ -1,4 +1,4 @@
-{ lib }: {
+{ lib }: rec {
 
   types = rec {
 
@@ -37,5 +37,19 @@
   };
 
   packageFunctions = import ./packageFunctions.nix { inherit lib; };
+
+  flake-parts = {
+    types = {
+      inherit
+        (import ./flake-parts.types.nix {
+          inherit lib;
+          inherit (moduleFunctions.default) mkOptionTree mkOptionModules mkOptionName;
+        })
+        nixosBuilder
+        moduleIntegrations
+        nixosConfigurations
+        ;
+    };
+  };
 
 }

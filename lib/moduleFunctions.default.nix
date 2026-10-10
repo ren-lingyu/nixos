@@ -58,6 +58,26 @@
 
     };
 
+  mkOptionName = path: lib.showOption path;
+
+  # Resolve deferred configuration values only after NixOS has supplied its final context.
+  # Do not traverse derivations: their attributes include function-valued helpers.
+  resolveFunOf =
+    scope: value:
+    if builtins.isFunction value then
+      resolveFunOf scope (value scope)
+    else if builtins.isList value then
+      builtins.map (resolveFunOf scope) value
+    else if
+      builtins.all (condition: condition) [
+        (builtins.isAttrs value)
+        (!(lib.isDerivation value))
+      ]
+    then
+      builtins.mapAttrs (unused_name: resolveFunOf scope) value
+    else
+      value;
+
   discoverModules =
     rootDirectory: searchDirectory:
     let
@@ -138,6 +158,22 @@
       searchDirectory
       relativePath
       null;
+
+  mkOptionModules =
+    { root, scope }:
+    path:
+    let
+      prefixes = lib.range 1 (builtins.length path);
+      optionFiles = builtins.filter builtins.pathExists (
+        builtins.map (
+          length: root + "/${lib.concatStringsSep "/" (lib.take length path)}/_options.nix"
+        ) prefixes
+      );
+    in
+    builtins.map (file: {
+      _file = file;
+      options = import file (scope // { inherit path; });
+    }) optionFiles;
 
   mkOptionTree =
     {

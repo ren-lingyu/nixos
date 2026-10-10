@@ -135,61 +135,25 @@
               lib = inputs.nixpkgs.lib;
             in
             {
-
-              nixosBuilder = {
-                nixosSystem = lib.mkOption {
-                  type = lib.types.raw;
-                  description = "Function used to construct NixOS configurations.";
-                };
-                homeManager = lib.mkOption {
-                  type = lib.types.deferredModule;
-                  description = "Home Manager integration module for NixOS.";
-                };
-                specialArgs = lib.mkOption {
-                  type = lib.types.attrsOf lib.types.raw;
-                  default = { };
-                  description = "Additional module arguments shared by NixOS and Home Manager.";
-                };
+              nixosBuilder = lib.mkOption {
+                type = llib.flake-parts.types.nixosBuilder;
+                readOnly = true;
               };
-
-              moduleIntegrations = llib.moduleFunctions.default.mkOptionTree {
-                root = ./.;
-                modulesDir = ./modules;
-                pathMapper = lib.drop 1;
-                optionMaker =
-                  moduleDescriptor_:
-                  lib.mkOption {
-                    type = lib.types.submodule {
-                      options = {
-                        nixosModules = lib.mkOption {
-                          type = lib.types.listOf lib.types.deferredModule;
-                          default = [ ];
-                          description = "Additional NixOS modules required by this module.";
-                        };
-                        nixpkgsOverlays = lib.mkOption {
-                          type = lib.types.listOf (
-                            lib.mkOptionType {
-                              name = "nixpkgs.overlay";
-                              description = "Nixpkgs overlay";
-                              check = lib.isFunction;
-                              merge = lib.mergeOneOption;
-                            }
-                          );
-                          default = [ ];
-                          description = "Additional Nixpkgs overlays required by this module.";
-                        };
-                        homeModules = lib.mkOption {
-                          type = lib.types.listOf lib.types.deferredModule;
-                          default = [ ];
-                          description = "Additional Home Manager modules for users selected by this module.";
-                        };
-                      };
-                    };
-                    default = { };
-                    description = "External integrations for ${lib.concatStringsSep "." moduleDescriptor_.path}.";
-                  };
+              moduleIntegrations = lib.mkOption {
+                type = llib.flake-parts.types.moduleIntegrations {
+                  root = ./.;
+                  modulesDir = ./modules;
+                };
+                readOnly = true;
               };
-
+              nixosConfigurations = lib.mkOption {
+                type = llib.flake-parts.types.nixosConfigurations {
+                  root = ./.;
+                  modulesDir = ./modules;
+                  scope = { inherit llib; };
+                };
+                readOnly = true;
+              };
             };
 
           config = {
