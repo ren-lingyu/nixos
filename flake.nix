@@ -122,6 +122,7 @@
           llib,
           lpkgs,
           config,
+          lib,
           ...
         }:
         {
@@ -131,31 +132,27 @@
             inputs.agenix-rekey.flakeModule
           ];
 
-          options =
-            let
-              lib = inputs.nixpkgs.lib;
-            in
-            {
-              nixosBuilder = lib.mkOption {
-                type = llib.flake-parts.types.nixosBuilder;
-                readOnly = true;
-              };
-              moduleIntegrations = lib.mkOption {
-                type = llib.flake-parts.types.moduleIntegrations {
-                  root = ./.;
-                  modulesDir = ./modules;
-                };
-                readOnly = true;
-              };
-              nixosConfigurations = lib.mkOption {
-                type = llib.flake-parts.types.nixosConfigurations {
-                  root = ./.;
-                  modulesDir = ./modules;
-                  scope = { inherit llib; };
-                };
-                readOnly = true;
-              };
+          options = {
+            nixosBuilder = lib.mkOption {
+              type = llib.flake-parts.types.nixosBuilder;
+              readOnly = true;
             };
+            moduleIntegrations = lib.mkOption {
+              type = llib.flake-parts.types.moduleIntegrations {
+                root = ./.;
+                modulesDir = ./modules;
+              };
+              readOnly = true;
+            };
+            nixosConfigurations = lib.mkOption {
+              type = llib.flake-parts.types.nixosConfigurations {
+                root = ./.;
+                modulesDir = ./modules;
+                scope = { inherit llib; };
+              };
+              readOnly = true;
+            };
+          };
 
           config = {
 
