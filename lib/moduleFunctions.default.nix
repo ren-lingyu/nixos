@@ -1,4 +1,4 @@
-{ lib }: {
+{ lib }: rec {
 
   mkModuleOptions =
     let
@@ -59,19 +59,28 @@
     };
 
   discoverModules =
-    rootDirectory:
+    rootDirectory: searchDirectory:
+    let
+      rootPath = lib.splitString "/" (toString rootDirectory);
+      searchPath = lib.splitString "/" (toString searchDirectory);
+
+      relativePath = lib.drop (builtins.length rootPath) searchPath;
+    in
+    assert lib.assertMsg (
+      lib.take (builtins.length rootPath) searchPath == rootPath
+    ) "discoverModules: searchDirectory must be contained in rootDirectory.";
     (lib.fix (
-      traverse: directory: relativePath: parentModulePath:
+      traverse: module: path: parentModulePath:
       let
-        osPath = directory + "/os/default.nix";
-        hmPath = directory + "/hm/default.nix";
+        osPath = module + "/os/default.nix";
+        hmPath = module + "/hm/default.nix";
 
         os = if builtins.pathExists osPath then osPath else null;
         hm = if builtins.pathExists hmPath then hmPath else null;
 
-        isModule = builtins.any (value: value) [
-          (os != null)
-          (hm != null)
+        isModule = builtins.any (value: value != null) [
+          os
+          hm
         ];
 
         childDirectories = builtins.attrNames (
@@ -86,17 +95,17 @@
                 ])
               )
             ]
-          ) (builtins.readDir directory)
+          ) (builtins.readDir module)
         );
 
       in
       if
         builtins.all (condition: condition) [
           isModule
-          (relativePath == [ ])
+          (path == relativePath)
         ]
       then
-        throw "discoverModules: the root directory cannot be a module."
+        throw "discoverModules: the search directory cannot be a module."
       else if
         builtins.all (condition: condition) [
           isModule
@@ -107,40 +116,47 @@
           builtins.concatStringsSep "\n" [
             "discoverModules: nested modules are not allowed."
             "Parent: ${lib.concatStringsSep "/" parentModulePath}"
-            "Child: ${lib.concatStringsSep "/" relativePath}"
+            "Child: ${lib.concatStringsSep "/" path}"
           ]
         )
       else
         builtins.concatLists [
           (lib.optional isModule {
-            path = relativePath;
-            inherit directory os hm;
+            inherit
+              path
+              module
+              os
+              hm
+              ;
           })
           (builtins.concatMap (
             name:
-            traverse (directory + "/${name}") (builtins.concatLists [
-              relativePath
-              [ name ]
-            ]) (if isModule then relativePath else parentModulePath)
+            traverse (module + "/${name}") (path ++ [ name ]) (if isModule then path else parentModulePath)
           ) childDirectories)
         ]
     ))
-      rootDirectory
-      [ ]
+      searchDirectory
+      relativePath
       null;
 
   mkOptionTree =
-    mkModuleOptionDeclarations: moduleDescriptors:
+    {
+      root,
+      modulesDir,
+      pathMapper ? lib.id,
+      optionMaker,
+    }:
     lib.foldl' (
-      optionTree: moduleDescriptor:
-      if moduleDescriptor.path == [ ] then
-        throw "mkOptionTree: module path must not be empty."
-      else if lib.hasAttrByPath moduleDescriptor.path optionTree then
-        throw "mkOptionTree: duplicate module path `${lib.concatStringsSep "." moduleDescriptor.path}`."
+      tree: module:
+      let
+        path = pathMapper module.path;
+      in
+      if path == [ ] then
+        throw "mkOptionTree: option path must not be empty."
+      else if lib.hasAttrByPath path tree then
+        throw "mkOptionTree: duplicate option path `${lib.concatStringsSep "." path}`."
       else
-        lib.recursiveUpdate optionTree (
-          lib.setAttrByPath moduleDescriptor.path (mkModuleOptionDeclarations moduleDescriptor)
-        )
-    ) { } moduleDescriptors;
+        lib.recursiveUpdate tree (lib.setAttrByPath path (optionMaker module))
+    ) { } (discoverModules root modulesDir);
 
 }
