@@ -188,7 +188,6 @@
                     default = { };
                     description = "External integrations for ${lib.concatStringsSep "." moduleDescriptor_.path}.";
                   };
-
               };
 
             };
