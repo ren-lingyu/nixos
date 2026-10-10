@@ -11,7 +11,7 @@
     modules.users.lingyu-minimal = {
       existModule = {
         os = false;
-        hm = false;
+        hm = true;
       };
     };
 

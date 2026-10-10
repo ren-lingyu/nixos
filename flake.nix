@@ -109,22 +109,187 @@
         inherit inputs;
 
         specialArgs = rec {
+          rootPath = ./.;
           llib = import ./lib { lib = inputs.nixpkgs.lib; };
           lpkgs = import ./pkgs { inherit llib; };
         };
 
       }
       (
-        { llib, lpkgs, ... }: {
+        {
+          rootPath,
+          llib,
+          lpkgs,
+          config,
+          ...
+        }@flakeParts:
+        {
 
           imports = [
             inputs.treefmt-nix.flakeModule
             inputs.agenix-rekey.flakeModule
           ];
 
+          options =
+            let
+              lib = inputs.nixpkgs.lib;
+            in
+            {
+
+              nixosBuilder = {
+                nixosSystem = lib.mkOption {
+                  type = lib.types.raw;
+                  description = "Function used to construct NixOS configurations.";
+                };
+                homeManager = lib.mkOption {
+                  type = lib.types.deferredModule;
+                  description = "Home Manager integration module for NixOS.";
+                };
+                specialArgs = lib.mkOption {
+                  type = lib.types.attrsOf lib.types.raw;
+                  default = { };
+                  description = "Additional module arguments shared by NixOS and Home Manager.";
+                };
+              };
+
+              moduleIntegrations = llib.moduleFunctions.default.mkOptionTree (
+                moduleDescriptor_:
+                lib.mkOption {
+                  type = lib.types.submodule {
+                    options = {
+                      nixosModules = lib.mkOption {
+                        type = lib.types.listOf lib.types.deferredModule;
+                        default = [ ];
+                        description = "Additional NixOS modules required by this module.";
+                      };
+                      nixpkgsOverlays = lib.mkOption {
+                        type = lib.types.listOf (
+                          lib.mkOptionType {
+                            name = "nixpkgs.overlay";
+                            description = "Nixpkgs overlay";
+                            check = lib.isFunction;
+                            merge = lib.mergeOneOption;
+                          }
+                        );
+                        default = [ ];
+                        description = "Additional Nixpkgs overlays required by this module.";
+                      };
+                      homeModules = lib.mkOption {
+                        type = lib.types.listOf lib.types.deferredModule;
+                        default = [ ];
+                        description = "Additional Home Manager modules for users selected by this module.";
+                      };
+                    };
+                  };
+                  default = { };
+                  description = "External integrations for ${lib.concatStringsSep "." moduleDescriptor_.path}.";
+                }
+              ) (llib.moduleFunctions.default.discoverModules ./modules);
+
+            };
+
           config = {
 
+            debug = true;
+
             systems = [ "x86_64-linux" ];
+
+            nixosBuilder = {
+              nixosSystem = inputs.nixpkgs.lib.nixosSystem;
+              homeManager = inputs.home-manager.nixosModules.home-manager;
+              specialArgs = { inherit llib rootPath; };
+            };
+
+            moduleIntegrations = {
+
+              share = {
+                nixosModules = [
+                  inputs.agenix.nixosModules.default
+                  inputs.agenix-rekey.nixosModules.default
+                  config.flake.nixosModules.default
+                ];
+                nixpkgsOverlays = [
+                  inputs.emarccs.overlays.default
+                  (final: prev: {
+                    lean4 = inputs.lean4-nix.packages.${final.stdenv.hostPlatform.system}.lean-bin;
+                    zotero = inputs.zotero-fix-nixpkgs.legacyPackages.${final.stdenv.hostPlatform.system}.zotero;
+                  })
+                  inputs.git-agent-workflow.overlays.default
+                  config.flake.overlays.default
+                ];
+                homeModules = [ config.flake.homeModules.default ];
+              };
+
+              hosts = {
+                wsl = {
+                  nixosModules = [ inputs.nixos-wsl.nixosModules.default ];
+                };
+                thinkbook = {
+                  nixosModules = [
+                    inputs.nix-flatpak.nixosModules.nix-flatpak
+                    inputs.nixvirt.nixosModules.default
+                  ];
+                };
+                aliyun = {
+                  nixosModules = [ inputs.disko.nixosModules.disko ];
+                };
+              };
+
+              features = {
+                editor = {
+                  nixpkgsOverlays = [
+                    inputs.lem.overlays.default
+                    (final_: prev_: {
+                      lem-webview = final_.symlinkJoin {
+                        name = "${prev_.lem-webview.name}-with-desktop";
+                        paths = [
+                          prev_.lem-webview
+                          (final_.makeDesktopItem {
+                            name = "lem";
+                            desktopName = "Lem";
+                            genericName = "Text Editor";
+                            comment = "Common Lisp editor/IDE with high expansibility";
+                            exec = "${prev_.lib.getExe prev_.lem-webview} %F";
+                            icon = "lem";
+                            terminal = false;
+                            categories = [
+                              "Development"
+                              "TextEditor"
+                            ];
+                            mimeTypes = [
+                              "text/english"
+                              "text/plain"
+                              "text/x-makefile"
+                              "text/x-c++hdr"
+                              "text/x-c++src"
+                              "application/x-shellscript"
+                              "text/x-c"
+                              "text/x-c++"
+                            ];
+                          })
+                          (final_.writeTextFile {
+                            name = "lem-icon";
+                            destination = "/share/icons/hicolor/scalable/apps/lem.svg";
+                            text = builtins.readFile "${inputs.lem}/scripts/install/lem.svg";
+                          })
+                        ];
+                        meta = prev_.lem-webview.meta;
+                      };
+                    })
+                  ];
+                  homeModules = [ inputs.nixvim.homeModules.nixvim ];
+                };
+                niri = {
+                  nixpkgsOverlays = [ inputs.niri-flake.overlays.niri ];
+                  homeModules = [ inputs.niri-flake.homeModules.niri ];
+                };
+                sops = {
+                  nixosModules = [ inputs.sops-nix.nixosModules.sops ];
+                  homeModules = [ inputs.sops-nix.homeManagerModules.sops ];
+                };
+              };
+
+            };
 
             flake = {
 
@@ -140,323 +305,288 @@
                 default = lpkgs.overlay;
               };
 
-              modules = {
+              modules =
+                let
+                  moduleIntegrations_ = config.moduleIntegrations;
+                  nixosBuilder_ = config.nixosBuilder;
+                in
+                {
 
-                base =
-                  {
-                    config,
-                    pkgs,
-                    lib,
-                    ...
-                  }:
-                  {
-                    _file = ./flake.nix;
-                    key = "${builtins.toString ./flake.nix}#self.modules.base";
-                    imports = [
-                      inputs.agenix.nixosModules.default
-                      inputs.agenix-rekey.nixosModules.default
-                      inputs.home-manager.nixosModules.home-manager
-                      self.nixosModules.default
-                      ./modules
-                    ];
-                    config = {
-                      # `llib` must be available before profile submodules are evaluated.
-                      # Home Manager has a separate argument scope, so it is passed again below.
-                      _module.args = {
-                        llib = llib;
+                  base =
+                    {
+                      config,
+                      pkgs,
+                      lib,
+                      ...
+                    }:
+                    {
+                      _file = ./flake.nix;
+                      key = "${builtins.toString ./flake.nix}#self.modules.base";
+                      imports = builtins.concatLists [
+                        [ nixosBuilder_.homeManager ]
+                        moduleIntegrations_.share.nixosModules
+                        [
+                          ./modules/share/os
+                          ./modules/features
+                          ./modules/hosts
+                          ./modules/users
+                          ./modules/workloads
+                        ]
+                      ];
+                      config = {
+                        _module.args = nixosBuilder_.specialArgs;
+                        nixpkgs = {
+                          overlays = moduleIntegrations_.share.nixpkgsOverlays;
+                        };
+                        home-manager = {
+                          sharedModules = builtins.concatLists [
+                            moduleIntegrations_.share.homeModules
+                            [ ./modules/share/hm ]
+                          ];
+                          extraSpecialArgs = nixosBuilder_.specialArgs;
+                        };
                       };
-                      nixpkgs = {
-                        overlays = [
-                          inputs.emarccs.overlays.default
-                          (final: prev: {
-                            lean4 = inputs.lean4-nix.packages.${final.stdenv.hostPlatform.system}.lean-bin;
-                            zotero = inputs.zotero-fix-nixpkgs.legacyPackages.${final.stdenv.hostPlatform.system}.zotero;
-                          })
-                          inputs.git-agent-workflow.overlays.default
-                          self.overlays.default
+                    };
+
+                  features = {
+                    niri =
+                      {
+                        config,
+                        pkgs,
+                        lib,
+                        ...
+                      }:
+                      {
+                        imports = [
+                          self.modules.base
+                          ./modules/features/niri
+                        ];
+                        config = {
+                          nixpkgs = {
+                            overlays = moduleIntegrations_.features.niri.nixpkgsOverlays;
+                          };
+                          home-manager.sharedModules = moduleIntegrations_.features.niri.homeModules;
+                        };
+                      };
+                    sops =
+                      {
+                        config,
+                        pkgs,
+                        lib,
+                        ...
+                      }:
+                      {
+                        imports = builtins.concatLists [
+                          [
+                            self.modules.base
+                            ./modules/features/sops
+                          ]
+                          moduleIntegrations_.features.sops.nixosModules
+                        ];
+                        config = {
+                          home-manager.sharedModules = moduleIntegrations_.features.sops.homeModules;
+                        };
+                      };
+                    editor =
+                      {
+                        config,
+                        pkgs,
+                        lib,
+                        ...
+                      }:
+                      {
+                        imports = [
+                          self.modules.base
+                          ./modules/features/editor
+                        ];
+                        config = {
+                          nixpkgs = {
+                            overlays = moduleIntegrations_.features.editor.nixpkgsOverlays;
+                          };
+                          home-manager.sharedModules = moduleIntegrations_.features.editor.homeModules;
+                        };
+                      };
+                    share =
+                      {
+                        config,
+                        pkgs,
+                        lib,
+                        ...
+                      }:
+                      {
+                        imports = [
+                          self.modules.base
+                          ./modules/features/agent
+                          ./modules/features/diagnostics
+                          ./modules/features/file-manager
+                          ./modules/features/font
+                          ./modules/features/greeter
+                          ./modules/features/media
+                          ./modules/features/office
+                          ./modules/features/proxy
+                          ./modules/features/shell
+                          ./modules/features/terminal
+                          ./modules/features/texlive
+                          ./modules/features/x11-session
                         ];
                       };
-                      home-manager = {
-                        sharedModules = [ self.homeModules.default ];
-                        extraSpecialArgs = {
-                          inherit inputs;
-                          inherit llib;
-                        };
-                      };
-                    };
                   };
 
-                features = {
-                  niri =
-                    {
-                      config,
-                      pkgs,
-                      lib,
-                      ...
-                    }:
-                    {
-                      imports = [
-                        self.modules.base
-                        ./modules/features/niri
-                      ];
-                      config = {
-                        nixpkgs = {
-                          overlays = [ inputs.niri-flake.overlays.niri ];
+                  users = {
+                    lingyu =
+                      {
+                        config,
+                        pkgs,
+                        lib,
+                        ...
+                      }:
+                      {
+                        imports = [ self.modules.base ];
+                        config.modules = {
+                          users.lingyu = {
+                            enable = true;
+                            username = "lingyu";
+                            homeDirectory = "/home/lingyu";
+                          };
                         };
-                        home-manager.sharedModules = [ inputs.niri-flake.homeModules.niri ];
                       };
-                    };
-                  sops =
-                    {
-                      config,
-                      pkgs,
-                      lib,
-                      ...
-                    }:
-                    {
-                      imports = [
-                        self.modules.base
-                        inputs.sops-nix.nixosModules.sops
-                        ./modules/features/sops
-                      ];
-                      config = {
-                        home-manager.sharedModules = [ inputs.sops-nix.homeManagerModules.sops ];
-                      };
-                    };
-                  editor =
-                    {
-                      config,
-                      pkgs,
-                      lib,
-                      ...
-                    }:
-                    {
-                      imports = [
-                        self.modules.base
-                        ./modules/features/editor
-                      ];
-                      config = {
-                        nixpkgs = {
-                          overlays = [
-                            inputs.lem.overlays.default
-                            (final_: prev_: {
-                              lem-webview = final_.symlinkJoin {
-                                name = "${prev_.lem-webview.name}-with-desktop";
-                                paths = [
-                                  prev_.lem-webview
-                                  (final_.makeDesktopItem {
-                                    name = "lem";
-                                    desktopName = "Lem";
-                                    genericName = "Text Editor";
-                                    comment = "Common Lisp editor/IDE with high expansibility";
-                                    exec = "${lib.getExe prev_.lem-webview} %F";
-                                    icon = "lem";
-                                    terminal = false;
-                                    categories = [
-                                      "Development"
-                                      "TextEditor"
-                                    ];
-                                    mimeTypes = [
-                                      "text/english"
-                                      "text/plain"
-                                      "text/x-makefile"
-                                      "text/x-c++hdr"
-                                      "text/x-c++src"
-                                      "application/x-shellscript"
-                                      "text/x-c"
-                                      "text/x-c++"
-                                    ];
-                                  })
-                                  (final_.writeTextFile {
-                                    name = "lem-icon";
-                                    destination = "/share/icons/hicolor/scalable/apps/lem.svg";
-                                    text = builtins.readFile "${inputs.lem}/scripts/install/lem.svg";
-                                  })
-                                ];
-                                meta = prev_.lem-webview.meta;
-                              };
-                            })
-                          ];
-                        };
-                        home-manager.sharedModules = [ inputs.nixvim.homeModules.nixvim ];
-                      };
-                    };
-                  share =
-                    {
-                      config,
-                      pkgs,
-                      lib,
-                      ...
-                    }:
-                    {
-                      imports = [
-                        self.modules.base
-                        ./modules/features/agent
-                        ./modules/features/diagnostics
-                        ./modules/features/file-manager
-                        ./modules/features/font
-                        ./modules/features/greeter
-                        ./modules/features/media
-                        ./modules/features/office
-                        ./modules/features/proxy
-                        ./modules/features/shell
-                        ./modules/features/terminal
-                        ./modules/features/texlive
-                        ./modules/features/x11-session
-                      ];
-                    };
-                };
-
-                users = {
-                  lingyu =
-                    {
-                      config,
-                      pkgs,
-                      lib,
-                      ...
-                    }:
-                    {
-                      imports = [ self.modules.base ];
-                      config.modules = {
-                        users.lingyu = {
+                    lingyu-minimal =
+                      {
+                        config,
+                        pkgs,
+                        lib,
+                        ...
+                      }:
+                      {
+                        imports = [ self.modules.base ];
+                        config.modules.users.lingyu-minimal = {
                           enable = true;
                           username = "lingyu";
                           homeDirectory = "/home/lingyu";
                         };
                       };
-                    };
-                  lingyu-minimal =
-                    {
-                      config,
-                      pkgs,
-                      lib,
-                      ...
-                    }:
-                    {
-                      imports = [ self.modules.base ];
-                      config.modules.users.lingyu-minimal = {
-                        enable = true;
-                        username = "lingyu";
-                        homeDirectory = "/home/lingyu";
+                  };
+
+                  workloads = {
+                    caddy =
+                      {
+                        config,
+                        pkgs,
+                        lib,
+                        ...
+                      }:
+                      {
+                        imports = [
+                          self.modules.base
+                          ./modules/workloads/caddy
+                        ];
                       };
-                    };
-                };
+                    wbo =
+                      {
+                        config,
+                        pkgs,
+                        lib,
+                        ...
+                      }:
+                      {
+                        imports = [
+                          self.modules.base
+                          ./modules/workloads/wbo
+                        ];
+                      };
+                  };
 
-                workloads = {
-                  caddy =
-                    {
-                      config,
-                      pkgs,
-                      lib,
-                      ...
-                    }:
-                    {
-                      imports = [
-                        self.modules.base
-                        ./modules/workloads/caddy
-                      ];
-                    };
-                  wbo =
-                    {
-                      config,
-                      pkgs,
-                      lib,
-                      ...
-                    }:
-                    {
-                      imports = [
-                        self.modules.base
-                        ./modules/workloads/wbo
-                      ];
-                    };
-                };
-
-                hosts = {
-                  wsl =
-                    {
-                      config,
-                      pkgs,
-                      lib,
-                      ...
-                    }:
-                    {
-                      imports = [
-                        self.modules.base
-                        inputs.nixos-wsl.nixosModules.default
-                        ./modules/hosts/wsl
-                      ];
-                    };
-                  thinkbook =
-                    {
-                      config,
-                      pkgs,
-                      lib,
-                      ...
-                    }:
-                    {
-                      imports = [
-                        self.modules.base
-                        self.modules.workloads.wbo
-                        inputs.nix-flatpak.nixosModules.nix-flatpak
-                        inputs.nixvirt.nixosModules.default
-                        ./modules/hosts/thinkbook
-                      ];
-                      config.modules = {
-                        hosts.thinkbook = {
-                          flatpak.enable = true;
-                        };
-                        workloads.wbo = {
-                          enable = true;
-                          ip = config.networking.wireguard.topology."3".nodes."2";
-                          port = 18000;
-                          networkInterface = config.networking.wireguard.topology."3".name;
-                          allowedSourceIp = config.networking.wireguard.topology."3".nodes."3";
+                  hosts = {
+                    wsl =
+                      {
+                        config,
+                        pkgs,
+                        lib,
+                        ...
+                      }:
+                      {
+                        imports = builtins.concatLists [
+                          moduleIntegrations_.hosts.wsl.nixosModules
+                          [
+                            self.modules.base
+                            ./modules/hosts/wsl
+                          ]
+                        ];
+                      };
+                    thinkbook =
+                      {
+                        config,
+                        pkgs,
+                        lib,
+                        ...
+                      }:
+                      {
+                        imports = builtins.concatLists [
+                          moduleIntegrations_.hosts.thinkbook.nixosModules
+                          [
+                            self.modules.base
+                            self.modules.workloads.wbo
+                            ./modules/hosts/thinkbook
+                          ]
+                        ];
+                        config.modules = {
+                          hosts.thinkbook = {
+                            flatpak.enable = true;
+                          };
+                          workloads.wbo = {
+                            enable = true;
+                            ip = config.networking.wireguard.topology."3".nodes."2";
+                            port = 18000;
+                            networkInterface = config.networking.wireguard.topology."3".name;
+                            allowedSourceIp = config.networking.wireguard.topology."3".nodes."3";
+                          };
                         };
                       };
-                    };
-                  aliyun =
-                    {
-                      config,
-                      pkgs,
-                      lib,
-                      ...
-                    }:
-                    {
-                      imports = [
-                        self.modules.base
-                        self.modules.workloads.caddy
-                        inputs.disko.nixosModules.disko
-                        ./modules/hosts/aliyun
-                      ];
-                      config.modules = {
-                        workloads.caddy = {
-                          enable = true;
-                          ip = config.networking.wireguard.topology."3".nodes."2";
-                          port = 18000;
-                          networkInterface = config.networking.wireguard.topology."3".name;
+                    aliyun =
+                      {
+                        config,
+                        pkgs,
+                        lib,
+                        ...
+                      }:
+                      {
+                        imports = builtins.concatLists [
+                          moduleIntegrations_.hosts.aliyun.nixosModules
+                          [
+                            self.modules.base
+                            self.modules.workloads.caddy
+                            ./modules/hosts/aliyun
+                          ]
+                        ];
+                        config.modules = {
+                          workloads.caddy = {
+                            enable = true;
+                            ip = config.networking.wireguard.topology."3".nodes."2";
+                            port = 18000;
+                            networkInterface = config.networking.wireguard.topology."3".name;
+                          };
                         };
                       };
-                    };
-                  matebook =
-                    {
-                      config,
-                      pkgs,
-                      lib,
-                      ...
-                    }:
-                    {
-                      imports = [
-                        self.modules.base
-                        ./modules/hosts/matebook
-                      ];
-                    };
-                };
+                    matebook =
+                      {
+                        config,
+                        pkgs,
+                        lib,
+                        ...
+                      }:
+                      {
+                        imports = [
+                          self.modules.base
+                          ./modules/hosts/matebook
+                        ];
+                      };
+                  };
 
-              };
+                };
 
               nixosConfigurations = {
 
-                nixos = inputs.nixpkgs.lib.nixosSystem {
+                nixos = config.nixosBuilder.nixosSystem {
                   system = "x86_64-linux";
                   modules = [
                     self.modules.features.share
@@ -535,7 +665,7 @@
                   ];
                 };
 
-                nixos-matebook = inputs.nixpkgs.lib.nixosSystem {
+                nixos-matebook = config.nixosBuilder.nixosSystem {
                   system = "x86_64-linux";
                   modules = [
                     self.modules.features.share
@@ -605,7 +735,7 @@
                   ];
                 };
 
-                nixos-server = inputs.nixpkgs.lib.nixosSystem {
+                nixos-server = config.nixosBuilder.nixosSystem {
                   system = "x86_64-linux";
                   modules = [
                     self.modules.features.share
@@ -640,7 +770,7 @@
                   ];
                 };
 
-                nixos-wsl = inputs.nixpkgs.lib.nixosSystem {
+                nixos-wsl = config.nixosBuilder.nixosSystem {
                   system = "x86_64-linux";
                   modules = [
                     self.modules.features.share
