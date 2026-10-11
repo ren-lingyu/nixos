@@ -1,28 +1,30 @@
 { pkgs, llib }:
 let
-
   lib = pkgs.lib;
 
-  assertionOption_ = lib.mkOption {
-    type = lib.types.listOf (
-      lib.types.submodule {
-        options = {
-          assertion = lib.mkOption { type = lib.types.bool; };
-          message = lib.mkOption { type = lib.types.str; };
-        };
-      }
-    );
-    default = [ ];
-  };
-
   assertionOptions_ = {
-    options.assertions = assertionOption_;
+    options = {
+      assertions = lib.mkOption {
+        type = lib.types.listOf (
+          lib.types.submodule {
+            options = {
+              assertion = lib.mkOption { type = lib.types.bool; };
+              message = lib.mkOption { type = lib.types.str; };
+            };
+          }
+        );
+        default = [ ];
+      };
+      modules = lib.mkOption {
+        type = lib.types.attrsOf lib.types.raw;
+        default = { };
+      };
+    };
   };
 
   assertionOnlyModule_ =
     modulePath_: args_:
     let
-
       loadModule_ =
         module_:
         if lib.isFunction module_ then
@@ -42,56 +44,75 @@ let
           options = attrs_.options or { };
           config.assertions = (attrs_.config or { }).assertions or [ ];
         };
-
     in
     stripModule_ modulePath_;
 
-  testHostMetadata_ = { options, ... }: {
-    config.modules.hosts = builtins.mapAttrs (unused_name_: unused_hostOptions_: {
-      wireguard = null;
-    }) options.modules.hosts;
+  hostFixture_ =
+    builtins.mapAttrs
+      (
+        unused_name: metadata:
+        lib.mergeAttrsList [
+          { enable = false; }
+          metadata
+        ]
+      )
+      {
+        thinkbook = import ../../modules/hosts/thinkbook/_metadata.nix;
+        matebook = import ../../modules/hosts/matebook/_metadata.nix;
+        aliyun = import ../../modules/hosts/aliyun/_metadata.nix;
+        wsl = import ../../modules/hosts/wsl/_metadata.nix;
+      };
+
+  userFixture_ = {
+    lingyu = {
+      enable = false;
+      uid = null;
+      username = "lingyu";
+      homeDirectory = "/home/lingyu";
+      existModule = {
+        os = false;
+        hm = true;
+      };
+    };
+  };
+
+  featureFixture_ = {
+    editor = {
+      enable = false;
+      allowUidList = [ ];
+      existModule = {
+        os = false;
+        hm = true;
+      };
+    };
+  };
+
+  testModules_ = {
+    hosts = hostFixture_;
+    users = userFixture_;
+    features = featureFixture_;
   };
 
   evalHostUserAssertions_ =
-    config_:
+    modules_:
     (lib.evalModules {
       specialArgs = { inherit pkgs llib; };
       modules = [
         assertionOptions_
         (assertionOnlyModule_ ../../modules/hosts)
         (assertionOnlyModule_ ../../modules/users)
-        testHostMetadata_
-        { config = config_; }
+        { config.modules = lib.recursiveUpdate testModules_ modules_; }
       ];
     }).config.assertions;
 
   evalFeatureAssertions_ =
-    config_:
+    modules_:
     (lib.evalModules {
       specialArgs = { inherit pkgs llib; };
       modules = [
         assertionOptions_
-        {
-          options.modules.users = lib.mkOption {
-            type = lib.types.attrsOf (
-              lib.types.submodule {
-                options = {
-                  enable = lib.mkOption {
-                    type = lib.types.bool;
-                    default = false;
-                  };
-                  uid = lib.mkOption {
-                    type = lib.types.nullOr lib.types.ints.unsigned;
-                    default = null;
-                  };
-                };
-              }
-            );
-            default = { };
-          };
-        }
         (assertionOnlyModule_ ../../modules/features)
-        { config = config_; }
+        { config.modules = lib.recursiveUpdate testModules_ modules_; }
       ];
     }).config.assertions;
 
@@ -100,11 +121,6 @@ let
     lib.findFirst (
       assertion_: assertion_.message == message_
     ) (throw "Expected assertion `${message_}` was not generated.") assertions_;
-
-  hostExistModule_ = {
-    os = true;
-    hm = false;
-  };
 
   uniqueEnabledHostAssertionMessage_ = "Exactly one host in `modules.hosts` must set `enable = true`.";
 
@@ -115,24 +131,15 @@ let
   oneEnabledHostAssertion_ =
     assertionByMessage_ uniqueEnabledHostAssertionMessage_
       (evalHostUserAssertions_ {
-        modules.hosts.thinkbook = {
-          enable = true;
-          existModule = hostExistModule_;
-        };
+        hosts.thinkbook.enable = true;
       });
 
   multipleEnabledHostAssertion_ =
     assertionByMessage_ uniqueEnabledHostAssertionMessage_
       (evalHostUserAssertions_ {
-        modules.hosts = {
-          aliyun = {
-            enable = true;
-            existModule = hostExistModule_;
-          };
-          thinkbook = {
-            enable = true;
-            existModule = hostExistModule_;
-          };
+        hosts = {
+          aliyun.enable = true;
+          thinkbook.enable = true;
         };
       });
 
@@ -140,29 +147,18 @@ let
     assertionByMessage_
       "`modules.users.lingyu.enable = true` requires `modules.users.lingyu.uid` to be assigned by the final flake composition."
       (evalHostUserAssertions_ {
-        modules = {
-          hosts.thinkbook = {
-            enable = true;
-            existModule = hostExistModule_;
-          };
-          users.lingyu.enable = true;
-        };
+        hosts.thinkbook.enable = true;
+        users.lingyu.enable = true;
       });
 
   unregisteredUidAssertion_ =
     assertionByMessage_
       "Every enabled user in `modules.users` must be declared in `modules.hosts.thinkbook.users` when this host is enabled."
       (evalHostUserAssertions_ {
-        modules = {
-          hosts.thinkbook = {
-            enable = true;
-            existModule = hostExistModule_;
-            users = lib.mkForce { };
-          };
-          users.lingyu = {
-            enable = true;
-            uid = 1000;
-          };
+        hosts.thinkbook.enable = true;
+        users.lingyu = {
+          enable = true;
+          uid = 1001;
         };
       });
 
@@ -170,19 +166,13 @@ let
     assertionByMessage_
       "`modules.features.editor.allowUidList` must only contain UIDs assigned to enabled users in `modules.users`."
       (evalFeatureAssertions_ {
-        modules = {
-          users.lingyu = {
-            enable = true;
-            uid = 1000;
-          };
-          features.editor = {
-            enable = true;
-            allowUidList = [ 1001 ];
-            existModule = {
-              os = false;
-              hm = true;
-            };
-          };
+        users.lingyu = {
+          enable = true;
+          uid = 1000;
+        };
+        features.editor = {
+          enable = true;
+          allowUidList = [ 1001 ];
         };
       });
 

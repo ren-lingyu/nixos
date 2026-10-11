@@ -1,11 +1,9 @@
 {
-  options,
   config,
-  pkgs,
   lib,
   llib,
   ...
-}@args:
+}:
 let
 
   enabledUserUids_ = builtins.map (user_: user_.uid) (
@@ -20,49 +18,8 @@ let
     )
   );
 
-  lmf = llib.moduleFunctions.features.default;
-
 in
 {
-
-  options = {
-
-    modules.features = llib.moduleFunctions.default.mkModuleOptions.default {
-      path = ./.;
-      commonSchema = (
-        feature_: {
-
-          enable = lib.mkOption {
-            type = lib.types.bool;
-            default = false;
-            example = true;
-            description = "Whether to enable the ${feature_} feature.";
-          };
-
-          allowUidList = lib.mkOption {
-            type = lib.types.listOf lib.types.ints.unsigned;
-            default =
-              if config.modules.features."${feature_}".existModule.hm == true then enabledUserUids_ else [ ];
-            example = [
-              1000
-              1001
-            ];
-            description = "User UIDs whose Home Manager configurations should import the ${feature_} module.";
-          };
-
-          existModule = lib.mkOption {
-            type = llib.types.existModule { optionPath = "modules.features.${feature_}.existModule"; };
-            internal = true;
-            default = { };
-            description = "Module availability declared by the ${feature_} feature.";
-          };
-
-        }
-      );
-      extraScope = args;
-    };
-
-  };
 
   config = {
 
@@ -97,17 +54,6 @@ in
           )
         ])
       ) config.modules.features
-    );
-
-    # Unlike NixOS `imports`, HM user imports can be assembled after option merging.
-    home-manager.users = builtins.mapAttrs (unused_uidKey_: imports_: { imports = imports_; }) (
-      lmf.groupImportsByUid (
-        unused_featureName_: feature_:
-        (lib.optionals (builtins.all (x_: x_) [
-          feature_.enable
-          (feature_.existModule.hm == true)
-        ]) feature_.allowUidList)
-      ) (featureName_: unused_feature_: [ (./. + "/${featureName_}/hm") ]) config.modules.features
     );
 
   };

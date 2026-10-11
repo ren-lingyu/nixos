@@ -3,26 +3,17 @@
   pkgs,
   lib,
   llib,
+  rootPath,
   ...
 }:
 {
 
-  options = {
-    modules.base = {
-      allowUnfreePredicateList = lib.mkOption {
-        type = lib.types.listOf lib.types.str;
-        default = [ ];
-        example = [ "github-copilot-cli" ];
-        description = "Package names allowed by the global unfree package predicate.";
-      };
-      createXdgUserDirectories = lib.mkOption {
-        type = lib.types.bool;
-        default = false;
-        example = true;
-        description = "Whether to enable and create XDG user directories.";
-      };
-    };
-  };
+  imports = builtins.concatMap (
+    descriptor:
+    lib.optional (builtins.pathExists (descriptor.module + "/os/internal-options.nix")) (
+      descriptor.module + "/os/internal-options.nix"
+    )
+  ) (llib.moduleFunctions.default.discoverModules rootPath (rootPath + "/modules"));
 
   config = {
 
@@ -43,7 +34,7 @@
 
     nixpkgs = {
       config.allowUnfreePredicate =
-        pkg: builtins.elem (lib.getName pkg) config.modules.base.allowUnfreePredicateList;
+        pkg: builtins.elem (lib.getName pkg) config.modules.share.allowUnfreePredicateList;
     };
 
     environment = {

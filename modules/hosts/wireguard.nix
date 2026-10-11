@@ -32,69 +32,6 @@ in
       readOnly = true;
     };
 
-    modules.hosts = llib.moduleFunctions.default.mkModuleOptions.withoutExtra {
-      path = ./.;
-      commonSchema = (
-        host_: {
-
-          wireguard = lib.mkOption {
-            type = lib.types.nullOr (
-              lib.types.submodule {
-                options = {
-
-                  publicKey = lib.mkOption {
-                    type = lib.types.nonEmptyStr;
-                    description = "WireGuard public key for this host.";
-                  };
-
-                  privateKey = lib.mkOption {
-                    type = (lib.types.either lib.types.path lib.types.nonEmptyStr);
-                    description = (
-                      builtins.concatStringsSep "\n" [
-                        "WireGuard private key material for this host."
-                        "Path values point to a repository file containing the key material; string values contain the key material inline."
-                        "Stored private key material should be encrypted."
-                      ]
-                    );
-                  };
-
-                  listenPort = lib.mkOption {
-                    type = lib.types.nullOr lib.types.port;
-                    default = null;
-                    description = "Local UDP port on which WireGuard listens on this host.";
-                  };
-
-                  endpoint = lib.mkOption {
-                    type = lib.types.nullOr (
-                      lib.types.submodule {
-                        options = {
-                          address = lib.mkOption {
-                            type = lib.types.nonEmptyStr;
-                            description = "Reachable address of this WireGuard endpoint.";
-                          };
-                          port = lib.mkOption {
-                            type = lib.types.port;
-                            description = "Reachable UDP port of this WireGuard endpoint.";
-                          };
-                        };
-                      }
-                    );
-                    default = null;
-                    description = "WireGuard endpoint through which this host can be reached by other hosts.";
-                  };
-
-                };
-              }
-            );
-            internal = true;
-            readOnly = true;
-            description = "Static WireGuard metadata for this host.";
-          };
-
-        }
-      );
-    };
-
   };
 
   config = {

@@ -19,14 +19,16 @@ let
   );
 in
 {
-  allowUidList = lib.mkOption {
-    type = lib.types.listOf lib.types.ints.unsigned;
-    default =
-      if config.modules.features.${feature_}.existModule.hm == true then enabledUserUids_ else [ ];
-    example = [
-      1000
-      1001
-    ];
-    description = "User UIDs whose Home Manager configurations should import the ${feature_} module.";
+  configuration = metadata: {
+    allowUidList = lib.mkOption {
+      type = lib.types.listOf lib.types.ints.unsigned;
+      default = if metadata.existModule.hm == true then enabledUserUids_ else [ ];
+      example = [
+        1000
+        1001
+      ];
+      description = "User UIDs whose Home Manager configurations should import the ${feature_} module.";
+    };
   };
+  metadata = { };
 }

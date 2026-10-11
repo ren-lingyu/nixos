@@ -31,34 +31,6 @@ let
 in
 {
 
-  options = {
-
-    modules.hosts = llib.moduleFunctions.default.mkModuleOptions.withoutExtra {
-      path = ./.;
-      commonSchema = (
-        host_: {
-
-          bootManager = lib.mkOption {
-            type = lib.types.submodule {
-              options = {
-                enable = lib.mkOption {
-                  type = lib.types.bool;
-                  internal = true;
-                  readOnly = true;
-                  description = "Whether to apply the boot-manager template for the host ${host_}.";
-                };
-              };
-            };
-            default = { };
-            description = "Boot-manager template configuration for the ${host_} host.";
-          };
-
-        }
-      );
-    };
-
-  };
-
   config = lib.mkIf enabledHost_.bootManager.enable {
 
     environment.systemPackages = (

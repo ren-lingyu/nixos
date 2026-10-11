@@ -1,82 +1,6 @@
 { lib }: rec {
 
-  mkModuleOptions =
-    let
-
-      mkModuleOptions_ =
-        {
-          path_,
-          commonSchema_,
-          extraSchema_,
-        }:
-        (lib.genAttrs
-          (builtins.attrNames (
-            lib.filterAttrs (
-              name_: type_:
-              (builtins.all (x_: x_) [
-                (type_ == "directory")
-                (builtins.pathExists (path_ + "/${name_}/default.nix"))
-              ])
-            ) (builtins.readDir path_)
-          ))
-          (
-            module_:
-            (lib.mergeAttrsList [
-              (commonSchema_ module_)
-              (extraSchema_ module_ (path_ + "/${builtins.toString module_}/extra-options.nix"))
-            ])
-          )
-        );
-
-    in
-    {
-
-      default =
-        {
-          path,
-          commonSchema,
-          extraScope,
-        }:
-        (mkModuleOptions_ {
-          path_ = path;
-          commonSchema_ = commonSchema;
-          extraSchema_ = (
-            module_: possibleExtraOptionsPath_:
-            (lib.optionalAttrs (builtins.pathExists possibleExtraOptionsPath_) (
-              (import possibleExtraOptionsPath_) module_ extraScope
-            ))
-          );
-        });
-
-      withoutExtra =
-        { path, commonSchema }:
-        (mkModuleOptions_ {
-          path_ = path;
-          commonSchema_ = commonSchema;
-          extraSchema_ = (x_: y_: { });
-        });
-
-    };
-
   mkOptionName = path: lib.showOption path;
-
-  # Resolve deferred configuration values only after NixOS has supplied its final context.
-  # Do not traverse derivations: their attributes include function-valued helpers.
-  resolveFunOf =
-    scope: value:
-    if builtins.isFunction value then
-      resolveFunOf scope (value scope)
-    else if builtins.isList value then
-      builtins.map (resolveFunOf scope) value
-    else if
-      builtins.all (condition: condition) [
-        (builtins.isAttrs value)
-        (!(lib.isDerivation value))
-      ]
-    then
-      builtins.mapAttrs (unused_name: resolveFunOf scope) value
-    else
-      value;
 
   discoverModules =
     rootDirectory: searchDirectory:
@@ -151,7 +75,10 @@
           })
           (builtins.concatMap (
             name:
-            traverse (module + "/${name}") (path ++ [ name ]) (if isModule then path else parentModulePath)
+            traverse (module + "/${name}") (builtins.concatLists [
+              path
+              [ name ]
+            ]) (if isModule then path else parentModulePath)
           ) childDirectories)
         ]
     ))
@@ -159,21 +86,62 @@
       relativePath
       null;
 
-  mkOptionModules =
-    { root, scope }:
-    path:
-    let
-      prefixes = lib.range 1 (builtins.length path);
-      optionFiles = builtins.filter builtins.pathExists (
-        builtins.map (
-          length: root + "/${lib.concatStringsSep "/" (lib.take length path)}/_options.nix"
-        ) prefixes
-      );
-    in
-    builtins.map (file: {
-      _file = file;
-      options = import file (scope // { inherit path; });
-    }) optionFiles;
+  mkOptionModules = rec {
+    default =
+      {
+        root,
+        scope,
+        target,
+      }:
+      path:
+      let
+        prefixes = lib.range 1 (builtins.length path);
+        optionFiles = builtins.filter builtins.pathExists (
+          builtins.map (
+            length: root + "/${lib.concatStringsSep "/" (lib.take length path)}/_options.nix"
+          ) prefixes
+        );
+      in
+      builtins.map (file: {
+        _file = file;
+        options =
+          (import file (
+            lib.mergeAttrsList [
+              scope
+              { inherit path; }
+            ]
+          )).${target};
+      }) optionFiles;
+
+    configuration =
+      {
+        root,
+        scope,
+        metadata,
+      }:
+      path:
+      builtins.map
+        (
+          module:
+          module
+          // {
+            options = if lib.isFunction module.options then module.options metadata else module.options;
+          }
+        )
+        (
+          default {
+            inherit root scope;
+            target = "configuration";
+          } path
+        );
+
+    metadata =
+      { root, scope }:
+      default {
+        inherit root scope;
+        target = "metadata";
+      };
+  };
 
   mkOptionTree =
     {

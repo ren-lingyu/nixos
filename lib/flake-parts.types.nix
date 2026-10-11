@@ -1,5 +1,6 @@
 {
   lib,
+  llib,
   mkOptionTree,
   mkOptionModules,
   mkOptionName,
@@ -23,7 +24,7 @@
     };
   };
 
-  moduleIntegrations =
+  moduleRegistry =
     { root, modulesDir }:
     lib.types.submodule {
       options = mkOptionTree {
@@ -58,6 +59,38 @@
                   default = [ ];
                   description = "Additional Home Manager modules for users selected by this module.";
                 };
+
+                metadata = lib.mkOption {
+                  type = lib.types.submoduleWith {
+                    modules = builtins.concatLists [
+                      [
+                        ({ config, options, ... }: {
+                          imports = mkOptionModules.metadata {
+                            inherit root;
+                            scope = {
+                              inherit
+                                lib
+                                llib
+                                config
+                                options
+                                ;
+                            };
+                          } descriptor.path;
+                        })
+                      ]
+                      (lib.optionals (builtins.pathExists (descriptor.module + "/_metadata.nix")) [
+                        {
+                          _file = descriptor.module + "/_metadata.nix";
+                          config = import (descriptor.module + "/_metadata.nix");
+                        }
+                      ])
+                    ];
+                  };
+                  default = { };
+                  internal = true;
+                  readOnly = true;
+                  description = "Metadata for ${mkOptionName descriptor.path}.";
+                };
               };
             };
             default = { };
@@ -91,11 +124,13 @@
                 descriptor:
                 lib.mkOption {
                   type = lib.types.submoduleWith {
-                    modules = mkOptionModules {
+                    modules = mkOptionModules.configuration {
                       inherit root;
-                      scope = scope // {
-                        inherit lib config options;
-                      };
+                      scope = lib.mergeAttrsList [
+                        scope
+                        { inherit lib config options; }
+                      ];
+                      metadata = lib.getAttrFromPath (lib.drop 1 descriptor.path ++ [ "metadata" ]) scope.moduleRegistry;
                     } descriptor.path;
                   };
                   default = { };
@@ -111,6 +146,14 @@
                     )
                   }.";
                 };
+            };
+
+            moduleOptions = lib.mkOption {
+              type = lib.types.raw;
+              default = options.modules;
+              readOnly = true;
+              internal = true;
+              description = "Option declarations for this system’s configuration adapter.";
             };
 
             specialArgs = lib.mkOption {

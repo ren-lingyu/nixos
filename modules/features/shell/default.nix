@@ -6,14 +6,9 @@
 }:
 {
 
-  imports = [ ./os ];
-
   config = {
-    modules.features.shell = {
-      existModule = {
-        os = true;
-        hm = true;
-      };
+    moduleInternals.features.shell = {
+
       zsh = {
         package = pkgs.zsh;
       };

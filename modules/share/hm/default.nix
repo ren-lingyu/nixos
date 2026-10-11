@@ -8,55 +8,26 @@
   llib,
   ...
 }:
-let
-  moduleRootPath_ = rootPath + "/modules";
-in
 {
 
-  options = {
-    moduleInterfaces = (
-      lib.genAttrs
-        (builtins.attrNames (
-          lib.filterAttrs (
-            name_: type_:
-            (builtins.all (x_: x_) [
-              (type_ == "directory")
-              (builtins.pathExists (moduleRootPath_ + "/${name_}/default.nix"))
-            ])
-          ) (builtins.readDir moduleRootPath_)
-        ))
-        (
-          moduleType_:
-          (lib.genAttrs
-            (builtins.attrNames (
-              lib.filterAttrs (
-                name_: type_:
-                (builtins.all (x_: x_) [
-                  (type_ == "directory")
-                  (builtins.pathExists (moduleRootPath_ + "/${moduleType_}/${name_}/default.nix"))
-                ])
-              ) (builtins.readDir (moduleRootPath_ + "/${moduleType_}"))
-            ))
-            (
-              module_:
-              let
-                possibleInterfaceOptionsPath_ =
-                  moduleRootPath_ + "/${moduleType_}/${module_}/hm/interface-options.nix";
-              in
-              (lib.optionalAttrs (builtins.pathExists possibleInterfaceOptionsPath_) (
-                (import possibleInterfaceOptionsPath_) module_ {
-                  inherit options;
-                  inherit config;
-                  inherit osConfig;
-                  inherit pkgs;
-                  inherit lib;
-                  inherit llib;
-                }
-              ))
-            )
-          )
-        )
-    );
+  options.moduleInterfaces = llib.moduleFunctions.default.mkOptionTree {
+    root = rootPath;
+    modulesDir = rootPath + "/modules";
+    pathMapper = lib.drop 1;
+    optionMaker =
+      descriptor:
+      lib.optionalAttrs (builtins.pathExists (descriptor.module + "/hm/interface-options.nix")) (
+        (import (descriptor.module + "/hm/interface-options.nix")) (lib.last descriptor.path) {
+          inherit
+            options
+            config
+            osConfig
+            pkgs
+            lib
+            llib
+            ;
+        }
+      );
   };
 
   config = {
@@ -73,8 +44,8 @@ in
       dataHome = "${config.home.homeDirectory}/.local/share";
       stateHome = "${config.home.homeDirectory}/.local/state";
       userDirs = {
-        enable = lib.mkForce osConfig.modules.base.createXdgUserDirectories;
-        createDirectories = lib.mkForce osConfig.modules.base.createXdgUserDirectories;
+        enable = lib.mkForce osConfig.modules.share.createXdgUserDirectories;
+        createDirectories = lib.mkForce osConfig.modules.share.createXdgUserDirectories;
         package = pkgs.xdg-user-dirs;
         desktop = "${config.home.homeDirectory}/Desktop";
         download = "${config.home.homeDirectory}/Downloads";

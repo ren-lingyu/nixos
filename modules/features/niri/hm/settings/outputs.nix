@@ -54,7 +54,7 @@ in
           }
         )
       ) x_ ([ hostMonitor_.name ]))
-    ) { } cfg.monitors;
+    ) { } osConfig.moduleInternals.features.niri.monitors;
 
   };
 

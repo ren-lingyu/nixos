@@ -13,17 +13,7 @@ let
 in
 {
 
-  imports = [ ./os ];
-
   config = {
-
-    modules.hosts.thinkbook = {
-      enable = true;
-      existModule = {
-        os = true;
-        hm = false;
-      };
-    };
 
     assertions = [
       {

@@ -15,7 +15,10 @@ in
 
     users = {
       defaultUserShell = (
-        if (config.programs.zsh.enable == true) then (cfg.zsh.package) else (cfg.bash.package)
+        if (config.programs.zsh.enable == true) then
+          (config.moduleInternals.features.shell.zsh.package)
+        else
+          (config.moduleInternals.features.shell.bash.package)
       );
     };
 

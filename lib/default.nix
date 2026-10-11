@@ -16,7 +16,12 @@
 
   };
 
-  moduleFunctions = {
+  moduleFunctions = rec {
+
+    configuration = import ./moduleFunctions.configuration.nix {
+      inherit lib;
+      moduleFunctions = default;
+    };
 
     default = import ./moduleFunctions.default.nix { inherit lib; };
 
@@ -27,8 +32,6 @@
     };
 
     features = {
-
-      default = import ./moduleFunctions.features.default.nix { inherit lib; };
 
       sops = import ./moduleFunctions.features.sops.nix;
 
@@ -43,10 +46,11 @@
       inherit
         (import ./flake-parts.types.nix {
           inherit lib;
+          llib = { inherit types moduleFunctions; };
           inherit (moduleFunctions.default) mkOptionTree mkOptionModules mkOptionName;
         })
         nixosBuilder
-        moduleIntegrations
+        moduleRegistry
         nixosConfigurations
         ;
     };

@@ -28,7 +28,7 @@ in
   config = lib.mkIf cfg.enable {
 
     home.sessionVariables = {
-      SOPS_AGE_KEY_FILE = cfg.ageKeys.hm.path;
+      SOPS_AGE_KEY_FILE = osConfig.moduleInternals.features.sops.ageKeys.hm.path;
     };
 
     sops = lib.mergeAttrsList [
@@ -46,7 +46,7 @@ in
 
         age = {
           generateKey = false;
-          keyFile = cfg.ageKeys.hm.path;
+          keyFile = osConfig.moduleInternals.features.sops.ageKeys.hm.path;
           plugins = [ ];
           sshKeyPaths = [ ];
         };

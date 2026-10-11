@@ -16,14 +16,14 @@ in
 
     programs.bash = {
       enable = !osConfig.programs.zsh.enable;
-      package = cfg.bash.package;
+      package = osConfig.moduleInternals.features.shell.bash.package;
       enableCompletion = true;
       shellAliases = { };
     };
 
     programs.zsh = {
       enable = osConfig.programs.zsh.enable;
-      package = cfg.zsh.package;
+      package = osConfig.moduleInternals.features.shell.zsh.package;
       defaultKeymap = "emacs";
       enableCompletion = true;
       autosuggestion = {

@@ -40,20 +40,13 @@ let
 in
 {
 
-  imports = [ ./os ];
-
   config = {
-    modules.features.sops = {
-      existModule = {
-        os = true;
-        hm = true;
-      };
+    moduleInternals.features.sops = {
+
       allowUsernameList = lib.optionals cfg.enable (builtins.map getUsernameByUid_ cfg.allowUidList);
-      ageKeys = {
-        hm = rec {
-          name = "sops.hm";
-          path = config.age.secrets.${name}.path;
-        };
+      ageKeys.hm = {
+        name = "sops.hm";
+        path = config.age.secrets."sops.hm".path;
       };
     };
   };

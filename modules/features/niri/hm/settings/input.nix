@@ -42,7 +42,11 @@ in
         enable = true;
         map-to-output =
           (builtins.head (
-            builtins.attrValues (lib.filterAttrs (_: monitor_: monitor_.role == "default") cfg.monitors)
+            builtins.attrValues (
+              lib.filterAttrs (
+                _: monitor_: monitor_.role == "default"
+              ) osConfig.moduleInternals.features.niri.monitors
+            )
           )).name;
       };
     };

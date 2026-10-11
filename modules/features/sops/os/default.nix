@@ -17,7 +17,7 @@ in
 
     users.groups.${sopsGroup} = {
       name = sopsGroup;
-      members = cfg.allowUsernameList;
+      members = config.moduleInternals.features.sops.allowUsernameList;
     };
 
     environment.systemPackages = with pkgs; [
@@ -28,7 +28,7 @@ in
     ];
 
     age.secrets = {
-      ${cfg.ageKeys.hm.name} = {
+      ${config.moduleInternals.features.sops.ageKeys.hm.name} = {
         rekeyFile = ./sops.hm.age;
         owner = "root";
         group = sopsGroup;

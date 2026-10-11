@@ -11,7 +11,9 @@ let
 
   defaultMonitor_ = builtins.head (
     builtins.attrValues (
-      lib.filterAttrs (unusedName_: monitor_: monitor_.role == "default") cfg.monitors
+      lib.filterAttrs (
+        unusedName_: monitor_: monitor_.role == "default"
+      ) osConfig.moduleInternals.features.niri.monitors
     )
   );
 

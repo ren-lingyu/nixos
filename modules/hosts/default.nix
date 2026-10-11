@@ -1,26 +1,14 @@
 {
-  options,
   config,
-  pkgs,
   lib,
   llib,
   ...
-}@args:
+}:
 let
 
   cfg = config.modules.hosts;
 
   mif = llib.moduleFunctions.hosts.default;
-
-  hostList_ = builtins.attrNames (
-    lib.filterAttrs (
-      name_: type_:
-      (builtins.all (x_: x_) [
-        (type_ == "directory")
-        (builtins.pathExists (./. + "/${name_}/default.nix"))
-      ])
-    ) (builtins.readDir ./.)
-  );
 
   enabledHost_ = mif.getUniqueEnabledHost config.modules.hosts;
 
@@ -34,105 +22,7 @@ in
     ./wireguard.nix
   ];
 
-  options = {
-
-    modules.hosts = llib.moduleFunctions.default.mkModuleOptions.default {
-      path = ./.;
-      commonSchema = (
-        host_: {
-
-          enable = lib.mkOption {
-            type = lib.types.bool;
-            default = false;
-            example = true;
-            description = "Whether to enable this host profile.";
-          };
-
-          number = lib.mkOption {
-            type = lib.types.ints.positive;
-            internal = true;
-            readOnly = true;
-            example = 1;
-            description = "Stable number assigned to this host.";
-          };
-
-          users = lib.mkOption {
-            type = lib.types.attrsOf (
-              lib.types.unique {
-                message = "Each `modules.hosts.${host_}.users.<uid>` can only be defined once.";
-              } lib.types.ints.unsigned
-            );
-            internal = true;
-            default = { };
-            example = {
-              "1000" = 1000;
-            };
-            description = "UID-keyed declarations of managed users registered for this host.";
-          };
-
-          monitors = lib.mkOption {
-            type = lib.types.attrsOf (
-              lib.types.unique {
-                message = "Each `modules.hosts.${host_}.monitors.<name>` can only be defined once.";
-              } llib.types.monitor
-            );
-            internal = true;
-            default = { };
-            example = {
-              "eDP-1" = {
-                name = "eDP-1";
-                role = "default";
-                mode = {
-                  width = 3072;
-                  height = 1920;
-                  refresh = 60.0;
-                };
-                scale = 1.6;
-              };
-            };
-            description = "Monitor declarations for this host.";
-          };
-
-          publicIpAddress = lib.mkOption {
-            type = lib.types.nullOr lib.types.str;
-            internal = true;
-            readOnly = true;
-            example = "203.0.113.10";
-            description = "Public IP address assigned to this host.";
-          };
-
-          existModule = lib.mkOption {
-            type = llib.types.existModule { optionPath = "modules.hosts.${host_}.existModule"; };
-            internal = true;
-            default = { };
-            description = "Module availability declared by the ${host_} host profile.";
-          };
-
-        }
-      );
-      extraScope = args;
-    };
-
-  };
-
   config = {
-
-    modules.hosts = (
-      lib.genAttrs hostList_ (
-        host_:
-        let
-          possibleMetadataPath_ = ./. + "/${builtins.toString host_}/metadata.nix";
-        in
-        (lib.optionalAttrs (builtins.pathExists possibleMetadataPath_) (
-          (import possibleMetadataPath_) host_ {
-            inherit config;
-            inherit pkgs;
-            inherit lib;
-            inherit llib;
-          }
-        ))
-      )
-    );
 
     assertions = (
       builtins.concatLists [
@@ -211,16 +101,6 @@ in
           ) cfg
         ))
       ]
-    );
-
-    home-manager.sharedModules = builtins.concatLists (
-      lib.mapAttrsToList (
-        hostName_: host_:
-        (lib.optionals (builtins.all (x_: x_) [
-          host_.enable
-          (host_.existModule.hm == true)
-        ]) [ (./. + "/${hostName_}/hm") ])
-      ) cfg
     );
 
   };

@@ -29,14 +29,16 @@ in
     };
 
     environment = {
-      systemPackages = cfg.sessionPackages;
+      systemPackages = config.moduleInternals.features.greeter.sessionPackages;
       etc = {
         "greetd/environments" = {
           enable = true;
           target = "greetd/environments";
           text =
             (builtins.concatStringsSep "\n" (
-              builtins.map (x_: "${builtins.baseNameOf (lib.getExe x_)}") cfg.sessionPackages
+              builtins.map (
+                x_: "${builtins.baseNameOf (lib.getExe x_)}"
+              ) config.moduleInternals.features.greeter.sessionPackages
             ))
             + "\n";
         };
@@ -63,7 +65,7 @@ in
           let
             concatWords_ = builtins.concatStringsSep (builtins.fromJSON "\"\\u0020\"");
             concatLines_ = builtins.concatStringsSep "\n";
-            greeterOutput_ = cfg.monitor.name;
+            greeterOutput_ = config.moduleInternals.features.greeter.monitor.name;
             swayGreetConfig_ =
               let
                 swayGreetCommand_ = builtins.concatStringsSep ";" [

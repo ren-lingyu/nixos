@@ -14,16 +14,9 @@ let
 in
 {
 
-  imports = [ ./os ];
-
   config = {
 
-    modules.features.greeter = {
-
-      existModule = {
-        os = true;
-        hm = false;
-      };
+    moduleInternals.features.greeter = {
 
       monitor =
         let
@@ -41,6 +34,12 @@ in
     };
 
     assertions = [
+      {
+        assertion = builtins.all (
+          package: (package.meta.mainProgram or "") != ""
+        ) config.moduleInternals.features.greeter.sessionPackages;
+        message = "Every package in `moduleInternals.features.greeter.sessionPackages` must declare a non-empty `meta.mainProgram`.";
+      }
       {
         assertion =
           let
@@ -60,7 +59,7 @@ in
         assertion = (
           builtins.any (x_: x_) [
             (!cfg.enable)
-            (cfg.sessionPackages != [ ])
+            (config.moduleInternals.features.greeter.sessionPackages != [ ])
           ]
         );
         message = "`modules.features.greeter.enable = true` requires at least one session provider.";

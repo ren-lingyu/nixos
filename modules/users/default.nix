@@ -1,78 +1,10 @@
 {
-  options,
   config,
-  pkgs,
   lib,
   llib,
   ...
-}@args:
-let
-
-  userList_ = builtins.attrNames (
-    lib.filterAttrs (
-      name_: type_:
-      (builtins.all (x_: x_) [
-        (type_ == "directory")
-        (builtins.pathExists (./. + "/${name_}/default.nix"))
-      ])
-    ) (builtins.readDir ./.)
-  );
-
-in
+}:
 {
-
-  # User roots declare profile metadata; only their `hm/` implementations are conditional.
-  imports = builtins.map (user_: ./. + "/${user_}") userList_;
-
-  options = {
-    modules.users = llib.moduleFunctions.default.mkModuleOptions.default {
-      path = ./.;
-      commonSchema = (
-        user_: {
-
-          enable = lib.mkOption {
-            type = lib.types.bool;
-            default = false;
-            example = true;
-            description = "Whether to enable the ${user_} user profile.";
-          };
-
-          uid = lib.mkOption {
-            type = lib.types.unique {
-              message = "Conflicting UID assignments for `modules.users.${user_}.uid`.";
-            } (lib.types.nullOr lib.types.ints.unsigned);
-            default = null;
-            example = 1000;
-            description = "UID assigned to the ${user_} user profile by the final flake composition.";
-          };
-
-          username = lib.mkOption {
-            type = lib.types.nonEmptyStr;
-            default = user_;
-            example = "jane.doe";
-            description = "Login name of the ${user_} user profile.";
-          };
-
-          homeDirectory = lib.mkOption {
-            type = lib.types.str;
-            default = "/home/${config.modules.users.${user_}.username}";
-            example = "/home/jane.doe";
-            description = "Home directory of the ${user_} user profile. Must be an absolute path.";
-          };
-
-          existModule = lib.mkOption {
-            type = llib.types.existModule { optionPath = "modules.users.${user_}.existModule"; };
-            internal = true;
-            default = { };
-            description = "Module availability declared by the ${user_} user profile.";
-          };
-
-        }
-      );
-      extraScope = args;
-    };
-
-  };
 
   config = {
 
@@ -188,10 +120,9 @@ in
 
     home-manager.users = builtins.listToAttrs (
       lib.mapAttrsToList
-        (userName_: user_: {
+        (unused_userName_: user_: {
           name = builtins.toString user_.uid;
           value = {
-            imports = lib.optionals (user_.existModule.hm == true) [ (./. + "/${userName_}/hm") ];
             home = {
               uid = lib.mkForce user_.uid;
               username = lib.mkForce user_.username;

@@ -15,56 +15,6 @@ let
 in
 {
 
-  options = {
-
-    modules.hosts = llib.moduleFunctions.default.mkModuleOptions.withoutExtra {
-      path = ./.;
-      commonSchema = (
-        host_: {
-
-          shared = lib.mkOption {
-            type = lib.types.submodule {
-              options = {
-
-                networkmanager = {
-                  enable = lib.mkOption {
-                    type = lib.types.bool;
-                    internal = true;
-                    readOnly = true;
-                    description = "Whether to enable NetworkManager for this host.";
-                  };
-                };
-
-                bluetooth = {
-                  enable = lib.mkOption {
-                    type = lib.types.bool;
-                    internal = true;
-                    readOnly = true;
-                    description = "Whether to enable Bluetooth and blueman for this host.";
-                  };
-                };
-
-                power = {
-                  enable = lib.mkOption {
-                    type = lib.types.bool;
-                    internal = true;
-                    readOnly = true;
-                    description = "Whether to enable power-profiles-daemon and UPower for this host.";
-                  };
-                };
-
-              };
-            };
-            default = { };
-            description = "Shared system services for the ${host_} host.";
-          };
-
-        }
-      );
-    };
-
-  };
-
   config = {
 
     networking.networkmanager = lib.mkIf enabledHost_.shared.networkmanager.enable { enable = true; };

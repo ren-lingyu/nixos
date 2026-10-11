@@ -137,8 +137,8 @@
               type = llib.flake-parts.types.nixosBuilder;
               readOnly = true;
             };
-            moduleIntegrations = lib.mkOption {
-              type = llib.flake-parts.types.moduleIntegrations {
+            moduleRegistry = lib.mkOption {
+              type = llib.flake-parts.types.moduleRegistry {
                 root = ./.;
                 modulesDir = ./modules;
               };
@@ -148,7 +148,10 @@
               type = llib.flake-parts.types.nixosConfigurations {
                 root = ./.;
                 modulesDir = ./modules;
-                scope = { inherit llib; };
+                scope = {
+                  inherit llib;
+                  moduleRegistry = config.moduleRegistry;
+                };
               };
               readOnly = true;
             };
@@ -166,7 +169,7 @@
               specialArgs = { inherit llib rootPath; };
             };
 
-            moduleIntegrations = {
+            moduleRegistry = {
 
               share = {
                 nixosModules = [
@@ -257,6 +260,225 @@
 
             };
 
+            nixosConfigurations = {
+
+              nixos = {
+                system = "x86_64-linux";
+                modules = {
+                  share = {
+                    enable = true;
+                    allowUnfreePredicateList = [
+                      "github-copilot-cli"
+                      "microsoft-edge"
+                      "feishu"
+                      "zoom"
+                      "rar"
+                      "unrar"
+                    ];
+                    createXdgUserDirectories = true;
+                  };
+                  features = {
+                    agent.enable = true;
+                    diagnostics.enable = true;
+                    editor = {
+                      enable = true;
+                      defaultEditor = "neovim";
+                      vim.enable = false;
+                      neovim.enable = true;
+                      emacs = {
+                        enable = true;
+                        programs.package = { pkgs, ... }: pkgs.emacs31-pgtk;
+                        services.package = { pkgs, ... }: pkgs.emacs-pgtk-twist;
+                      };
+                      lem = {
+                        enable = true;
+                        package = { pkgs, ... }: pkgs.lem-webview;
+                      };
+                    };
+                    file-manager.enable = true;
+                    font.enable = true;
+                    greeter.enable = true;
+                    media.enable = true;
+                    niri = {
+                      enable = true;
+                      noctalia.enable = true;
+                      waybar.enable = false;
+                    };
+                    office.enable = true;
+                    proxy = {
+                      enable = true;
+                      clash-verge.enable = true;
+                      throne.enable = true;
+                    };
+                    sops.enable = true;
+                    shell.enable = true;
+                    terminal.enable = true;
+                    texlive.enable = true;
+                    x11-session.enable = true;
+                  };
+                  hosts = {
+                    thinkbook = {
+                      enable = true;
+                      flatpak.enable = true;
+                    };
+                  };
+                  workloads.wbo = {
+                    enable = true;
+                    ip = { config, ... }: config.networking.wireguard.topology."3".nodes."2";
+                    port = _: 18000;
+                    networkInterface = { config, ... }: config.networking.wireguard.topology."3".name;
+                    allowedSourceIp = { config, ... }: config.networking.wireguard.topology."3".nodes."3";
+                  };
+                  users = {
+                    lingyu = {
+                      enable = true;
+                      username = "lingyu";
+                      homeDirectory = "/home/lingyu";
+                      uid = config.moduleRegistry.hosts.thinkbook.metadata.users."1000";
+                    };
+                  };
+                };
+              };
+
+              nixos-matebook = {
+                system = "x86_64-linux";
+                modules = {
+                  share = {
+                    enable = true;
+                    allowUnfreePredicateList = [ "github-copilot-cli" ];
+                    createXdgUserDirectories = true;
+                  };
+                  features = {
+                    agent.enable = true;
+                    diagnostics.enable = true;
+                    editor = {
+                      enable = true;
+                      defaultEditor = "neovim";
+                      vim.enable = false;
+                      neovim.enable = true;
+                      emacs = {
+                        enable = true;
+                        programs.package = { pkgs, ... }: pkgs.emacs31-pgtk;
+                        services.package = { pkgs, ... }: pkgs.emacs-pgtk-twist;
+                      };
+                      lem = {
+                        enable = true;
+                        package = { pkgs, ... }: pkgs.lem-webview;
+                      };
+                    };
+                    file-manager.enable = true;
+                    font.enable = true;
+                    greeter.enable = true;
+                    media.enable = true;
+                    niri = {
+                      enable = true;
+                      noctalia.enable = true;
+                      waybar.enable = false;
+                    };
+                    proxy = {
+                      enable = true;
+                      clash-verge.enable = true;
+                      throne.enable = false;
+                    };
+                    sops.enable = true;
+                    shell.enable = true;
+                    terminal.enable = true;
+                    texlive.enable = true;
+                  };
+                  hosts = {
+                    matebook = {
+                      enable = true;
+                    };
+                  };
+                  users = {
+                    lingyu = {
+                      enable = true;
+                      username = "lingyu";
+                      homeDirectory = "/home/lingyu";
+                      uid = config.moduleRegistry.hosts.matebook.metadata.users."1000";
+                    };
+                  };
+                };
+              };
+
+              nixos-server = {
+                system = "x86_64-linux";
+                modules = {
+                  share = {
+                    enable = true;
+                    createXdgUserDirectories = false;
+                  };
+                  features = {
+                    shell.enable = true;
+                    sops.enable = true;
+                  };
+                  hosts = {
+                    aliyun = {
+                      enable = true;
+                    };
+                  };
+                  workloads.caddy = {
+                    enable = true;
+                    ip = { config, ... }: config.networking.wireguard.topology."3".nodes."2";
+                    port = _: 18000;
+                    networkInterface = { config, ... }: config.networking.wireguard.topology."3".name;
+                  };
+                  users = {
+                    lingyu-minimal = {
+                      enable = true;
+                      username = "lingyu";
+                      homeDirectory = "/home/lingyu";
+                      uid = config.moduleRegistry.hosts.aliyun.metadata.users."1000";
+                    };
+                  };
+                };
+              };
+
+              nixos-wsl = {
+                system = "x86_64-linux";
+                modules = {
+                  share = {
+                    enable = true;
+                    allowUnfreePredicateList = [ "github-copilot-cli" ];
+                    createXdgUserDirectories = false;
+                  };
+                  features = {
+                    agent.enable = true;
+                    diagnostics.enable = true;
+                    editor = {
+                      enable = true;
+                      defaultEditor = "neovim";
+                      vim.enable = false;
+                      neovim.enable = true;
+                      emacs.enable = true;
+                    };
+                    file-manager.enable = true;
+                    font.enable = true;
+                    media.enable = false;
+                    office.enable = false;
+                    sops.enable = true;
+                    shell.enable = true;
+                    terminal.enable = true;
+                    texlive.enable = true;
+                  };
+                  hosts = {
+                    wsl = {
+                      enable = true;
+                    };
+                  };
+                  users = {
+                    lingyu = {
+                      enable = true;
+                      username = "lingyu";
+                      homeDirectory = "/home/lingyu";
+                      uid = config.moduleRegistry.hosts.wsl.metadata.users."1000";
+                    };
+                  };
+                };
+              };
+
+            };
+
             flake = {
 
               nixosModules = {
@@ -271,520 +493,11 @@
                 default = lpkgs.overlay;
               };
 
-              modules =
-                let
-                  moduleIntegrations_ = config.moduleIntegrations;
-                  nixosBuilder_ = config.nixosBuilder;
-                in
-                {
-
-                  base =
-                    {
-                      config,
-                      pkgs,
-                      lib,
-                      ...
-                    }:
-                    {
-                      _file = ./flake.nix;
-                      key = "${builtins.toString ./flake.nix}#self.modules.base";
-                      imports = builtins.concatLists [
-                        [ nixosBuilder_.homeManager ]
-                        moduleIntegrations_.share.nixosModules
-                        [
-                          ./modules/share/os
-                          ./modules/features
-                          ./modules/hosts
-                          ./modules/users
-                          ./modules/workloads
-                        ]
-                      ];
-                      config = {
-                        _module.args = nixosBuilder_.specialArgs;
-                        nixpkgs = {
-                          overlays = moduleIntegrations_.share.nixpkgsOverlays;
-                        };
-                        home-manager = {
-                          sharedModules = builtins.concatLists [
-                            moduleIntegrations_.share.homeModules
-                            [ ./modules/share/hm ]
-                          ];
-                          extraSpecialArgs = nixosBuilder_.specialArgs;
-                        };
-                      };
-                    };
-
-                  features = {
-                    niri =
-                      {
-                        config,
-                        pkgs,
-                        lib,
-                        ...
-                      }:
-                      {
-                        imports = [
-                          self.modules.base
-                          ./modules/features/niri
-                        ];
-                        config = {
-                          nixpkgs = {
-                            overlays = moduleIntegrations_.features.niri.nixpkgsOverlays;
-                          };
-                          home-manager.sharedModules = moduleIntegrations_.features.niri.homeModules;
-                        };
-                      };
-                    sops =
-                      {
-                        config,
-                        pkgs,
-                        lib,
-                        ...
-                      }:
-                      {
-                        imports = builtins.concatLists [
-                          [
-                            self.modules.base
-                            ./modules/features/sops
-                          ]
-                          moduleIntegrations_.features.sops.nixosModules
-                        ];
-                        config = {
-                          home-manager.sharedModules = moduleIntegrations_.features.sops.homeModules;
-                        };
-                      };
-                    editor =
-                      {
-                        config,
-                        pkgs,
-                        lib,
-                        ...
-                      }:
-                      {
-                        imports = [
-                          self.modules.base
-                          ./modules/features/editor
-                        ];
-                        config = {
-                          nixpkgs = {
-                            overlays = moduleIntegrations_.features.editor.nixpkgsOverlays;
-                          };
-                          home-manager.sharedModules = moduleIntegrations_.features.editor.homeModules;
-                        };
-                      };
-                    share =
-                      {
-                        config,
-                        pkgs,
-                        lib,
-                        ...
-                      }:
-                      {
-                        imports = [
-                          self.modules.base
-                          ./modules/features/agent
-                          ./modules/features/diagnostics
-                          ./modules/features/file-manager
-                          ./modules/features/font
-                          ./modules/features/greeter
-                          ./modules/features/media
-                          ./modules/features/office
-                          ./modules/features/proxy
-                          ./modules/features/shell
-                          ./modules/features/terminal
-                          ./modules/features/texlive
-                          ./modules/features/x11-session
-                        ];
-                      };
-                  };
-
-                  users = {
-                    lingyu =
-                      {
-                        config,
-                        pkgs,
-                        lib,
-                        ...
-                      }:
-                      {
-                        imports = [ self.modules.base ];
-                        config.modules = {
-                          users.lingyu = {
-                            enable = true;
-                            username = "lingyu";
-                            homeDirectory = "/home/lingyu";
-                          };
-                        };
-                      };
-                    lingyu-minimal =
-                      {
-                        config,
-                        pkgs,
-                        lib,
-                        ...
-                      }:
-                      {
-                        imports = [ self.modules.base ];
-                        config.modules.users.lingyu-minimal = {
-                          enable = true;
-                          username = "lingyu";
-                          homeDirectory = "/home/lingyu";
-                        };
-                      };
-                  };
-
-                  workloads = {
-                    caddy =
-                      {
-                        config,
-                        pkgs,
-                        lib,
-                        ...
-                      }:
-                      {
-                        imports = [
-                          self.modules.base
-                          ./modules/workloads/caddy
-                        ];
-                      };
-                    wbo =
-                      {
-                        config,
-                        pkgs,
-                        lib,
-                        ...
-                      }:
-                      {
-                        imports = [
-                          self.modules.base
-                          ./modules/workloads/wbo
-                        ];
-                      };
-                  };
-
-                  hosts = {
-                    wsl =
-                      {
-                        config,
-                        pkgs,
-                        lib,
-                        ...
-                      }:
-                      {
-                        imports = builtins.concatLists [
-                          moduleIntegrations_.hosts.wsl.nixosModules
-                          [
-                            self.modules.base
-                            ./modules/hosts/wsl
-                          ]
-                        ];
-                      };
-                    thinkbook =
-                      {
-                        config,
-                        pkgs,
-                        lib,
-                        ...
-                      }:
-                      {
-                        imports = builtins.concatLists [
-                          moduleIntegrations_.hosts.thinkbook.nixosModules
-                          [
-                            self.modules.base
-                            self.modules.workloads.wbo
-                            ./modules/hosts/thinkbook
-                          ]
-                        ];
-                        config.modules = {
-                          hosts.thinkbook = {
-                            flatpak.enable = true;
-                          };
-                          workloads.wbo = {
-                            enable = true;
-                            ip = config.networking.wireguard.topology."3".nodes."2";
-                            port = 18000;
-                            networkInterface = config.networking.wireguard.topology."3".name;
-                            allowedSourceIp = config.networking.wireguard.topology."3".nodes."3";
-                          };
-                        };
-                      };
-                    aliyun =
-                      {
-                        config,
-                        pkgs,
-                        lib,
-                        ...
-                      }:
-                      {
-                        imports = builtins.concatLists [
-                          moduleIntegrations_.hosts.aliyun.nixosModules
-                          [
-                            self.modules.base
-                            self.modules.workloads.caddy
-                            ./modules/hosts/aliyun
-                          ]
-                        ];
-                        config.modules = {
-                          workloads.caddy = {
-                            enable = true;
-                            ip = config.networking.wireguard.topology."3".nodes."2";
-                            port = 18000;
-                            networkInterface = config.networking.wireguard.topology."3".name;
-                          };
-                        };
-                      };
-                    matebook =
-                      {
-                        config,
-                        pkgs,
-                        lib,
-                        ...
-                      }:
-                      {
-                        imports = [
-                          self.modules.base
-                          ./modules/hosts/matebook
-                        ];
-                      };
-                  };
-
-                };
-
-              nixosConfigurations = {
-
-                nixos = config.nixosBuilder.nixosSystem {
-                  system = "x86_64-linux";
-                  modules = [
-                    self.modules.features.share
-                    self.modules.features.editor
-                    self.modules.features.niri
-                    self.modules.features.sops
-                    self.modules.hosts.thinkbook
-                    self.modules.users.lingyu
-                    (
-                      {
-                        config,
-                        pkgs,
-                        lib,
-                        ...
-                      }:
-                      {
-                        config = {
-                          modules = {
-                            base = {
-                              allowUnfreePredicateList = [
-                                "github-copilot-cli"
-                                "microsoft-edge"
-                                "feishu"
-                                "zoom"
-                                "rar"
-                                "unrar"
-                              ];
-                              createXdgUserDirectories = true;
-                            };
-                            features = {
-                              agent.enable = true;
-                              diagnostics.enable = true;
-                              editor = {
-                                enable = true;
-                                defaultEditor = "neovim";
-                                vim.enable = false;
-                                neovim.enable = true;
-                                emacs = {
-                                  enable = true;
-                                  programs.package = pkgs.emacs31-pgtk;
-                                  services.package = pkgs.emacs-pgtk-twist;
-                                };
-                                lem = {
-                                  enable = true;
-                                  package = pkgs.lem-webview;
-                                };
-                              };
-                              file-manager.enable = true;
-                              font.enable = true;
-                              greeter.enable = true;
-                              media.enable = true;
-                              niri = {
-                                enable = true;
-                                noctalia.enable = true;
-                                waybar.enable = false;
-                              };
-                              office.enable = true;
-                              proxy = {
-                                enable = true;
-                                clash-verge.enable = true;
-                                throne.enable = true;
-                              };
-                              sops.enable = true;
-                              shell.enable = true;
-                              terminal.enable = true;
-                              texlive.enable = true;
-                              x11-session.enable = true;
-                            };
-                            users = {
-                              lingyu.uid = config.modules.hosts.thinkbook.users."1000";
-                            };
-                          };
-                        };
-                      }
-                    )
-                  ];
-                };
-
-                nixos-matebook = config.nixosBuilder.nixosSystem {
-                  system = "x86_64-linux";
-                  modules = [
-                    self.modules.features.share
-                    self.modules.features.editor
-                    self.modules.features.niri
-                    self.modules.features.sops
-                    self.modules.hosts.matebook
-                    self.modules.users.lingyu
-                    (
-                      {
-                        config,
-                        pkgs,
-                        lib,
-                        ...
-                      }:
-                      {
-                        config = {
-                          modules = {
-                            base = {
-                              allowUnfreePredicateList = [ "github-copilot-cli" ];
-                              createXdgUserDirectories = true;
-                            };
-                            features = {
-                              agent.enable = true;
-                              diagnostics.enable = true;
-                              editor = {
-                                enable = true;
-                                defaultEditor = "neovim";
-                                vim.enable = false;
-                                neovim.enable = true;
-                                emacs = {
-                                  enable = true;
-                                  programs.package = pkgs.emacs31-pgtk;
-                                  services.package = pkgs.emacs-pgtk-twist;
-                                };
-                                lem = {
-                                  enable = true;
-                                  package = pkgs.lem-webview;
-                                };
-                              };
-                              file-manager.enable = true;
-                              font.enable = true;
-                              greeter.enable = true;
-                              media.enable = true;
-                              niri = {
-                                enable = true;
-                                noctalia.enable = true;
-                                waybar.enable = false;
-                              };
-                              proxy = {
-                                enable = true;
-                                clash-verge.enable = true;
-                                throne.enable = false;
-                              };
-                              sops.enable = true;
-                              shell.enable = true;
-                              terminal.enable = true;
-                              texlive.enable = true;
-                            };
-                            users = {
-                              lingyu.uid = config.modules.hosts.matebook.users."1000";
-                            };
-                          };
-                        };
-                      }
-                    )
-                  ];
-                };
-
-                nixos-server = config.nixosBuilder.nixosSystem {
-                  system = "x86_64-linux";
-                  modules = [
-                    self.modules.features.share
-                    self.modules.features.editor
-                    self.modules.features.sops
-                    self.modules.hosts.aliyun
-                    self.modules.users.lingyu-minimal
-                    (
-                      {
-                        config,
-                        pkgs,
-                        lib,
-                        ...
-                      }:
-                      {
-                        config = {
-                          modules = {
-                            base = {
-                              createXdgUserDirectories = false;
-                            };
-                            features = {
-                              shell.enable = true;
-                              sops.enable = true;
-                            };
-                            users = {
-                              lingyu-minimal.uid = config.modules.hosts.aliyun.users."1000";
-                            };
-                          };
-                        };
-                      }
-                    )
-                  ];
-                };
-
-                nixos-wsl = config.nixosBuilder.nixosSystem {
-                  system = "x86_64-linux";
-                  modules = [
-                    self.modules.features.share
-                    self.modules.features.editor
-                    self.modules.features.sops
-                    self.modules.hosts.wsl
-                    self.modules.users.lingyu
-                    (
-                      {
-                        config,
-                        pkgs,
-                        lib,
-                        ...
-                      }:
-                      {
-                        config = {
-                          modules = {
-                            base = {
-                              allowUnfreePredicateList = [ "github-copilot-cli" ];
-                              createXdgUserDirectories = false;
-                            };
-                            features = {
-                              agent.enable = true;
-                              diagnostics.enable = true;
-                              editor = {
-                                enable = true;
-                                defaultEditor = "neovim";
-                                vim.enable = false;
-                                neovim.enable = true;
-                                emacs.enable = true;
-                              };
-                              file-manager.enable = true;
-                              font.enable = true;
-                              media.enable = false;
-                              office.enable = false;
-                              sops.enable = true;
-                              shell.enable = true;
-                              terminal.enable = true;
-                              texlive.enable = true;
-                            };
-                            users.lingyu.uid = config.modules.hosts.wsl.users."1000";
-                          };
-                        };
-                      }
-                    )
-                  ];
-                };
-
+              nixosConfigurations = llib.moduleFunctions.configuration.mkNixosConfigurations {
+                inherit rootPath;
+                builder = config.nixosBuilder;
+                registry = config.moduleRegistry;
+                configurations = config.nixosConfigurations;
               };
 
             };
