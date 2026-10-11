@@ -74,6 +74,9 @@ Choose the type from the staged change's primary semantic effect, then check it 
 - `perf`: improve performance without otherwise changing external behavior.
 - `revert`: intentionally reverse an earlier commit as the primary purpose.
 
+- Distinguish new capabilities from new implementation artifacts. Introducing a usable capability or configuration interface is `feat`, even when existing configuration is migrated to support it. Merely extracting existing behavior into a new module, package, or wrapper does not by itself require `feat`; classify by the primary semantic effect.
+- Classify parameter and value changes by their effect. Prefer `chore` for discretionary configuration tuning that neither introduces a capability nor corrects a demonstrated defect. Use `feat`, `fix`, or another more specific type when justified by the actual change.
+
 A touched lock file does not by itself require `build`. In configuration repositories, routine locked-input refreshes are commonly `chore`; reserve `build` for changes whose primary meaning is build, packaging, or dependency wiring. If a change partially undoes an earlier commit but retains a new coherent state, classify that resulting change rather than automatically using `revert`.
 
 Prompt, command, agent, and skill files can change agent behavior. Choose `feat`, `fix`, `refactor`, or `chore` according to that behavior rather than their `.md` extension.
@@ -86,6 +89,7 @@ Choose scope from the conceptual owner or driver of the change, not mechanically
 - A slash-separated path-like scope such as `modules/features/niri` is valid when established by repository history.
 - Use a shared library scope when a library API or function signature drives coordinated consumer changes.
 - Use a feature or module scope when the change is primarily owned by that feature, even if supporting files elsewhere also change.
+- Prefer the package name as scope when the change primarily targets one package, even if its implementation involves shared configuration or dependency wiring such as `flake.nix`. Use a broader scope for changes coordinated across multiple packages.
 - Omit scope when no single scope is more informative than the subject.
 
 Keep scope lowercase. Do not use `*` unless the repository consistently does so.
@@ -107,6 +111,7 @@ Write the body in Chinese by default, while retaining established English techni
 
 - Use `-` bullets with no blank lines between them.
 - End each bullet with an English period.
+- Use half-width ASCII punctuation in Chinese body text (e.g. `,`, `.`, `(`, `)`, `;`) instead of full-width Chinese punctuation. Preserve punctuation in verbatim quotations and literals.
 - Wrap paths, options, attributes, functions, commands, and identifiers in backticks.
 - Cover every meaningful staged effect, but group mechanically related edits instead of narrating each changed line.
 - Prefer an explicit "从 ... 改为 ..." comparison when the old-to-new transformation is important to understanding the change.
