@@ -22,7 +22,7 @@ let
     };
   };
 
-  result_ = llib.moduleFunctions.configuration.adaptOptions options_ config_ { value = "resolved"; };
+  result_ = llib.flakeParts.adaptOptions options_ config_ { value = "resolved"; };
 
 in
 assert result_.plain;

@@ -8,7 +8,7 @@
 }:
 let
 
-  mif = llib.moduleFunctions.hosts.default;
+  mif = llib.hosts;
 
   enabledHost_ = mif.getUniqueEnabledHost config.modules.hosts;
 

@@ -13,7 +13,7 @@
     lib.optional (builtins.pathExists (descriptor.module + "/os/internal-options.nix")) (
       descriptor.module + "/os/internal-options.nix"
     )
-  ) (llib.moduleFunctions.default.discoverModules rootPath (rootPath + "/modules"));
+  ) (llib.modules.discoverModules rootPath (rootPath + "/modules"));
 
   config = {
 
@@ -63,7 +63,7 @@
 
     age =
       let
-        enabledHost_ = llib.moduleFunctions.hosts.default.getUniqueEnabledHost config.modules.hosts;
+        enabledHost_ = llib.hosts.getUniqueEnabledHost config.modules.hosts;
       in
       {
         identityPaths = [ enabledHost_.identity.keys.ssh.private.path ];

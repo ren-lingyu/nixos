@@ -10,50 +10,34 @@
 
   };
 
-  assertions = {
-
-    existModule = import ./assertions.exist-module.nix;
-
+  modules = (import ./modules.nix { inherit lib; }) // {
+    assertions.existModule = import ./modules.assertions.exist-module.nix;
   };
 
-  moduleFunctions = rec {
+  hosts = import ./hosts.nix { inherit lib; };
 
-    configuration = import ./moduleFunctions.configuration.nix {
+  features.sops = import ./features.sops.nix;
+
+  packages = import ./packages.nix { inherit lib; };
+
+  flakeParts =
+    (import ./flakeParts.configurations.nix {
       inherit lib;
-      moduleFunctions = default;
+      moduleTools = modules;
+    })
+    // {
+      types = {
+        inherit
+          (import ./flakeParts.types.nix {
+            inherit lib;
+            llib = { inherit types modules; };
+            inherit (modules) mkOptionTree mkOptionModules mkOptionName;
+          })
+          nixosBuilder
+          moduleRegistry
+          nixosConfigurations
+          ;
+      };
     };
-
-    default = import ./moduleFunctions.default.nix { inherit lib; };
-
-    hosts = {
-
-      default = import ./moduleFunctions.hosts.default.nix { inherit lib; };
-
-    };
-
-    features = {
-
-      sops = import ./moduleFunctions.features.sops.nix;
-
-    };
-
-  };
-
-  packageFunctions = import ./packageFunctions.nix { inherit lib; };
-
-  flake-parts = {
-    types = {
-      inherit
-        (import ./flake-parts.types.nix {
-          inherit lib;
-          llib = { inherit types moduleFunctions; };
-          inherit (moduleFunctions.default) mkOptionTree mkOptionModules mkOptionName;
-        })
-        nixosBuilder
-        moduleRegistry
-        nixosConfigurations
-        ;
-    };
-  };
 
 }

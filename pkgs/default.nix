@@ -2,23 +2,23 @@
 
   mkLegacyPackages =
     pkgs:
-    llib.packageFunctions.mkLegacyPackages {
+    llib.packages.mkLegacyPackages {
       root = ./.;
       packagePath = "package.nix";
       inherit pkgs;
     };
 
-  overlay = llib.packageFunctions.mkOverlay {
+  overlay = llib.packages.mkOverlay {
     root = ./.;
     overlayPath = "overlay.nix";
   };
 
-  nixosModule = llib.packageFunctions.mkNixosModule {
+  nixosModule = llib.packages.mkNixosModule {
     root = ./.;
     modulePath = "os/default.nix";
   };
 
-  homeModule = llib.packageFunctions.mkHomeModule {
+  homeModule = llib.packages.mkHomeModule {
     root = ./.;
     modulePath = "hm/default.nix";
   };

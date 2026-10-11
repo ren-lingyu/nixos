@@ -17,7 +17,7 @@ let
 
   secretsInput_ = if mifOptions_.secretsInput.isDefined then mif.secretsInput else [ ];
 
-  lmf = llib.moduleFunctions.features.sops {
+  lmf = llib.features.sops {
     inherit config;
     inherit osConfig;
   };

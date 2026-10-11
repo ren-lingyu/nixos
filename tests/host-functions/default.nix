@@ -1,7 +1,7 @@
 { pkgs, llib }:
 let
 
-  hostFunctions_ = llib.moduleFunctions.hosts.default;
+  hostFunctions_ = llib.hosts;
 
   hosts_ = {
     disabled = {

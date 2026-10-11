@@ -7,7 +7,7 @@ let
 
   assertTrue = name_: value_: if value_ then true else throw "Test `${name_}` failed: expected true.";
 
-  validAssertions_ = llib.assertions.existModule {
+  validAssertions_ = llib.modules.assertions.existModule {
     enable = true;
     value = {
       os = true;
@@ -19,7 +19,7 @@ let
     enabledMessage = "Both module declarations are required.";
   };
 
-  invalidAssertions_ = llib.assertions.existModule {
+  invalidAssertions_ = llib.modules.assertions.existModule {
     enable = true;
     value = {
       os = null;

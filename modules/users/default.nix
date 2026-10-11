@@ -66,7 +66,7 @@
                   message = "`modules.users.${userName_}.homeDirectory` must be an absolute path when this user is enabled.";
                 }
               ]
-              (llib.assertions.existModule {
+              (llib.modules.assertions.existModule {
                 enable = user_.enable;
                 value = user_.existModule;
                 optionPath = "modules.users.${userName_}.existModule";

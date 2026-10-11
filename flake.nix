@@ -134,18 +134,18 @@
 
           options = {
             nixosBuilder = lib.mkOption {
-              type = llib.flake-parts.types.nixosBuilder;
+              type = llib.flakeParts.types.nixosBuilder;
               readOnly = true;
             };
             moduleRegistry = lib.mkOption {
-              type = llib.flake-parts.types.moduleRegistry {
+              type = llib.flakeParts.types.moduleRegistry {
                 root = ./.;
                 modulesDir = ./modules;
               };
               readOnly = true;
             };
             nixosConfigurations = lib.mkOption {
-              type = llib.flake-parts.types.nixosConfigurations {
+              type = llib.flakeParts.types.nixosConfigurations {
                 root = ./.;
                 modulesDir = ./modules;
                 scope = {
@@ -493,7 +493,7 @@
                 default = lpkgs.overlay;
               };
 
-              nixosConfigurations = llib.moduleFunctions.configuration.mkNixosConfigurations {
+              nixosConfigurations = llib.flakeParts.mkNixosConfigurations {
                 inherit rootPath;
                 builder = config.nixosBuilder;
                 registry = config.moduleRegistry;

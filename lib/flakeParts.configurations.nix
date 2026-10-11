@@ -1,4 +1,4 @@
-{ lib, moduleFunctions }: rec {
+{ lib, moduleTools }: rec {
 
   # Adapt only functions explicitly declared with functionTo; do not inspect Nix values
   # to guess whether arbitrary functions, packages or overlays should be called.
@@ -101,7 +101,7 @@
       systemConfiguration,
     }:
     let
-      descriptors = moduleFunctions.discoverModules rootPath (rootPath + "/modules");
+      descriptors = moduleTools.discoverModules rootPath (rootPath + "/modules");
       enabled = enabledModules descriptors systemConfiguration;
     in
     builder.nixosSystem {
@@ -189,7 +189,12 @@
     lib.mapAttrs (
       unused_name: systemConfiguration:
       mkNixosSystem {
-        inherit rootPath builder registry systemConfiguration;
+        inherit
+          rootPath
+          builder
+          registry
+          systemConfiguration
+          ;
       }
     ) configurations;
 

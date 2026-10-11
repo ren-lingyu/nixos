@@ -27,7 +27,7 @@ in
       lib.mapAttrsToList (
         featureName_: feature_:
         (builtins.concatLists [
-          (llib.assertions.existModule {
+          (llib.modules.assertions.existModule {
             enable = feature_.enable;
             value = feature_.existModule;
             optionPath = "modules.features.${featureName_}.existModule";

@@ -77,7 +77,7 @@ let
           if builtins.isAttrs previous_ then
             (
               if lib.isDerivation previous_ then
-                builtins.throw "packageFunctions.mkOverlay: `${name_}` already exists and is a derivation"
+                builtins.throw "packages.mkOverlay: `${name_}` already exists and is a derivation"
               else
                 (
                   if previous_ ? overrideScope then
@@ -87,7 +87,7 @@ let
                 )
             )
           else
-            builtins.throw "packageFunctions.mkOverlay: `${name_}` already exists and is not an attribute set"
+            builtins.throw "packages.mkOverlay: `${name_}` already exists and is not an attribute set"
         )
       else
         (lib.makeScope final_.newScope (self_: overlay_ self_ { }))

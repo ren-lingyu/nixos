@@ -9,7 +9,7 @@ let
 
   cfg = config.modules.features.niri;
 
-  enabledHost_ = llib.moduleFunctions.hosts.default.getUniqueEnabledHost config.modules.hosts;
+  enabledHost_ = llib.hosts.getUniqueEnabledHost config.modules.hosts;
 
   noctaliaEnable = (
     builtins.all (x_: x_) [

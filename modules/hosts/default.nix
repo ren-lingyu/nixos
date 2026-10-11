@@ -8,7 +8,7 @@ let
 
   cfg = config.modules.hosts;
 
-  mif = llib.moduleFunctions.hosts.default;
+  mif = llib.hosts;
 
   enabledHost_ = mif.getUniqueEnabledHost config.modules.hosts;
 
@@ -43,7 +43,7 @@ in
         (builtins.concatLists (
           lib.mapAttrsToList (
             hostName_: host_:
-            llib.assertions.existModule {
+            llib.modules.assertions.existModule {
               enable = host_.enable;
               value = host_.existModule;
               optionPath = "modules.hosts.${hostName_}.existModule";

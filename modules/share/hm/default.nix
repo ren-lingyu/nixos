@@ -10,7 +10,7 @@
 }:
 {
 
-  options.moduleInterfaces = llib.moduleFunctions.default.mkOptionTree {
+  options.moduleInterfaces = llib.modules.mkOptionTree {
     root = rootPath;
     modulesDir = rootPath + "/modules";
     pathMapper = lib.drop 1;

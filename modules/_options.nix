@@ -16,9 +16,7 @@
 
   metadata = {
     existModule = lib.mkOption {
-      type = llib.types.existModule {
-        optionPath = "${llib.moduleFunctions.default.mkOptionName path}.existModule";
-      };
+      type = llib.types.existModule { optionPath = "${llib.modules.mkOptionName path}.existModule"; };
       internal = true;
       default = { };
       description = "Availability of the OS and Home Manager implementations.";

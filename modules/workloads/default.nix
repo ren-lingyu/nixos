@@ -10,7 +10,7 @@
     assertions = builtins.concatLists (
       lib.mapAttrsToList (
         workloadName_: workload_:
-        llib.assertions.existModule {
+        llib.modules.assertions.existModule {
           enable = workload_.enable;
           value = workload_.existModule;
           optionPath = "modules.workloads.${workloadName_}.existModule";

@@ -5,7 +5,7 @@ let
     name_: expected_: actual_:
     if actual_ == expected_ then true else throw "Test `${name_}` failed: values differ.";
 
-  sopsFunctions_ = llib.moduleFunctions.features.sops {
+  sopsFunctions_ = llib.features.sops {
     config = {
       home.uid = 1000;
       sops = {
