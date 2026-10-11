@@ -19,7 +19,9 @@
 
 =modules/= 下包含 =os/default.nix= 或 =hm/default.nix= 的目录会被识别为模块. 两侧实现是统一目录约定, 模块之间不允许嵌套. 模块根目录的 =default.nix= 是可选的 NixOS 配置补充, 不再承担模块发现入口的职责.
 
-从 =modules/_options.nix= 到模块目录沿途的 =_options.nix= 共同定义 schema, 分为 =configuration= 和 =metadata= 两部分. =configuration= 用于 flake-parts 层的 =nixosConfigurations.<system>.modules=; =metadata= 用于 =moduleRegistry.<kind>.<name>.metadata=. 模块的 =_metadata.nix= 提供静态 metadata 值.
+从 =modules/_options.fp.nix= 到模块目录沿途的 =_options.fp.nix= 共同定义 schema, 分为 =configuration= 和 =metadata= 两部分. =configuration= 用于 flake-parts 层的 =nixosConfigurations.<system>.modules=; =metadata= 用于 =moduleRegistry.<kind>.<name>.metadata=. 模块的 =_metadata.nix= 提供静态 metadata 值.
+
+仓库使用 =_options.<system>.nix= 标识按约定发现的 option declaration 文件: =fp= 对应 flake-parts, =os= 对应 NixOS, =hm= 对应 Home Manager. 这些文件由仓库加载器发现, 文件名标识解释环境, 不限定声明的 option namespace. 三者保留各自接口: FP 返回 configuration/metadata 声明分支, OS 返回原生 NixOS module, HM 返回以模块名和求值上下文为参数的声明片段. 统一命名不要求统一返回值结构或函数签名.
 
 share 没有 profile 名这一层, 对应 =nixosConfigurations.<system>.modules.share= 和 =moduleRegistry.share.metadata=.
 
@@ -53,9 +55,9 @@ nixosConfigurations.nixos.modules.users.lingyu.uid =
 user profile 的 HM 实现导入到自身绑定的 UID. 其他类别的已启用模块, 包括 share 和 host, 将 HM 实现及外部 HM 集成加入 =home-manager.sharedModules=.
 
 ** =moduleInternals= 与 =moduleInterfaces=
-=moduleInternals= 保存 NixOS 求值阶段产生的内部状态, 例如启用 host 的显示器信息和 shell 包. 声明位于各模块的 =os/internal-options.nix=; HM 实现通过 =osConfig.moduleInternals= 读取这些状态.
+=moduleInternals= 保存 NixOS 求值阶段产生的内部状态, 例如启用 host 的显示器信息和 shell 包. 声明位于各模块的 =os/_options.os.nix=; HM 实现通过 =osConfig.moduleInternals= 读取这些状态.
 
-=moduleInterfaces= 是 Home Manager 模块之间的内部通信命名空间. 声明位于各模块的 =hm/interface-options.nix=, 注册到每个 Home Manager 用户自己的 option 合并范围中. user profile 可以通过 =moduleInterfaces.<kind>.<name>.*= 向 feature 提供 per-user 内部数据; 当前 sops feature 用它接收 per-user SOPS 输入, agent feature 用它接收 provider 配置和 API key 文件路径.
+=moduleInterfaces= 是 Home Manager 模块之间的内部通信命名空间. 声明位于各模块的 =hm/_options.hm.nix=, 注册到每个 Home Manager 用户自己的 option 合并范围中. user profile 可以通过 =moduleInterfaces.<kind>.<name>.*= 向 feature 提供 per-user 内部数据; 当前 sops feature 用它接收 per-user SOPS 输入, agent feature 用它接收 provider 配置和 API key 文件路径.
 
 =mkNixosSystem= 通过构建库的私有生成函数统一加载这两类声明, 不依赖 =share.enable=. 声明加载不表示对应功能已启用. niri 与 x11-session 直接向 =moduleInternals.features.greeter.sessionPackages= 贡献会话包, niri 使用 =mkBefore= 保持优先顺序; greeter 校验包的 =meta.mainProgram= 并消费列表.
 
@@ -180,7 +182,7 @@ nixosConfigurations.nixos.modules.features.editor.emacs.programs.package =
 *** [[file:./modules/][/modules]]
 #+begin_example
 /modules/
-├── _options.nix
+├── _options.fp.nix
 ├── features/
 ├── hosts/
 ├── share/
@@ -188,25 +190,25 @@ nixosConfigurations.nixos.modules.features.editor.emacs.programs.package =
 └── workloads/
 #+end_example
 
-=modules/_options.nix= 定义所有模块共享的 configuration 与 metadata schema. 模块发现和系统组装由 =llib.modules= 与 =llib.flakeParts= 完成; 各类别的 =default.nix= 保留公共配置与断言, =share/= 提供公共 OS/HM 配置.
+=modules/_options.fp.nix= 定义所有模块共享的 configuration 与 metadata schema. 模块发现和系统组装由 =llib.modules= 与 =llib.flakeParts= 完成; 各类别的 =default.nix= 保留公共配置与断言, =share/= 提供公共 OS/HM 配置.
 
 **** [[file:./modules/share/][/modules/share]]
 #+begin_example
 /modules/share/
 ├── _metadata.nix
-├── _options.nix
+├── _options.fp.nix
 ├── hm/
 │   └── default.nix
 └── os/
     └── default.nix
 #+end_example
 
-=_options.nix= 声明允许的 unfree 包名和 XDG 用户目录开关. =os/default.nix= 提供 Nix, 防火墙, 基础工具, age 与 Home Manager 公共配置; =hm/default.nix= 提供 Fastfetch, XDG 路径和 home state version. 内部状态与 HM 接口声明由构建库独立加载.
+=_options.fp.nix= 声明允许的 unfree 包名和 XDG 用户目录开关. =os/default.nix= 提供 Nix, 防火墙, 基础工具, age 与 Home Manager 公共配置; =hm/default.nix= 提供 Fastfetch, XDG 路径和 home state version. 内部状态与 HM 接口声明由构建库独立加载.
 
 **** [[file:./modules/features/][/modules/features]]
 #+begin_example
 /modules/features/
-├── _options.nix
+├── _options.fp.nix
 ├── agent/
 ├── default.nix
 ├── diagnostics/
@@ -225,9 +227,9 @@ nixosConfigurations.nixos.modules.features.editor.emacs.programs.package =
 └── x11-session/
 #+end_example
 
-[[file:./modules/features/default.nix][modules/features/default.nix]] 校验 feature 的 OS/HM 结构和 HM 用户选择. =_options.nix= 定义公共 =allowUidList= schema; 发现, option tree 生成与 HM 送达由构建库统一处理.
+[[file:./modules/features/default.nix][modules/features/default.nix]] 校验 feature 的 OS/HM 结构和 HM 用户选择. =_options.fp.nix= 定义公共 =allowUidList= schema; 发现, option tree 生成与 HM 送达由构建库统一处理.
 
-每个 feature 通过 =_metadata.nix= 声明实现性质, 通过可选的 =_options.nix= 定义配置 schema, 按需提供 =os/= 和 =hm/= 实现. 可选根 =default.nix= 保存跨实现的内部状态, 会话包贡献或断言.
+每个 feature 通过 =_metadata.nix= 声明实现性质, 通过可选的 =_options.fp.nix= 定义配置 schema, 按需提供 =os/= 和 =hm/= 实现. 可选根 =default.nix= 保存跨实现的内部状态, 会话包贡献或断言.
 
 ***** [[file:./modules/features/agent/][/modules/features/agent]]
 #+begin_example
@@ -241,7 +243,7 @@ nixosConfigurations.nixos.modules.features.editor.emacs.programs.package =
 │   │   ├── preamble.md
 │   │   └── runtime.md
 │   ├── default.nix
-│   └── interface-options.nix
+│   └── _options.hm.nix
 └── os/
     └── default.nix
 #+end_example
@@ -262,18 +264,18 @@ nixosConfigurations.nixos.modules.features.editor.emacs.programs.package =
 #+begin_example
 /modules/features/editor/
 ├── _metadata.nix
-├── _options.nix
+├── _options.fp.nix
 └── hm/
     └── default.nix
 #+end_example
 
-=_options.nix= 定义默认编辑器, Vim, Neovim, Emacs 和 Lem 相关 option. =hm/default.nix= 配置 nixvim, vim, Emacs program 和 Emacs service.
+=_options.fp.nix= 定义默认编辑器, Vim, Neovim, Emacs 和 Lem 相关 option. =hm/default.nix= 配置 nixvim, vim, Emacs program 和 Emacs service.
 
 ***** [[file:./modules/features/file-manager/][/modules/features/file-manager]]
 #+begin_example
 /modules/features/file-manager/
 ├── _metadata.nix
-├── _options.nix
+├── _options.fp.nix
 ├── hm/
 │   └── default.nix
 └── os/
@@ -301,10 +303,10 @@ nixosConfigurations.nixos.modules.features.editor.emacs.programs.package =
 ├── default.nix
 └── os/
     ├── default.nix
-    └── internal-options.nix
+    └── _options.os.nix
 #+end_example
 
-=default.nix= 根据启用的 host 推导默认显示器, 并校验会话提供者贡献的 =sessionPackages=. =os/internal-options.nix= 声明 greeter 的内部显示器与会话包接口. =os/default.nix= 配置系统级 greeter 相关服务和 session 列表.
+=default.nix= 根据启用的 host 推导默认显示器, 并校验会话提供者贡献的 =sessionPackages=. =os/_options.os.nix= 声明 greeter 的内部显示器与会话包接口. =os/default.nix= 配置系统级 greeter 相关服务和 session 列表.
 
 ***** [[file:./modules/features/media/][/modules/features/media]]
 #+begin_example
@@ -320,7 +322,7 @@ nixosConfigurations.nixos.modules.features.editor.emacs.programs.package =
 #+begin_example
 /modules/features/niri/
 ├── _metadata.nix
-├── _options.nix
+├── _options.fp.nix
 ├── default.nix
 ├── hm/
 │   ├── default.nix
@@ -343,7 +345,7 @@ nixosConfigurations.nixos.modules.features.editor.emacs.programs.package =
 │       └── style.css
 └── os/
     ├── default.nix
-    └── internal-options.nix
+    └── _options.os.nix
 #+end_example
 
 通过 registry 中的 =niri-flake= 集成窗口管理器. =default.nix= 从 host 读取显示器信息, 保存到 =moduleInternals.features.niri.monitors=, 并向 greeter 贡献 Niri session wrapper. =hm/default.nix= 导入用户级 Niri 配置; =hm/settings/default.nix= 汇总输入, 布局, 输出, 绑定, 动画和窗口规则; =hm/noctalia/default.nix= 配置 Noctalia shell/bar; =hm/waybar/default.nix= 配置 Waybar; =os/default.nix= 配置系统级 Niri 支持.
@@ -362,13 +364,13 @@ nixosConfigurations.nixos.modules.features.editor.emacs.programs.package =
 #+begin_example
 /modules/features/proxy/
 ├── _metadata.nix
-├── _options.nix
+├── _options.fp.nix
 ├── default.nix
 └── os/
     └── default.nix
 #+end_example
 
-=_options.nix= 定义 clash-verge, throne, mihomo 和 v2raya 等开关. =default.nix= 保留相关断言; =os/default.nix= 配置系统级代理组件的 package 与运行模式.
+=_options.fp.nix= 定义 clash-verge, throne, mihomo 和 v2raya 等开关. =default.nix= 保留相关断言; =os/default.nix= 配置系统级代理组件的 package 与运行模式.
 
 ***** [[file:./modules/features/shell/][/modules/features/shell]]
 #+begin_example
@@ -379,7 +381,7 @@ nixosConfigurations.nixos.modules.features.editor.emacs.programs.package =
 │   └── default.nix
 └── os/
     ├── default.nix
-    └── internal-options.nix
+    └── _options.os.nix
 #+end_example
 
 =default.nix= 提供 OS 与 HM 共享的 shell 包内部状态. =hm/default.nix= 配置 zsh, starship 和 shell 行为; =os/default.nix= 配置系统级 shell 支持.
@@ -391,14 +393,14 @@ nixosConfigurations.nixos.modules.features.editor.emacs.programs.package =
 ├── default.nix
 ├── hm/
 │   ├── default.nix
-│   └── interface-options.nix
+│   └── _options.hm.nix
 └── os/
     ├── default.nix
-    ├── internal-options.nix
+    ├── _options.os.nix
     └── sops.hm.age
 #+end_example
 
-声明 sops feature 的 OS 与 HM 模块入口. =default.nix= 根据 =allowUidList= 推导允许读取密钥的用户名列表, 并提供 HM age key 文件路径; =os/default.nix= 创建 =sops-decrypt= group, 安装 SOPS 相关工具, 并通过 =age.secrets= 暴露 HM 使用的 age key file. =hm/interface-options.nix= 定义 per-user SOPS 输入.
+声明 sops feature 的 OS 与 HM 模块入口. =default.nix= 根据 =allowUidList= 推导允许读取密钥的用户名列表, 并提供 HM age key 文件路径; =os/default.nix= 创建 =sops-decrypt= group, 安装 SOPS 相关工具, 并通过 =age.secrets= 暴露 HM 使用的 age key file. =hm/_options.hm.nix= 定义 per-user SOPS 输入.
 
 ***** [[file:./modules/features/terminal/][/modules/features/terminal]]
 #+begin_example
@@ -438,25 +440,25 @@ nixosConfigurations.nixos.modules.features.editor.emacs.programs.package =
 /modules/workloads/
 ├── caddy/
 │   ├── _metadata.nix
-│   ├── _options.nix
+│   ├── _options.fp.nix
 │   └── os/
 │       └── default.nix
 ├── default.nix
 └── wbo/
     ├── _metadata.nix
-    ├── _options.nix
+    ├── _options.fp.nix
     └── os/
         └── default.nix
 #+end_example
 
-[[file:./modules/workloads/default.nix][modules/workloads/default.nix]] 通过 =existModule= 断言核对 OS/HM 实现结构. 各 workload 的 =_options.nix= 定义 configuration schema, 依赖 NixOS 网络配置的值通过函数延迟解析.
+[[file:./modules/workloads/default.nix][modules/workloads/default.nix]] 通过 =existModule= 断言核对 OS/HM 实现结构. 各 workload 的 =_options.fp.nix= 定义 configuration schema, 依赖 NixOS 网络配置的值通过函数延迟解析.
 
 =caddy= workload 配置 Caddy container, 通过指定 network interface, upstream IP 和 port 反向代理服务, 并用 nftables 限制出站路径. =wbo= workload 配置 whitebophir container, 通过指定 listen IP, port, network interface 和 allowed source IP 暴露白板服务.
 
 **** [[file:./modules/hosts/][/modules/hosts]]
 #+begin_example
 /modules/hosts/
-├── _options.nix
+├── _options.fp.nix
 ├── aliyun/
 ├── boot-manager.nix
 ├── default.nix
@@ -468,7 +470,7 @@ nixosConfigurations.nixos.modules.features.editor.emacs.programs.package =
 └── wsl/
 #+end_example
 
-[[file:./modules/hosts/default.nix][modules/hosts/default.nix]] 导入 boot-manager, identity, shared 和 WireGuard 相关通用模块, 校验 UID registry, monitor 和 OS/HM 结构, 并确保恰好启用一个 host. =_options.nix= 定义 host metadata schema.
+[[file:./modules/hosts/default.nix][modules/hosts/default.nix]] 导入 boot-manager, identity, shared 和 WireGuard 相关通用模块, 校验 UID registry, monitor 和 OS/HM 结构, 并确保恰好启用一个 host. =_options.fp.nix= 定义 host metadata schema.
 
 [[file:./modules/hosts/boot-manager.nix][modules/hosts/boot-manager.nix]], [[file:./modules/hosts/identity.nix][modules/hosts/identity.nix]], [[file:./modules/hosts/shared.nix][modules/hosts/shared.nix]] 和 [[file:./modules/hosts/wireguard.nix][modules/hosts/wireguard.nix]] 分别消费 host metadata, 生成 boot manager, identity, shared capability 和 WireGuard topology/secret 的配置.
 
@@ -505,7 +507,7 @@ MateBook bare metal NixOS host, hostname =nixos-matebook=, 配置本机硬件, �
 #+begin_example
 /modules/hosts/thinkbook/
 ├── _metadata.nix
-├── _options.nix
+├── _options.fp.nix
 ├── default.nix
 ├── os/
 │   ├── default.nix
@@ -547,13 +549,13 @@ NixOS-WSL host, hostname =nixos-wsl=.
 **** [[file:./modules/users/][/modules/users]]
 #+begin_example
 /modules/users/
-├── _options.nix
+├── _options.fp.nix
 ├── default.nix
 ├── lingyu/
 └── lingyu-minimal/
 #+end_example
 
-[[file:./modules/users/default.nix][modules/users/default.nix]] 校验用户绑定, 创建 NixOS user, 并向 UID-keyed 的 =home-manager.users= 提供 UID, username 和 home directory. =_options.nix= 定义 user configuration schema, HM 实现由构建函数送达.
+[[file:./modules/users/default.nix][modules/users/default.nix]] 校验用户绑定, 创建 NixOS user, 并向 UID-keyed 的 =home-manager.users= 提供 UID, username 和 home directory. =_options.fp.nix= 定义 user configuration schema, HM 实现由构建函数送达.
 
 ***** [[file:./modules/users/lingyu/][/modules/users/lingyu]]
 #+begin_example

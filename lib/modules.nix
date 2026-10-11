@@ -98,7 +98,7 @@
         prefixes = lib.range 1 (builtins.length path);
         optionFiles = builtins.filter builtins.pathExists (
           builtins.map (
-            length: root + "/${lib.concatStringsSep "/" (lib.take length path)}/_options.nix"
+            length: root + "/${lib.concatStringsSep "/" (lib.take length path)}/_options.fp.nix"
           ) prefixes
         );
       in

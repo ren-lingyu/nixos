@@ -4,8 +4,8 @@ let
     { root, modulesDir }:
     builtins.concatMap (
       descriptor:
-      lib.optional (builtins.pathExists (descriptor.module + "/os/internal-options.nix")) (
-        descriptor.module + "/os/internal-options.nix"
+      lib.optional (builtins.pathExists (descriptor.module + "/os/_options.os.nix")) (
+        descriptor.module + "/os/_options.os.nix"
       )
     ) (moduleTools.discoverModules root modulesDir);
 
@@ -26,8 +26,8 @@ let
         pathMapper = lib.drop 1;
         optionMaker =
           descriptor:
-          lib.optionalAttrs (builtins.pathExists (descriptor.module + "/hm/interface-options.nix")) (
-            (import (descriptor.module + "/hm/interface-options.nix")) (lib.last descriptor.path) {
+          lib.optionalAttrs (builtins.pathExists (descriptor.module + "/hm/_options.hm.nix")) (
+            (import (descriptor.module + "/hm/_options.hm.nix")) (lib.last descriptor.path) {
               inherit
                 options
                 config
