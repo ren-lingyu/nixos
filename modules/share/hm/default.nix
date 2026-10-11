@@ -1,34 +1,11 @@
 {
-  rootPath,
-  options,
   config,
   osConfig,
   pkgs,
   lib,
-  llib,
   ...
 }:
 {
-
-  options.moduleInterfaces = llib.modules.mkOptionTree {
-    root = rootPath;
-    modulesDir = rootPath + "/modules";
-    pathMapper = lib.drop 1;
-    optionMaker =
-      descriptor:
-      lib.optionalAttrs (builtins.pathExists (descriptor.module + "/hm/interface-options.nix")) (
-        (import (descriptor.module + "/hm/interface-options.nix")) (lib.last descriptor.path) {
-          inherit
-            options
-            config
-            osConfig
-            pkgs
-            lib
-            llib
-            ;
-        }
-      );
-  };
 
   config = {
     programs.fastfetch = {

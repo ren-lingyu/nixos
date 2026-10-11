@@ -3,17 +3,9 @@
   pkgs,
   lib,
   llib,
-  rootPath,
   ...
 }:
 {
-
-  imports = builtins.concatMap (
-    descriptor:
-    lib.optional (builtins.pathExists (descriptor.module + "/os/internal-options.nix")) (
-      descriptor.module + "/os/internal-options.nix"
-    )
-  ) (llib.modules.discoverModules rootPath (rootPath + "/modules"));
 
   config = {
 

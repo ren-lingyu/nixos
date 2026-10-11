@@ -1,4 +1,52 @@
-{ lib, moduleTools }: rec {
+{ lib, moduleTools }:
+let
+  mkInternalOptionsModules =
+    { root, modulesDir }:
+    builtins.concatMap (
+      descriptor:
+      lib.optional (builtins.pathExists (descriptor.module + "/os/internal-options.nix")) (
+        descriptor.module + "/os/internal-options.nix"
+      )
+    ) (moduleTools.discoverModules root modulesDir);
+
+  mkInterfaceOptionsModule =
+    { root, modulesDir }:
+    {
+      options,
+      config,
+      osConfig,
+      pkgs,
+      lib,
+      llib,
+      ...
+    }:
+    {
+      options.moduleInterfaces = moduleTools.mkOptionTree {
+        inherit root modulesDir;
+        pathMapper = lib.drop 1;
+        optionMaker =
+          descriptor:
+          lib.optionalAttrs (builtins.pathExists (descriptor.module + "/hm/interface-options.nix")) (
+            (import (descriptor.module + "/hm/interface-options.nix")) (lib.last descriptor.path) {
+              inherit
+                options
+                config
+                osConfig
+                pkgs
+                lib
+                llib
+                ;
+            }
+          );
+      };
+    };
+
+  mkDeclarationModules = args: {
+    nixosModules = mkInternalOptionsModules args;
+    homeModules = [ (mkInterfaceOptionsModule args) ];
+  };
+in
+rec {
 
   # Adapt only functions explicitly declared with functionTo; do not inspect Nix values
   # to guess whether arbitrary functions, packages or overlays should be called.
@@ -103,6 +151,10 @@
     let
       descriptors = moduleTools.discoverModules rootPath (rootPath + "/modules");
       enabled = enabledModules descriptors systemConfiguration;
+      declarationModules = mkDeclarationModules {
+        root = rootPath;
+        modulesDir = rootPath + "/modules";
+      };
     in
     builder.nixosSystem {
       inherit (systemConfiguration) system;
@@ -143,28 +195,31 @@
                     builder.specialArgs
                     systemConfiguration.specialArgs
                   ];
-                  sharedModules = builtins.concatMap (
-                    descriptor:
-                    lib.optionals
-                      (
-                        !builtins.elem (builtins.elemAt descriptor.path 1) [
-                          "features"
-                          "users"
-                        ]
-                      )
-                      (
-                        builtins.concatLists [
-                          (lib.optional (descriptor.hm != null) descriptor.hm)
-                          (lib.getAttrFromPath (lib.drop 1 descriptor.path) registry).homeModules
-                        ]
-                      )
-                  ) enabled;
+                  sharedModules =
+                    declarationModules.homeModules
+                    ++ builtins.concatMap (
+                      descriptor:
+                      lib.optionals
+                        (
+                          !builtins.elem (builtins.elemAt descriptor.path 1) [
+                            "features"
+                            "users"
+                          ]
+                        )
+                        (
+                          builtins.concatLists [
+                            (lib.optional (descriptor.hm != null) descriptor.hm)
+                            (lib.getAttrFromPath (lib.drop 1 descriptor.path) registry).homeModules
+                          ]
+                        )
+                    ) enabled;
                   users = homeUserModules enabled systemConfiguration registry;
                 };
               };
             }
           )
         ]
+        declarationModules.nixosModules
         (categoryModules rootPath descriptors)
         (builtins.concatMap (
           descriptor:
