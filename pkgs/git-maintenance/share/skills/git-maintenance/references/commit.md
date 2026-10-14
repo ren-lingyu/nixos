@@ -123,9 +123,11 @@ Write the body in Chinese by default, while retaining established English techni
 
 ### Footer
 
-Use `BREAKING CHANGE:` only when the staged diff clearly introduces an incompatible public API, CLI, configuration interface, file format, or documented contract, or when the user explicitly confirms that impact. Internal restructuring and private function-signature changes are not breaking changes by themselves. When uncertain, report the possible incompatibility in the response instead of asserting it in the footer.
+Use `BREAKING-CHANGE:` only when the staged diff clearly introduces an incompatible public API, CLI, configuration interface, file format, or documented contract, or when the user explicitly confirms that impact. Internal restructuring and private function-signature changes are not breaking changes by themselves. When uncertain, report the possible incompatibility in the response instead of asserting it in the footer.
 
-Use `Closes #123` only when the issue relationship is known. Separate `BREAKING CHANGE:` and `Closes` footers with one blank line.
+Use `Closes: #123` only when the staged change resolves the referenced issue and closure is intended. A known issue relationship alone does not justify closing it.
+Use `Refs: #123` when the staged change relates to an issue without resolving it.
+Keep multiple footers on adjacent lines without blank lines so that `git interpret-trailers` recognizes them as a single trailer block.
 
 ## Write and report
 
