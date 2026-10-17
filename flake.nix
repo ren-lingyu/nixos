@@ -287,7 +287,7 @@
                       neovim.enable = true;
                       emacs = {
                         enable = true;
-                        programs.package = { pkgs, ... }: pkgs.emacs31-pgtk;
+                        programs.package = { pkgs, ... }: pkgs.emacs-pgtk;
                         services.package = { pkgs, ... }: pkgs.emacs-pgtk-twist;
                       };
                       lem = {
@@ -358,7 +358,7 @@
                       neovim.enable = true;
                       emacs = {
                         enable = true;
-                        programs.package = { pkgs, ... }: pkgs.emacs31-pgtk;
+                        programs.package = { pkgs, ... }: pkgs.emacs-pgtk;
                         services.package = { pkgs, ... }: pkgs.emacs-pgtk-twist;
                       };
                       lem = {
