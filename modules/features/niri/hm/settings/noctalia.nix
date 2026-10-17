@@ -103,6 +103,7 @@ in
         };
 
         "XF86AudioRaiseVolume" = lib.mkForce {
+          allow-when-locked = true;
           action.spawn = builtins.concatLists [
             noctaliaCommand
             [
@@ -112,6 +113,7 @@ in
           ];
         };
         "XF86AudioLowerVolume" = lib.mkForce {
+          allow-when-locked = true;
           action.spawn = builtins.concatLists [
             noctaliaCommand
             [
@@ -121,6 +123,7 @@ in
           ];
         };
         "XF86AudioMute" = lib.mkForce {
+          allow-when-locked = true;
           action.spawn = builtins.concatLists [
             noctaliaCommand
             [
@@ -130,6 +133,7 @@ in
           ];
         };
         "XF86MonBrightnessUp" = lib.mkForce {
+          allow-when-locked = true;
           action.spawn = builtins.concatLists [
             noctaliaCommand
             [
@@ -139,6 +143,7 @@ in
           ];
         };
         "XF86MonBrightnessDown" = lib.mkForce {
+          allow-when-locked = true;
           action.spawn = builtins.concatLists [
             noctaliaCommand
             [
