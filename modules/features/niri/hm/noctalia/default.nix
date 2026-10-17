@@ -741,6 +741,7 @@ in
               enable_ddcutil = false;
               sync_all_monitors = false;
               ignore_mmids = [ ];
+              minimum_brightness = 0.05;
             };
 
             battery = {
