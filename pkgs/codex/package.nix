@@ -3,6 +3,7 @@
   symlinkJoin,
   makeWrapper,
   python3,
+  bubblewrap,
   codex,
 }:
 symlinkJoin {
@@ -19,6 +20,7 @@ symlinkJoin {
         (python3.withPackages (pythonPackages_: [
           pythonPackages_.pyyaml
         ]))
+        bubblewrap
       ]
     }"
   ];
