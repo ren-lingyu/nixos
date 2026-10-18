@@ -35,3 +35,15 @@ Agent provider 未定义 enable 与显式 false 均禁用；fallback 在消费�
 ### Nix 风格
 
 新增/修改表达式不用 &&、||、//、++，用现有函数形式；不修改 .gitignore。
+
+### 严格 getter
+
+零个和多个 enabled host 的临时 Nix 求值均先报 attribute wireguard missing。根因是旧 helper 返回 {} 后被直接读字段；assertions 不是命令式前置检查。用户采纳 getUniqueEnabledHost 非唯一时 builtins.throw，错误包括 enabled names，不增加 bool 模式参数。
+
+### 模块不变量
+
+保留全局 exactly-one-host assertion，因为惰性 getter 未必被调用；assertion 改用 (builtins.tryEval enabledHost_).success。host-functions 测试期待失败，module-composition 同步新通用消息。
+
+### 验证和 staging
+
+更新遗留 composition 消息后，用户 check 通过。随后发现 staged composition tests 与 unstaged assertion 错位，不能用完整 worktree check 证明 index snapshot。最终拆成 getter+单测的 fix(lib)，以及 assertion+composition 的第二笔草稿，分别审阅。不把草稿或检查认作实际 commit。
