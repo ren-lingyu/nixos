@@ -1,38 +1,45 @@
-# 模块重构: 组装约定与故障修复阶段
+# 模块重构: lib 命名空间与构造入口整理后
 
 这是历史知识的清洁重建状态, 不是当前项目权威. 来源范围和证据限制见 `source.md`. 以下描述所选历史阶段; 本次新增核实或纠错另行标注.
 
 ## 历史可恢复状态
 
-## 目标与已采用的职责边界
+## 已采用的架构
 
-用户希望用 flake-parts 的 options 描述最终配置, 据此在调用 NixOS 构造器前生成 OS/HM imports, 删除旧 `self.modules.*` wrappers 与重复聚合逻辑.
+最终配置在 flake-parts 层决定 enable、UID 绑定及外部集成, 再由构造函数生成 NixOS/HM 模块列表. OS/HM 是统一目录约定; 模块只校验依赖, 不能启用其他 profile. configuration 与 metadata 在外层分离, 到 NixOS 中适配后合并为只读 `config.modules`; HM 读取 `osConfig.modules`.
 
-- 最终配置决定 profile 的 enable、UID 绑定和外部集成. 模块仅检查依赖是否满足, 不能启用其他 profile.
-- `os/default.nix` 与 `hm/default.nix` 是统一目录约定. 中央发现并聚合这两侧是合理公共职责, 不需要为“模块自治”另建编排层.
-- configuration、静态 metadata 与 NixOS 求值期内部状态分离. 此时 `_options.nix` 提供 configuration/metadata schema, `_metadata.nix` 提供静态值.
-- 实际 imports 列表由外层 flake-parts options 生成; 不应误把同层 `config.modules` 决定 imports 的循环问题归咎于这条已有构造路径.
+此时声明文件仍使用 `_options.nix`、`os/internal-options.nix`、`hm/interface-options.nix`. `_metadata.nix` 只保存静态值. OS 内部状态使用 moduleInternals, HM 用户通信使用 moduleInterfaces.
 
-## 困难发现与修复
+## lib API 整理
 
-1. WSL 求值栈溢出的完整 trace 指向 imports 收集, 有约两万个重复帧. `share/os/internal-options.nix` 聚合所有模块的同名文件时也选中了自己. 将 OS 聚合移至 `share/os/default.nix`, HM 聚合移至 `share/hm/default.nix`, 删除作为聚合器的两个中转文件, 消除自导入.
-2. niri、x11-session 的只读 session-wrapper options 同时提供默认 null 和实现值, 导致 read-only 多次定义错误. 当时移除默认值后消除了冲突.
-3. 模块组合测试用 recursiveUpdate 将主机 users 覆盖成空集合, 实际保留已登记 UID 1000. 将负向场景改用未登记的 UID 1001, 继续验证真实的未注册 UID.
-4. 进一步去掉两个 session-wrapper options 和相关 null 状态断言. wrapper 作为模块局部值, niri 和 x11-session 直接贡献 `moduleInternals.features.greeter.sessionPackages`; niri 保留 mkBefore. greeter 统一校验非空 meta.mainProgram. 不因注册会话而启用 greeter.
+用户要求尽量保持函数名, 重新组织 namespace 并减少无意义嵌套, 保留逻辑关系. 已实施:
 
-## 被纠正的判断
+- `moduleFunctions.default` → `modules`, 包含 discoverModules、mkOptionName、mkOptionTree 和 mkOptionModules.
+- 根 assertions 中的 existModule → `modules.assertions.existModule`.
+- `moduleFunctions.hosts.default` → `hosts`.
+- `moduleFunctions.features.sops` → `features.sops`.
+- `packageFunctions` → `packages`.
+- `moduleFunctions.configuration` 的构造与适配函数直接放入 `flakeParts`, 不增加 configurations namespace 层.
+- 原 `flake-parts.types` → `flakeParts.types`.
 
-agent 最初建议把组合职责全面下放并允许跨模块依赖编排, 被用户明确否定. 后来还将外层 imports 误判成缺少 specialArgs 配置入口, 已纠正. 这些不是未完成目标.
+库文件按职责改名为 modules.nix、modules.assertions.exist-module.nix、hosts.nix、features.sops.nix、packages.nix、flakeParts.configurations.nix 和 flakeParts.types.nix. lib/default.nix 聚合这些实现. flake、modules、pkgs 和 tests 的调用全部随之调整. 保留既有 helper 的导出范围; 此轮不额外改造 adapter 或统一函数接口.
 
-父 enable 为 false 时业务模块不导入, 子 enable 为 true 也不会单独启用实现. `!child.enable || parent.enable` 若只在父模块启用时导入, 就是冗余断言, 不是重构阻塞或已证实功能缺陷. 用户接受其作为非阻塞中间状态; 只有将这种配置定义为非法时, 才有必要在外层设置可达校验.
+## 构造入口与清理
 
-## 验证与状态
+- 新增 mkNixosConfigurations, 接受 rootPath、builder、registry 和 configurations, 内部用 mapAttrs 调用 mkNixosSystem. flake 只调用该集合入口. 这是封装生成职责, 不是消除映射操作.
+- groupImportsByUid 已没有生产调用, 只剩旧测试. 按用户要求删除其定义文件、lib 导出、feature-import-grouping 测试文件及注册入口.
+- 不为函数名或无效冗余断言扩大重构. mkOptionName 继续保留; 模块结构发现与系统构造属于不同逻辑职责.
 
-- session 内实际运行 Nix 诊断并复现了栈溢出; 沙箱缓存访问失败后经用户批准使用沙箱外执行.
-- 修复 read-only 冲突和测试夹具后, `nix flake check` exit 0, 四台 NixOS 配置通过求值, 最终输出 all checks passed.
-- 直接会话包贡献修改后再次运行 `nix flake check`, 也 exit 0 并输出 all checks passed.
-- 这些结果仅对应当时的修改工作区, 不关联后续提交或未来改动.
+## 仍有效的故障修复与约束
+
+之前的栈溢出来自声明聚合器导入自己, 已通过将聚合移到 share 的 default.nix 消除. session-wrapper 只读默认值冲突已通过移除中转 options 彻底消除; 提供者直接向 greeter.sessionPackages 贡献包, niri 使用 mkBefore, greeter 统一校验 meta.mainProgram. 未登记 UID 的测试使用 1001, 不用 recursiveUpdate 的空 users 集合假装覆盖.
+
+父关闭时子开关被忽略, `!child.enable || parent.enable` 若只在父启用时加载就没有实际约束作用. 用户接受它作为非阻塞清理项, 不是功能缺陷.
+
+## 验证边界
+
+模块修复和会话包贡献阶段确有两次 nix flake check 通过, 仅验证当时工作区. 本阶段的 helper 删除、集合入口和 namespace 迁移只完成定向引用检查与 git diff --check; 没有运行新的 Nix 求值或构建. 新路径最初未被跟踪, agent 未替用户 stage.
 
 ## 当时下一步
 
-主体重构已可用. 后续讨论 lib 的 API 与命名空间整理、构造整个 configurations 集合的入口和旧 helper 清理; 不能为了笼统的“自治”再次扩大职责或自动启用依赖.
+主体重构和命名空间整理已完成. 需要单独审视声明注册对 share 的依赖, 同步 README 中旧 wrappers、extra-options.nix、目录及输入说明. 若要声明新状态通过完整检查, 必须另有相应 Nix 检查结果, 不能沿用前阶段成功记录.
