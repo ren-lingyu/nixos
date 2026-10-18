@@ -18,4 +18,12 @@ postFixup保留old内容，用getBin/getExe/outputName推导目标输出和相�
 
 ### 验证
 
-本阶段没有eval/build，不能声称override已工作。
+成功rebuild来自用户报告；此前整理不复现Pi联网、安装或构建。staged草稿只覆盖实际diff及install telemetry范围。
+
+### 外部工具
+
+fd/ripgrep由programs.pi-coding-agent.extraPackages进入Pi PATH，取代手写--prefix PATH；override只管PI_OFFLINE。settings.packages是Pi资源包，不是系统CLI依赖。用户不希望Pi自行管理，未默认加npm/bun。
+
+### 构建失败与修正
+
+日志显示引用目标后少空格，导致wrapProgram尝试pi--set；修正空格后用户报告下一次rebuild成功。npm兼容/deprecated警告不是这次失败原因，不在HM层压制上游日志。
