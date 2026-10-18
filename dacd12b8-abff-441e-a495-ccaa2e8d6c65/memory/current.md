@@ -14,7 +14,7 @@
 
 ### 验证
 
-坐标方案仅静态 diff 检查，未 Nix build/check 或锁定运行验证。
+最后 cached diff 格式检查通过，无 unstaged；未运行此锁屏最终版本的 Nix check、build 或重启验证。早期 v5 check 不能升级为最终锁屏验证。
 
 ### 系统侧
 
@@ -43,3 +43,15 @@ Noctalia 接管常规/idle/休眠前锁定；swaylock 继续安装，Super+Alt+L
 ### 显示与覆盖边界
 
 其他输出仍锁定，视觉为黑；运行时可保留其他输出的 widget 记录。settings.toml 的旧覆盖可能优先于声明式设置，需要后续明确处理，实验不修改该文件。固定 mode/scale 是当前方案前提。
+
+### 时钟试验结果
+
+曾添加上方时间/日期、再改为默认数字钟和 sans-serif，后试默认背景卡片。对照后明确 v4 Header 组合时钟与 v5 通用 clock 不同，早先称其为等同默认锁屏钟不准确。用户最终要求去掉自行添加的 clock：widget_order 只留 login_box，保留默认显示器与中心坐标，随后曾试开天气, 用户最终修改后 show_weather=false。不要在正式整合时复活已撤销时钟方案。
+
+### 最终风格和 index
+
+用户又修改并 stage 锁屏/idle/session 动作/挂起快捷键三文件。审查基本一致；参数 {config, pkgs, lib,…} 顺序用户明确要求保留，不擅自统一。最后 staged diff 被评估为一个连贯 Noctalia 锁屏集成，提交草稿已更新，但没有实际提交证据。
+
+## 本次重建纠错
+
+此前摘要把天气试开误作最终状态. 本次已核对历史最后一次用户修改和 staged 审阅: 最终 show_weather=false, show_unlock_hint=true. 保留仅一个居中 login_box 的决定; 这项纠错不是重新运行或验证 Noctalia.
