@@ -14,4 +14,16 @@
 
 ### 验证
 
-该阶段staged/diff草稿审查完成，没有新Nix check。Niri.enable由目录schema始终定义，不必因profile未导入就猜该enable不存在。
+独立staged集合与格式检查通过；没有该terminal/Niri变更Nix运行检查。
+
+### Terminal
+
+从user terminal.nix迁成HM terminal feature；保留Kitty/Alacritty与xdg.terminal-exec，桌面/WSL启用、server minimal不启用。用户stash掉file-manager后单独整理terminal边界。
+
+### 终端接口
+
+Niri Mod+T、Fuzzel、Noctalia改为xdg-terminal-exec并受该HM能力enable守卫；去掉Kitty直接依赖及专用-e。没有新增仓库internal桥接option；缺接口时省略这些设置。
+
+### File chooser
+
+新增file-manager.fileChooser.enable，默认随feature；统一控制Portal、backend/provider、配置和terminal能力检查，不把整个chooser绑到Niri。
