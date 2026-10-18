@@ -14,7 +14,7 @@
 
 ### 验证
 
-独立staged集合与格式检查通过；没有该terminal/Niri变更Nix运行检查。
+用户check失败点被源码修复；最后历史记录仍明确没有修复后成功检查结果。不要用更早Niri环境的check替代WSL/Portal验证。
 
 ### Terminal
 
@@ -27,3 +27,23 @@ Niri Mod+T、Fuzzel、Noctalia改为xdg-terminal-exec并受该HM能力enable守�
 ### File chooser
 
 新增file-manager.fileChooser.enable，默认随feature；统一控制Portal、backend/provider、配置和terminal能力检查，不把整个chooser绑到Niri。
+
+### 恢复与语法
+
+用户恢复stash后worktree冲突标记已修，但index旧版本仍有，后用户add清除。初次file-manager check失败因顶层assertions与显式config混用；修复为放在config内，并去冗余enable条件。
+
+### 能力契约
+
+用户最终认可HM侧检查实际config.xdg.terminal-exec.enable，而非OS侧间接检查terminalfeature及allowUidList。不会反向禁止其他模块提供原生终端接口，也不增加排他双向等价断言。
+
+### Portal链路
+
+file-manager/termfilechooser→xdg-terminal-exec→终端→Yazi，只有调用XDG FileChooser Portal的应用才能走这条链。不会保证所有GTK/Qt/浏览器应用都使用它。
+
+### OS配套
+
+在WSL上首次独立启用HM Portal，useUserPackages模式要求系统pathsToLink含/share/applications及/share/xdg-desktop-portal。增加file-manager/os/default.nix，existModule.os=true；整体cfg.enable守卫，路径列表用fileChooser.enable的optionals，不清空其他模块列表。
+
+### 最终状态
+
+最后一次staged审阅主题已变为ThinkBook framebuffer/udev/kmscon初始化，不能把末尾提交草稿当作Yazi Portal通过的证明。这只是所选归纳覆盖的范围, 不宣称恢复了完整原始对话。
