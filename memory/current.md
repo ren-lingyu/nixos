@@ -1,32 +1,43 @@
-# 当前项目记忆
+# Current project memory
 
-## 项目目标与维护入口
+## Purpose and entry points
 
-维护可组合的声明式 NixOS 与 Home Manager 配置, 将最终系统组装, 业务实现, 静态 metadata 和内部接口分开. 当前没有待继续的历史整理任务, 也没有已接续的新实现任务. 后续按具体需求维护项目, 从本文件恢复当前状态, 从 [architecture.md](architecture.md) 查阅约束与理由, 从 [consolidation.md](consolidation.md) 按需追溯历史知识来源.
+Maintain composable, declarative NixOS and Home Manager configurations with separate responsibilities for final system composition, feature implementations, static metadata, and internal interfaces. Historical consolidation and cleanup are complete. No new implementation task has been taken on.
 
-当前静态事实基线为普通项目已提交的 `48c7f0fc403d525ce982d11e613008042cf1e456`. 本记忆只采用该提交中的项目内容; 后续更新需要重新核对所选基线. Formal GAW 使用 `_agents`, 没有活动 Auxiliary 分支; 历史来源已由 Formal ancestry 保留.
+Start here to resume maintenance. See [architecture.md](architecture.md) for interfaces, invariants, and design rationale, and [consolidation.md](consolidation.md) for historical sources and recovery instructions.
 
-## 已实现的范围
+The committed baseline for the existing static review is `48c7f0fc403d525ce982d11e613008042cf1e456`. Project HEAD still matches that baseline at this normalization. An unstaged `flake.lock` change is outside this memory's implementation baseline and remains untouched. Future implementation claims must check the relevant baseline.
 
-`flake.nix` 是最终组装入口, 提供以下 `x86_64-linux` 系统. 配置存在不代表对应机器已经部署到此提交.
+Formal GAW uses `_agents`. No Auxiliary branches remain active; Formal ancestry retains historical sources. This normalization changes only the three current memory documents, without repeating consolidation, retirement, or repository-wide validation.
 
-| 系统输出 | Host profile | User profile | 主要配置范围 |
+## Confirmed implementation scope
+
+`flake.nix` composes four `x86_64-linux` configurations. Their presence does not establish that the corresponding machines have been deployed from this revision.
+
+| System output | Host profile | User profile | Main configuration scope |
 | --- | --- | --- | --- |
-| `nixos` | `thinkbook` | `lingyu` | Niri/Noctalia, IceWM fallback, 桌面应用, Flatpak, VM, WBO |
-| `nixos-matebook` | `matebook` | `lingyu` | Niri/Noctalia, 编辑器与桌面工具 |
-| `nixos-server` | `aliyun` | `lingyu-minimal` | Shell, SOPS, Caddy workload |
-| `nixos-wsl` | `wsl` | `lingyu` | NixOS-WSL, 编辑器与终端工具 |
+| `nixos` | `thinkbook` | `lingyu` | Niri/Noctalia, IceWM fallback, desktop applications, Flatpak, VM, WBO |
+| `nixos-matebook` | `matebook` | `lingyu` | Niri/Noctalia, editors, and desktop tools |
+| `nixos-server` | `aliyun` | `lingyu-minimal` | Shell, SOPS, and the Caddy workload |
+| `nixos-wsl` | `wsl` | `lingyu` | NixOS-WSL, editors, and terminal tools |
 
-实现入口为 `flake.nix`, 公共库在 `lib/`, 业务模块在 `modules/`, 本地包在 `pkgs/`. 关键接口与消费者的源码路径见 architecture.md. Flake 另提供 `legacyPackages`, overlays, OS/HM modules, `deploy`/`secret` devShells, treefmt formatter 和 checks.
+Project entry points are `flake.nix`, `lib/`, `modules/`, and `pkgs/`, relative to the ordinary project root. The flake also exposes `legacyPackages`, overlays, NixOS/Home Manager modules, `deploy` and `secret` devShells, a treefmt formatter, and checks. Detailed source references are in architecture.md.
 
-## 实现与验证状态
+## Active constraints
 
-本轮重新核对已提交的组装入口, README, 库和关键消费者, 包括 FileChooser, agent provider, Codex/Pi/rage-armored 包及 Noctalia 设置. 结论是静态实现事实, 未执行 Nix eval/check/build, 系统部署或运行时应用验证. 历史 session 的成功报告只覆盖当时工作区, 不能替代本基线验证.
+- Final configuration selects profiles, binds UIDs, and injects external dependencies. Modules check dependencies rather than enabling other profiles.
+- OS/HM implementation discovery and declaration registration are distinct from activation. Keep configuration, static metadata, `moduleInternals`, and per-user `moduleInterfaces` separate.
+- Distinguish committed implementation, historical rationale, reported success, and current execution evidence. Internal option declarations are not access controls.
+- Follow host authorization rules for project writes, Nix commands, deployment, and external changes. Previous results and drafts do not authorize or prove new results.
 
-`tests/default.nix` 注册六类 checks: `lib-types`, `exist-module-assertions`, `host-functions`, `module-composition`, `configuration-adapter`, `sops-functions`. 覆盖类型与实现见证, 唯一 host/monitor, UID 与 feature 组合负例, 配置适配及 SOPS 输入处理; treefmt 另提供格式检查. `nix flake check` 是 README 所列验证入口, 实际运行仍按宿主授权规则进行.
+## Validation status
 
-## 已知限制与后续决策
+The existing review checked committed composition, README, libraries, and key consumers, including FileChooser, agent providers, Codex/Pi/rage-armored packages, and Noctalia settings. These are static findings. No Nix evaluation, check, build, deployment, or application runtime validation was performed for that review or this normalization. Historical success reports cover their original workspaces, not this baseline.
 
-- FileChooser/跨会话应用, Clash geodata 实际加载, Noctalia runtime settings/多显示器, fbset/kmscon 模式恢复, rage-armored 行为仍缺当前运行证据. 这些是历史留下的验证边界, 不等于全部仍可复现的当前 bug.
-- `README.org` 的 `functionTo` 示例仍用 `emacs31-pgtk`, 而 `flake.nix` 当前桌面配置使用 `emacs-pgtk`. 后续编辑器或文档维护时可同步示例; 尚未修改 README.
-- 后续实现需求, 相关 Issues/PRs 和部署状态以实际检查为准, 当前未建立外部跟踪结论. 过去的整理进度与清理操作已退出当前维护入口, 需要审计时查 Formal first-parent 历史.
+`tests/default.nix` registers six checks: `lib-types`, `exist-module-assertions`, `host-functions`, `module-composition`, `configuration-adapter`, and `sops-functions`. They cover types and implementation-presence assertions, unique host/monitor constraints, negative UID/feature combinations, configuration adaptation, and SOPS inputs. Treefmt supplies a separate formatting check. README lists `nix flake check` as the validation entry point; execution requires applicable host authorization.
+
+## Open issues and next actions
+
+- Current runtime evidence is missing for FileChooser and applications across sessions, actual Clash geodata loading, Noctalia settings overrides and multiple monitors, fbset/kmscon mode restoration, and rage-armored behavior. These are historical validation limits, not a claim that every reported problem is a reproducible current bug. Investigate the relevant case when maintenance requires it.
+- README's `functionTo` example uses `emacs31-pgtk`, while desktop configurations in `flake.nix` use `emacs-pgtk`. Synchronize the example during the next relevant editor or documentation change; README was not modified here.
+- No current conclusion has been established about related Issues/PRs or deployment status. Check them when a concrete implementation request arrives. Completed consolidation and cleanup belong in consolidation.md and Formal first-parent history, not an active work queue.

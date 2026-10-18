@@ -1,74 +1,118 @@
-# 当前项目架构与约束
+# Project architecture and constraints
 
-## 当前实现基线
+## Baseline and evidence
 
-这是声明式 NixOS 与 Home Manager 配置仓库. `flake.nix` 通过 flake-parts 建立外层配置, 定义 `nixosBuilder`, `moduleRegistry` 与 `nixosConfigurations`, 再调用 `llib.flakeParts.mkNixosConfigurations` 生成系统集合. 当前四个系统配置为 `nixos`, `nixos-matebook`, `nixos-server`, `nixos-wsl`, 均使用 `x86_64-linux`.
+This repository maintains declarative NixOS and Home Manager configurations. `flake.nix` uses flake-parts to define `nixosBuilder`, `moduleRegistry`, and `nixosConfigurations`, then calls `llib.flakeParts.mkNixosConfigurations`. The four configurations are `nixos`, `nixos-matebook`, `nixos-server`, and `nixos-wsl`, all for `x86_64-linux`.
 
-业务按 hosts, users, features, workloads 组织; share 提供公共 OS/HM 配置. 本文件以 current.md 所列已提交基线的实现为准, 历史理由另有来源归纳支持; 证据强度与来源定位见 consolidation.md.
+Implementation statements below describe the committed baseline in [current.md](current.md). Historical rationale comes from the retained summaries indexed in [consolidation.md](consolidation.md); it does not independently establish present behavior. Project paths are relative to the ordinary project root, not the Formal GAW worktree.
 
-测试由 `tests/default.nix` 注册, 包括类型, 实现见证断言, host 函数, 模块组合, configuration adapter 和 SOPS 函数六类. 测试存在不等于当前版本已经执行通过; 当前验证状态统一见 current.md.
+`tests/default.nix` registers checks for types, implementation-presence assertions, host functions, module composition, the configuration adapter, and SOPS functions. Their existence does not establish successful execution against this baseline. Current validation limits are recorded in current.md.
 
-## 关键实现路径
+## Implementation entry points
 
-- `lib/modules.nix`: `discoverModules`, `mkOptionModules`, `mkOptionTree`. `lib/flakeParts.types.nix` 定义 builder/registry/configuration schema, `lib/flakeParts.configurations.nix` 实现 `adaptType`, `adaptOptions`, `mkNixosSystem` 和私有 OS/HM declaration 生成.
-- `modules/hosts/default.nix`, `modules/users/default.nix`, `modules/features/default.nix`: host/monitor, 用户 UID 绑定与 feature HM 送达的断言和配置. `lib/hosts.nix` 提供 `getUniqueEnabledHost` 与 `mkWireGuardNetworks`, `modules/hosts/wireguard.nix` 接线主机网络.
-- `modules/features/sops/{default.nix,os/default.nix,hm/default.nix}` 与 `lib/features.sops.nix`: OS/HM 密钥桥梁及 per-user 输入处理. `modules/features/agent/hm/{default.nix,_options.hm.nix}`: provider 配置接口和消费者.
-- `modules/features/file-manager/hm/default.nix`: directory opener 与 FileChooser. `modules/features/niri/hm/noctalia/default.nix` 和 `modules/features/niri/hm/settings/binds.nix`: 锁屏, 声音, 亮度和快捷键. `pkgs/{codex,pi-coding-agent,rage-armored}/package.nix`: 本地 wrappers.
+| Responsibility | Entry points |
+| --- | --- |
+| Discovery and schema composition | `lib/modules.nix`: `discoverModules`, `mkOptionModules`, `mkOptionTree` |
+| Builder, registry, and configuration types | `lib/flakeParts.types.nix` |
+| Configuration adaptation and system construction | `lib/flakeParts.configurations.nix`: `adaptType`, `adaptOptions`, `mkNixosSystem`, and private OS/HM declaration generators |
+| Host/monitor, UID, and feature constraints | `modules/hosts/default.nix`, `modules/users/default.nix`, `modules/features/default.nix` |
+| Host selection and network topology | `lib/hosts.nix`: `getUniqueEnabledHost`, `mkWireGuardNetworks`; `modules/hosts/wireguard.nix` connects host networking |
+| OS/HM secret bridge and per-user SOPS inputs | `modules/features/sops/default.nix`, `modules/features/sops/os/default.nix`, `modules/features/sops/hm/default.nix`, `lib/features.sops.nix` |
+| Agent provider declarations and consumers | `modules/features/agent/hm/_options.hm.nix`, `modules/features/agent/hm/default.nix` |
+| Directory opening and FileChooser | `modules/features/file-manager/hm/default.nix` |
+| Lock screen, audio, brightness, and key bindings | `modules/features/niri/hm/noctalia/default.nix`, `modules/features/niri/hm/settings/binds.nix` |
+| Local wrappers | `pkgs/codex/package.nix`, `pkgs/pi-coding-agent/package.nix`, `pkgs/rage-armored/package.nix` |
 
-## 模块构造, 声明与职责
+## Composition and ownership
 
-最终配置负责 enable, UID 绑定和外部依赖注入; 模块检查依赖, 不通过互相启用来编排依赖. 目录发现以 `os/default.nix` 或 `hm/default.nix` 为实现依据, 根 `default.nix` 可选, 不允许嵌套业务模块. 外层 flake-parts 先选择业务模块, 再生成 NixOS/HM imports; 不能把这种外层选择误判成同层递归 imports.
+Profiles are organized as hosts, users, features, and workloads; share provides common OS/HM configuration. Final configuration controls `enable`, UID binding, and external dependency injection. Modules check dependencies; they do not enable one another to orchestrate them.
 
-`_options.fp.nix` 沿路径前缀提供 configuration/metadata schema; `_metadata.nix` 保存静态值. `os/_options.os.nix` 是原生 NixOS declaration module, `hm/_options.hm.nix` 保留模块名与 HM 上下文的片段函数接口. 后缀表达解释环境, 不要求三个接口返回相同结构. 私有声明生成函数位于构建库, OS 声明进入系统 modules, HM 声明进入 sharedModules, 不依赖 share.enable. 声明入口独立于 share 的静态结构已核对, share 关闭场景仍缺当前行为验证.
+Discovery recognizes `os/default.nix` or `hm/default.nix` as an implementation. A module-root `default.nix` is optional, and nested business modules are disallowed. The outer flake-parts configuration selects modules before generating NixOS/HM `imports`. This is not same-layer configuration-dependent recursive import selection.
 
-适配器只按 option 声明处理 functionTo 和 submodule, 不猜测执行任意函数值. 经适配的 configuration 与 metadata 合并为只读 `config.modules`; HM 从 `osConfig.modules` 读取. OS 内部状态用 moduleInternals, HM 每用户通信使用 moduleInterfaces; 声明注册不等于相应业务功能启用.
+The public `llib` namespaces are `types`, `modules`, `hosts`, `features.sops`, `packages`, and `flakeParts`. Generic directory discovery is separate from system construction. The configuration-set constructor maps to the single-system constructor. `groupImportsByUid` has been removed. Package namespace merging explicitly rejects treating a derivation as a namespace.
 
-`llib` 按 types, modules, hosts, features.sops, packages, flakeParts 划分职责. 通用目录发现与系统构造分开; 集合入口内部映射到单系统构造器. 原 groupImportsByUid 已移除, 旧 self.modules registry, 早期 base 身份去重和声明文件名只作为演化背景, 不恢复为当前 API. Package namespace 合并显式拒绝将 derivation 当作 namespace.
+### Declaration protocol and configuration adaptation
 
-internal 表达生产与声明边界, 不是访问控制. unique 的类型合并语义不同于 readOnly 的定义数量限制; 不能机械互换, 默认值也可能成为第二个定义. UID 由最终组装赋值, 不因其他内部派生选项使用 readOnly 而改变其输入职责. cfg 只缩写自身 option 的读取, 不改定义路径, 跨模块读取或诊断路径.
+- `_options.fp.nix` contributes configuration/metadata schemas along module path prefixes; `_metadata.nix` holds static values.
+- `os/_options.os.nix` is a native NixOS declaration module.
+- `hm/_options.hm.nix` retains the declaration-fragment function interface taking a module name and HM context.
 
-### 历史理由与纠错
+The suffix identifies the interpreting environment; it does not require identical return structures. Private declaration generators in the construction library add OS declarations to system modules and HM declarations to `sharedModules`, independently of `share.enable`. This independence has been checked structurally, but the share-disabled case lacks current behavioral validation.
 
-曾考虑将所有策略推入 host 或把组合职责全面下放, 因改变同级模块所有权而撤回. 早期 share 声明聚合器导入自身导致递归, 后来先迁出同名声明文件, 再私有化到构建库. session-wrapper 默认 null 与实现值冲突, 最终删除中转 options, 由 provider 直接贡献 greeter.sessionPackages. 这些理由来自历史归纳, 未在当前基线重新复现失败.
+The adapter follows option declarations for `functionTo` and submodules rather than guessing whether arbitrary function values should be called. Adapted configuration and metadata form the read-only `config.modules` view; HM reads it through `osConfig.modules`. `moduleInternals` holds OS internal state, and `moduleInterfaces` carries per-user HM data. Registering declarations does not enable the corresponding functionality.
 
-Registry 曾采用自定义 self.modules 并接受输出 schema 警告; 当前采用 flake-parts options, 不能把当年的折中当作当前目标. nixos-anywhere 的旧 app 包装属于历史; 当前代码通过部署 devShell 提供工具. 不为工具警告自动迁移 Nix 实现, 也不据早期判断推断今天的上游兼容性.
+`internal` expresses a declaration/producer boundary, not access control. The merge semantics of `unique` differ from `readOnly`'s definition-count restriction. They are not interchangeable, and a default can become a second definition. UID remains an input assigned by final composition even when other derived internal options use `readOnly`. A `cfg` alias abbreviates reads of a module's own options; it does not change definition paths, cross-module reads, or diagnostic paths.
 
-## Host, 用户, 身份与网络
+### Rationale and superseded designs
 
-当前必须恰好启用一个 host. getUniqueEnabledHost 非唯一时抛出清晰错误, 全局 assertion 使用 tryEval 保留未调用 getter 时的不变量检查. 早期返回空集合的设计曾让字段读取先于 assertion 失败, 不能重新引入该 fallback.
+Moving all policy into hosts or delegating all composition to individual modules was rejected because it changed ownership among peer modules. An early share declaration aggregator imported itself, causing recursion. Aggregation was first moved out of the discovered declaration file and later made private in the construction library. A default `null` and an implementation value conflicted for read-only session-wrapper options. Those intermediate options were removed; providers now contribute directly to `moduleInternals.features.greeter.sessionPackages`. These failure explanations come from historical summaries, not a new reproduction against the current baseline.
 
-Host metadata 是静态事实, 不随消费者 enable 消失. UID registry 允许预留未启用 UID; 仅要求启用用户绑定的 UID 属于所选 host registry, 不要求集合双向相等. Feature allowUidList 对应启用用户, 用户 HM 实现送达绑定 UID. 当前组合负测使用未登记 UID 1001; 早期 mkForce 清空 registry 的方案属于另一夹具阶段, 不能把 recursiveUpdate 的空集合当作清空操作.
+The old `self.modules` registry, early base-module identity deduplication, and former declaration filenames are evolution context, not current APIs to restore. The earlier registry accepted output-schema warnings; the current design uses flake-parts options. The old nixos-anywhere app wrapper is also historical; the deployment devShell now provides the tool. Tool warnings do not automatically justify migrating the Nix implementation, and old assessments do not establish current upstream compatibility.
 
-OS 侧 agenix/rekey 提供基础秘密设施, SOPS 保持可选且可组合. 这是职责分层, 不是全面替换 SOPS. 历史动机包括避免应用秘密管理工具的构建或下载问题阻断基础身份部署. Host SSH 身份, 派生 recipient, master identity 各有职责, 不把类型声明当作加密或私钥安全保证.
+## Hosts, users, identities, and networking
 
-当前 HM SOPS key bridge 由 OS age secret 提供, 以 root 所有, sops-decrypt 组及 0440 权限供获准用户消费. HM 从 moduleInternals 路径读取; 非空 secretsInput 要求格式和文件已定义. NSS 更新不代表现存用户进程已取得新组凭据; 历史重启恢复报告不能作为当前运行验证.
+### Host selection and UID ownership
 
-稳定 WireGuard 成员关系属于 hosts. 当前构建函数根据 host number 与 endpoint metadata 生成网络及 topology, host wrapper 接线秘密路径与防火墙. 旧 interconnect, claims, claimantCount 和 mkNode 原型已退役; membership 不证明运行时在线独占, schema 支持多个申领者也不代表派生配置完整支持. 当前记忆没有握手或实际路由验证结果.
+Exactly one host must be enabled. `getUniqueEnabledHost` throws a clear error otherwise. A global assertion uses `tryEval` to preserve the invariant even when no consumer calls the getter. The earlier empty-set fallback allowed field access to fail before the assertion; do not reintroduce it.
 
-纯文本密文包装专用于 rekey 工具, 不替换全局 rage. 当前 package 使用 builtins.readFile 嵌入 Scheme wrapper, 保留原 phase 并注入实际程序路径. 先前把文件路径插入脚本当源码的错误已修正; wrapper 的当前构建与运行结果尚未验证.
+Host metadata is static and does not disappear when a consumer is disabled. The UID registry may reserve UIDs that are not enabled. Every enabled user's bound UID must belong to the selected host's registry; the two sets need not be equal. Feature `allowUidList` refers to enabled users, and each user profile's HM implementation goes to its bound UID. The current negative composition test uses unregistered UID `1001`. Clearing the registry with `mkForce` belonged to a different fixture stage; an empty set passed to `recursiveUpdate` does not clear existing entries.
 
-## 桌面与应用能力
+### Secret-management responsibilities
 
-Host 层保持真实 monitor 名唯一, default 最多一个; headless 可以没有显示器. GUI 消费者在启用时另要求唯一 default, 默认显示器需要有效 mode. 几何与 scale 是 Noctalia 居中方案的输入, 不是运行时显示状态的普遍保证.
+OS-side agenix/rekey supplies the base secret infrastructure; SOPS remains optional and composable. This separates responsibilities rather than replacing SOPS wholesale. One historical motivation was to avoid application-secret tooling build/download problems blocking base identity deployment. Host SSH identity, derived recipients, and master identities have separate roles. Type declarations do not establish encryption or private-key security.
 
-X11 是通用兼容 fallback, 当前采用 IceWM 的 OS/HM 分层, 不专属于某个应用. 清理旧 Wayland 会话变量, 不将 fallback 强绑到共享 graphical target 或额外 monitor 协议. 历史用户报告能够登录并运行应用, 不证明所有跨 VT, 已有应用实例或剪贴板场景已解决.
+The current HM SOPS key bridge uses an OS age secret owned by root, accessible to approved users through the `sops-decrypt` group with mode `0440`. HM reads its path through `moduleInternals`. Nonempty `secretsInput` requires a defined format and file. NSS updates do not give existing processes new group credentials; a historical report that restarting resolved access is not current runtime validation.
 
-Terminal 能力通过原生 xdg.terminal-exec 提供, 消费端检查实际 HM 能力, 不把某个 terminal feature 的启用当作唯一合法提供方式. 当前 directory opener 在启用 Niri 时使用 Wayfile, 非 Niri 默认 Yazi; FileChooser Portal 是另一条链路, 由 termfilechooser 调用终端和 Yazi. directory opener 与 Portal 不可因早期默认 Yazi 的目标而混为同一入口. OS 侧保留 applications 与 Portal 的系统链接路径. 仅调用该 Portal 的应用才经过这一链路, 没有通用 GUI 成功保证.
+The armored ciphertext wrapper is specific to rekey tooling; it does not replace global rage. The package embeds the Scheme wrapper with `builtins.readFile`, preserves the original phase, and substitutes the actual executable path. An earlier mistake inserted a file path where script source was required. That implementation was corrected, but the current wrapper build and runtime behavior remain unverified.
 
-Noctalia 常规锁屏与 swaylock 救援职责分开. 当前 default monitor 的 login_box 使用 mode/scale 推导逻辑中心, 不恢复已撤销的自定义 clock. 当前锁屏 show_weather=false, show_unlock_hint=true; 早期试开天气已撤回. Noctalia audio.enable_sounds=false, brightness.minimum_brightness=0.05, Niri 音量与亮度快捷键允许锁屏时使用. 这些值来自已提交源码, 不代表运行时 settings 覆盖和多显示器行为已验证.
+### WireGuard topology
 
-ThinkBook fbset 为 oneshot, 与 kmscon 的排序, 拉起依赖, 互斥和模式恢复是不同问题. 停止已退出的 oneshot 不撤销 framebuffer geometry. 历史讨论没有采纳完整的模式恢复方案, 不把建议的 Conflicts 或生命周期钩子写成现有修复.
+Stable WireGuard membership belongs to hosts. The topology builder derives networks and topology from host numbers and endpoint metadata; the host module connects secret paths and firewall rules. The former `interconnect`, `claims`, `claimantCount`, and `mkNode` prototypes are retired. Membership does not prove exclusive runtime activity, and a schema admitting multiple claimants does not prove that all derived configuration supports them. No handshake or actual routing result is established in current memory.
 
-## Agent, 包与操作边界
+## Desktop and application capabilities
 
-Codex 本地包在 wrapper PATH 中提供 Python/PyYAML 与 bubblewrap, 入口是 pkgs/codex/package.nix. 安装工具并不证明沙箱在所有环境均可运行, 仍需相应运行验证. emarccs 的 treefmt-nix 跟随根 treefmt-nix; 当前桌面 Emacs 使用 emacs-pgtk, 不按 README 中旧 emacs31-pgtk 示例反推实现.
+### Monitors and session fallback
 
-Agent provider interface 消费密钥文件路径, 不依赖该路径一定由 SOPS 产生. 当前消费者区分未定义 enable 与启用状态, 不向 readOnly 选项补默认定义. Provider 模型选择是消费者行为; 早期 nullable 模型接口已撤回. 配置数据不构成密钥安全或权限执行保证.
+At the host level, real monitor names are unique and at most one monitor is the default. Headless hosts may have no monitors. Enabled GUI consumers separately require a unique default, and a default monitor needs a valid mode. Geometry and scale are inputs to Noctalia centering, not a general guarantee of runtime display state.
 
-Pi wrapper 通过 overrideAttrs 保留原包 outputs, metadata 与原有 phase, 仅设置启动离线变量; 工具依赖通过 extraPackages 管理. 早期缺空格导致 wrapper 目标错误, 修正后成功 rebuild 属于历史用户报告. 当前源码包含正确的输出路径前缀检查及命令分隔; PI_OFFLINE=1 不解释为禁止模型 API 网络请求, 当前包构建状态见 current.md.
+X11 is a general compatibility fallback, currently split into IceWM OS/HM implementations rather than owned by a single application. Old Wayland session variables are cleared. The fallback is not tightly coupled to a shared graphical target or an additional monitor protocol. Historical user reports of successful login and applications do not resolve every cross-VT, existing-instance, or clipboard case.
 
-通用 skill 描述工作方法, 宿主的权限设置负责执行边界. 旧重复 agent/command 包装已被共享 skill 方向取代; 不把可找到命令, alias 或能力裁剪设想写成已部署的安全隔离. 历史 Nix 风格决定按其当时范围保留, 不扩大为未经当前代码支持的全仓库规则.
+### Terminal, directory opener, and FileChooser
 
-WSL vscode-server integration 的历史结果是移除, 不是仅抽模块. 提交类型依据语义, 不为追随旧标题混用而改写普通项目历史. 历史审阅结论不继承为新来源的 project parent, 也不把草稿当作实际提交.
+Native `xdg.terminal-exec` exposes terminal capability. Consumers check the actual HM capability rather than requiring one particular terminal feature as its only valid provider.
 
-Clash 包内 geodata override 与实际应用加载来源不同. 初版 eval 成功未证明 build, 简化后 rebuild 成功没有证明 gfw 故障消失. 缓存优先加载是历史推测, 下载 geoip.metadb 的 EOF 又是独立现象. 当前代码仍有 geodata override, 但是否复现这些故障未知; 不写成已经确认或已经修复的当前 bug.
+With Niri enabled, the directory opener uses Wayfile; otherwise it defaults to Yazi. The FileChooser Portal is a separate path: termfilechooser invokes a terminal and Yazi. Do not conflate the directory opener and Portal based on an earlier goal of making Yazi the default. OS configuration retains the application and Portal link paths. Only applications using that Portal follow this path; no universal GUI success is established.
+
+### Noctalia and Niri
+
+Regular Noctalia locking and swaylock recovery have separate roles. The default monitor's `login_box` uses mode/scale to derive the logical center. A withdrawn custom clock should not be restored as current design.
+
+At the committed baseline, lock-screen settings are `show_weather=false` and `show_unlock_hint=true`; the earlier weather experiment was reverted. Noctalia uses `audio.enable_sounds=false` and `brightness.minimum_brightness=0.05`. Niri permits the audio and brightness bindings while locked. These are source settings, not evidence that runtime settings overrides or multiple-monitor behavior have been verified.
+
+### Framebuffer and kmscon
+
+ThinkBook's fbset service is `oneshot`. Ordering, activation dependencies, mutual exclusion with kmscon, and mode restoration are separate problems. Stopping a completed oneshot does not undo framebuffer geometry. No complete mode-restoration design was adopted in the historical discussion; suggested `Conflicts` or lifecycle hooks are not implemented fixes.
+
+## Agent tooling, packages, and operational boundaries
+
+### Codex, Emacs, and input wiring
+
+The local Codex wrapper adds Python/PyYAML and bubblewrap to `PATH` in `pkgs/codex/package.nix`. Installing those tools does not prove the sandbox works in every environment; that needs runtime evidence. emarccs's `treefmt-nix` follows the root `treefmt-nix`. Desktop configuration uses `emacs-pgtk`; README's old `emacs31-pgtk` example is not implementation evidence.
+
+### Provider interface
+
+The agent provider interface consumes key-file paths without requiring SOPS to produce them. Consumers distinguish undefined `enable` from enabled state and do not add default definitions to read-only options. Model selection belongs to the consumer; the earlier nullable model interface was withdrawn. Configuration data does not establish credential security or permission enforcement.
+
+### Pi wrapper
+
+The Pi wrapper uses `overrideAttrs` to retain original outputs, metadata, and phases while setting the startup offline variable. Tool dependencies are managed through `extraPackages`. A corrected rebuild after an earlier missing-space wrapper-path error is a historical user report. Current source has output-path-prefix checks and command separation. `PI_OFFLINE=1` does not mean model API network requests are forbidden; current build evidence is governed by current.md.
+
+### Skills and maintenance boundaries
+
+Generic skills describe working methods; host permissions enforce execution boundaries. Earlier duplicate agent/command wrappers gave way to shared skills. Command availability, aliases, and proposed capability restrictions are not evidence of deployed security isolation. Historical Nix style decisions retain their original scope; do not turn them into repository-wide rules unsupported by current code.
+
+The historical WSL vscode-server integration change removed it rather than merely extracting a module. Classify commits by semantic effect; do not rewrite ordinary project history to repair inconsistent old titles. A historical review does not establish a new source's project parent, and a draft is not an actual commit.
+
+### Clash geodata
+
+A package geodata override and the data actually loaded by an application are different. Successful evaluation of an initial version did not establish a build; a later successful rebuild did not prove the gfw problem was fixed. Cache-first loading was a historical hypothesis, while EOF downloading `geoip.metadb` was a separate observation. The current source retains the override, but reproduction of those failures is unknown. Do not describe them as confirmed current bugs or resolved current bugs.
