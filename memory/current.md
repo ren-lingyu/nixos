@@ -1,36 +1,32 @@
 # 当前项目记忆
 
-## 目标与状态
+## 项目目标与维护入口
 
-项目目标是维护可组合的声明式 NixOS/HM 配置, 保持最终配置、业务模块、静态事实和内部接口的职责边界. 当前维护任务是清洁重建历史知识并完成旧历史退役; 用户因原始日志难以人工审阅, 明确改为保留经审阅的知识归纳.
+维护可组合的声明式 NixOS 与 Home Manager 配置, 将最终系统组装, 业务实现, 静态 metadata 和内部接口分开. 当前没有待继续的历史整理任务, 也没有已接续的新实现任务. 后续按具体需求维护项目, 从本文件恢复当前状态, 从 [architecture.md](architecture.md) 查阅约束与理由, 从 [consolidation.md](consolidation.md) 按需追溯历史知识来源.
 
-本次恢复状态: 清洁知识重建、Formal 整合及获准的旧历史退役和本地 Git GC 均已完成. 通过 Formal ancestry 保留 18 条清洁来源历史和 52 个知识 checkpoints; 原始 18 条及弃用试建 18 条的分支与 worktrees 已移除, Formal 未继承它们的 commits 或原始日志.
+当前静态事实基线为普通项目已提交的 `48c7f0fc403d525ce982d11e613008042cf1e456`. 本记忆只采用该提交中的项目内容; 后续更新需要重新核对所选基线. Formal GAW 使用 `_agents`, 没有活动 Auxiliary 分支; 历史来源已由 Formal ancestry 保留.
 
-架构与已采用理由见 [architecture.md](architecture.md); 来源审查、知识处理、保留状态及退役条件见 [consolidation.md](consolidation.md). 当前 Formal 是项目知识权威, Auxiliary 只提供有范围限制的历史来源.
+## 已实现的范围
 
-## 当前证据
+`flake.nix` 是最终组装入口, 提供以下 `x86_64-linux` 系统. 配置存在不代表对应机器已经部署到此提交.
 
-- 本次静态审阅的普通项目 HEAD 为 `48c7f0f`, 已读实现与该提交一致; `flake.lock` 有未暂存修改, 单独保留且未修改. 未把当前 HEAD 当作旧 session 的工作环境.
-- 当前四个系统和六类测试的声明已核对, 但本次没有运行 Nix 检查、构建、部署或运行时应用验证. 历史成功只覆盖各自当时的工作区, 不等于当前锁定输入或后续重构已验证.
-- 新建 18 条独立清洁 Auxiliary, 共 52 个知识 checkpoints. 新内容由既有 memory 历史提炼, 原始会话、完整工具日志与此前归档不进入新历史. 这保留知识与相对演化, 减少原始证据的复核能力.
-- 不新增普通项目 parent, 不使 Formal 通过来源边继承未经审阅的项目历史. 普通项目历史没有修改; 远端 Issue 状态本次未核实.
+| 系统输出 | Host profile | User profile | 主要配置范围 |
+| --- | --- | --- | --- |
+| `nixos` | `thinkbook` | `lingyu` | Niri/Noctalia, IceWM fallback, 桌面应用, Flatpak, VM, WBO |
+| `nixos-matebook` | `matebook` | `lingyu` | Niri/Noctalia, 编辑器与桌面工具 |
+| `nixos-server` | `aliyun` | `lingyu-minimal` | Shell, SOPS, Caddy workload |
+| `nixos-wsl` | `wsl` | `lingyu` | NixOS-WSL, 编辑器与终端工具 |
 
-## 未决与下一步
+实现入口为 `flake.nix`, 公共库在 `lib/`, 业务模块在 `modules/`, 本地包在 `pkgs/`. 关键接口与消费者的源码路径见 architecture.md. Flake 另提供 `legacyPackages`, overlays, OS/HM modules, `deploy`/`secret` devShells, treefmt formatter 和 checks.
 
-本次迁移和清理已验收. 后续从当前 Formal Memory 恢复项目维护, 按需查阅清洁来源的知识演化; 不再依赖退役对象或临时操作报告. 未执行 push. 最终 18 条清洁来源的活动分支及 worktrees 已按用户授权安全退役, 完整知识历史仍由 Formal 保留.
+## 实现与验证状态
 
-当前代码与历史尚未闭环的运行结果分开处理: Portal/跨会话应用、Clash 数据加载、锁屏 settings 覆盖、framebuffer 生命周期、armored wrapper 以及当前依赖输入的完整检查, 均不能凭历史摘要宣布成功. 历史 UID 夹具和旧接口的差异按各阶段解释, 不回滚当前实现来迁就早期结论.
+本轮重新核对已提交的组装入口, README, 库和关键消费者, 包括 FileChooser, agent provider, Codex/Pi/rage-armored 包及 Noctalia 设置. 结论是静态实现事实, 未执行 Nix eval/check/build, 系统部署或运行时应用验证. 历史 session 的成功报告只覆盖当时工作区, 不能替代本基线验证.
 
-## 历史维护结果与边界
+`tests/default.nix` 注册六类 checks: `lib-types`, `exist-module-assertions`, `host-functions`, `module-composition`, `configuration-adapter`, `sops-functions`. 覆盖类型与实现见证, 唯一 host/monitor, UID 与 feature 组合负例, 配置适配及 SOPS 输入处理; treefmt 另提供格式检查. `nix flake check` 是 README 所列验证入口, 实际运行仍按宿主授权规则进行.
 
-用户明确授权 36 条指定 histories 退役, 随后确认全部不可达 commits 及独立 blob/tree 可以直接清理且不备份. 依次移除干净 worktrees, 使用公共 `git gaw branch -D` 放弃旧分支, 仅过期不可达 reflog 条目并执行本地 GC; 没有制作恢复包或改写普通项目历史.
+## 已知限制与后续决策
 
-清理后逐个核验: 187 个旧/试建 commits 和 17 个原始 rollout blobs 均已无法从目标仓库读取. 清理前共 276 commits, 702 trees 和 681 blobs 不可达, 完成后完整不可达对象检查为空. 18 个清洁 tips 仍由 Formal ancestry 保留, 普通项目分支及原有未暂存 lockfile 内容保持不变.
-
-既有 commit-graph 派生缓存的四个失效条目已通过公开 Git 维护命令重建消除; 默认完整 `git fsck` 通过. 本地 Git 对象清理不等于外部副本或物理介质残留擦除. 仓库外原始 Codex 会话、隔离审阅副本及本次忽略目录中的临时文件不在清理范围, 未执行删除或传播.
-
-## 清洁来源活动分支退役
-
-用户随后授权退役最终 18 条 Auxiliary. 全部 tips 已被当前 Formal ancestry 保留, worktrees 干净; 移除 worktrees 后逐条复查安全删除条件, 使用公共 `git gaw branch -d` 删除活动分支, 未使用强制放弃. 当前无 Auxiliary 分支, 只保留普通项目与 Formal 两个 worktrees. 18 条来源的全部 70 个 commits (含 52 个知识 checkpoints 和 18 个初始化) 仍可达; 本轮未运行 GC. 根据 consolidation.md 的 UUID-relative 路径和 Formal 整合 ancestry 恢复来源, 不依赖已移除的本机挂载位置.
-
-退役前审阅覆盖 Formal 的全部 80 个可达 commits 和 93 个文件内容版本, 未发现凭据值或原始日志. 个人配置背景仍有保留, 用户明确表示无需担心这类内容; 不将此审阅解释为绝对无敏感内容的保证.
+- FileChooser/跨会话应用, Clash geodata 实际加载, Noctalia runtime settings/多显示器, fbset/kmscon 模式恢复, rage-armored 行为仍缺当前运行证据. 这些是历史留下的验证边界, 不等于全部仍可复现的当前 bug.
+- `README.org` 的 `functionTo` 示例仍用 `emacs31-pgtk`, 而 `flake.nix` 当前桌面配置使用 `emacs-pgtk`. 后续编辑器或文档维护时可同步示例; 尚未修改 README.
+- 后续实现需求, 相关 Issues/PRs 和部署状态以实际检查为准, 当前未建立外部跟踪结论. 过去的整理进度与清理操作已退出当前维护入口, 需要审计时查 Formal first-parent 历史.

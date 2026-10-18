@@ -2,63 +2,72 @@
 
 ## 当前实现基线
 
-这是声明式 NixOS 与 Home Manager 配置仓库. `flake.nix` 通过 flake-parts 建立外层配置, 定义 `nixosBuilder`、`moduleRegistry` 与 `nixosConfigurations`, 再调用 `llib.flakeParts.mkNixosConfigurations` 生成系统集合. 当前四个系统配置为 `nixos`、`nixos-matebook`、`nixos-server`、`nixos-wsl`, 均使用 `x86_64-linux`.
+这是声明式 NixOS 与 Home Manager 配置仓库. `flake.nix` 通过 flake-parts 建立外层配置, 定义 `nixosBuilder`, `moduleRegistry` 与 `nixosConfigurations`, 再调用 `llib.flakeParts.mkNixosConfigurations` 生成系统集合. 当前四个系统配置为 `nixos`, `nixos-matebook`, `nixos-server`, `nixos-wsl`, 均使用 `x86_64-linux`.
 
-业务按 hosts、users、features、workloads 组织; share 提供公共 OS/HM 配置. 原始材料未保留在清洁来源中, 历史归纳不能替代当前实现. 本文件的当前结论来自实际源码静态核对; 历史理由仅在相应主题整合后补入.
+业务按 hosts, users, features, workloads 组织; share 提供公共 OS/HM 配置. 本文件以 current.md 所列已提交基线的实现为准, 历史理由另有来源归纳支持; 证据强度与来源定位见 consolidation.md.
 
-测试由 `tests/default.nix` 注册, 包括类型、实现见证断言、host 函数、模块组合、configuration adapter 和 SOPS 函数六类. 测试代码存在不等于当前版本已经执行通过. 本次未运行 Nix 检查或构建.
+测试由 `tests/default.nix` 注册, 包括类型, 实现见证断言, host 函数, 模块组合, configuration adapter 和 SOPS 函数六类. 测试存在不等于当前版本已经执行通过; 当前验证状态统一见 current.md.
 
-## 模块构造、声明与职责
+## 关键实现路径
 
-最终配置负责 enable、UID 绑定和外部依赖注入; 模块检查依赖, 不通过互相启用来编排依赖. 目录发现以 `os/default.nix` 或 `hm/default.nix` 为实现依据, 根 `default.nix` 可选, 不允许嵌套业务模块. 外层 flake-parts 先选择业务模块, 再生成 NixOS/HM imports; 不能把这种外层选择误判成同层递归 imports.
+- `lib/modules.nix`: `discoverModules`, `mkOptionModules`, `mkOptionTree`. `lib/flakeParts.types.nix` 定义 builder/registry/configuration schema, `lib/flakeParts.configurations.nix` 实现 `adaptType`, `adaptOptions`, `mkNixosSystem` 和私有 OS/HM declaration 生成.
+- `modules/hosts/default.nix`, `modules/users/default.nix`, `modules/features/default.nix`: host/monitor, 用户 UID 绑定与 feature HM 送达的断言和配置. `lib/hosts.nix` 提供 `getUniqueEnabledHost` 与 `mkWireGuardNetworks`, `modules/hosts/wireguard.nix` 接线主机网络.
+- `modules/features/sops/{default.nix,os/default.nix,hm/default.nix}` 与 `lib/features.sops.nix`: OS/HM 密钥桥梁及 per-user 输入处理. `modules/features/agent/hm/{default.nix,_options.hm.nix}`: provider 配置接口和消费者.
+- `modules/features/file-manager/hm/default.nix`: directory opener 与 FileChooser. `modules/features/niri/hm/noctalia/default.nix` 和 `modules/features/niri/hm/settings/binds.nix`: 锁屏, 声音, 亮度和快捷键. `pkgs/{codex,pi-coding-agent,rage-armored}/package.nix`: 本地 wrappers.
 
-`_options.fp.nix` 沿路径前缀提供 configuration/metadata schema; `_metadata.nix` 保存静态值. `os/_options.os.nix` 是原生 NixOS declaration module, `hm/_options.hm.nix` 保留模块名与 HM 上下文的片段函数接口. 后缀表达解释环境, 不要求三个接口返回相同结构. 私有声明生成函数位于构建库, OS 声明进入系统 modules, HM 声明进入 sharedModules, 不依赖 share.enable. 静态路径已核对, 本次未执行 share 关闭场景的行为测试.
+## 模块构造, 声明与职责
+
+最终配置负责 enable, UID 绑定和外部依赖注入; 模块检查依赖, 不通过互相启用来编排依赖. 目录发现以 `os/default.nix` 或 `hm/default.nix` 为实现依据, 根 `default.nix` 可选, 不允许嵌套业务模块. 外层 flake-parts 先选择业务模块, 再生成 NixOS/HM imports; 不能把这种外层选择误判成同层递归 imports.
+
+`_options.fp.nix` 沿路径前缀提供 configuration/metadata schema; `_metadata.nix` 保存静态值. `os/_options.os.nix` 是原生 NixOS declaration module, `hm/_options.hm.nix` 保留模块名与 HM 上下文的片段函数接口. 后缀表达解释环境, 不要求三个接口返回相同结构. 私有声明生成函数位于构建库, OS 声明进入系统 modules, HM 声明进入 sharedModules, 不依赖 share.enable. 声明入口独立于 share 的静态结构已核对, share 关闭场景仍缺当前行为验证.
 
 适配器只按 option 声明处理 functionTo 和 submodule, 不猜测执行任意函数值. 经适配的 configuration 与 metadata 合并为只读 `config.modules`; HM 从 `osConfig.modules` 读取. OS 内部状态用 moduleInternals, HM 每用户通信使用 moduleInterfaces; 声明注册不等于相应业务功能启用.
 
-`llib` 按 types、modules、hosts、features.sops、packages、flakeParts 划分职责. 通用目录发现与系统构造分开; 集合入口内部映射到单系统构造器. 原 groupImportsByUid 已移除, 旧 self.modules registry、早期 base 身份去重和声明文件名只作为演化背景, 不恢复为当前 API. Package namespace 合并显式拒绝将 derivation 当作 namespace.
+`llib` 按 types, modules, hosts, features.sops, packages, flakeParts 划分职责. 通用目录发现与系统构造分开; 集合入口内部映射到单系统构造器. 原 groupImportsByUid 已移除, 旧 self.modules registry, 早期 base 身份去重和声明文件名只作为演化背景, 不恢复为当前 API. Package namespace 合并显式拒绝将 derivation 当作 namespace.
 
-internal 表达生产与声明边界, 不是访问控制. unique 的类型合并语义不同于 readOnly 的定义数量限制; 不能机械互换, 默认值也可能成为第二个定义. UID 由最终组装赋值, 不因其他内部派生选项使用 readOnly 而改变其输入职责. cfg 只缩写自身 option 的读取, 不改定义路径、跨模块读取或诊断路径.
+internal 表达生产与声明边界, 不是访问控制. unique 的类型合并语义不同于 readOnly 的定义数量限制; 不能机械互换, 默认值也可能成为第二个定义. UID 由最终组装赋值, 不因其他内部派生选项使用 readOnly 而改变其输入职责. cfg 只缩写自身 option 的读取, 不改定义路径, 跨模块读取或诊断路径.
 
 ### 历史理由与纠错
 
-曾考虑将所有策略推入 host 或把组合职责全面下放, 因改变同级模块所有权而撤回. 早期 share 声明聚合器导入自身导致递归, 后来先迁出同名声明文件, 再私有化到构建库. session-wrapper 默认 null 与实现值冲突, 最终删除中转 options, 由 provider 直接贡献 greeter.sessionPackages. 这些历史原因来自已审阅的清洁归纳, 不声称当前重新复现失败.
+曾考虑将所有策略推入 host 或把组合职责全面下放, 因改变同级模块所有权而撤回. 早期 share 声明聚合器导入自身导致递归, 后来先迁出同名声明文件, 再私有化到构建库. session-wrapper 默认 null 与实现值冲突, 最终删除中转 options, 由 provider 直接贡献 greeter.sessionPackages. 这些理由来自历史归纳, 未在当前基线重新复现失败.
 
 Registry 曾采用自定义 self.modules 并接受输出 schema 警告; 当前采用 flake-parts options, 不能把当年的折中当作当前目标. nixos-anywhere 的旧 app 包装属于历史; 当前代码通过部署 devShell 提供工具. 不为工具警告自动迁移 Nix 实现, 也不据早期判断推断今天的上游兼容性.
 
-## Host、用户、身份与网络
+## Host, 用户, 身份与网络
 
 当前必须恰好启用一个 host. getUniqueEnabledHost 非唯一时抛出清晰错误, 全局 assertion 使用 tryEval 保留未调用 getter 时的不变量检查. 早期返回空集合的设计曾让字段读取先于 assertion 失败, 不能重新引入该 fallback.
 
 Host metadata 是静态事实, 不随消费者 enable 消失. UID registry 允许预留未启用 UID; 仅要求启用用户绑定的 UID 属于所选 host registry, 不要求集合双向相等. Feature allowUidList 对应启用用户, 用户 HM 实现送达绑定 UID. 当前组合负测使用未登记 UID 1001; 早期 mkForce 清空 registry 的方案属于另一夹具阶段, 不能把 recursiveUpdate 的空集合当作清空操作.
 
-OS 侧 agenix/rekey 提供基础秘密设施, SOPS 保持可选且可组合. 这是职责分层, 不是全面替换 SOPS. 历史动机包括避免应用秘密管理工具的构建或下载问题阻断基础身份部署. Host SSH 身份、派生 recipient、master identity 各有职责, 不把类型声明当作加密或私钥安全保证.
+OS 侧 agenix/rekey 提供基础秘密设施, SOPS 保持可选且可组合. 这是职责分层, 不是全面替换 SOPS. 历史动机包括避免应用秘密管理工具的构建或下载问题阻断基础身份部署. Host SSH 身份, 派生 recipient, master identity 各有职责, 不把类型声明当作加密或私钥安全保证.
 
-当前 HM SOPS key bridge 由 OS age secret 提供, 以 root 所有、sops-decrypt 组及 0440 权限供获准用户消费. HM 从 moduleInternals 路径读取; 非空 secretsInput 要求格式和文件已定义. 历史组权限故障中 NSS 已更新不代表现存用户进程取得新组凭据, 重启后的恢复仅是当时用户报告, 本次未复现.
+当前 HM SOPS key bridge 由 OS age secret 提供, 以 root 所有, sops-decrypt 组及 0440 权限供获准用户消费. HM 从 moduleInternals 路径读取; 非空 secretsInput 要求格式和文件已定义. NSS 更新不代表现存用户进程已取得新组凭据; 历史重启恢复报告不能作为当前运行验证.
 
-稳定 WireGuard 成员关系属于 hosts. 当前构建函数根据 host number 与 endpoint metadata 生成网络及 topology, host wrapper接线秘密路径与防火墙. 旧 interconnect、claims、claimantCount 和 mkNode 原型已退役; membership 不证明运行时在线独占, schema 支持多个申领者也不代表派生配置完整支持. 本次仅核对源码, 没有握手或实际路由验证.
+稳定 WireGuard 成员关系属于 hosts. 当前构建函数根据 host number 与 endpoint metadata 生成网络及 topology, host wrapper 接线秘密路径与防火墙. 旧 interconnect, claims, claimantCount 和 mkNode 原型已退役; membership 不证明运行时在线独占, schema 支持多个申领者也不代表派生配置完整支持. 当前记忆没有握手或实际路由验证结果.
 
-纯文本密文包装专用于 rekey 工具, 不替换全局 rage. 当前 package 使用 builtins.readFile 嵌入 Scheme wrapper, 保留原 phase 并注入实际程序路径. 先前把文件路径插入脚本当源码的错误已修正; 本次未构建或执行 wrapper, 不作运行安全认证.
+纯文本密文包装专用于 rekey 工具, 不替换全局 rage. 当前 package 使用 builtins.readFile 嵌入 Scheme wrapper, 保留原 phase 并注入实际程序路径. 先前把文件路径插入脚本当源码的错误已修正; wrapper 的当前构建与运行结果尚未验证.
 
 ## 桌面与应用能力
 
-Host 层保持真实 monitor 名唯一、default 最多一个; headless 可以没有显示器. GUI 消费者在启用时另要求唯一 default, 默认显示器需要有效 mode. 几何与 scale 是 Noctalia 居中方案的输入, 不是运行时显示状态的普遍保证.
+Host 层保持真实 monitor 名唯一, default 最多一个; headless 可以没有显示器. GUI 消费者在启用时另要求唯一 default, 默认显示器需要有效 mode. 几何与 scale 是 Noctalia 居中方案的输入, 不是运行时显示状态的普遍保证.
 
-X11 是通用兼容 fallback, 当前采用 IceWM 的 OS/HM 分层, 不专属于某个应用. 清理旧 Wayland 会话变量, 不将 fallback 强绑到共享 graphical target 或额外 monitor 协议. 历史用户报告能够登录并运行应用, 不证明所有跨 VT、已有应用实例或剪贴板场景已解决.
+X11 是通用兼容 fallback, 当前采用 IceWM 的 OS/HM 分层, 不专属于某个应用. 清理旧 Wayland 会话变量, 不将 fallback 强绑到共享 graphical target 或额外 monitor 协议. 历史用户报告能够登录并运行应用, 不证明所有跨 VT, 已有应用实例或剪贴板场景已解决.
 
-Terminal 能力通过原生 xdg.terminal-exec 提供, 消费端检查实际 HM 能力, 不把某个 terminal feature 的启用当作唯一合法提供方式. 当前 directory opener 在启用 Niri 时使用 Wayfile, 非 Niri 默认 Yazi; FileChooser Portal 是另一条链路, 由 termfilechooser 调用终端和 Yazi. 这是本次源码核对的区别, 不能根据早期“默认使用 Yazi”的目标省略当前条件. OS 侧保留 applications 与 Portal 的系统链接路径. 仅调用该 Portal 的应用才经过这一链路, 没有通用 GUI 成功保证.
+Terminal 能力通过原生 xdg.terminal-exec 提供, 消费端检查实际 HM 能力, 不把某个 terminal feature 的启用当作唯一合法提供方式. 当前 directory opener 在启用 Niri 时使用 Wayfile, 非 Niri 默认 Yazi; FileChooser Portal 是另一条链路, 由 termfilechooser 调用终端和 Yazi. directory opener 与 Portal 不可因早期默认 Yazi 的目标而混为同一入口. OS 侧保留 applications 与 Portal 的系统链接路径. 仅调用该 Portal 的应用才经过这一链路, 没有通用 GUI 成功保证.
 
-Noctalia 常规锁屏与 swaylock 救援职责分开. 当前 default monitor 的 login_box 使用 mode/scale 推导逻辑中心, 不恢复已撤销的自定义 clock. 最终 show_weather=false、show_unlock_hint=true 已根据原历史最终 staged 审阅纠正并与当前代码核对; 早期曾试开天气不能当作末态. 本次未运行锁屏, 运行时 settings 覆盖和多显示器行为仍需单独验证.
+Noctalia 常规锁屏与 swaylock 救援职责分开. 当前 default monitor 的 login_box 使用 mode/scale 推导逻辑中心, 不恢复已撤销的自定义 clock. 当前锁屏 show_weather=false, show_unlock_hint=true; 早期试开天气已撤回. Noctalia audio.enable_sounds=false, brightness.minimum_brightness=0.05, Niri 音量与亮度快捷键允许锁屏时使用. 这些值来自已提交源码, 不代表运行时 settings 覆盖和多显示器行为已验证.
 
-ThinkBook fbset 为 oneshot, 与 kmscon 的排序、拉起依赖、互斥和模式恢复是不同问题. 停止已退出的 oneshot 不撤销 framebuffer geometry. 历史讨论没有采纳完整的模式恢复方案, 不把建议的 Conflicts 或生命周期钩子写成现有修复.
+ThinkBook fbset 为 oneshot, 与 kmscon 的排序, 拉起依赖, 互斥和模式恢复是不同问题. 停止已退出的 oneshot 不撤销 framebuffer geometry. 历史讨论没有采纳完整的模式恢复方案, 不把建议的 Conflicts 或生命周期钩子写成现有修复.
 
-## Agent、包与操作边界
+## Agent, 包与操作边界
+
+Codex 本地包在 wrapper PATH 中提供 Python/PyYAML 与 bubblewrap, 入口是 pkgs/codex/package.nix. 安装工具并不证明沙箱在所有环境均可运行, 仍需相应运行验证. emarccs 的 treefmt-nix 跟随根 treefmt-nix; 当前桌面 Emacs 使用 emacs-pgtk, 不按 README 中旧 emacs31-pgtk 示例反推实现.
 
 Agent provider interface 消费密钥文件路径, 不依赖该路径一定由 SOPS 产生. 当前消费者区分未定义 enable 与启用状态, 不向 readOnly 选项补默认定义. Provider 模型选择是消费者行为; 早期 nullable 模型接口已撤回. 配置数据不构成密钥安全或权限执行保证.
 
-Pi wrapper 通过 overrideAttrs 保留原包 outputs、metadata 与原有 phase, 仅设置启动离线变量; 工具依赖通过 extraPackages 管理. 早期缺空格导致 wrapper 目标错误, 修正后成功 rebuild 属于历史用户报告. 当前源码包含正确的输出路径前缀检查及命令分隔; 本次未构建 Pi, 离线启动不解释为禁止模型 API 网络请求.
+Pi wrapper 通过 overrideAttrs 保留原包 outputs, metadata 与原有 phase, 仅设置启动离线变量; 工具依赖通过 extraPackages 管理. 早期缺空格导致 wrapper 目标错误, 修正后成功 rebuild 属于历史用户报告. 当前源码包含正确的输出路径前缀检查及命令分隔; PI_OFFLINE=1 不解释为禁止模型 API 网络请求, 当前包构建状态见 current.md.
 
-通用 skill 描述工作方法, 宿主的权限设置负责执行边界. 旧重复 agent/command 包装已被共享 skill 方向取代; 不把可找到命令、alias 或能力裁剪设想写成已部署的安全隔离. 历史 Nix 风格决定按其当时范围保留, 不扩大为未经当前代码支持的全仓库规则.
+通用 skill 描述工作方法, 宿主的权限设置负责执行边界. 旧重复 agent/command 包装已被共享 skill 方向取代; 不把可找到命令, alias 或能力裁剪设想写成已部署的安全隔离. 历史 Nix 风格决定按其当时范围保留, 不扩大为未经当前代码支持的全仓库规则.
 
 WSL vscode-server integration 的历史结果是移除, 不是仅抽模块. 提交类型依据语义, 不为追随旧标题混用而改写普通项目历史. 历史审阅结论不继承为新来源的 project parent, 也不把草稿当作实际提交.
 
