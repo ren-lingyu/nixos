@@ -1,45 +1,41 @@
-# 模块重构: lib 命名空间与构造入口整理后
+# 模块重构: 声明聚合独立于 share
 
 这是历史知识的清洁重建状态, 不是当前项目权威. 来源范围和证据限制见 `source.md`. 以下描述所选历史阶段; 本次新增核实或纠错另行标注.
 
 ## 历史可恢复状态
 
-## 已采用的架构
+## 架构与 API
 
-最终配置在 flake-parts 层决定 enable、UID 绑定及外部集成, 再由构造函数生成 NixOS/HM 模块列表. OS/HM 是统一目录约定; 模块只校验依赖, 不能启用其他 profile. configuration 与 metadata 在外层分离, 到 NixOS 中适配后合并为只读 `config.modules`; HM 读取 `osConfig.modules`.
+flake-parts configuration 显式选择 profile、UID 绑定和外部集成; 外层先完成 enable 决策, 构造器再生成 NixOS/HM imports. `os/default.nix`、`hm/default.nix` 是统一实现约定, 可选模块根 default.nix 承载补充状态或断言. 模块不能启用依赖.
 
-此时声明文件仍使用 `_options.nix`、`os/internal-options.nix`、`hm/interface-options.nix`. `_metadata.nix` 只保存静态值. OS 内部状态使用 moduleInternals, HM 用户通信使用 moduleInterfaces.
+configuration/metadata schema 此时仍在 `_options.nix`, 静态值在 `_metadata.nix`. configuration 经 functionTo/submodule 适配后与 metadata 合并为只读 config.modules, HM 用 osConfig.modules 读取. 父关闭时子选项不会单独生效; 冗余父子 enable 断言是非阻塞清理项.
 
-## lib API 整理
+lib 公共命名空间为 types、modules (包含 modules.assertions)、hosts、features.sops、packages 和 flakeParts (包含 flakeParts.types). 保留函数名, 去掉 moduleFunctions/packageFunctions/default 组织层. flakeParts 直接导出 mkNixosSystem、mkNixosConfigurations 和适配入口, 不额外套 configurations namespace. groupImportsByUid 及其旧测试已删除. 集合入口内部映射到单系统构造器.
 
-用户要求尽量保持函数名, 重新组织 namespace 并减少无意义嵌套, 保留逻辑关系. 已实施:
+## 已采用的声明注册方案
 
-- `moduleFunctions.default` → `modules`, 包含 discoverModules、mkOptionName、mkOptionTree 和 mkOptionModules.
-- 根 assertions 中的 existModule → `modules.assertions.existModule`.
-- `moduleFunctions.hosts.default` → `hosts`.
-- `moduleFunctions.features.sops` → `features.sops`.
-- `packageFunctions` → `packages`.
-- `moduleFunctions.configuration` 的构造与适配函数直接放入 `flakeParts`, 不增加 configurations namespace 层.
-- 原 `flake-parts.types` → `flakeParts.types`.
+目标是将内部/接口 options 的注册从 share 公共配置撤回, 不依赖 share.enable, 同时保留两套不同的声明接口.
 
-库文件按职责改名为 modules.nix、modules.assertions.exist-module.nix、hosts.nix、features.sops.nix、packages.nix、flakeParts.configurations.nix 和 flakeParts.types.nix. lib/default.nix 聚合这些实现. flake、modules、pkgs 和 tests 的调用全部随之调整. 保留既有 helper 的导出范围; 此轮不额外改造 adapter 或统一函数接口.
+`lib/flakeParts.configurations.nix` 的 let 中新增私有函数:
 
-## 构造入口与清理
+- mkInternalOptionsModules: 根据发现结果返回各模块 `os/internal-options.nix` 的列表; 文件本身是原生 NixOS module.
+- mkInterfaceOptionsModule: 返回一个 HM module, 在每个用户的 HM 上下文中读取 options、config、osConfig、pkgs、lib、llib, 调用各模块 `hm/interface-options.nix` 的原有片段函数, 将结果置于 moduleInterfaces option tree.
+- mkDeclarationModules: 统一返回 nixosModules/homeModules 两侧声明模块, 由 mkNixosSystem 调用.
 
-- 新增 mkNixosConfigurations, 接受 rootPath、builder、registry 和 configurations, 内部用 mapAttrs 调用 mkNixosSystem. flake 只调用该集合入口. 这是封装生成职责, 不是消除映射操作.
-- groupImportsByUid 已没有生产调用, 只剩旧测试. 按用户要求删除其定义文件、lib 导出、feature-import-grouping 测试文件及注册入口.
-- 不为函数名或无效冗余断言扩大重构. mkOptionName 继续保留; 模块结构发现与系统构造属于不同逻辑职责.
+两个具体生成函数和统一接口均不导出到 llib. mkNixosSystem 将 OS 声明模块放进系统 modules, 将 HM 声明模块放进 home-manager.sharedModules, 与已启用业务模块的送达独立. share 的 OS/HM default.nix 只保留公共业务配置, 删除相关聚合代码和不再使用的参数.
 
-## 仍有效的故障修复与约束
+曾实施的 builder.nixosModules/homeModules options 加上 flake.nix 内联声明聚合只是中间方案, 用户随后采用固定库机制; 两个新增 builder options 和 flake 内联代码已撤销, 不属于最终 API.
 
-之前的栈溢出来自声明聚合器导入自己, 已通过将聚合移到 share 的 default.nix 消除. session-wrapper 只读默认值冲突已通过移除中转 options 彻底消除; 提供者直接向 greeter.sessionPackages 贡献包, niri 使用 mkBefore, greeter 统一校验 meta.mainProgram. 未登记 UID 的测试使用 1001, 不用 recursiveUpdate 的空 users 集合假装覆盖.
+## 保留的修复与验证限制
 
-父关闭时子开关被忽略, `!child.enable || parent.enable` 若只在父启用时加载就没有实际约束作用. 用户接受它作为非阻塞清理项, 不是功能缺陷.
+早期递归 imports 来自聚合文件选中了自己, 曾将聚合移至 share/default.nix 修复; 此阶段进一步把机制私有化到构建库. 不再创建名为声明文件的聚合器.
 
-## 验证边界
+session-wrapper 中转 options 已删, niri/x11-session 局部构造包并贡献 greeter.sessionPackages, niri 保留 mkBefore; greeter 校验非空 meta.mainProgram. 组合测试用 UID 1001 验证未登记用户, 避免 recursiveUpdate 空集合不清空旧用户的问题.
 
-模块修复和会话包贡献阶段确有两次 nix flake check 通过, 仅验证当时工作区. 本阶段的 helper 删除、集合入口和 namespace 迁移只完成定向引用检查与 git diff --check; 没有运行新的 Nix 求值或构建. 新路径最初未被跟踪, agent 未替用户 stage.
+早期修复和会话包贡献阶段实际有两次 nix flake check 成功. lib 整理和本阶段声明迁出后仅做定向搜索、完整 diff 审查与 git diff --check; 没有后续完整 Nix 验证. 不将之前成功推广到此阶段.
 
-## 当时下一步
+## README 与交付
 
-主体重构和命名空间整理已完成. 需要单独审视声明注册对 share 的依赖, 同步 README 中旧 wrappers、extra-options.nix、目录及输入说明. 若要声明新状态通过完整检查, 必须另有相应 Nix 检查结果, 不能沿用前阶段成功记录.
+README 已按当时工作区同步: flake-parts schema/registry/builder、metadata、UID 绑定、HM 送达、functionTo 适配、私有声明聚合、lib 命名空间, 以及目录、inputs、本地包和 tests 说明. 移除旧 wrappers、extra-options.nix 和 modules/default.nix 的有效结构描述, 保留真实存在的功能配置说明. 文档操作没有运行 formatter 或 Nix 检查.
+
+agent 仅根据 staged diff 准备提交草稿, 没有普通项目 Git 写操作. 后续需保持“声明注册独立于业务启用”和“函数接口不必统一”的边界; 若要继续验证, 使用新证据而非旧工作区的检查结果.
