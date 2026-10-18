@@ -10,7 +10,7 @@
 
 ### 验证
 
-仅静态 diff 与旧引用搜索通过，未做 Nix 求值。modules/containers 未跟踪，modules/default.nix unstaged；不宣称部署或 staged 完整。
+定向搜索与 git diff --check 通过，未运行 Nix check。该阶段还存在其他此前变更，不能把此验证当整个工作区构建证明。
 
 ### 提交表达
 
@@ -55,3 +55,19 @@ Agent provider 未定义 enable 与显式 false 均禁用；fallback 在消费�
 ### 显式网络输入
 
 caddy 暴露 ip、port、networkInterface；WBO 再加 allowedSourceIp。port 默认18000，其他需要明确设置。enable 不自动从 host 推导，防火墙限制目标/source IP 与 TCP port，caddy UID 从 config.ids.uids.caddy 派生，不写死 wg0。extra-options 完整参数签名与仓库一致。
+
+### genAttrs
+
+五处按名称生成 attrset 改为 lib.genAttrs，分布在四个文件，保留括号换行。涉及通用 module option generator、HM interfaces 两层、host metadata 和 Thunderbird fromList。SOPS UID→username 需要同时派生键值，保留 listToAttrs+map。用户示例 getAttrs 是笔误，实际采用 genAttrs。
+
+### Package helper
+
+lib/packageFunctions.nix 同时收集 localOverlays 与 namespaceOverlays，避免目录两种 overlay 并存时漏掉更深层。审查发现 derivation 也是 attrs，单用 isAttrs 会把同名 package 当 namespace；历史记录 加 lib.isDerivation 保护，明确拒绝冲突。两处 // 改 mergeAttrsList，保持后 overlay 覆盖顺序。
+
+### pkgs 风格
+
+统一参数/回调/括号；禁止 Nix indented multiline strings，phase 用 concatStringsSep，固定 argv 用 escapeShellArgs。需要 runtime 展开的变量保留正确引用；不误用面向 option attrset 的 GNU CLI helper 生成有序完整命令。
+
+### 最终验证
+
+git diff --check 与禁用运算符搜索通过，未 Nix build/check。packageFunctions 是 MM，最终修复在 unstaged；需要重新 stage 才进入未来提交。此前八月初段 check 不覆盖九月后续 containers/package 改动。
