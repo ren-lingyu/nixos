@@ -18,7 +18,7 @@ disabled host元数据也需数据完整性，host层default monitor最多一个
 
 ### 验证
 
-只静态检查，Aliyun旧extra-options曾AD index/worktree错位；不把worktree删除当index已接受。
+改动后仅diff检查，无求值/构建成功记录。
 
 ### 生成器
 
@@ -30,7 +30,7 @@ claimantNames不为断言暴露成option；辅助assertion函数统一生成唯�
 
 ### Schema
 
-intranets整体internal+unique；claimed可复用局部生成，unique本身不再额外抽helper。
+外层mapAttrs <net>=[nodes]，内层listToAttrs/map，公共option直接在value，hub.ip用optionalAttrs；动态message/description用net/node名。没有为了局部重复再造大通用函数。
 
 ### 公网地址
 
@@ -39,3 +39,23 @@ publicIpAddress提升为所有host通用internal nullable string/default null，
 ### Claims
 
 按最终net/node集合生成通用结构/唯一性断言，特定hubIP要求仍显式。旧版本尚无通用覆盖机制，不能把unique内部值当可自由合并公共API。
+
+### Claim语义
+
+claim只声明membership，不证明runtime在线独占。共用key/IP会导致WireGuard身份/路由冲突，secret管理不会自动解决；协调策略不由通用层猜测。
+
+### 数量约束
+
+constraints.claimantCount.{min,max}统一命名空间，0分别表示该方向不限制，不能表达恰好0。当前hub1/1，spoke默认0/0；计数是所有hostmetadata申领者，不是当前claimed布尔。
+
+### 实现边界
+
+源已实现数量/未知net-node校验、hubIP单独检查，避免异常head[]。但多claim派生配置仍局限，不能据schema表达力声称多claim生成完整支持；具体os配置未大改。
+
+### 最终生成器
+
+mkNet改三参数mkNode_ netName_ nodeName_ derive_；claimed看当前闭包唯一enabled host，derive看全局唯一claimant的metadata。约束直接写最终intranets，不放进控制spec；无特有字段spoke仍空函数。
+
+### 断言与状态
+
+一次性claimantCountAssertions函数移除，直接mapAttrsToList里生成。最终修改叠在staged版本上，有unstaged；仅git diff --check通过，未Nix求值/构建。多claim且需派生属性仍明确暂缓。
