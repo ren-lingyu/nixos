@@ -14,7 +14,7 @@
 
 ### 验证与状态
 
-此阶段只记录源码与 staged diff 审查；没有新 build/eval 成功记录。此前针对 SOPS rename 的 check 不覆盖这些后续内容。
+最终 wrapper 只有源码与 diff 审查，未 build/eval；不能宣称 runtime wrapper、armor/rekey 已验证。很早的 assistant 回答对 placeholder scope 的解释自相矛盾，已被后续 token substitution 方案取代，不应当作可靠 Nix 教程。
 
 ### Secrets 分层
 
@@ -59,3 +59,15 @@ age.rekey.masterIdentities 是单独的 master identity 配置，不是从 host 
 ### WireGuard 私钥
 
 interconnect hub/spoke 使用 age.secrets 与 rekeyFile，新增 ingress-hub.age / ingress-spoke.age；重复 mkIf 被用户移除。stage 变更被评估为一个连贯迁移，不等于已经执行 commit。
+
+### 纯文本 Git 策略
+
+用户明确不接受非纯文本文件进入 Git；agenix-rekey 默认 age ciphertext 是二进制，这不是加密失败。采用专用于 rekey 的 rage-armored，不覆盖全局 rage。
+
+### Wrapper 最终形态
+
+用户提取 pkgs/rage-armored；flake packages 通过 import ./pkgs 暴露，再给 agenix-rekey.agePackage 使用。基于 rage.overrideAttrs 保留 old.postInstall，原程序移为 rage-unwrapped。wrapper.scm 是纯 Scheme body；Nix prepend Guile shebang 与 --no-auto-compile。用 @rage-unwrapped@ 和 substituteInPlace --replace-fail 注入路径，运行时不靠 makeWrapper 或环境变量。仅 encrypt 且未 armor/decrypt 时追加 --armor。
+
+### 最后修复
+
+历史记录 发现把 ${./wrapper.scm} 放进脚本会插入 store 路径而非 Scheme 源码，已改为 builtins.readFile ./wrapper.scm。保留 concatStringsSep，已讨论路径转义和 $out 展开。
