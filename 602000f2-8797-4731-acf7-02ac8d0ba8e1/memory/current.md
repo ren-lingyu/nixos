@@ -23,3 +23,11 @@
 ### 已核实的 project provenance
 
 历史归纳记载曾只读审阅明确的项目版本. 该事实不证明相邻脏工作区或整个会话对应同一提交. 本次仅保留审阅结论和限制, 不继承此前历史的 parent 关系.
+
+### 提交语义
+
+历史记录 修正了此前按局部历史先例推荐 refactor 的建议。移除实际 integration 会改变配置结果，不是严格意义上的行为不变重构。用户选择语义优先，最终保留 chore(wsl): remove vscode-server integration。不为追随既有标题混用而自动重写历史。
+
+### 验证边界
+
+后续查询包含 flake.nix/flake.lock 历史标题；不能把这些 log 输出中的所有 commits 都当作本状态的 project provenance。本 checkpoint 是提交语义决定，不新增 project parent。
