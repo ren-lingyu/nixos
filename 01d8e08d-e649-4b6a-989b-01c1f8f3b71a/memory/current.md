@@ -10,7 +10,7 @@
 
 ### 验证
 
-历史 agent 执行 nix flake check Exit code 0；用户 shell 部署 nixos-server Exit code 0。copying 0 paths 只说明目标已有依赖路径，不能独立证明新旧 system closure 相同。
+仅静态 diff 与旧引用搜索通过，未做 Nix 求值。modules/containers 未跟踪，modules/default.nix unstaged；不宣称部署或 staged 完整。
 
 ### 提交表达
 
@@ -47,3 +47,11 @@ Agent provider 未定义 enable 与显式 false 均禁用；fallback 在消费�
 ### 验证和 staging
 
 更新遗留 composition 消息后，用户 check 通过。随后发现 staged composition tests 与 unstaged assertion 错位，不能用完整 worktree check 证明 index snapshot。最终拆成 getter+单测的 fix(lib)，以及 assertion+composition 的第二笔草稿，分别审阅。不把草稿或检查认作实际 commit。
+
+### Containers
+
+旧 caddy/WBO staged 代码引用已删除 interconnect namespace，不能只改排版。用户要求完整接入：modules/default.nix 导入 containers，自动发现 container，统一 enable/extra-options/existModule。每个 container 根只导入 os 并声明 os=true/hm=false；真实配置在 os/default.nix。
+
+### 显式网络输入
+
+caddy 暴露 ip、port、networkInterface；WBO 再加 allowedSourceIp。port 默认18000，其他需要明确设置。enable 不自动从 host 推导，防火墙限制目标/source IP 与 TCP port，caddy UID 从 config.ids.uids.caddy 派生，不写死 wg0。extra-options 完整参数签名与仓库一致。
