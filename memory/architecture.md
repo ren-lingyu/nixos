@@ -25,3 +25,17 @@ internal 表达生产与声明边界, 不是访问控制. unique 的类型合并
 曾考虑将所有策略推入 host 或把组合职责全面下放, 因改变同级模块所有权而撤回. 早期 share 声明聚合器导入自身导致递归, 后来先迁出同名声明文件, 再私有化到构建库. session-wrapper 默认 null 与实现值冲突, 最终删除中转 options, 由 provider 直接贡献 greeter.sessionPackages. 这些历史原因来自已审阅的清洁归纳, 不声称当前重新复现失败.
 
 Registry 曾采用自定义 self.modules 并接受输出 schema 警告; 当前采用 flake-parts options, 不能把当年的折中当作当前目标. nixos-anywhere 的旧 app 包装属于历史; 当前代码通过部署 devShell 提供工具. 不为工具警告自动迁移 Nix 实现, 也不据早期判断推断今天的上游兼容性.
+
+## Host、用户、身份与网络
+
+当前必须恰好启用一个 host. getUniqueEnabledHost 非唯一时抛出清晰错误, 全局 assertion 使用 tryEval 保留未调用 getter 时的不变量检查. 早期返回空集合的设计曾让字段读取先于 assertion 失败, 不能重新引入该 fallback.
+
+Host metadata 是静态事实, 不随消费者 enable 消失. UID registry 允许预留未启用 UID; 仅要求启用用户绑定的 UID 属于所选 host registry, 不要求集合双向相等. Feature allowUidList 对应启用用户, 用户 HM 实现送达绑定 UID. 当前组合负测使用未登记 UID 1001; 早期 mkForce 清空 registry 的方案属于另一夹具阶段, 不能把 recursiveUpdate 的空集合当作清空操作.
+
+OS 侧 agenix/rekey 提供基础秘密设施, SOPS 保持可选且可组合. 这是职责分层, 不是全面替换 SOPS. 历史动机包括避免应用秘密管理工具的构建或下载问题阻断基础身份部署. Host SSH 身份、派生 recipient、master identity 各有职责, 不把类型声明当作加密或私钥安全保证.
+
+当前 HM SOPS key bridge 由 OS age secret 提供, 以 root 所有、sops-decrypt 组及 0440 权限供获准用户消费. HM 从 moduleInternals 路径读取; 非空 secretsInput 要求格式和文件已定义. 历史组权限故障中 NSS 已更新不代表现存用户进程取得新组凭据, 重启后的恢复仅是当时用户报告, 本次未复现.
+
+稳定 WireGuard 成员关系属于 hosts. 当前构建函数根据 host number 与 endpoint metadata 生成网络及 topology, host wrapper接线秘密路径与防火墙. 旧 interconnect、claims、claimantCount 和 mkNode 原型已退役; membership 不证明运行时在线独占, schema 支持多个申领者也不代表派生配置完整支持. 本次仅核对源码, 没有握手或实际路由验证.
+
+纯文本密文包装专用于 rekey 工具, 不替换全局 rage. 当前 package 使用 builtins.readFile 嵌入 Scheme wrapper, 保留原 phase 并注入实际程序路径. 先前把文件路径插入脚本当源码的错误已修正; 本次未构建或执行 wrapper, 不作运行安全认证.

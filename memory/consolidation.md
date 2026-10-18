@@ -14,13 +14,13 @@
 | --- | --- | ---: | --- | --- | --- | --- |
 | monitor-host-x11 | `d1ecfe98-8d70-4ed0-8fe9-086bfb5721fc/memory/source.md` 与同目录 `current.md` | 3 | 所有拟提交版本及 ancestry 已审查 | 待主题整合; 后续阶段 3 | 独立 history 已验收; 尚未关联 Formal | 知识归纳, 原始材料未长期保留 |
 | file-manager-terminal-portal | `7cc5b1b0-9ad0-47a3-8e9e-afeb342bd6e9/memory/source.md` 与同目录 `current.md` | 3 | 所有拟提交版本及 ancestry 已审查 | 待主题整合; 后续阶段 3 | 独立 history 已验收; 尚未关联 Formal | 知识归纳, 原始材料未长期保留 |
-| metadata-claims | `bd1cbfba-87f8-40ff-8170-07cf548cca1e/memory/source.md` 与同目录 `current.md` | 3 | 所有拟提交版本及 ancestry 已审查 | 待主题整合; 后续阶段 2 | 独立 history 已验收; 尚未关联 Formal | 知识归纳, 原始材料未长期保留 |
+| metadata-claims | `bd1cbfba-87f8-40ff-8170-07cf548cca1e/memory/source.md` 与同目录 `current.md` | 3 | 所有拟提交版本及 ancestry 已审查 | 已处理主题阶段 2; 其余历史细节留在来源 | tip 已纳入当前 Formal ancestry | 知识归纳, 原始材料未长期保留 |
 | registry-nix-app | `3ae570e4-1a6f-4eb5-a587-fef91898260a/memory/source.md` 与同目录 `current.md` | 1 | 所有拟提交版本及 ancestry 已审查 | 已处理主题阶段 1; 其余历史细节留在来源 | tip 已纳入当前 Formal ancestry | 知识归纳, 原始材料未长期保留 |
 | framebuffer-kmscon | `4038629b-910a-4e71-a8da-fcb671781cfc/memory/source.md` 与同目录 `current.md` | 1 | 所有拟提交版本及 ancestry 已审查 | 待主题整合; 后续阶段 3 | 独立 history 已验收; 尚未关联 Formal | 知识归纳, 原始材料未长期保留 |
-| module-composition | `ab0e5495-e6c7-449b-a798-4b7453eb9319/memory/source.md` 与同目录 `current.md` | 6 | 所有拟提交版本及 ancestry 已审查 | 已处理主题阶段 1; 后续阶段 2 | tip 已纳入当前 Formal ancestry | 知识归纳, 原始材料未长期保留 |
+| module-composition | `ab0e5495-e6c7-449b-a798-4b7453eb9319/memory/source.md` 与同目录 `current.md` | 6 | 所有拟提交版本及 ancestry 已审查 | 已处理主题阶段 1,2; 其余历史细节留在来源 | tip 已纳入当前 Formal ancestry | 知识归纳, 原始材料未长期保留 |
 | pi-skills | `67b1954b-f1df-49fa-9d6d-90f7779239e2/memory/source.md` 与同目录 `current.md` | 3 | 所有拟提交版本及 ancestry 已审查 | 待主题整合; 后续阶段 4 | 独立 history 已验收; 尚未关联 Formal | 知识归纳, 原始材料未长期保留 |
 | flake-parts-introduction | `556edc63-3a28-4090-9d6f-12d884625a5a/memory/source.md` 与同目录 `current.md` | 2 | 所有拟提交版本及 ancestry 已审查 | 已处理主题阶段 1; 其余历史细节留在来源 | tip 已纳入当前 Formal ancestry | 知识归纳, 原始材料未长期保留 |
-| identity-secrets-armor | `8536cd94-a761-42a6-9ebd-517e37d30423/memory/source.md` 与同目录 `current.md` | 5 | 所有拟提交版本及 ancestry 已审查 | 待主题整合; 后续阶段 2,4 | 独立 history 已验收; 尚未关联 Formal | 知识归纳, 原始材料未长期保留 |
+| identity-secrets-armor | `8536cd94-a761-42a6-9ebd-517e37d30423/memory/source.md` 与同目录 `current.md` | 5 | 所有拟提交版本及 ancestry 已审查 | 已处理主题阶段 2; 后续阶段 4 | tip 已纳入当前 Formal ancestry | 知识归纳, 原始材料未长期保留 |
 | cfg-aliases | `cc157a3b-d374-4edf-b3f1-284a0f7a8fab/memory/source.md` 与同目录 `current.md` | 2 | 所有拟提交版本及 ancestry 已审查 | 已处理主题阶段 1; 其余历史细节留在来源 | tip 已纳入当前 Formal ancestry | 知识归纳, 原始材料未长期保留 |
 | agent-providers | `d39e1ab2-c94e-4ec6-b7b9-eb5d16a54dec/memory/source.md` 与同目录 `current.md` | 2 | 所有拟提交版本及 ancestry 已审查 | 待主题整合; 后续阶段 4 | 独立 history 已验收; 尚未关联 Formal | 知识归纳, 原始材料未长期保留 |
 | readonly-host-packages | `01d8e08d-e649-4b6a-989b-01c1f8f3b71a/memory/source.md` 与同目录 `current.md` | 4 | 所有拟提交版本及 ancestry 已审查 | 已处理主题阶段 1; 后续阶段 4 | tip 已纳入当前 Formal ancestry | 知识归纳, 原始材料未长期保留 |
@@ -29,7 +29,7 @@
 | icewm-fallback | `2b6c7939-aeff-4f1a-adcb-2a578653020a/memory/source.md` 与同目录 `current.md` | 2 | 所有拟提交版本及 ancestry 已审查 | 待主题整合; 后续阶段 3 | 独立 history 已验收; 尚未关联 Formal | 知识归纳, 原始材料未长期保留 |
 | wsl-removal-commit-semantics | `602000f2-8797-4731-acf7-02ac8d0ba8e1/memory/source.md` 与同目录 `current.md` | 3 | 所有拟提交版本及 ancestry 已审查 | 待主题整合; 后续阶段 4 | 独立 history 已验收; 尚未关联 Formal | 知识归纳, 原始材料未长期保留 |
 | noctalia-lockscreen | `dacd12b8-abff-441e-a495-ccaa2e8d6c65/memory/source.md` 与同目录 `current.md` | 3 | 所有拟提交版本及 ancestry 已审查 | 待主题整合; 后续阶段 3 | 独立 history 已验收; 尚未关联 Formal | 知识归纳, 原始材料未长期保留 |
-| wireguard-evolution | `8a007c91-445c-4409-9af8-c574fe2663a3/memory/source.md` 与同目录 `current.md` | 3 | 所有拟提交版本及 ancestry 已审查 | 待主题整合; 后续阶段 2 | 独立 history 已验收; 尚未关联 Formal | 知识归纳, 原始材料未长期保留 |
+| wireguard-evolution | `8a007c91-445c-4409-9af8-c574fe2663a3/memory/source.md` 与同目录 `current.md` | 3 | 所有拟提交版本及 ancestry 已审查 | 已处理主题阶段 2; 其余历史细节留在来源 | tip 已纳入当前 Formal ancestry | 知识归纳, 原始材料未长期保留 |
 
 ## 关联的含义
 
@@ -63,7 +63,7 @@ GC 前置预检发现 89 个非本次旧 Auxiliary 的未引用 commits, 其中 
 
 ## 当前恢复入口
 
-整合模块组装与接口契约. 继续 整合主机身份、秘密及网络知识.
+整合主机身份、秘密及网络知识. 继续 整合桌面与应用能力边界.
 
 ## 本次重建过程的纠正
 
