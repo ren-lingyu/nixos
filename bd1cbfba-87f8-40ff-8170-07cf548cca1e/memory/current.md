@@ -18,4 +18,24 @@ disabled host元数据也需数据完整性，host层default monitor最多一个
 
 ### 验证
 
-源check曾因旧fixture失败；修复后未重跑check，但用户nix eval hosts显示disabled Aliyun/WSL仍有UIDslot、existModule=null，符合静态/激活分离。
+只静态检查，Aliyun旧extra-options曾AD index/worktree错位；不把worktree删除当index已接受。
+
+### 生成器
+
+mkNet多轮调整，从回调六个上下文参数收窄为claimantHost，避免暴露冗余内部状态。配置保持普通attrset，existModule不由net函数生成；不滥用mkMerge，列表用concatLists。
+
+### 内部状态
+
+claimantNames不为断言暴露成option；辅助assertion函数统一生成唯一检查，特殊hubIP检查最终结果。claimed独立布尔，唯一claimant时才optionalAttrs派生，避免head[]抢先失败；缺省值来自schema，不伪造else{}状态。
+
+### Schema
+
+intranets整体internal+unique；claimed可复用局部生成，unique本身不再额外抽helper。
+
+### 公网地址
+
+publicIpAddress提升为所有host通用internal nullable string/default null，移除Aliyun专属option，值不改；interconnect直接读claimantHost.publicIpAddress。null语义由schema而非读取fallback。
+
+### Claims
+
+按最终net/node集合生成通用结构/唯一性断言，特定hubIP要求仍显式。旧版本尚无通用覆盖机制，不能把unique内部值当可自由合并公共API。
