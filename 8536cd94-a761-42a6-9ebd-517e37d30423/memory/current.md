@@ -14,7 +14,7 @@
 
 ### 验证与状态
 
-这些历史阶段跨过多次恢复, 相对顺序来自既有归纳, 不以文件名日期推断整体时间范围。
+此阶段只记录源码与 staged diff 审查；没有新 build/eval 成功记录。此前针对 SOPS rename 的 check 不覆盖这些后续内容。
 
 ### Secrets 分层
 
@@ -47,3 +47,15 @@ greeter/niri/interconnect 删除重复数量断言及空 host 分支，直接读
 ### 测试
 
 module-composition 增加 0/1/多个 host 真值覆盖；missing-UID fixture 显式启用 thinkbook，unregistered-UID fixture 补 existModule。记录是测试代码调整，未在此区间运行检查。
+
+### OS 接线
+
+flake.nix 导入 agenix/rekey 外部模块与 flakeModule；实际 age 配置经用户移动到 modules/default.nix。identityPaths 来自 SSH private runtime path；最终 历史记录 审阅中 hostPubkey 已是 SSH public.key，不再把较早 ageRecipient wiring 当作最终实现。
+
+### Master identity
+
+age.rekey.masterIdentities 是单独的 master identity 配置，不是从 host identity 派生；历史提交草稿遗漏后已专门补充。
+
+### WireGuard 私钥
+
+interconnect hub/spoke 使用 age.secrets 与 rekeyFile，新增 ingress-hub.age / ingress-spoke.age；重复 mkIf 被用户移除。stage 变更被评估为一个连贯迁移，不等于已经执行 commit。
