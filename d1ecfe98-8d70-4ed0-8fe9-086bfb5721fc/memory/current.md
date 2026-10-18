@@ -14,7 +14,7 @@ mode宽高用正整数，refresh/scale非null为正浮点。hosts 约束真实 n
 
 ### 验证
 
-用户 rebuild test 后，历史agent eval确认thinkbook开启、旧modules.hosts.monitors消失、greeter output及Niri生成配置符合预期。历史曾审阅部分已提交版本, 但不能据此为修改后的脏工作区建立精确关联。
+源历史记录报告nixos/server/wsl求值检查通过及diff格式通过；没有新增构建或runtime登录验证。提交草稿只描述各host下共同options保持，顶层生成结构确有变化。
 
 ### 风格
 
@@ -22,8 +22,20 @@ mode宽高用正整数，refresh/scale非null为正浮点。hosts 约束真实 n
 
 ### Host 模型
 
-modules.hosts 改为 attrsOf submodule，各host有 enable/monitors/packageGroups；host根入口导入即声明自身enable=true。当前阶段允许零个、至多一个enabled host；图形feature另要求唯一host/default monitor。不要提前套用七月后段的全局恰好一个设计。
+最终hosts schema由modules/hosts/*/default.nix直接目录生成固定namespace，不再开放任意attrsOf hostkey；保留共同enable/monitors/packageGroups/flatpak，并加载每host extra-options。仍是至多一个enabled host。
 
 ### 消费边界
 
 硬件/OS普通配置以自身enable守卫；imports保持模块顶层，不能放进config.mkIf。ThinkBook packageGroups迁到hostnamespace；niri.monitors为内部唯一值，由启用host派生。
+
+### X11 fallback
+
+最初用startx+XFCE，目的是让wemeet等应用有稳定少配置的原生X11环境，不追求极端最小。发现wrapper把$out留到runtime导致无法启动，已改为构建时绝对路径，同时改用pkgs.xfce4-session/pkgs.xinit。
+
+### Overlay
+
+modules/overlays按子目录default.nix自动发现，生成enable并支持extra-options；Tencent overlay显式守卫，由thinkbook最终组合启用。
+
+### 保留断言
+
+用户明确要求保留enabled host对应default.nix存在的防御性检查；不是因为新schema可阻止拼写错误就擅自删去。monitor与flatpak相关检查保留。
