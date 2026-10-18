@@ -14,4 +14,16 @@ cfg只用于读取自身feature配置；OS用config.modules.features.<name>，HM
 
 ### 验证
 
-目前只有定向搜索和diff检查；尚无运行检查，不能把别名重构意图直接当作无行为变化证明。
+hosts阶段第一次沙箱外no-build flake check通过，用户rebuild后symlink/closure对比仍一致，failed units为空。源历史记录压缩后的resume只是恢复和总结，没有新仓库操作。
+
+### 运行证据
+
+用户rebuild test后，历史只读比较current/system-profile/booted symlink仍指向事前同一store closure，diff-closures无输出，沙箱外failed-units为空。比copying0paths更强，但仅覆盖该主机当时active closure。
+
+### 状态
+
+hosts11文件staged，提交草稿区分集合级和实例级cfg。源未提供这组修改后exact project commit；无额外parent。
+
+### Host cfg
+
+hosts11文件改用实例级cfg=config.modules.hosts.<host>，集合入口用cfg=config.modules.hosts；仅替换自身读取，定义路径/错误文本不改。users评估后未修改。
