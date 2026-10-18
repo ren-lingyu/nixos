@@ -10,8 +10,24 @@
 
 ### Host 公钥模型
 
-publicSshKey 实际存 age recipient，命名误导。用户采纳 publicHostKey = unique(submodule …)，用 map 生成 age/ssh 子 option；三个 host metadata 改成 publicHostKey.age。历史记录 删除多余 formats 局部列表，改为内联。
+已由 publicHostKey 迁到 identityKeys.<format>.{public,private}.{key,path}；key 是内容或材料载体，path 是 runtime 位置。private.key 为 nullOr(either path nonEmptyStr)，metadata 显式展开结构。仓库不应放明文私钥；类型本身不能强制加密。
 
 ### 验证与状态
 
-四个相关文件是 MM（旧 index 与新 worktree 不同），没有 build/eval；vaultix 已撤销，不应把未来恢复设想当成已实现。
+历史记录 提交草稿只覆盖 staged host metadata；flake.nix 仍 unstaged，不能把二者描述成一个已提交状态。
+
+### Secrets 分层
+
+用户要引入 agenix 作为 OS 基础设施；sops-nix 保留为可选、可组合的 feature。这不是全面替换 sops-nix。
+
+### SOPS 迁移
+
+secret→sops 同步 option、moduleInterfaces、moduleFunctions、flake 和引用，压平重复 sops.sops。首次用户 nix flake check 失败是 tests/secret-functions 仍引用旧 helper；历史记录 更新为 sops-functions，历史记录 用户 shell 记录 Exit code 0。
+
+### SSH 与 age
+
+用户把 SSH host key 定为 host 身份；age recipient 是派生表示，迁为 identityKeys.ssh.public.ageRecipient，移除把 identityKeys.age 当独立 host 身份的结构。
+
+### OS 设施动机
+
+agenix/rekey 用于 OS 基础秘密，降低 rebuild 受 sops-nix Go 构建/网络阻塞时失去秘密部署能力的风险；HM/应用 secrets 继续用可选 SOPS。
