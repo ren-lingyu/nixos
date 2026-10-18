@@ -74,3 +74,13 @@ Formal 知识整合与清洁来源关联已完成; 下一阶段必须处理旧�
 ## 仓库存储诊断限制
 
 默认完整 fsck 因既有 commit-graph 缓存引用四个缺失对象而告警; 这些条目不属于任何当前 refs/reflogs 的提交集合. 禁用该可选缓存读取后的完整对象检查通过, Formal/Auxiliary 的公共检查与 ancestry 检查通过. 本次未修改缓存, 不将默认仓库级诊断报告为完全通过; 在获准的清理验收中需要重新检查并明确处理缓存维护.
+
+## 待用户确认的具体清理方案
+
+退役范围是原始 18 条及未采用试建 18 条, 共 36 个 branches/worktrees、187 个 first-parent commits; 最终 reviewed 来源 18 条继续保留. 执行前重新核对 tip、干净 worktree/index、未跟踪文件和进行中的操作, 不用 --force 丢弃用户数据. 使用 git worktree remove 后再以公共 git gaw branch -D 明确放弃, 不手动改 refs.
+
+非目标未引用集合当前有 936 个对象, 含 89 commits、283 trees、564 blobs; 17 个 commits 只由 reflog 保留. 469 blobs 和 22 trees 不在这些 commits 的可达闭包, 可能含独立 staging 成果. 未判定它们可以丢弃. 推荐先以标准 Git pack 导出整个非目标集合并检查对象集合和完整性; 该恢复材料保持本地私有, 不加入 GAW. 这是依赖既有普通项目基础对象的恢复包, 不是独立完整仓库副本.
+
+经用户分别确认保护方式和清理权限后, 再按顺序退役, 重新检查 refs/reflogs, 只过期不可达 reflog 条目, 对可达条目保留恢复历史, 然后执行获准 GC. 对状态变化或未预期保留关系立即停止. 已知 commit-graph 派生缓存问题的维护同样列入清理方案, 本次不自行修复.
+
+验收应检查待退役 commits 和 17 个原始 rollout blobs 的本地可读取性, 以及 Formal、全部清洁 tips、普通分支和原有未暂存 lockfile 的保留. 共享且仍被合法引用的 config blobs 不作为清理失败. 删除分支不等于对象消失; 完成清理后才记录实际结果, 并精简临时操作细节. 当前仅完成方案准备, 没有导出恢复包、删除 worktree/branch、过期 reflog 或运行 GC.

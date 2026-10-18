@@ -26,3 +26,7 @@
 ## 仓库存储诊断限制
 
 默认完整 fsck 因既有 commit-graph 缓存引用四个缺失对象而告警; 这些条目不属于任何当前 refs/reflogs 的提交集合. 禁用该可选缓存读取后的完整对象检查通过, Formal/Auxiliary 的公共检查与 ancestry 检查通过. 本次未修改缓存, 不将默认仓库级诊断报告为完全通过; 在获准的清理验收中需要重新检查并明确处理缓存维护.
+
+## 退役门禁的进一步核实
+
+清理预检发现 936 个非目标未引用对象: 89 commits、283 trees、564 blobs. 其中 469 blobs 和 22 trees 不属于上述 commits 的可达闭包, 不能只保护 commit 就立即 prune. 17 个非目标 commits 仍由 reflog 保留. 推荐在单独授权后先将完整非目标集合保存到权限受限的本地 Git 恢复包并校验, 再退役指定 36 条 histories, 最后重新核对 refs/reflogs 后执行获准 GC. 恢复包不进入 GAW, 不包含本次待退役 commits; 执行前还要核对原始 rollout blobs 不被保留. 当前没有创建恢复包或执行清理.
