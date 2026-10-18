@@ -51,3 +51,15 @@ Terminal 能力通过原生 xdg.terminal-exec 提供, 消费端检查实际 HM �
 Noctalia 常规锁屏与 swaylock 救援职责分开. 当前 default monitor 的 login_box 使用 mode/scale 推导逻辑中心, 不恢复已撤销的自定义 clock. 最终 show_weather=false、show_unlock_hint=true 已根据原历史最终 staged 审阅纠正并与当前代码核对; 早期曾试开天气不能当作末态. 本次未运行锁屏, 运行时 settings 覆盖和多显示器行为仍需单独验证.
 
 ThinkBook fbset 为 oneshot, 与 kmscon 的排序、拉起依赖、互斥和模式恢复是不同问题. 停止已退出的 oneshot 不撤销 framebuffer geometry. 历史讨论没有采纳完整的模式恢复方案, 不把建议的 Conflicts 或生命周期钩子写成现有修复.
+
+## Agent、包与操作边界
+
+Agent provider interface 消费密钥文件路径, 不依赖该路径一定由 SOPS 产生. 当前消费者区分未定义 enable 与启用状态, 不向 readOnly 选项补默认定义. Provider 模型选择是消费者行为; 早期 nullable 模型接口已撤回. 配置数据不构成密钥安全或权限执行保证.
+
+Pi wrapper 通过 overrideAttrs 保留原包 outputs、metadata 与原有 phase, 仅设置启动离线变量; 工具依赖通过 extraPackages 管理. 早期缺空格导致 wrapper 目标错误, 修正后成功 rebuild 属于历史用户报告. 当前源码包含正确的输出路径前缀检查及命令分隔; 本次未构建 Pi, 离线启动不解释为禁止模型 API 网络请求.
+
+通用 skill 描述工作方法, 宿主的权限设置负责执行边界. 旧重复 agent/command 包装已被共享 skill 方向取代; 不把可找到命令、alias 或能力裁剪设想写成已部署的安全隔离. 历史 Nix 风格决定按其当时范围保留, 不扩大为未经当前代码支持的全仓库规则.
+
+WSL vscode-server integration 的历史结果是移除, 不是仅抽模块. 提交类型依据语义, 不为追随旧标题混用而改写普通项目历史. 历史审阅结论不继承为新来源的 project parent, 也不把草稿当作实际提交.
+
+Clash 包内 geodata override 与实际应用加载来源不同. 初版 eval 成功未证明 build, 简化后 rebuild 成功没有证明 gfw 故障消失. 缓存优先加载是历史推测, 下载 geoip.metadb 的 EOF 又是独立现象. 当前代码仍有 geodata override, 但是否复现这些故障未知; 不写成已经确认或已经修复的当前 bug.
