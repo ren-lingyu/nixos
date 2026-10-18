@@ -156,7 +156,9 @@
         "melpa": "melpa",
         "nix-to-lisp": "nix-to-lisp",
         "nixpkgs": "nixpkgs",
-        "treefmt-nix": "treefmt-nix",
+        "treefmt-nix": [
+          "treefmt-nix"
+        ],
         "twist": "twist"
       },
       "locked": {
@@ -954,7 +956,7 @@
         "nixvim": "nixvim",
         "nixvirt": "nixvirt",
         "sops-nix": "sops-nix",
-        "treefmt-nix": "treefmt-nix_2",
+        "treefmt-nix": "treefmt-nix",
         "zotero-fix-nixpkgs": "zotero-fix-nixpkgs"
       }
     },
@@ -998,29 +1000,6 @@
       }
     },
     "treefmt-nix": {
-      "inputs": {
-        "nixpkgs": [
-          "emarccs",
-          "nixpkgs"
-        ]
-      },
-      "locked": {
-        "lastModified": 1791885023,
-        "narHash": "sha256-C3alQ2MEt0zVrUSho5NUDo3jmhbff72++bfwoqT9Omo=",
-        "ref": "refs/heads/main",
-        "rev": "0d6d739a833ba9a9c93034862e4a7b061a062a1c",
-        "shallow": true,
-        "type": "git",
-        "url": "https://github.com/numtide/treefmt-nix.git"
-      },
-      "original": {
-        "ref": "refs/heads/main",
-        "shallow": true,
-        "type": "git",
-        "url": "https://github.com/numtide/treefmt-nix.git"
-      }
-    },
-    "treefmt-nix_2": {
       "inputs": {
         "nixpkgs": [
           "nixpkgs"
