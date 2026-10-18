@@ -26,7 +26,7 @@ interconnect聚合所有metadata，当前启用host派生claimed，内部ingress
 
 ### 验证
 
-地址范围等额外检查用户暂缓；没有后段运行检查或network试验成功记录。
+仅源码/diff检查；暂缓断言问题，没有求值或真实网络测试。
 
 ### 地址模型
 
@@ -47,3 +47,23 @@ intranetDefs内部只读含network number0..255与nodes，schema和地址都读�
 ### Orchestration
 
 后续staged有hub/spoke containers、feature注册与闭包启用；只记录审阅阶段，不补造服务部署成功。
+
+### 网络归属
+
+用户彻底移除interconnect feature，把稳定WireGuard成员关系收回hosts。llib.moduleFunctions.hosts下mkWireGuardNetworking是针对当前hostschema的纯转换，不是通用WireGuard框架。旧intranetDefs/claimant方案已退役，不应再视作当前实现。
+
+### 拓扑
+
+endpoint host形成以host number命名的wg网络，其他参与host做spoke；多hub时角色按当前网络判断，只给hub peer endpoint/keepalive，不因某host全局有endpoint就漏掉其作为另网spoke的keepalive。
+
+### 边界修复
+
+enabledHost_.wireguard=null时返回{}且不读keypath；hubHosts从wireguardHosts继续过滤。保留参数别名用户偏好，合并冗余let/分支，optionalAttrs，禁&&和//。
+
+### Staging
+
+初次agent认为未接线函数不宜提交；用户明确调用下次整理后，接受独立feat(lib): add WireGuard networking builder。随后hosts builder调用、地址规则和endpoint/listenPort约束再作为一组staged变更审阅。
+
+### 最终状态
+
+末尾无unstaged，cached diff check通过，提交草稿反映当前接线主题；未执行实际project commit，也没有本源末段成功Nix/网络验证证据。
