@@ -14,7 +14,7 @@ editor wrapper补显式base依赖，remote.existModule.os=false匹配仅HM实现
 
 ### 验证
 
-接口迁移和草稿静态检查通过，尚无该完整变化新的check成功记录。
+这一阶段diff检查/草稿通过，无后续Nix检查证据。
 
 ### existModule
 
@@ -26,7 +26,7 @@ features可高度定制，不以是否第三方通用判断；users可保留模�
 
 ### HM interface
 
-feature拥有hm/interface-options.nix schema，各user赋数据；共享HM modules统一注册接口、实际feature按enable+allowUidList投递，实现接口始终存在/行为按需启用。最终命名moduleInterfaces.features.<feature>，文件函数接feature名与HM参数，不写死实例。
+自动发现从features/default移到modules/default，覆盖moduleTypes；修正内层readDir必须扫描当前moduleType目录及listToAttrs缺失。接口始终在每HM scope，非注册一套全局用户数据。
 
 ### Secret分层
 
@@ -42,8 +42,24 @@ feature拥有hm/interface-options.nix schema，各user赋数据；共享HM modul
 
 ### UID registry
 
-增加规范十进制UID key和allowUidList去重。hosts注册users."<uid>"=<uid>，只表达UID；跨模块一致性放users，不反向依赖配置身份数据。此历史阶段存在双向host/users集合校验；用户要求移除无host时强制唯一host的额外检查。
+最终仅要求enabled user UIDs属于enabled host registry，registry允许预留未用UID；撤销之前双向集合相等约束。Feature allowUidList默认直接来自启用用户，不再固定1000或要求feature校验host绑定。
 
 ### 运行验证
 
 用户check通过。当rebuild后HM/sops失败，日志keyfile Permission denied且旧user-manager仍运行；NSS id/getent有新组，不代表当前进程取得新凭据。用户boot重启后恢复，oneshot inactive且status0/SUCCESS不是失败。这里是源中诊断和用户运行结果，此前整理未执行系统命令。
+
+### Remote
+
+讨论过保留remote+moduleInterfaces透传，但HM原生rclone接口已足够；最终删除remote feature，把rclone配置移users/lingyu/hm/rclone.nix并补导入。rclone始终启用，secret关闭只跳过凭据remotes；requiresUnit=sops-nix.service的移除是用户有意行为。
+
+### 用户模型
+
+modules.users.<profile>目录发现，enable只表示启用，不等于import或最终选择。启用必须绑定非null UID，禁用可预绑定；username/homeDirectory默认可覆盖，移除home.enable/manager.enable/source。启用用户生成NixOS/HM配置，UID绑定由flake引用hostregistry。
+
+### Secret边界
+
+OS secret不直接依赖原生users.users的UID-keyed实现细节；根wrapper通过modules.users推导allowUsernameList内部唯一option，os侧只消费它。
+
+### 最小profile
+
+先试lingyu-server后按用户偏好改回规模命名lingyu-minimal，空私有配置仍接受最终启用公共features；不是禁用HM或无用户管理。
