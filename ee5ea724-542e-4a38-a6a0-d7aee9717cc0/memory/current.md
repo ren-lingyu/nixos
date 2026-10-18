@@ -14,4 +14,24 @@ agent 初版通过 linkFarm 适配 v2ray-rules-dat，只跑 nix eval 得到 clas
 
 ### 验证边界
 
-初版 eval 成功不能证明构建成功。用户新版 rebuild 通过是用户报告，不能归功于 agent 初版。没有已证实的 exact 修改后 commit parent。
+最后没有错误消失的记录；不宣称彻底修复，不从时间邻近选择 project parent。
+
+### 诊断事实
+
+进程路径是 rebuild 后的新 Nix package；跟随 symlink 后找到包内 geosite.dat/geoip.dat。用户数据目录另有独立普通 geodata 文件，mtime 早于报错；生成配置仍包含 fallback-filter.geosite 的 gfw。
+
+### 未证实之处
+
+用户缓存优先加载是有线索的解释，不是直接观察到进程打开的文件；/proc/exe 查询失败、fd 访问 Permission denied。不要把推测升级为证实因果。
+
+### 读取范围失误
+
+历史诊断曾因宽泛匹配读到预期之外的应用配置. 后续应采用明确文件白名单和脱敏输出; 本次不携带那些工具日志或应用数据.
+
+### 处置状态
+
+停止在建议阶段：核实 geoip.dat 与 geoip.metadb 的具体需求、更新设置和 runtime 数据路径；备份/链接、关闭自动下载或重启都未在此实验执行。
+
+### 新增故障
+
+用户报告下载 MetaCubeX 的 geoip.metadb 时 EOF。这是 MMDB/GeoIP 下载失败，不能等同于此前 geosite 缺 gfw。包内 override 并不保证 GUI 最终使用这些数据，也可能由应用自动更新/补齐。
