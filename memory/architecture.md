@@ -39,3 +39,15 @@ OS 侧 agenix/rekey 提供基础秘密设施, SOPS 保持可选且可组合. 这
 稳定 WireGuard 成员关系属于 hosts. 当前构建函数根据 host number 与 endpoint metadata 生成网络及 topology, host wrapper接线秘密路径与防火墙. 旧 interconnect、claims、claimantCount 和 mkNode 原型已退役; membership 不证明运行时在线独占, schema 支持多个申领者也不代表派生配置完整支持. 本次仅核对源码, 没有握手或实际路由验证.
 
 纯文本密文包装专用于 rekey 工具, 不替换全局 rage. 当前 package 使用 builtins.readFile 嵌入 Scheme wrapper, 保留原 phase 并注入实际程序路径. 先前把文件路径插入脚本当源码的错误已修正; 本次未构建或执行 wrapper, 不作运行安全认证.
+
+## 桌面与应用能力
+
+Host 层保持真实 monitor 名唯一、default 最多一个; headless 可以没有显示器. GUI 消费者在启用时另要求唯一 default, 默认显示器需要有效 mode. 几何与 scale 是 Noctalia 居中方案的输入, 不是运行时显示状态的普遍保证.
+
+X11 是通用兼容 fallback, 当前采用 IceWM 的 OS/HM 分层, 不专属于某个应用. 清理旧 Wayland 会话变量, 不将 fallback 强绑到共享 graphical target 或额外 monitor 协议. 历史用户报告能够登录并运行应用, 不证明所有跨 VT、已有应用实例或剪贴板场景已解决.
+
+Terminal 能力通过原生 xdg.terminal-exec 提供, 消费端检查实际 HM 能力, 不把某个 terminal feature 的启用当作唯一合法提供方式. 当前 directory opener 在启用 Niri 时使用 Wayfile, 非 Niri 默认 Yazi; FileChooser Portal 是另一条链路, 由 termfilechooser 调用终端和 Yazi. 这是本次源码核对的区别, 不能根据早期“默认使用 Yazi”的目标省略当前条件. OS 侧保留 applications 与 Portal 的系统链接路径. 仅调用该 Portal 的应用才经过这一链路, 没有通用 GUI 成功保证.
+
+Noctalia 常规锁屏与 swaylock 救援职责分开. 当前 default monitor 的 login_box 使用 mode/scale 推导逻辑中心, 不恢复已撤销的自定义 clock. 最终 show_weather=false、show_unlock_hint=true 已根据原历史最终 staged 审阅纠正并与当前代码核对; 早期曾试开天气不能当作末态. 本次未运行锁屏, 运行时 settings 覆盖和多显示器行为仍需单独验证.
+
+ThinkBook fbset 为 oneshot, 与 kmscon 的排序、拉起依赖、互斥和模式恢复是不同问题. 停止已退出的 oneshot 不撤销 framebuffer geometry. 历史讨论没有采纳完整的模式恢复方案, 不把建议的 Conflicts 或生命周期钩子写成现有修复.
