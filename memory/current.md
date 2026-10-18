@@ -4,7 +4,7 @@
 
 项目目标是维护可组合的声明式 NixOS/HM 配置, 保持最终配置、业务模块、静态事实和内部接口的职责边界. 当前维护任务是清洁重建历史知识并完成旧历史退役; 用户因原始日志难以人工审阅, 明确改为保留经审阅的知识归纳.
 
-本次恢复状态: 完成知识整合验收并准备旧历史退役. 提交旧历史退役与 GC 方案供用户决定. 未获单独授权前不移除旧 worktrees、不执行 branch -D、不做 reflog 过期或 GC.
+本次恢复状态: 清洁知识重建、Formal 整合及获准的旧历史退役和本地 Git GC 均已完成. 保留 18 条清洁 Auxiliary 和 52 个知识 checkpoints; 原始 18 条及弃用试建 18 条的分支与 worktrees 已移除, Formal 未继承它们的 commits 或原始日志.
 
 架构与已采用理由见 [architecture.md](architecture.md); 来源审查、知识处理、保留状态及退役条件见 [consolidation.md](consolidation.md). 当前 Formal 是项目知识权威, Auxiliary 只提供有范围限制的历史来源.
 
@@ -17,16 +17,14 @@
 
 ## 未决与下一步
 
-提交旧历史退役与 GC 方案供用户决定. 未获单独授权前不移除旧 worktrees、不执行 branch -D、不做 reflog 过期或 GC.
+本次迁移和清理已验收. 后续从当前 Formal Memory 恢复项目维护, 按需查阅清洁来源的知识演化; 不再依赖退役对象或临时操作报告. 未执行 push, 未删除最终 18 条清洁来源.
 
 当前代码与历史尚未闭环的运行结果分开处理: Portal/跨会话应用、Clash 数据加载、锁屏 settings 覆盖、framebuffer 生命周期、armored wrapper 以及当前依赖输入的完整检查, 均不能凭历史摘要宣布成功. 历史 UID 夹具和旧接口的差异按各阶段解释, 不回滚当前实现来迁就早期结论.
 
-原始 18 条旧历史及 18 条未采用的试建历史均待退役, 共 36 条; 退役尚未执行. 预检发现 89 个不属于本次旧 Auxiliary 的未引用 commits, 其中 17 个由 reflog 保留; 不得无审查地全局过期 reflogs 或立即 prune. 清理完成前不记录 GC 成功或旧对象消失.
+## 历史维护结果与边界
 
-## 仓库存储诊断限制
+用户明确授权 36 条指定 histories 退役, 随后确认全部不可达 commits 及独立 blob/tree 可以直接清理且不备份. 依次移除干净 worktrees, 使用公共 `git gaw branch -D` 放弃旧分支, 仅过期不可达 reflog 条目并执行本地 GC; 没有制作恢复包或改写普通项目历史.
 
-默认完整 fsck 因既有 commit-graph 缓存引用四个缺失对象而告警; 这些条目不属于任何当前 refs/reflogs 的提交集合. 禁用该可选缓存读取后的完整对象检查通过, Formal/Auxiliary 的公共检查与 ancestry 检查通过. 本次未修改缓存, 不将默认仓库级诊断报告为完全通过; 在获准的清理验收中需要重新检查并明确处理缓存维护.
+清理后逐个核验: 187 个旧/试建 commits 和 17 个原始 rollout blobs 均已无法从目标仓库读取. 清理前共 276 commits, 702 trees 和 681 blobs 不可达, 完成后完整不可达对象检查为空. 18 个清洁 tips 仍由 Formal ancestry 保留, 普通项目分支及原有未暂存 lockfile 内容保持不变.
 
-## 退役门禁的进一步核实
-
-清理预检发现 936 个非目标未引用对象: 89 commits、283 trees、564 blobs. 其中 469 blobs 和 22 trees 不属于上述 commits 的可达闭包, 不能只保护 commit 就立即 prune. 17 个非目标 commits 仍由 reflog 保留. 推荐在单独授权后先将完整非目标集合保存到权限受限的本地 Git 恢复包并校验, 再退役指定 36 条 histories, 最后重新核对 refs/reflogs 后执行获准 GC. 恢复包不进入 GAW, 不包含本次待退役 commits; 执行前还要核对原始 rollout blobs 不被保留. 当前没有创建恢复包或执行清理.
+既有 commit-graph 派生缓存的四个失效条目已通过公开 Git 维护命令重建消除; 默认完整 `git fsck` 通过. 本地 Git 对象清理不等于外部副本或物理介质残留擦除. 仓库外原始 Codex 会话、隔离审阅副本及本次忽略目录中的临时文件不在清理范围, 未执行删除或传播.
