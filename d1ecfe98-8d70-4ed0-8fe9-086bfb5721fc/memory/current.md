@@ -14,8 +14,16 @@ mode宽高用正整数，refresh/scale非null为正浮点。hosts 约束真实 n
 
 ### 验证
 
-staged 版本经静态审查和 toplevel drvPath eval 成功，原有 Niri provider 互斥/依赖约束保留。先前 mode 阶段的 check 与本阶段 eval 分开记录；本次未重跑项目检查。
+用户 rebuild test 后，历史agent eval确认thinkbook开启、旧modules.hosts.monitors消失、greeter output及Niri生成配置符合预期。历史曾审阅部分已提交版本, 但不能据此为修改后的脏工作区建立精确关联。
 
 ### 风格
 
 局部 type/helper/断言的 let 紧邻其消费属性，不把一次性局部值提升为全局；断言 message 保留完整 option 路径。
+
+### Host 模型
+
+modules.hosts 改为 attrsOf submodule，各host有 enable/monitors/packageGroups；host根入口导入即声明自身enable=true。当前阶段允许零个、至多一个enabled host；图形feature另要求唯一host/default monitor。不要提前套用七月后段的全局恰好一个设计。
+
+### 消费边界
+
+硬件/OS普通配置以自身enable守卫；imports保持模块顶层，不能放进config.mkIf。ThinkBook packageGroups迁到hostnamespace；niri.monitors为内部唯一值，由启用host派生。
