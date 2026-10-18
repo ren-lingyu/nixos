@@ -14,7 +14,7 @@ editor wrapper补显式base依赖，remote.existModule.os=false匹配仅HM实现
 
 ### 验证
 
-静态diff与草稿通过，尚无这组函数新check。
+先有4组check通过，再有历史记录用户check Exit0、新module-composition构建成功；三套NixOS配置同时求值通过。仅证明当时源码，不是跨session的最终项目状态。
 
 ### existModule
 
@@ -86,7 +86,7 @@ sessionPackages内部unique、有default=[]和描述；保留options探测接口
 
 ### 共享type
 
-llib.types.monitor/monitors为直接option type；hosts保持每entry unique，Niri保持整体unique。
+monitor.name非空约束移入共享type，删除hosts重复非空assertion，补空名负向测试；修正role/scale/name描述。shell package选项补unique消息、example/description。
 
 ### 手工边界
 
@@ -99,3 +99,19 @@ module args不会自动流入普通import函数应用；补host/feature extra-op
 ### 算法与风格
 
 保留双层fold和直接构造UID属性集；不为替换fold引入mkMerge，不把一次性具体network/module逻辑全藏let。两个selector避免回调必须返回{uids,imports}的隐式结构契约。
+
+### 测试
+
+tests/default聚合，每类别runCommand derivation，经perSystem.checks；覆盖monitor/existModule/groupImportsByUid/SOPS生成。再加真实module组合负例：user无UID、UID未注册、feature指向未启用user。测试读取真实assertions，不重写规则。
+
+### 诊断文案
+
+greeter monitor错误路径及SOPS接口sops.secretsInput/defaultSopsFormat/defaultSopsFile路径笔误均逐步纠正，后者到历史记录才修完。
+
+### 文档
+
+初次推倒README被用户撤销；最终保留原逐目录章节，增架构约定/Option和组装协议并移到结构前，更新旧overlays/remote、minimal、lib/tests及OS/HM不对称说明。代码注释与README共同记录同一契约。只为措辞覆盖面更好不建议改已提交历史。
+
+### 最终验证与待办
+
+后段类型/文档/shell只有diff静态检查，没有新flake check；源最后判断架构基本完备。Niri session-wrapper.package错误路径及unique文案统一仍属后续可选维护，不声称全部修完。
