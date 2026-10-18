@@ -26,4 +26,24 @@ interconnect聚合所有metadata，当前启用host派生claimed，内部ingress
 
 ### 验证
 
-staged/diff检查通过，无本源成功handshake/网络runtime记录。
+地址范围等额外检查用户暂缓；没有后段运行检查或network试验成功记录。
+
+### 地址模型
+
+从host全局intraIpAddress过渡到稳定number，避免同host多个网络只能一个IP。number为正整数，非字符串；内部netIds_.ingress=0，地址10.100.<netId>.<hostNumber>，不按列表顺序自动分配以免重排换地址。
+
+### 生成器
+
+mkNode保持三个柯里化参数；claimed独立始终有值，只有唯一claimant时optionalAttrs派生公共地址与node特有字段。防火墙不再硬写旧hubIP。
+
+### Topology
+
+intranetDefs内部只读含network number0..255与nodes，schema和地址都读取它，移除重复netIds/topology。用户报告无递归问题；未知claims按defs校验，network number和node名各自唯一。
+
+### Claim数量
+
+实现只支持唯一claimant派生单值字段，当前min/max都readOnly默认1/1；用户保留constraints是为未来扩展，不是假装已支持多个claim。未来放开必须连同生成器/地址/key/peer模型一起改。
+
+### Orchestration
+
+后续staged有hub/spoke containers、feature注册与闭包启用；只记录审阅阶段，不补造服务部署成功。
