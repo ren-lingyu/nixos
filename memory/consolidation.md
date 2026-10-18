@@ -51,11 +51,19 @@ Noctalia 原摘要遗漏用户最后一次修改: 天气曾试开, 最终 staged
 
 重新核对保留关系后, 仅过期不可达 reflog 条目, 保留可达 reflog 历史, 并执行 `git gc --prune=now`; GC 本身禁止额外过期 reflog. 未制作恢复包. 清理前不可达集合为 276 commits, 702 trees, 681 blobs, 包括 187 个指定退役 commits 和用户允许丢弃的 89 个其他不可达 commits. 原预检中不归属这些 commits 闭包的 469 blobs 与 22 trees 亦获得明确丢弃授权.
 
-清理后逐个检查 187 个旧/试建 commits, 17 个原始 rollout blobs 及原预检的 936 个非目标对象, 全部已无法读取. 完整不可达对象检查为空. 36 个指定 refs/worktrees 不存在, 保留 18 个清洁 Auxiliary 和共 20 个 worktrees; 所有清洁 tips 仍可从 Formal ancestry 到达. 普通项目分支及原有未暂存 lockfile 保持不变, 未 push 或改写普通项目历史.
+清理后逐个检查 187 个旧/试建 commits, 17 个原始 rollout blobs 及原预检的 936 个非目标对象, 全部已无法读取. 完整不可达对象检查为空. 上轮清理后, 36 个指定 refs/worktrees 不存在, 当时保留 18 个清洁 Auxiliary 和共 20 个 worktrees; 所有清洁 tips 仍可从 Formal ancestry 到达. 普通项目分支及原有未暂存 lockfile 保持不变, 未 push 或改写普通项目历史.
 
 已有 commit-graph 派生缓存引用四个失效条目; 通过公开 `git commit-graph write --reachable --split=replace` 重建后, 默认完整对象检查及 GC 后检查通过. 共享且仍由合法历史引用的对象继续保留, 不将其误报为清理失败.
 
 上述结果仅针对目标本地仓库中的 Git 对象和指定 worktrees. 不保证外部副本或物理存储残留清除. 仓库外原始 Codex 会话与隔离审阅副本未删除, 忽略目录内临时材料也未自动清空; 它们不是 Formal 的长期恢复依赖.
+
+## 已整合清洁来源的安全退役
+
+在上述旧历史 GC 完成后, 用户明确接受来源中保留的个人配置背景, 并授权退役全部 18 条清洁 Auxiliary 的活动分支. 退役前重新确认完整 tips 已进入 Formal ancestry, 所有 worktrees/index/untracked 干净且无进行中的操作. 顺序为移除对应 worktree, 复查 `git gaw aux check`, 再使用公共 `git gaw branch -d` 安全删除; 不使用 `-D`.
+
+验收结果: Auxiliary branches 为零, worktrees 只剩普通项目与 Formal 两个. 18 条清洁来源的全部 70 个 commits 仍从 Formal 可达, 包括 52 个知识 checkpoints 与 18 个初始化 roots. UUID-relative 来源表及 Formal 整合 parents 保留, 删除活动分支不删除这些历史. 可从相关 Formal 整合 checkpoint 的 parents 检查对应 UUID tree, 再按表中路径读取 source.md/current.md 及其 first-parent 演化; 不依赖已删除分支名或本机 worktree 路径. 本轮未执行 GC 或 push, 普通项目 refs 与原有 lockfile 修改保持, 完整 fsck 通过.
+
+敏感性复查覆盖当时 Formal 可达的 80 个 commits 和 93 个文件内容版本, 未发现凭据值或原始日志. 部分来源包含用户名及个人配置背景, 用户明确接受保留; 这不等于绝对排除所有未识别风险.
 
 ## 工作流经验与恢复
 

@@ -4,7 +4,7 @@
 
 项目目标是维护可组合的声明式 NixOS/HM 配置, 保持最终配置、业务模块、静态事实和内部接口的职责边界. 当前维护任务是清洁重建历史知识并完成旧历史退役; 用户因原始日志难以人工审阅, 明确改为保留经审阅的知识归纳.
 
-本次恢复状态: 清洁知识重建、Formal 整合及获准的旧历史退役和本地 Git GC 均已完成. 保留 18 条清洁 Auxiliary 和 52 个知识 checkpoints; 原始 18 条及弃用试建 18 条的分支与 worktrees 已移除, Formal 未继承它们的 commits 或原始日志.
+本次恢复状态: 清洁知识重建、Formal 整合及获准的旧历史退役和本地 Git GC 均已完成. 通过 Formal ancestry 保留 18 条清洁来源历史和 52 个知识 checkpoints; 原始 18 条及弃用试建 18 条的分支与 worktrees 已移除, Formal 未继承它们的 commits 或原始日志.
 
 架构与已采用理由见 [architecture.md](architecture.md); 来源审查、知识处理、保留状态及退役条件见 [consolidation.md](consolidation.md). 当前 Formal 是项目知识权威, Auxiliary 只提供有范围限制的历史来源.
 
@@ -17,7 +17,7 @@
 
 ## 未决与下一步
 
-本次迁移和清理已验收. 后续从当前 Formal Memory 恢复项目维护, 按需查阅清洁来源的知识演化; 不再依赖退役对象或临时操作报告. 未执行 push, 未删除最终 18 条清洁来源.
+本次迁移和清理已验收. 后续从当前 Formal Memory 恢复项目维护, 按需查阅清洁来源的知识演化; 不再依赖退役对象或临时操作报告. 未执行 push. 最终 18 条清洁来源的活动分支及 worktrees 已按用户授权安全退役, 完整知识历史仍由 Formal 保留.
 
 当前代码与历史尚未闭环的运行结果分开处理: Portal/跨会话应用、Clash 数据加载、锁屏 settings 覆盖、framebuffer 生命周期、armored wrapper 以及当前依赖输入的完整检查, 均不能凭历史摘要宣布成功. 历史 UID 夹具和旧接口的差异按各阶段解释, 不回滚当前实现来迁就早期结论.
 
@@ -28,3 +28,9 @@
 清理后逐个核验: 187 个旧/试建 commits 和 17 个原始 rollout blobs 均已无法从目标仓库读取. 清理前共 276 commits, 702 trees 和 681 blobs 不可达, 完成后完整不可达对象检查为空. 18 个清洁 tips 仍由 Formal ancestry 保留, 普通项目分支及原有未暂存 lockfile 内容保持不变.
 
 既有 commit-graph 派生缓存的四个失效条目已通过公开 Git 维护命令重建消除; 默认完整 `git fsck` 通过. 本地 Git 对象清理不等于外部副本或物理介质残留擦除. 仓库外原始 Codex 会话、隔离审阅副本及本次忽略目录中的临时文件不在清理范围, 未执行删除或传播.
+
+## 清洁来源活动分支退役
+
+用户随后授权退役最终 18 条 Auxiliary. 全部 tips 已被当前 Formal ancestry 保留, worktrees 干净; 移除 worktrees 后逐条复查安全删除条件, 使用公共 `git gaw branch -d` 删除活动分支, 未使用强制放弃. 当前无 Auxiliary 分支, 只保留普通项目与 Formal 两个 worktrees. 18 条来源的全部 70 个 commits (含 52 个知识 checkpoints 和 18 个初始化) 仍可达; 本轮未运行 GC. 根据 consolidation.md 的 UUID-relative 路径和 Formal 整合 ancestry 恢复来源, 不依赖已移除的本机挂载位置.
+
+退役前审阅覆盖 Formal 的全部 80 个可达 commits 和 93 个文件内容版本, 未发现凭据值或原始日志. 个人配置背景仍有保留, 用户明确表示无需担心这类内容; 不将此审阅解释为绝对无敏感内容的保证.
