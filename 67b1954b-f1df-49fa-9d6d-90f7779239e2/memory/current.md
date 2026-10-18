@@ -18,7 +18,7 @@ postFixup保留old内容，用getBin/getExe/outputName推导目标输出和相�
 
 ### 验证
 
-成功rebuild来自用户报告；此前整理不复现Pi联网、安装或构建。staged草稿只覆盖实际diff及install telemetry范围。
+定向diff和staged草稿检查完成，无该技能迁移后新build/eval证明。
 
 ### 外部工具
 
@@ -27,3 +27,23 @@ fd/ripgrep由programs.pi-coding-agent.extraPackages进入Pi PATH，取代手写-
 ### 构建失败与修正
 
 日志显示引用目标后少空格，导致wrapProgram尝试pi--set；修正空格后用户报告下一次rebuild成功。npm兼容/deprecated警告不是这次失败原因，不在HM层压制上游日志。
+
+### 技能目录
+
+删除旧OpenCode git-maintainer agent与commit-message command封装，通用git-maintenance移到agent/hm/skills；Pi与OpenCode消费同一根。最终OpenCode skills=./skills，agents/commands为空，去除compatibility:opencode。
+
+### 权限
+
+OpenCode保留permission=ask，技能不承担权限边界。旧agent重复workflow造成漂移的风险通过共享skill减少。
+
+### 包装修正
+
+prefix检查改为带/的storeoutput边界，显式builtins.throw。只用一次且无独立解释价值的let不新增。
+
+### Extension设想
+
+用户希望使用convco等成熟Git CLI，但只向agent暴露部分命令。建议skill描述原CLI名与语义，Pi extension在执行层拦截/裁剪bash能力，Nix管理extension路径。不要把命令存在或alias当作安全授权机制。
+
+### 状态
+
+最后只做可行性讨论；未实现extension、白名单或安全隔离，也未证明黑名单足以拦住任意shell语法。该计划不能视为已部署能力。
