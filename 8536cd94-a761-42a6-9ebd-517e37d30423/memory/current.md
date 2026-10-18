@@ -14,7 +14,7 @@
 
 ### 验证与状态
 
-历史记录 提交草稿只覆盖 staged host metadata；flake.nix 仍 unstaged，不能把二者描述成一个已提交状态。
+这些历史阶段跨过多次恢复, 相对顺序来自既有归纳, 不以文件名日期推断整体时间范围。
 
 ### Secrets 分层
 
@@ -31,3 +31,19 @@ secret→sops 同步 option、moduleInterfaces、moduleFunctions、flake 和引�
 ### OS 设施动机
 
 agenix/rekey 用于 OS 基础秘密，降低 rebuild 受 sops-nix Go 构建/网络阻塞时失去秘密部署能力的风险；HM/应用 secrets 继续用可选 SOPS。
+
+### 唯一 host helper
+
+getUniqueEnabledHost 在本会话此时仍非唯一返回 {}；但全局 host assertion 已从 <=1 改成 ==1。最小 host 仍是具有身份的 profile，并不等于无 host。
+
+### 消费和风格
+
+greeter/interconnect/niri 改用 helper；此阶段消费端显式判断 enabledHost_ != {}。条件加括号；跨行赋值通过外层括号让等号行与结束分号行同缩进。
+
+### 消费和断言
+
+greeter/niri/interconnect 删除重复数量断言及空 host 分支，直接读所需字段；users 的 enabled-host 用户归属检查有独立意义，保留。此设计的后续求值风险由另一个八月 session 发现，当前阶段不能声称已发现或已修复。
+
+### 测试
+
+module-composition 增加 0/1/多个 host 真值覆盖；missing-UID fixture 显式启用 thinkbook，unregistered-UID fixture 补 existModule。记录是测试代码调整，未在此区间运行检查。
