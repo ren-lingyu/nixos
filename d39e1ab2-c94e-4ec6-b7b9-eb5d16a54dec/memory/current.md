@@ -15,3 +15,15 @@ opencode.providers.deepseek与pi.providers.deepseek，enable默认false，apiKey
 ### 验证
 
 三文件接口/消费/用户数据配套staged、无unstaged，草稿更新，未Nix检查或build。这里的旧default/unique设计不能提前套用后续readOnly迁移。
+
+### SOPS解耦
+
+agent只消费apiKey文件路径，可来自任意secretmanager，移除全局SOPS assertion。Lingyu实际用SOPS，所以其provider输入用SOPS mkIf守卫；不要求agent feature了解密钥来源。
+
+### 模型方案修正
+
+曾试nullable model/smallModel interface，用户要求撤销；最终根据DeepSeek provider enable自动设置默认model/small_model，未启用则省略非必需字段，不再公开模型接口。enabled_providers始终显式生成，空列表不代表放行其他provider。
+
+### 完整staging
+
+中途agent变更staged但Lingyu guard unstaged，草稿拒绝不完整集合；历史记录最终集合无unstaged并通过cached diff检查。没有check/build/实际commit记录；scope围绕核心agent行为而非枚举每个受影响目录。
