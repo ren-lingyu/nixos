@@ -15,3 +15,11 @@
 ### 边界
 
 保留清理DISPLAY/WAYLAND_DISPLAY/SWAYSOCK/NIRI_SOCKET，不硬编码启动fcitx5，不绑共享user graphical target；跨VT剪贴板互通不在目标中。第一阶段不消费host monitors、不加新的monitor internal option、不生成xrandr布局，仅提供工具。
+
+### 实现
+
+existModule.hm=true，wrapper仍X11-Session，client通过dbus-run-session启动icewm-session；OS启用IceWM/startx，移除XFCE；新增HM侧rofi等用户launcher最小配置，提供xdg-utils/xrandr但无布局策略。
+
+### 验证与未解问题
+
+用户报告rebuild test成功、tty2进入X11且wemeet大致正常；Edge等会在Niri已有实例中打开。该问题在末尾被重复提出后中断，没有已完成的根因诊断或修复；不能认定switch/boot或重启是答案。
