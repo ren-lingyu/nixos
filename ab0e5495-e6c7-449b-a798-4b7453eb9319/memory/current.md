@@ -14,7 +14,7 @@ editor wrapper补显式base依赖，remote.existModule.os=false匹配仅HM实现
 
 ### 验证
 
-这一阶段diff检查/草稿通过，无后续Nix检查证据。
+历史记录用户shell nix flake check Exit0；说明修复后的base/llib/monitor和当时配置通过，不能追溯到早期失败实现或未来existModule重构。
 
 ### existModule
 
@@ -63,3 +63,27 @@ OS secret不直接依赖原生users.users的UID-keyed实现细节；根wrapper�
 ### 最小profile
 
 先试lingyu-server后按用户偏好改回规模命名lingyu-minimal，空私有配置仍接受最终启用公共features；不是禁用HM或无用户管理。
+
+### 目录与模块性质
+
+profile根default是NixOS协调入口，OS静态import、HM按existModule.hm送达；enable控制效果。existModule只声明私有os/hm文件是否存在，不决定用户是否有HM。hosts/users与features统一声明配对、启用见证、文件一致性断言。minimal可无私有HM仍生成HM用户。
+
+### 集合契约位置
+
+options/assertions仍留modules/<type>/default.nix，不因统一而搬到modules根；OS imports不能依赖config，接受两侧导入机制不对称。
+
+### Greeter补全
+
+sessionPackages内部unique、有default=[]和描述；保留options探测接口是否存在，再检查最终config wrapper非null，避免未导入provider路径失败；greeter启用要求非空，Niri guard与feature启用语义对齐。
+
+### 公共llib
+
+根lib/作为flake output，以当前模块系统nixpkgs lib实例化self.lib {inherit lib;}。NixOS经_module.args，HM经extraSpecialArgs。secret函数迁入llib.moduleFunctions.features.secret，不把固定仓库父路径塞进modules子目录。
+
+### 迁移失败与修正
+
+早期check因users参数遮蔽失败，后用户撤销导致遮蔽的commit。抽monitor后暴露匿名base重复导入导致_module.args.llib多定义；最终base保留函数参数并显式稳定key/_file去重。不是仅改成attrset就可靠去重。
+
+### 共享type
+
+llib.types.monitor/monitors为直接option type；hosts保持每entry unique，Niri保持整体unique。
