@@ -10,8 +10,16 @@
 
 ### 进行中状态
 
-用户报告已清理工作区，进入 edit 并 stage。会话 历史记录 检查到 flake input/module import、lock 节点、WSL import、独立模块删除这些 staged 内容。nix flake check 通过来自用户报告，不是此前整理执行。
+已完成上述只读核验，不再处于待 amend / continue 的状态。
 
 ### 证据缺口
 
 原始工作阶段的完整项目快照存在恢复限制. 新来源只保留有支持的归纳, 不根据当前 HEAD 或附近提交猜测旧环境.
+
+### 结果核验
+
+历史记录 的只读工具输出确认 rebase 已结束、工作树干净；历史结果是 chore(wsl): remove vscode-server integration。检查 flake.nix、flake.lock 和 WSL 文件未发现相关 input/import/service 残留。未重跑 Nix 检查。
+
+### 已核实的 project provenance
+
+历史归纳记载曾只读审阅明确的项目版本. 该事实不证明相邻脏工作区或整个会话对应同一提交. 本次仅保留审阅结论和限制, 不继承此前历史的 parent 关系.
