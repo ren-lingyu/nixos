@@ -14,11 +14,11 @@ editor wrapper补显式base依赖，remote.existModule.os=false匹配仅HM实现
 
 ### 验证
 
-历史记录用户shell nix flake check Exit0；说明修复后的base/llib/monitor和当时配置通过，不能追溯到早期失败实现或未来existModule重构。
+静态diff与草稿通过，尚无这组函数新check。
 
 ### existModule
 
-初版无条件把所有目录与false默认值比较，在WSL未导入Niri时失败。改os/hm为nullOr bool、default null；null表示未导入，显式true/false才核对文件。两侧同时声明或同时null，启用要求已声明；HM条件显式==true。
+llib.types.existModule统一os/hm的unique nullOr bool/default null；llib.assertions.existModule生成文件一致性、配对声明、启用见证断言。移除subject冗余参数，type只用optionPath；调用方保留实际paths和上下文message。
 
 ### 职责边界
 
@@ -87,3 +87,15 @@ sessionPackages内部unique、有default=[]和描述；保留options探测接口
 ### 共享type
 
 llib.types.monitor/monitors为直接option type；hosts保持每entry unique，Niri保持整体unique。
+
+### 手工边界
+
+module args不会自动流入普通import函数应用；补host/feature extra-options、HM interface-options显式传llib，既存函数签名也补上，即使未用。
+
+### UID imports聚合
+
+最终函数groupImportsByUid=getUids:getImports:items:…，两个selector均取name和value。公共库仅遍历attrset、UID字符串化及按原顺序累积imports；不知enable/existModule/allowUidList或/hm布局。调用方负责过滤和生成path。
+
+### 算法与风格
+
+保留双层fold和直接构造UID属性集；不为替换fold引入mkMerge，不把一次性具体network/module逻辑全藏let。两个selector避免回调必须返回{uids,imports}的隐式结构契约。
