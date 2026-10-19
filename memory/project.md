@@ -1,33 +1,25 @@
-# Project knowledge at generalized UID and Feature routing
+# Shared capabilities become independent responsibilities
 
-## Horizon and adopted direction
+## Goal and composition
 
-This reconstructed state describes the June 6 implementation of general UID-keyed users, feature discovery and selected-user HM routing. The project parent identifies the tree reinspected now; this GAW commit is created during reconstruction. It does not prove when every machine adopted the design or that historical evaluations passed.
+The project now composes desktop ThinkBook, WSL and an Aliyun server rather than only the original two environments. The flake remains the final assembly point, selecting public wrappers, external integrations and enabled features. Shared root configuration owns common Nix policy, basic tools and HM defaults. User-level sharing remains important, while native hardware, WSL platform behavior and server disk/bootstrap responsibilities remain host-specific.
 
-The owner wanted finer sharing than one monolithic Home Manager profile, including Features spanning NixOS and selected users' HM configuration. The research dossier recovers the direction toward central flake enablement, peer modules and UID allowlists without per-feature/per-user nested switches. Those discussion leads are paraphrases. The committed implementation determines the exact interfaces and defaults described below.
+The early Feature/User protocol is being used for actual maintenance. Cloud became `remote`; shell and editor implementations moved out of the personal profile into reusable features. The shell HM side was explicitly gated after extraction: moving a file alone does not make activation correct. Editor options select enabled editor implementations and defaults. Personal home settings moved to `modules/users/lingyu/home.nix`; generic XDG paths and directory-creation policy moved to the shared root rather than staying private to one user.
 
-## Composition root and implementation availability
+## Interfaces and delivery
 
-The final flake still constructs ThinkBook and WSL with `nixosSystem`, selects explicit public wrappers and sets feature values. `nixosModules.base` imports Home Manager and the common `./modules` entry. `modules/default.nix` imports the feature/user schemas and owns common GC, basic tools, unfree policy and baseline HM settings. The previous `modules.base.enable` gate is no longer in this shared root. Public wrappers still repeat the anonymous base wrapper and carry some provider integrations; do not portray dependency decoupling or stable module identity as already complete.
+Users are still keyed by numeric UID with separate enable, home and HM controls. A nullable HM profile source allows a minimal server user to exist without private profile imports while still participating in common HM configuration and selected features. This is not the later directory-keyed user-profile model. Shared Features and their HM recipient lists remain separate from personal profile contents.
 
-`modules/features/default.nix` discovers immediate feature directories and generates `enable`, `allowUidList` and `existModule.{os,hm}` options. At this point the availability markers are internal unique boolean options with `false` defaults, supplied by implementations. Filesystem directory discovery does not yet derive whether every OS/HM implementation exists. The later nullable marker design and construction-library registry are separate evolutions.
+Proxy implementation has been extracted from ThinkBook into `modules/features/proxy`, with explicit feature/backend options and implication assertions. The enabled host chooses policy; the feature owns service implementation. This state has the initial Clash/V2RayA choices, not every later backend. The Aliyun host uses disko/nixos-anywhere-related bootstrap wiring; its existence is static composition evidence, not proof of a fresh remote deployment.
 
-## UID registry, identity and routing
+## Maintenance implications and unresolved evidence
 
-`modules/users/default.nix` exposes `modules.users` as `attrsOf (submodule ...)`, keyed by numeric UID strings. Each user has separate `enable`, `uid`, `username`, `home.enable`, `home.directory`, `home.manager.enable` and `home.manager.source`. UID defaults from the key and must agree with it. Enabled users require a nonempty unique username and normal-user UID; home/HM participation has implication and path checks. Profile source paths must remain under `modules/users` with an existing entry point. The module produces NixOS users and eligible HM users and binds their identity values.
+Look first at `modules/default.nix`, `modules/features/default.nix`, `modules/users/default.nix`, the feature's OS/HM files and the final flake choices. Route common capabilities through feature interfaces rather than copying personal settings to each host. Keep personal identity and data in user configuration, hardware/platform constraints in hosts, and reusable implementation in Features. This ownership direction is supported by the owner reference and actual migrations, rather than inferred merely from directory names.
 
-Enabled HM-capable features contribute their `hm` implementation to the imports of each allowlisted UID. Listed users must exist, be enabled and have HM enabled. An empty allowlist is valid and produces no recipients. The actual default is `[1000]` when `existModule.hm` is true, otherwise `[]`. The discussion's wish to reach all eligible users is not this committed default. A general schema is not evidence of multiple deployed users or automatic distribution to every future user.
+The greeter remains the greetd/Sway/gtkgreet path to Niri. Host-owned generic monitor schemas, independently selectable greeter and native X11 fallback belong to subsequent states. The earlier duplicate base and Niri service/portal reports still lack a precise established resolution at this horizon. Some authored June migrations have later committer dates; no assertion is made that author date equals publication on main.
 
-For maintenance, register the user and its personal profile independently from reusable Feature implementation. Inspect eligibility and the Feature allowlist whenever a module is missing from a user's HM imports. Changing the default list has delivery consequences. Keep the Feature's OS requirements and selected HM recipients explicit; importing a feature directory, enabling a feature and routing its HM part are different operations.
+## Evidence and maintenance boundaries
 
-## Features, platforms and login
+This is a reconstructed historical knowledge state grounded in the associated project tree inspected during the present task. Its GAW commit is created now, not at the original event time. Main ancestry orders Formal stages; dates alone do not establish adoption. Discussion summaries establish attributed intent with limited completeness. Historical test reports are not new checks. This task has run no Nix evaluation, build, deployment, decryption or runtime test.
 
-ThinkBook and WSL retain distinct platform wrappers and feature choices while sharing the user registry and selected capabilities. Niri still owns desktop options and the greetd/Sway/gtkgreet login boundary; temporary greeter composition is distinct from the user's Niri session. SOPS/secret integration and external provider modules remain configured through the corresponding wrappers. Reusable cloud functionality is separate from the personal profile; shell/editor extraction, additional hosts and broader shared-user policy follow in later main states.
-
-The design moved beyond mere file categorization: common declarations, UID identity checks and feature recipient aggregation now encode responsibilities and interfaces. It still has implementation tensions. The recovered duplicate base declaration report motivates checking self-contained wrapper dependencies versus imported-once infrastructure. A shared file root is visible, but the evidence does not establish the exact successful repair of the reported error. The Niri service/portal regression lead likewise remains unresolved by the available material.
-
-## Verification and next action
-
-The present task directly inspected the flake, feature/user/root files and their parent-order relationship to the first integrated namespace state. It ran no Nix evaluation, build, deployment or runtime test. Assertions describe intended rejection conditions, not observed negative-test results. Author and committer timestamps diverge for some subsequent migrations; use main ancestry for their reconstruction order, not timestamp sorting.
-
-Continue with actual feature/user responsibility migrations and host selection, then the later flake-parts, interface/library, metadata, identity, networking and configuration-construction stages. Each has its own evidence and validation boundary. See [reconstruction.md](reconstruction.md) for the present task and sources.
+Read [reconstruction.md](reconstruction.md) for the current establishment work and [sources.md](sources.md) for source coverage and retained history. Do not interpret this in-progress historical horizon as the architecture deployed today.
