@@ -8,6 +8,8 @@ The v5 migration changes programs.noctalia-shell to programs.noctalia, executabl
 
 Noctalia takes routine, idle and pre-suspend locking; swaylock remains an allow-when-locked rescue entry. Omitting placement coordinates had put login UI at 0/0. The adopted fix centers one login_box on the default-role monitor using mode/scale-derived logical dimensions and complete placement/widget order. Other outputs remain locked with a black appearance. Runtime settings can override declaration values; the experiment did not modify that runtime file or demonstrate a final fresh check.
 
+Custom clock experiments were withdrawn. The final retained decision is one centered login_box on the default monitor, weather false and unlock hint true. An earlier summary incorrectly treated a temporary weather trial as final; the previous reconstruction corrected it from its last recorded user edit/staged review. Do not revive the clock/weather trial as adopted design. Final lock/idle/action edits had staged static review but no final build/runtime proof.
+
 ## Continuation
 
 Compare these conclusions with the relevant project snapshot before Formal adoption. Preserve unresolved questions, distinguish proposals from adopted behavior and do not extend a historical successful check to later changes.
