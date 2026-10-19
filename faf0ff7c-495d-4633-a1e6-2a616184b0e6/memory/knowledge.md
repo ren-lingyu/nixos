@@ -16,6 +16,10 @@ Caddy/WBO orchestration must not retain references to the removed interconnect f
 
 The source's earlier term was containers; the eventual main implementation is workloads and must be checked separately. Examples and partially staged reviews are not deployment proof.
 
+Package discovery collects both local and namespace overlays so nested contributions are not lost. A derivation is also an attrset: namespace collision checks must reject derivations instead of treating them as namespace containers. Overlay combination retains the intended precedence. Several attrset generators use genAttrs only when keys already exist; simultaneous key/value derivation still needs listToAttrs/map.
+
+Package shell generation preserves ordered arguments and runtime quoting; this source preferred concatStringsSep/escapeShellArgs rather than indented multiline strings or an option-to-CLI helper for a whole command. Final package edits were partly unstaged and only statically reviewed. Earlier host checks do not verify these later package/container changes.
+
 ## Continuation
 
 Compare these conclusions with the relevant project snapshot before Formal adoption. Preserve unresolved questions, distinguish proposals from adopted behavior and do not extend a historical successful check to later changes.
