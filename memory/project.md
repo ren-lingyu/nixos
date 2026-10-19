@@ -1,4 +1,4 @@
-# Private connectivity and stable host claims
+# Agent providers separated from secret management
 
 ## Purpose and composition
 
@@ -18,7 +18,7 @@ Niri is the main native desktop; greetd uses temporary Sway/gtkgreet before laun
 
 ## Secrets and agent inputs
 
-The optional secret Feature consumes user-owned encrypted inventory through per-user HM interfaces. Its system-to-HM age key is a bootstrap bridge with root ownership and group-based restricted access. Stale process credentials explained one historical permission failure despite correct NSS membership; no current deployment is tested. Agent tools and their secret inputs are still being separated in subsequent states.
+The secret feature is renamed sops across namespaces and helper/test references. Per-user SOPS inventory remains optional and supplies the bootstrap key bridge with restricted group access. Agent-first provider interfaces expose enablement and an API-key file path, without assuming its secret manager. The personal user guards SOPS-derived inputs; Agent drops a global SOPS dependency. A nullable model-interface proposal was withdrawn; enabled providers determine default model fields and an explicit enabled-provider list. No final runtime/model request is tested.
 
 ## Library and verification
 
