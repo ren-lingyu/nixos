@@ -1,4 +1,4 @@
-# Tested composition contracts and reusable aggregation
+# Native terminal and portal capability contracts
 
 ## Composition and ownership
 
@@ -85,6 +85,14 @@ Availability types/assertions are centralized without hiding real file paths and
 Per-system checks register type, availability, UID grouping and SOPS generator categories plus real module-composition negative cases. They exercise missing UID bindings, unregistered enabled users and invalid recipient references using actual assertions rather than copying the rules. The shared monitor type enforces nonempty names, with a negative test; package options and diagnostics are clarified. README preserves its directory overview and adds the ownership/assembly contracts rather than replacing all structure with a new document.
 
 Historical sources report successful category/composition checks for specific intermediate trees. Subsequent type, shell and documentation changes had static review only, so this stage does not acquire a blanket fresh pass. Browser cross-session reuse, the older Niri service/portal lead and comprehensive original working-tree provenance remain limited evidence.
+
+## Directory handling, terminals and file chooser
+
+Yazi is the cross-environment directory handler and Wayfile supplies a desktop alternative. Reuse the packaged desktop ID instead of duplicating it. A terminal desktop entry needs a real provider. Terminal configuration has moved into a Feature with Kitty/Alacritty and native HM `xdg.terminal-exec`; Niri/Fuzzel/Noctalia consume that native interface rather than hardcoding Kitty. Another module may provide the same capability.
+
+An independent FileChooser flag controls termfilechooser portal configuration and the native terminal prerequisite. The chain runs portal to terminal selector to terminal to Yazi, only for clients that use XDG FileChooser. OS `pathsToLink` adds application/portal resources conditionally for HM useUserPackages, including WSL. Directory MIME association is not itself portal selection, and no claim is made that every GUI toolkit uses this path.
+
+The source reports corrected stash/index conflict remnants and an assertions/config syntax problem, but no successful check after the final fixes. These failures are not declared current reproducible bugs merely because they occurred historically; the current static wiring and the missing final runtime evidence are separate facts. Inspect `modules/features/{file-manager,terminal}/` and the relevant HM consumers.
 
 ## Evidence and maintenance boundaries
 
