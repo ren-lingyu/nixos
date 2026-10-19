@@ -1,4 +1,4 @@
-# Agent providers separated from secret management
+# SSH host identity and independent OS secrets
 
 ## Purpose and composition
 
@@ -10,7 +10,7 @@ User profiles are directory-named; final composition binds their UID from a host
 
 ## Host facts and graphics
 
-Host metadata is now loaded independently of enablement. UID slots and monitor facts remain available for all hosts without activating their OS configuration. Data integrity applies even to disabled hosts. Monitor output names are nonempty/unique and at most one has the default role; dimensions and non-null scale/refresh are positive. The global host rule is still at most one, while graphical consumers require exactly one selected host/default monitor. The available default monitor is selected safely after cardinality checks. This separates hardware facts from consumer requirements.
+Host metadata is now loaded independently of enablement. UID slots and monitor facts remain available for all hosts without activating their OS configuration. Data integrity applies even to disabled hosts. Monitor output names are nonempty/unique and at most one has the default role; dimensions and non-null scale/refresh are positive. The global host rule now requires exactly one enabled host; graphical consumers additionally require a default monitor. The available default monitor is selected safely after cardinality checks. This separates hardware facts from consumer requirements. SSH host identity separates material from runtime paths, with age recipients derived from SSH public identity rather than a second independent identity. At this phase the shared getter still returns an empty set for non-unique selection, relying on global assertions; its later lazy-evaluation failure is not yet repaired.
 
 ## Desktop and native capabilities
 
@@ -18,7 +18,7 @@ Niri is the main native desktop; greetd uses temporary Sway/gtkgreet before laun
 
 ## Secrets and agent inputs
 
-The secret feature is renamed sops across namespaces and helper/test references. Per-user SOPS inventory remains optional and supplies the bootstrap key bridge with restricted group access. Agent-first provider interfaces expose enablement and an API-key file path, without assuming its secret manager. The personal user guards SOPS-derived inputs; Agent drops a global SOPS dependency. A nullable model-interface proposal was withdrawn; enabled providers determine default model fields and an explicit enabled-provider list. No final runtime/model request is tested.
+The secret feature is renamed sops across namespaces and helper/test references. Per-user SOPS inventory remains optional and supplies the bootstrap key bridge with restricted group access. Agent-first provider interfaces expose enablement and an API-key file path, without assuming its secret manager. The personal user guards SOPS-derived inputs; Agent drops a global SOPS dependency. A nullable model-interface proposal was withdrawn; enabled providers determine default model fields and an explicit enabled-provider list. No final runtime/model request is tested. OS age/agenix-rekey infrastructure is now independent of optional HM/application SOPS, motivated by keeping base secret deployment usable when SOPS tooling builds/downloads block. Host runtime SSH identity and its public key feed rekey setup; master identities are separate inputs. The initial age-recipient hostPubkey wiring has been corrected to SSH public key. Public/ciphertext review does not establish private-key custody or runtime decryptability.
 
 ## Library and verification
 

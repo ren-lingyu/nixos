@@ -17,7 +17,7 @@ The table distinguishes reconstruction from Formal knowledge adoption and retain
 | framebuffer-kmscon | `137ed987-bbc6-4b09-8ea4-c69a62232a47/memory/knowledge.md` | framebuffer | 1 of 1 reconstructed states |
 | metadata-claims | `ad3350fb-7d8d-43e1-9a42-afdbaad927a9/memory/knowledge.md` | static-metadata, interconnect-prototype | 3 of 3 reconstructed states |
 | agent-providers | `3ae9e556-0bc7-4112-89e1-2a0f78704872/memory/knowledge.md` | provider-decoupling | 2 of 2 reconstructed states |
-| identity-secrets-armor | `561332c5-5dc9-4ddb-b6ba-5ce35890c629/memory/knowledge.md` | Not yet adopted | 0 of 5 reconstructed states |
+| identity-secrets-armor | `561332c5-5dc9-4ddb-b6ba-5ce35890c629/memory/knowledge.md` | host-identity | 3 of 5 reconstructed states |
 | readonly-host-packages | `faf0ff7c-495d-4633-a1e6-2a616184b0e6/memory/knowledge.md` | Not yet adopted | 0 of 4 reconstructed states |
 | wireguard-evolution | `8344824c-eb7e-43d2-9115-3249ac58f59a/memory/knowledge.md` | interconnect-prototype | 1 of 3 reconstructed states |
 | clash-geodata | `11b23298-31e9-40ff-93c5-685d0cefd36f/memory/knowledge.md` | Not yet adopted | 0 of 2 reconstructed states |
