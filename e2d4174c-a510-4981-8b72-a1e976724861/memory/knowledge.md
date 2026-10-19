@@ -6,7 +6,7 @@ This independent source history reconstructs one existing archived discovery lin
 
 Use `cfg` for reads of the current feature's own configuration. OS modules read their own feature in `config`, while HM modules read it through `osConfig`. Keep definition left-hand paths, cross-feature references, dynamic paths, option declarations and full diagnostic paths explicit. A definition's right-hand own-configuration read may use the alias.
 
-The source reviewed aliases across 24 feature files. An X11 HM file had both staged and additional worktree edits; trailing-whitespace cleanup was not silently staged. Targeted searches and diff review established the editing boundary, without a runtime check.
+The host pass used an instance alias for one host and a collection alias at the schema root across 11 files. User modules were considered and left unchanged. The source reports a no-build flake check and, after the owner's rebuild test, unchanged active/system-profile/booted closure links, no diff-closures output and no failed units. That is stronger evidence than copying zero paths, but covers one host's then-active closure only. No exact post-edit project commit is established.
 
 ## Continuation
 
