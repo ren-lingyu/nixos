@@ -26,7 +26,7 @@ Greeter session packages retain interface-presence probing, non-null values and 
 
 ExistModule types/assertion generators centralize paired declarations, enable witnesses and file consistency while callers retain real paths and contextual diagnostics. Ordinary imported functions do not inherit module arguments automatically: extra-options and interface functions must explicitly receive `llib`.
 
-`groupImportsByUid` accepts separate UID and import selectors, each taking item name and value. It only traverses attributes, stringifies UIDs and accumulates imports in order. Callers own feature filtering, enable/availability semantics and file layout. The nested folds remain; no opaque result-record callback or unrelated mkMerge abstraction is introduced. Static review at this step is not yet a new check result.
+`groupImportsByUid` accepts separate UID and import selectors, each taking item name and value. It traverses attributes, stringifies UIDs and prepends each contribution to the accumulated imports. Later traversed names therefore precede earlier names for a shared UID. Callers own feature filtering, enable/availability semantics and file layout. The nested folds remain; no opaque result-record callback or unrelated mkMerge abstraction is introduced. Static review at this step is not yet a new check result.
 
 Tests are registered through per-system checks with category derivations. They cover monitor/availability types, UID import grouping and SOPS generation, plus actual module-composition assertions rejecting unbound users, unregistered UIDs and invalid feature recipients. The source reports earlier successful category and composition checks for that stage. Later type, shell and documentation refinements have only static diff evidence, so success must not be extended automatically.
 
@@ -35,3 +35,7 @@ Nonempty monitor names move into the shared type with a negative case. Shell pac
 ## Continuation
 
 Compare these conclusions with the relevant project snapshot before Formal adoption. Preserve unresolved questions, distinguish proposals from adopted behavior and do not extend a historical successful check to later changes.
+
+## Reconstruction-time ordering correction
+
+Direct inspection of the historical `lib/moduleFunctions.features.default.nix` and `tests/feature-import-grouping/default.nix` establishes prepend behavior: the shared UID fixture expects beta-hm before alpha-hm. The earlier summary's generic ordering language was insufficient. This is a newly confirmed static interpretation during reconstruction, not an additional original-session result or a newly run Nix test. Keep the exact sequence when refactoring the fold.
