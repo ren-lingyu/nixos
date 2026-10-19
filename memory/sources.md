@@ -19,7 +19,7 @@ The table distinguishes reconstruction from Formal knowledge adoption and retain
 | agent-providers | `3ae9e556-0bc7-4112-89e1-2a0f78704872/memory/knowledge.md` | provider-decoupling | 2 of 2 reconstructed states |
 | identity-secrets-armor | `561332c5-5dc9-4ddb-b6ba-5ce35890c629/memory/knowledge.md` | host-identity, armored-rekey | 5 of 5 reconstructed states |
 | readonly-host-packages | `faf0ff7c-495d-4633-a1e6-2a616184b0e6/memory/knowledge.md` | readonly-contracts | 1 of 4 reconstructed states |
-| wireguard-evolution | `8344824c-eb7e-43d2-9115-3249ac58f59a/memory/knowledge.md` | interconnect-prototype, network-definitions | 2 of 3 reconstructed states |
+| wireguard-evolution | `8344824c-eb7e-43d2-9115-3249ac58f59a/memory/knowledge.md` | interconnect-prototype, network-definitions, host-wireguard | 3 of 3 reconstructed states |
 | clash-geodata | `11b23298-31e9-40ff-93c5-685d0cefd36f/memory/knowledge.md` | Not yet adopted | 0 of 2 reconstructed states |
 | pi-skills | `09c2c62a-b95a-44b0-b09f-4a3223de90d3/memory/knowledge.md` | Not yet adopted | 0 of 3 reconstructed states |
 | noctalia-lockscreen | `0e10e70e-eb73-4e65-b5a7-30f1bda7de9d/memory/knowledge.md` | Not yet adopted | 0 of 3 reconstructed states |

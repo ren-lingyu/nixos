@@ -1,4 +1,4 @@
-# Stable network numbering and explicit derivation limits
+# Host-owned WireGuard networking
 
 ## Purpose and composition
 
@@ -26,7 +26,7 @@ The public llib is instantiated with the receiving nixpkgs lib and passed throug
 
 ## Network ownership
 
-Interconnect remains an optional OS Feature, but intranetDefs centralizes network numbers, nodes and constraints. Stable host numbers replace one global intranet address, avoiding list-order-dependent reassignment across multiple networks. Node fields derive only with one claimant; claimed membership and claimant count remain distinct. Generalized constraints do not make multi-claim address/key/peer generation complete. Private reachability, explicit service ports and no takeover of ordinary internet routes remain the intended boundaries. No fresh network success is established.
+Interconnect has been removed. Stable WireGuard membership and encrypted key references belong to hosts; the public host helper purely derives the selected host's networking from the registry. Endpoint hosts define numbered networks, and other participants become spokes. Role checks are per network, so being a hub elsewhere does not suppress needed spoke keepalive/endpoint settings. Addresses and interface names derive from stable host numbers, not directory order. No-WireGuard selection returns an empty result without reading a private-key path. Builder implementation and host wiring were independent useful source states; their source reviews do not prove a deployed handshake.
 
 ## Definition ownership
 
