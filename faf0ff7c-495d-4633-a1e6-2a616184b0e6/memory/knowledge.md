@@ -12,6 +12,10 @@ A non-unique host helper returning an empty set failed with a missing wireguard 
 
 After a fixture/message correction the owner reported a successful check. Later staged tests and unstaged assertions diverged, so that worktree result did not prove the index snapshot. Getter/unit-test and assertion/composition changes were separately reviewed, without assuming draft messages were executed commits.
 
+Caddy/WBO orchestration must not retain references to the removed interconnect feature. The owner required complete registry and OS-module wiring with explicit IP, port, interface and allowed-source inputs rather than hardcoded wg0 or automatic enablement from a host. The HTTP port defaults to 18000; other network decisions remain explicit. Firewall scope includes the intended destination/source and TCP port. Derive the caddy UID from the system registry.
+
+The source's earlier term was containers; the eventual main implementation is workloads and must be checked separately. Examples and partially staged reviews are not deployment proof.
+
 ## Continuation
 
 Compare these conclusions with the relevant project snapshot before Formal adoption. Preserve unresolved questions, distinguish proposals from adopted behavior and do not extend a historical successful check to later changes.
