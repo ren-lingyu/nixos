@@ -1,4 +1,4 @@
-# Internal ownership and single-definition contracts
+# Stable network numbering and explicit derivation limits
 
 ## Purpose and composition
 
@@ -26,7 +26,7 @@ The public llib is instantiated with the receiving nixpkgs lib and passed throug
 
 ## Network ownership
 
-Interconnect is an optional OS Feature for private reachability through a cloud entry, not a default route for all internet traffic or a trusted whole interface. Static intranetClaims express network/node membership across host metadata. The active closure determines claimed participation, while a globally unique claimant supplies derived node fields. Unknown names/counts are checked; zero means unlimited for a count direction and cannot express exactly zero. A multi-claim-capable schema does not imply complete multi-claim generation. Offline peers should not block boot, service ports remain explicit, and no successful handshake/deployment is established.
+Interconnect remains an optional OS Feature, but intranetDefs centralizes network numbers, nodes and constraints. Stable host numbers replace one global intranet address, avoiding list-order-dependent reassignment across multiple networks. Node fields derive only with one claimant; claimed membership and claimant count remain distinct. Generalized constraints do not make multi-claim address/key/peer generation complete. Private reachability, explicit service ports and no takeover of ordinary internet routes remain the intended boundaries. No fresh network success is established.
 
 ## Definition ownership
 
