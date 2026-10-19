@@ -4,7 +4,9 @@ This independent source history reconstructs one existing archived discovery lin
 
 ## Recoverable knowledge
 
-Add flake-parts as a direct root dependency before migrating outputs. Preserve Nixvim's independent nixpkgs choice for compatibility; duplicate flake-parts nodes alone do not imply duplicate runtime package cost or a mandatory lock merge. This state concerns inputs and lock data, not an already migrated `mkFlake` architecture. The source reports staged input changes and a later owner statement that they were committed, without establishing the exact project revision.
+Outputs now use `mkFlake` with `systems`. Keep NixOS configurations in top-level `flake` rather than transposing them per system. The convenience nixos-anywhere executable belongs under apps; use the per-system `inputs'` projection and explicit executable lookup rather than hand-assembled paths.
+
+The source reports a check failure involving nested standard `nixosModules` handling and `features.share`. Flattened names and a registry hidden in a local let were rejected. The owner selected the custom public `self.modules.features/hosts/users` hierarchy; it is not a standard flake-parts output or the ecosystem's `flakeModules` interface. The diagnosis is historical and was not rerun here. No successful final check after this rename is preserved, and the app description belongs to a separate source. A partially staged working tree means the complete final source state has no proven exact project parent.
 
 ## Continuation
 
