@@ -8,6 +8,8 @@ Preserve Pi's package outputs, metadata and resource tree while adding startup-o
 
 PI_OFFLINE suppresses certain startup updates/telemetry/tool downloads according to the historical version review; it is not an API-network ban. Native extraPackages supplies fd/ripgrep in the command PATH; settings.packages instead refers to Pi resource packages. The source does not justify installing npm/bun by default.
 
+A missing space made wrapProgram interpret a pi--set executable; after correction the owner reported a successful rebuild. Compatibility/deprecation warnings were not that root cause. Shared git-maintenance instructions replaced duplicative OpenCode agent/command wrappers and were consumed by multiple tools. OpenCode retained ask permissions; a skill is not the execution authorization boundary. No fresh check is established for all subsequent skill changes.
+
 ## Continuation
 
 Compare these conclusions with the relevant project snapshot before Formal adoption. Preserve unresolved questions, distinguish proposals from adopted behavior and do not extend a historical successful check to later changes.
