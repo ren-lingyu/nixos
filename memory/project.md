@@ -1,4 +1,4 @@
-# WSL integration removal
+# Directory-based host discovery
 
 ## Composition and ownership
 
@@ -10,7 +10,7 @@ The convenience nixos-anywhere app uses the per-system `inputs'` projection and 
 
 Three configurations still compose desktop ThinkBook, WSL and Aliyun, common base policy, reusable features and UID-keyed users. Shared shell/editor/remote and XDG responsibilities remain separated from private profiles. The minimal server user has no private profile import but retains common HM participation. Provider imports still live partly in public wrappers: this is not the much later flake-parts configuration-builder architecture.
 
-`modules/hosts` now provides an `attrsOf submodule` host namespace. Each profile has its own `enable`, `monitors` and package-group settings. Importing the host entry declares that host enabled; ordinary hardware and OS effects are guarded by its own enable state while imports remain at module top level. The global assertion currently permits zero or one enabled host. It is not yet the later exactly-one invariant.
+`modules/hosts` now generates its namespace from host directories with entry points. Each profile has its own `enable`, `monitors` and package-group settings. Importing the host entry declares that host enabled; ordinary hardware and OS effects are guarded by its own enable state while imports remain at module top level. The global assertion currently permits zero or one enabled host. It is not yet the later exactly-one invariant.
 
 ## Monitor and session interfaces
 
@@ -37,6 +37,14 @@ The independent monitor source preserves the motivation, earlier schema and name
 WSL no longer includes vscode-server integration. The inspected main change removes its flake input and wrapper import; the associated lock/platform result no longer needs that integration. NixOS-WSL remains the platform dependency. This is an intentional capability removal, not just an extraction that preserves all behavior.
 
 The independent source preserves the owner's intent and historical read-only completion checks. It also corrected an earlier commit-title recommendation: classify the actual removal semantically rather than mechanically following earlier refactor titles. No history rewrite is performed by this reconstruction. The source's user-reported check and later clean-worktree inspection do not establish fresh verification of this project parent.
+
+## Discovery versus activation
+
+Host declarations are now generated from directories with `default.nix`; the prior open host-key submodule schema is replaced by fixed discovered names. Common enable/monitor/package/Flatpak fields combine with per-host `extra-options.nix`. The enabled-host entry-point check remains deliberately defensive. Feature discovery also requires an actual entry point.
+
+This changes what names are available, not who activates them. Global host cardinality remains at most one, and graphical consumers retain stronger selection/display prerequisites. Import availability and enable effects must be checked separately. The monitor source's later state preserves the transition and an earlier XFCE wrapper lesson; that XFCE investigation does not supersede the already-adopted IceWM result.
+
+Local `cfg` aliases abbreviate own-configuration reads; schema definition paths, cross-module references and diagnostic paths remain explicit. The alias source reports one host's unchanged active closure after a historical check/rebuild, not a universal or freshly repeated runtime equivalence result.
 
 ## Evidence and maintenance boundaries
 
