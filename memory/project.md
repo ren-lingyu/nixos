@@ -1,4 +1,4 @@
-# Shared network topology and a fourth host
+# Host-owned Windows virtualization and shared resources
 
 ## Purpose and composition
 
@@ -35,6 +35,10 @@ Internal options designate producer ownership, not access security. Direct inter
 ## Workload responsibilities
 
 A fourth peer category, workloads, discovers service roots and validates their OS/HM availability. Caddy reverse-proxy and WBO whiteboard containers receive explicit address, port, network-interface and permitted-source inputs; they do not automatically enable from host identity or refer to the removed interconnect namespace. The committed WBO port option defaults to null; 18000 is only an example, and final composition supplies the actual port. This corrects the previous Formal stage, which copied an older draft summary. Network policy stays explicit, including firewall source/destination restrictions. The source used an earlier containers name; the committed main framework is workloads. Source reviews and wiring do not establish deployed HTTP reachability.
+
+## Virtualization and host resources
+
+ThinkBook integrates a declarative libvirt Windows guest through NixVirt, with domain/network/storage XML templates, GPU SR-IOV, guest tooling and Samba sharing. Display experiments return to SPICE after GTK trials; virtualized Windows is a host-owned workload/resource rather than another NixOS host profile. Mount policy distinguishes Windows and shared filesystems, with the Windows partition mounted read-only at this horizon. Static configuration does not establish a successful guest boot, GPU assignment, filesystem safety under every external OS or runtime display result.
 
 ## Reconstruction and evidence
 
