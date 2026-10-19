@@ -8,6 +8,10 @@ Internal is an ownership/definition boundary, not a confidentiality mechanism; f
 
 User UID is a final-composition input and loses internal tagging, while a host's produced numeric registry remains internal. Provider fallbacks belong in the consumer view, not extra definitions on readOnly options. Disabled providers are not implicitly enabled by absence. Historical operator/style changes distinguish Nix expressions from shell strings and do not by themselves prove runtime equivalence.
 
+A non-unique host helper returning an empty set failed with a missing wireguard field before global assertions could report cardinality. The adopted getter throws for zero/multiple hosts with useful names. Keep a global exactly-one assertion too, because laziness may avoid calling the helper; its assertion uses tryEval on the selected host.
+
+After a fixture/message correction the owner reported a successful check. Later staged tests and unstaged assertions diverged, so that worktree result did not prove the index snapshot. Getter/unit-test and assertion/composition changes were separately reviewed, without assuming draft messages were executed commits.
+
 ## Continuation
 
 Compare these conclusions with the relevant project snapshot before Formal adoption. Preserve unresolved questions, distinguish proposals from adopted behavior and do not extend a historical successful check to later changes.
