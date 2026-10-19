@@ -1,48 +1,35 @@
-# Project knowledge after the greetd login change
+# Project knowledge at the first module-protocol integration
 
-## Purpose and evidence horizon
+## Scope and motivation
 
-This is a retrospective, maintainable knowledge baseline for the committed main state at the greetd introduction on 2026-05-31 (repository local date). The associated project parent identifies the inspected snapshot. This GAW checkpoint is created during the present reconstruction, not at the time of that project change, and does not describe today's deployed machines.
+This reconstructed state describes the initial explicit modular architecture as integrated into main by the development-line merge in early June. The associated project parent is the exact historical tree inspected now. This GAW commit is made at reconstruction time and is not a contemporaneous build record. The main first-parent merge, rather than date-sorting its development commits, determines this stage's position.
 
-The owner explains during this reconstruction that the NixOS-WSL environment came first, followed by native NixOS on ThinkBook. Sharing user-level configuration between them was an important goal. This is an owner-supplied recollection, distinguished from contemporaneous execution evidence.
+WSL and native ThinkBook continue to share user-level configuration while preserving platform differences. The owner now explains that treating an entire Home Manager configuration as the sharing unit was too coarse. The supplied research dossier recovers early discussion positions: cross-layer Features need coherent OS/HM activation; the final flake selects enabled components; host, user and feature modules should be peers; checking dependencies must not silently enable peers. These are attributed historical paraphrases, not complete original messages. Static source corroborates incremental adoption, not perfect realization of every principle.
 
-The repository already has substantial earlier history. The initial baseline summarized the supported state reached by the selected date rather than claiming that the project or its design began then. Between May 12 and May 18, the two later main commits only update the lock file; implementation content is unchanged.
+## Composition and responsibilities
 
-## Working model and maintenance responsibilities
+`flake.nix` still calls `inputs.nixpkgs.lib.nixosSystem` separately for `nixos` and `nixos-wsl`. It replaces `globalConfGenerate` with exported `nixosModules.base`, `features`, `hosts` and `users` wrappers and explicit per-system selections. `modules.base.enable` gates common policy; `allowUnfreePredicateList` controls the permitted unfree package names. External Home Manager, Niri, Noctalia, SOPS, WSL and Flatpak wiring remains in wrappers. This phase does not yet use flake-parts or a general construction library.
 
-The flake explicitly builds two x86_64-linux systems: `nixos` imports the ThinkBook host and `nixos-wsl` imports NixOS-WSL and the WSL host. Each calls `inputs.nixpkgs.lib.nixosSystem` directly. A local `globalConfGenerate` supplies common overlays, unfree-package policy, basic tools, and Nix garbage-collection settings. System-specific module lists decide the actual composition.
+Implementations are grouped under `modules/features/`, `modules/hosts/` and `modules/users/`, with matching `modules.features`, `modules.hosts` and `modules.users` option responsibilities. Feature modules use enable flags and conditional configuration. A directory move and an option-namespace change are separate implementation steps, both integrated by this main merge. Host entry points were briefly changed to `configuration.nix`; `default.nix` then became the directory entry aggregating that file and submodules. Use the actual snapshot's paths rather than treating an intermediate name as permanent.
 
-Home Manager is integrated into each NixOS system. Both directly configure `home-manager.users.lingyu`, reuse the personal module under `modules/users/lingyu`, and import selected functional HM modules. External HM integrations are passed through `sharedModules`; ordinary imports receive `inputs` explicitly through `extraSpecialArgs`. Sharing therefore already crosses host boundaries, while hardware, WSL integration, and graphics remain host-dependent.
+The wrappers remain explicit. `features.share` groups several feature imports; Niri and secret wrappers add external provider integrations. The flake selects each host and activates its intended capabilities. This is not automatic discovery of all features or a blanket guarantee that importing any wrapper has no effects. A separate modularizer flake was explored and deferred in favor of handwritten options and narrow pure helpers; this was not a permanent ban on later abstractions.
 
-Functional code is partly separated into `os/` and `hm/` implementations. There is no repository-wide features/hosts/users selection protocol, UID registry, integration registry, flake-parts configuration layer, or root public `lib/` yet. The secret module has its own local helper; that is not the later general construction library. These are historical boundaries, not a claim that the earlier arrangement was already considered defective.
+## User and cross-layer interfaces
 
-For maintenance at this point:
+The initial `modules.users` interface is one record with `enable`, `name`, `uid` and `home`. The exported `users.lingyu` wrapper fills it, while generated NixOS and HM user entries use the UID string. `modules/users/default.nix` still imports the specific `./lingyu` profile. This is UID-referenced integration, not the later `attrsOf submodule` multi-user registry or per-feature `allowUidList` router.
 
-- Change machine-specific hardware and platform behavior in the corresponding host module. Do not make WSL inherit native laptop graphics or boot requirements merely to share a user environment.
-- Keep final host composition visible in `flake.nix`. Adding an HM module file alone does not deliver it to either user: inspect each system's user imports and external `sharedModules` as appropriate.
-- Personal editor, mail, Git, shell, terminal, and related settings still live under the user module. Cloud functionality now has its own HM module. Some reusable capabilities, including agent tooling, fonts, office tools, Niri, and secret integration, already have separate module paths. Do not infer a universal reuse contract from their directory names.
-- When changing a shared capability, inspect both its OS requirements and HM configuration. The desktop receives Niri and desktop-oriented HM modules; the WSL composition intentionally differs. A successful change to one configuration does not establish compatibility with the other.
+Feature enable options make cross-layer participation more explicit. Niri has greeter, monitor geometry, Noctalia and Waybar options. Secret integration has distinct OS/HM controls at this stage. Do not rename these to later interfaces or claim that later general user routing is already implemented.
 
-The implementation entry points are the selected snapshot's `flake.nix`, `modules/hosts/thinkbook/default.nix`, `modules/hosts/wsl/default.nix`, and `modules/users/lingyu/default.nix`. Use historical paths when examining this state; later profile schemas and library names do not apply here.
+For maintenance, read the exported wrappers and final system choices in `flake.nix`, then the selected feature's own options and OS/HM imports. Keep the capability's shared contract out of a personal profile where practical, and hardware/platform details in the host. Central selection, dependency availability and side-effect gating are distinct questions; check each rather than inferring behavior from directory names.
 
-## Functional capabilities and open boundaries
+## Capabilities and unresolved work
 
-The desktop composition includes Niri/Noctalia-related integrations, office and media functionality, fonts, and native host support. The WSL composition supplies the WSL platform with a shared personal environment rather than the desktop's complete OS module list. SOPS integrations are present on both OS and HM sides. These are inspected wiring facts, not a statement that each application, graphical session, secret operation, or host deployment was exercised.
+The ThinkBook has the Niri/Noctalia desktop, optional Waybar, greetd/Sway/gtkgreet login, and desktop-oriented office/media features. WSL selects its platform and shared cloud, shell, font, secret and other user capabilities without native laptop graphics requirements. Cloud has already been extracted from the personal profile. The greeter's temporary Sway session launches the Niri session wrapper; it does not replace Niri as the user compositor.
 
-Cloud functionality has moved unchanged from `modules/users/lingyu/cloud.nix` to `modules/cloud/hm/default.nix`. Both system compositions explicitly import the new path, and the personal module no longer does. This separates reusable capability ownership from one user without yet introducing a general Feature protocol. File extraction is not automatic registration: adding or changing recipients still requires explicit flake composition. This is a source-level responsibility change, not a demonstrated new cloud runtime capability. General UID routing is not present yet.
+General multi-user composition and recipient routing remain future work at this horizon. Later discussion reports a duplicate base import/declaration problem and disappeared Niri service/portal components. The supplied dossier does not establish their final diagnosis, exact fix or successful evaluation. Do not present an assistant's stable-key proposal as an adopted and verified resolution.
 
-## Login and system/user boundaries
+## Evidence and continuation
 
-`modules/niri/os/greeter.nix` now disables GDM and enables greetd on VT 1. A dedicated system `greeter` user runs a temporary Sway session containing gtkgreet. Its environment removes inherited display/socket variables, avoids portal use for GTK, selects logind and DRM/libinput, and focuses the configured laptop output. After authentication, a packaged `Niri` command executes the configured Niri package's `niri-session`. The temporary Sway greeter is not the user's persistent compositor.
+This task directly inspected the integrated flake and user interface, the development commits' relationship to main, and earlier cloud/greeter changes. No Nix evaluation, build, deployment, decryption or runtime login test was performed. A code-level invariant or assertion is not evidence that every system evaluated successfully. The next independently useful state is the general UID registry and feature-to-HM import routing, checked against its own committed tree.
 
-The Niri package definition moved from HM to the OS module immediately before this change. Maintain the OS-provided session command and HM desktop settings together, but distinguish their responsibilities. Inspect `modules/niri/os/default.nix`, `modules/niri/os/greeter.nix` and `modules/niri/hm/default.nix`; this state still has fixed greeter output assumptions rather than the later host-monitor metadata contract. Windows font sharing was also introduced through the ThinkBook mount module and system font configuration; it is host-specific, not a requirement imposed on WSL. Nixvim no longer follows the root nixpkgs pin after a recorded compatibility correction.
-
-The owner reference says the GDM-to-greetd choice was intentional. That does not establish the cause or resolution of later reported Niri service/portal disappearance. The static diff establishes the login design, not successful login, service activation or portal operation.
-
-## Verification and next maintenance questions
-
-The present reconstruction inspected the committed flake, module layout, and relevant main history. The cloud file move and both updated recipient imports were checked directly. There is no root `tests/` registration in this snapshot. No historical build success is inferred from a commit message, an existing module, or the absence of failures. No Nix evaluation, check, build, deployment, decryption, or application runtime test was executed in this reconstruction.
-
-The current baseline supports continued investigation of where shared functionality should be owned, what is deliberately host-specific, and how a change is actually delivered to the two systems. Before making a stronger behavioral claim, obtain evidence for the affected historical snapshot; do not reuse a later session's successful check.
-
-For the actual present-day establishment task, source decisions and the next action, see [reconstruction.md](reconstruction.md). Later recollections and research do not turn the May 18 implementation into a later architecture.
+See [reconstruction.md](reconstruction.md) for the present establishment task, source coverage and retention limits.
