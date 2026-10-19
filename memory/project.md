@@ -1,4 +1,4 @@
-# Host-owned Windows virtualization and shared resources
+# Noctalia v5 and explicit lockscreen ownership
 
 ## Purpose and composition
 
@@ -14,7 +14,9 @@ Host metadata is now loaded independently of enablement. UID slots and monitor f
 
 ## Desktop and native capabilities
 
-Niri is the main native desktop; greetd uses temporary Sway/gtkgreet before launching its session. An independent IceWM/startx fallback provides native X11 compatibility through an OS entry and HM launcher, without cross-VT clipboard/layout promises. The unresolved browser reuse report is historical. Terminal consumers use native HM xdg.terminal-exec; the file manager provides Yazi and desktop Wayfile, and FileChooser integration requires a real terminal provider and OS application/portal resources. Only portal-using applications follow that route. ThinkBook framebuffer initialization is a guarded oneshot plus late-device udev rule, distinct from kmscon's own KMS/font lifecycle. Proposed conflict/pre/post policies were not adopted fixes.
+Niri remains the main native desktop and starts Noctalia v5 from HM settings. OS Noctalia configuration supplies recommended services without installing its own competing user launch path. Noctalia now owns normal/idle/pre-suspend locking; swaylock remains an allow-when-locked rescue path. One login_box is centered on the default monitor using mode/scale-derived logical dimensions, with weather false and unlock hint true. Custom clock/weather trials were withdrawn; earlier successful migration checks do not verify this final lockscreen stage. Other outputs remain locked; runtime settings may override declarative values.
+
+Greetd's temporary Sway/gtkgreet and the independent IceWM/startx fallback retain separate session duties. Browser reuse across concurrent sessions remains a historical unresolved report. Native xdg.terminal-exec supplies terminal capability; Yazi/Wayfile handle directories and the independent FileChooser portal only affects clients using it. ThinkBook framebuffer initialization is a host-gated oneshot/udev path; kmscon ownership proposals remain unadopted.
 
 ## Secrets and agent inputs
 
