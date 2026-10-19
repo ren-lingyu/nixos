@@ -10,7 +10,9 @@ Terminal configuration moves from the personal user into an HM feature with Kitt
 
 The file chooser has its own enable flag controlling provider configuration and terminal prerequisites rather than being unconditionally tied to Niri. A separate terminal change was reviewed after the user temporarily stashed the file-manager work; these were independently recoverable editing states, not a single verified final deployment.
 
-No fresh successful Nix check is retained for the combined changes.
+The actual capability test is HM's native `config.xdg.terminal-exec.enable`, not an indirect equivalence with the repository terminal feature or its recipient list. The chain is FileChooser portal to termfilechooser to xdg-terminal-exec to a terminal to Yazi; it applies only to applications actually using that portal.
+
+With HM useUserPackages on WSL, OS `pathsToLink` must include applications and portal resources. The file-manager gained an OS implementation with conditional additions that preserve other modules' paths. Conflict markers left in the index after worktree resolution were later cleared by the owner. An invalid mix of top-level assertions and explicit config was fixed by moving assertions inside config. The source retains no successful check after the final fixes; later framebuffer commit drafting does not validate the portal.
 
 ## Continuation
 
