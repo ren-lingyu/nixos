@@ -10,6 +10,10 @@ SSH host keys become the host identity; an age recipient is a derived representa
 
 The secret feature is renamed to sops consistently across options, interfaces and helper namespaces. An old test still referenced the previous helper and was corrected; the source reports a later user check succeeding at that phase, without extending it to future changes.
 
+OS age/agenix-rekey infrastructure is independent of optional application/HM SOPS. This reduces the risk that SOPS tooling's network/Go build requirements block base secret deployment; it is not complete replacement of SOPS. SSH runtime identity paths and public key feed host rekey setup. Master identities are separate input, not derived from host identity.
+
+Global host cardinality changes from at most one to exactly one. At this phase the helper still returns an empty set for invalid cardinality; consumers remove redundant local checks relying on the global assertion. A later source discovers the lazy-evaluation failure of that assumption. Do not retroactively claim the strict throwing getter already exists. New cardinality/fixture tests in this interval are source changes, not a newly demonstrated successful run.
+
 ## Continuation
 
 Compare these conclusions with the relevant project snapshot before Formal adoption. Preserve unresolved questions, distinguish proposals from adopted behavior and do not extend a historical successful check to later changes.
