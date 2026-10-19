@@ -8,6 +8,12 @@ Host metadata describes static facts/capabilities, not a shared consumer's activ
 
 Automatic metadata made an old unregistered-UID fixture accidentally valid. At this historical stage the owner chose explicitly forcing the host registry empty rather than relying on a different unused UID. This is a stage-specific fixture, later revised again when clearing an attrset no longer worked. Static diff review does not demonstrate a successful evaluation.
 
+Claims express stable host membership, not runtime online exclusivity. Duplicate WireGuard identities/addresses can conflict; a secret manager does not solve coordination. Derive node-specific values only with one claimant, leaving an independent claimed flag and meaningful assertions rather than failing on an empty list first. Public IP is a generic nullable host fact, not a provider-specific interface.
+
+The schema names networks/nodes and checks unknown claims and counts. Historical min/max zero means no limit in that direction, so the pair cannot express exactly zero claimants. Count all metadata claimants rather than the active closure's boolean. A flexible schema does not establish complete multiple-claim generation support.
+
+An early mkNet callback exposed excessive internal context; narrowing it avoids presenting incidental state as a stable API.
+
 ## Continuation
 
 Compare these conclusions with the relevant project snapshot before Formal adoption. Preserve unresolved questions, distinguish proposals from adopted behavior and do not extend a historical successful check to later changes.
