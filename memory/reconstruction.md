@@ -37,4 +37,10 @@ Recover historical relationships from Formal first-parent history, actual Git pa
 
 The owner accepted existing project password hashes retained through project ancestry and personal configuration context during establishment. No credential values were copied into memory. Text-pattern screening was not an exhaustive confidentiality guarantee. This historical decision does not extend authorization to future sensitive material: review new content/messages and any newly associated ancestor boundary under the applicable workflow before persistence.
 
-Current navigation is provided by the project memory entry skill. Routine maintenance removes Git-derived inventories instead of maintaining parallel source registries, and preserves evidence limitations without refreshing behavioral verification. Future source retirement or garbage collection requires its own lifecycle decision and authorization.
+Current navigation is provided by the project memory entry skill. Routine maintenance removes Git-derived inventories instead of maintaining parallel source registries, and preserves evidence limitations without refreshing behavioral verification.
+
+## Completed source retirement
+
+After owner authorization, the reconstructed Auxiliary branches were safely retired: their clean worktrees were removed, deletion readiness was checked, and branches were deleted through `git gaw branch -d`. Every source tip was verified as retained in the selected Formal ancestry before and after deletion. Historical source material remains recoverable through Git parents and committed trees; recovery does not require recreating the retired branches or worktrees. This operation did not establish that every historical claim was adopted or independently verified.
+
+No forced abandonment, history rewriting or garbage collection was performed. Formal and ordinary project branch tips were unchanged by retirement. Any later lifecycle changes or garbage collection require their own decision and authorization.
