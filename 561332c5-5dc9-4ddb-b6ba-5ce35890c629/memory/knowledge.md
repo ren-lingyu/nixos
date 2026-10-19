@@ -14,6 +14,8 @@ OS age/agenix-rekey infrastructure is independent of optional application/HM SOP
 
 Global host cardinality changes from at most one to exactly one. At this phase the helper still returns an empty set for invalid cardinality; consumers remove redundant local checks relying on the global assertion. A later source discovers the lazy-evaluation failure of that assumption. Do not retroactively claim the strict throwing getter already exists. New cardinality/fixture tests in this interval are source changes, not a newly demonstrated successful run.
 
+WireGuard secrets move to age-managed rekey files and runtime paths. This is reviewed staging, not proof that keys deployed or peers connected. The owner requires text-only Git content: default binary age output is an encoding issue rather than encryption failure. A dedicated rekey wrapper is preferable to overriding global rage behavior.
+
 ## Continuation
 
 Compare these conclusions with the relevant project snapshot before Formal adoption. Preserve unresolved questions, distinguish proposals from adopted behavior and do not extend a historical successful check to later changes.
