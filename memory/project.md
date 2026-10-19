@@ -1,8 +1,8 @@
-# Explicit service workloads over host networking
+# Shared network topology and a fourth host
 
 ## Purpose and composition
 
-Maintain native ThinkBook, WSL and Aliyun configurations while sharing selected user capabilities without erasing platform differences. The owner explains that a whole HM profile was too coarse a sharing unit. The root flake owns external inputs, provider adaptation and final selection; hosts own hardware/resources, users own identity/private settings and Features own reusable implementation. Modules check dependencies rather than enabling peers. The flake-parts root exposes top-level NixOS configurations and per-system tools, with a custom hierarchical self.modules registry.
+Maintain native ThinkBook and MateBook, WSL and Aliyun configurations while sharing selected user capabilities without erasing platform differences. The owner explains that a whole HM profile was too coarse a sharing unit. The root flake owns external inputs, provider adaptation and final selection; hosts own hardware/resources, users own identity/private settings and Features own reusable implementation. Modules check dependencies rather than enabling peers. The flake-parts root exposes top-level NixOS configurations and per-system tools, with a custom hierarchical self.modules registry.
 
 ## Users and interfaces
 
@@ -26,7 +26,7 @@ The public llib is instantiated with the receiving nixpkgs lib and passed throug
 
 ## Network ownership
 
-Interconnect has been removed. Stable WireGuard membership and encrypted key references belong to hosts; the public host helper purely derives the selected host's networking from the registry. Endpoint hosts define numbered networks, and other participants become spokes. Role checks are per network, so being a hub elsewhere does not suppress needed spoke keepalive/endpoint settings. Addresses and interface names derive from stable host numbers, not directory order. No-WireGuard selection returns an empty result without reading a private-key path. Builder implementation and host wiring were independent useful source states; their source reviews do not prove a deployed handshake.
+Interconnect has been removed. Stable WireGuard membership and encrypted key references belong to hosts; the public host helper purely derives the selected host's networking from the registry. Endpoint hosts define numbered networks, and other participants become spokes. Role checks are per network, so being a hub elsewhere does not suppress needed spoke keepalive/endpoint settings. Addresses and interface names derive from stable host numbers, not directory order. No-WireGuard selection returns an empty result without reading a private-key path. Builder implementation and host wiring were independent useful source states; their source reviews do not prove a deployed handshake. The builder now separates topology from configuration, publishes a readOnly networking.wireguard.topology view and exposes interface derivation for consumers. Endpoint metadata requires a local listen port. Common identity/boot/WireGuard modules consume host facts; MateBook joins the host inventory. Topology is configuration knowledge, not a live peer-health registry.
 
 ## Definition ownership
 
@@ -34,7 +34,7 @@ Internal options designate producer ownership, not access security. Direct inter
 
 ## Workload responsibilities
 
-A fourth peer category, workloads, discovers service roots and validates their OS/HM availability. Caddy reverse-proxy and WBO whiteboard containers receive explicit address, port, network-interface and permitted-source inputs; they do not automatically enable from host identity or refer to the removed interconnect namespace. The HTTP port defaults to 18000 and network policy stays explicit, including firewall source/destination restrictions. The source used an earlier containers name; the committed main framework is workloads. Source reviews and wiring do not establish deployed HTTP reachability.
+A fourth peer category, workloads, discovers service roots and validates their OS/HM availability. Caddy reverse-proxy and WBO whiteboard containers receive explicit address, port, network-interface and permitted-source inputs; they do not automatically enable from host identity or refer to the removed interconnect namespace. The committed WBO port option defaults to null; 18000 is only an example, and final composition supplies the actual port. This corrects the previous Formal stage, which copied an older draft summary. Network policy stays explicit, including firewall source/destination restrictions. The source used an earlier containers name; the committed main framework is workloads. Source reviews and wiring do not establish deployed HTTP reachability.
 
 ## Reconstruction and evidence
 
