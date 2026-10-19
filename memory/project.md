@@ -1,8 +1,14 @@
-# Host contracts with a native X11 fallback
+# Flake-parts composition and a public module registry
 
 ## Composition and ownership
 
-ThinkBook, WSL and Aliyun remain explicit flake compositions over common base policy, reusable features and UID-keyed users. Shared shell/editor/remote capabilities and generic XDG policy have separated from private profiles. Proxy has become a feature with selectable backends. Niri remains the primary native desktop; WSL and the server do not inherit laptop graphics merely because they share user capabilities.
+The root outputs now use `inputs.flake-parts.lib.mkFlake` with a systems list. NixOS configurations remain top-level flake outputs; each still calls `nixosSystem`. `perSystem` owns system-specific apps, not a transposed set of NixOS configurations. This changes flake construction while preserving final assembly responsibility at the root.
+
+The public hierarchical module registry is now the custom `self.modules`, containing base/features/hosts/users. The independent source explains why a flat standard `nixosModules` naming scheme and a registry hidden in let were rejected. A reported nested-output schema failure motivated that discussion; the final rename is not backed by a retained successful source check. The custom-output warning was accepted at that time rather than changing Nix implementations solely for it. This is historical reasoning, not a current recommendation about alternative Nix implementations.
+
+The convenience nixos-anywhere app uses the per-system `inputs'` projection and explicit executable lookup and now has a description. Editor has a separate public wrapper and configurable Emacs package selection, with the external distribution exposed through an overlay. Nixvim's independent dependency pin is preserved rather than forcing all dependencies to share a version.
+
+Three configurations still compose desktop ThinkBook, WSL and Aliyun, common base policy, reusable features and UID-keyed users. Shared shell/editor/remote and XDG responsibilities remain separated from private profiles. The minimal server user has no private profile import but retains common HM participation. Provider imports still live partly in public wrappers: this is not the much later flake-parts configuration-builder architecture.
 
 `modules/hosts` now provides an `attrsOf submodule` host namespace. Each profile has its own `enable`, `monitors` and package-group settings. Importing the host entry declares that host enabled; ordinary hardware and OS effects are guarded by its own enable state while imports remain at module top level. The global assertion currently permits zero or one enabled host. It is not yet the later exactly-one invariant.
 

@@ -8,7 +8,7 @@ The table distinguishes reconstruction from Formal knowledge adoption and retain
 | --- | --- | --- | --- |
 | monitor-host-x11 | `095981ae-92a7-447e-9fef-dc2fd6df75f5/memory/knowledge.md` | host-namespace | 2 of 3 reconstructed states |
 | icewm-fallback | `3165dc7e-df30-4bee-939a-690764d24eaa/memory/knowledge.md` | icewm | 2 of 2 reconstructed states |
-| flake-parts-introduction | `df292072-3892-4579-be04-bca4770b8e6e/memory/knowledge.md` | Not yet adopted | 0 of 2 reconstructed states |
-| registry-nix-app | `8d20905b-0cf1-435c-8a43-e370486c0113/memory/knowledge.md` | Not yet adopted | 0 of 1 reconstructed states |
+| flake-parts-introduction | `df292072-3892-4579-be04-bca4770b8e6e/memory/knowledge.md` | flake-parts | 2 of 2 reconstructed states |
+| registry-nix-app | `8d20905b-0cf1-435c-8a43-e370486c0113/memory/knowledge.md` | flake-parts | 1 of 1 reconstructed states |
 
 4 of 18 independent source histories are reconstructed. Remaining source scopes await their planned reconstruction and comparison. A retained source state does not establish adoption of all its claims. No source is retired automatically, and branch-tip reachability is checked separately from knowledge coverage.
