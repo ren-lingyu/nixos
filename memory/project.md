@@ -1,4 +1,4 @@
-# Declaration registration independent of shared behavior
+# Environment-specific declaration discovery
 
 ## Purpose and composition
 
@@ -56,7 +56,7 @@ Clash's package-data override reportedly rebuilt, but the original missing geosi
 
 Private construction helpers in lib/flakeParts.configurations.nix discover OS internal options and HM interface fragments, return declaration modules and supply them to system construction. Registration is independent of share.enable; share owns common OS/HM behavior, while declarations remain available for selected consumers. A self-selecting share declaration file caused the earlier import overflow, so aggregation stays outside discovered declarations.
 
-Public builder.nixosModules/homeModules additions and inline-flake aggregators were considered and withdrawn. User UID delivery, Feature recipients and other shared HM integrations remain distinct. Parent positions are not business-role declarations, and registration does not activate a Feature. No later share-disabled behavior test or fresh Nix success is established by this source.
+Public builder.nixosModules/homeModules additions and inline-flake aggregators were considered and withdrawn. User UID delivery, Feature recipients and other shared HM integrations remain distinct. Parent positions are not business-role declarations, and registration does not activate a Feature. No later share-disabled behavior test or fresh Nix success is established by this source. The final loader convention is _options.fp.nix along module path prefixes for outer configuration/metadata branches, os/_options.os.nix for native OS declarations and hm/_options.hm.nix for named HM interface fragments. These are distinct function/module interfaces, not native automatic loading rules or fixed namespace names. Static values remain in _metadata.nix. Eighteen declaration files were renamed byte-identically with matching loader/README updates and no old-name fallback. The source reports static rename/path consistency checks, not a final evaluated pass.
 
 ## Reconstruction and evidence
 

@@ -23,6 +23,6 @@ The table distinguishes reconstruction from Formal knowledge adoption and retain
 | clash-geodata | `11b23298-31e9-40ff-93c5-685d0cefd36f/memory/knowledge.md` | package-discovery | 2 of 2 reconstructed states |
 | pi-skills | `09c2c62a-b95a-44b0-b09f-4a3223de90d3/memory/knowledge.md` | package-discovery | 3 of 3 reconstructed states |
 | noctalia-lockscreen | `0e10e70e-eb73-4e65-b5a7-30f1bda7de9d/memory/knowledge.md` | noctalia-lock | 3 of 3 reconstructed states |
-| flake-parts-module-refactor | `80619f41-6571-4b72-965a-7152932af142/memory/knowledge.md` | outer-configurations, responsibility-namespaces, private-declarations | 3 of 4 reconstructed states |
+| flake-parts-module-refactor | `80619f41-6571-4b72-965a-7152932af142/memory/knowledge.md` | outer-configurations, responsibility-namespaces, private-declarations, declaration-filenames | 4 of 4 reconstructed states |
 
 18 of 18 independent source histories are reconstructed. All source discovery lines are reconstructed; Formal adoption remains topic-specific and may still be incomplete. A retained source state does not establish adoption of all its claims. No source is retired automatically, and branch-tip reachability is checked separately from knowledge coverage.
