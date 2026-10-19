@@ -10,6 +10,8 @@ PI_OFFLINE suppresses certain startup updates/telemetry/tool downloads according
 
 A missing space made wrapProgram interpret a pi--set executable; after correction the owner reported a successful rebuild. Compatibility/deprecation warnings were not that root cause. Shared git-maintenance instructions replaced duplicative OpenCode agent/command wrappers and were consumed by multiple tools. OpenCode retained ask permissions; a skill is not the execution authorization boundary. No fresh check is established for all subsequent skill changes.
 
+A later proposal would expose selected mature Git CLI actions through a Pi execution extension. Merely installing a command, providing an alias or describing allowed actions in a skill is not an enforced boundary. The source ends in feasibility discussion: no action allowlist, extension or secure arbitrary-shell filtering was implemented or verified there.
+
 ## Continuation
 
 Compare these conclusions with the relevant project snapshot before Formal adoption. Preserve unresolved questions, distinguish proposals from adopted behavior and do not extend a historical successful check to later changes.
