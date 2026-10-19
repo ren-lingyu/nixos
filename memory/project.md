@@ -1,22 +1,24 @@
-# Shared capabilities become independent responsibilities
+# Host namespaces and graphics contracts
 
-## Goal and composition
+## Composition and ownership
 
-The project now composes desktop ThinkBook, WSL and an Aliyun server rather than only the original two environments. The flake remains the final assembly point, selecting public wrappers, external integrations and enabled features. Shared root configuration owns common Nix policy, basic tools and HM defaults. User-level sharing remains important, while native hardware, WSL platform behavior and server disk/bootstrap responsibilities remain host-specific.
+ThinkBook, WSL and Aliyun remain explicit flake compositions over common base policy, reusable features and UID-keyed users. Shared shell/editor/remote capabilities and generic XDG policy have separated from private profiles. Proxy has become a feature with selectable backends. Niri remains the primary native desktop; WSL and the server do not inherit laptop graphics merely because they share user capabilities.
 
-The early Feature/User protocol is being used for actual maintenance. Cloud became `remote`; shell and editor implementations moved out of the personal profile into reusable features. The shell HM side was explicitly gated after extraction: moving a file alone does not make activation correct. Editor options select enabled editor implementations and defaults. Personal home settings moved to `modules/users/lingyu/home.nix`; generic XDG paths and directory-creation policy moved to the shared root rather than staying private to one user.
+`modules/hosts` now provides an `attrsOf submodule` host namespace. Each profile has its own `enable`, `monitors` and package-group settings. Importing the host entry declares that host enabled; ordinary hardware and OS effects are guarded by its own enable state while imports remain at module top level. The global assertion currently permits zero or one enabled host. It is not yet the later exactly-one invariant.
 
-## Interfaces and delivery
+## Monitor and session interfaces
 
-Users are still keyed by numeric UID with separate enable, home and HM controls. A nullable HM profile source allows a minimal server user to exist without private profile imports while still participating in common HM configuration and selected features. This is not the later directory-keyed user-profile model. Shared Features and their HM recipient lists remain separate from personal profile contents.
+Hosts own monitor facts. A logical monitor attribute key may differ from its actual output name; actual names must be nonempty and unique to avoid overwriting generated output entries. A host has at most one default-role monitor. Dimensions are positive integers and non-null refresh/scale values are positive floats. Niri's internal monitor configuration is derived from the selected host rather than repeated as feature-local constants.
 
-Proxy implementation has been extracted from ThinkBook into `modules/features/proxy`, with explicit feature/backend options and implication assertions. The enabled host chooses policy; the feature owns service implementation. This state has the initial Clash/V2RayA choices, not every later backend. The Aliyun host uses disko/nixos-anywhere-related bootstrap wiring; its existence is static composition evidence, not proof of a fresh remote deployment.
+Graphical consumers add contextual requirements: enabled Niri and greeter require exactly one enabled host and exactly one default monitor. Thus headless compositions may have no default display without weakening graphical validation. Derivations check list cardinality before selecting its first member, so malformed metadata can reach meaningful assertions rather than failing on an empty list.
 
-## Maintenance implications and unresolved evidence
+Greeter has become an independent Feature. It owns login service implementation and consumes session packages provided by desktop features; Niri owns its session wrapper and user compositor. The greetd service's temporary Sway/gtkgreet session is not the user's Niri session. Provider registration and later X11 session support continue after this horizon.
 
-Look first at `modules/default.nix`, `modules/features/default.nix`, `modules/users/default.nix`, the feature's OS/HM files and the final flake choices. Route common capabilities through feature interfaces rather than copying personal settings to each host. Keep personal identity and data in user configuration, hardware/platform constraints in hosts, and reusable implementation in Features. This ownership direction is supported by the owner reference and actual migrations, rather than inferred merely from directory names.
+## Maintenance and evidence
 
-The greeter remains the greetd/Sway/gtkgreet path to Niri. Host-owned generic monitor schemas, independently selectable greeter and native X11 fallback belong to subsequent states. The earlier duplicate base and Niri service/portal reports still lack a precise established resolution at this horizon. Some authored June migrations have later committer dates; no assertion is made that author date equals publication on main.
+Inspect `modules/hosts/default.nix`, the selected host `default.nix`, and `modules/features/{niri,greeter}/default.nix`. Keep monitor data in hosts and graphical prerequisites in consumers. Do not weaken name/cardinality checks simply because a default display works on ThinkBook. Do not put imports under an enable-dependent `config` branch.
+
+The independent monitor source preserves the motivation, earlier schema and namespace transition. Its reported rebuild/evaluation successes apply to historical working trees with incomplete exact provenance, not to every tree associated here. The source is used for rationale while the directly inspected main snapshot determines the committed interface. The earlier Niri service/portal investigation is not retrospectively declared resolved by this extraction.
 
 ## Evidence and maintenance boundaries
 
