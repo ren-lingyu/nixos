@@ -1,4 +1,4 @@
-# Typed outer configuration and NixOS construction
+# Responsibility-based library namespaces
 
 ## Purpose and composition
 
@@ -26,7 +26,7 @@ The secret feature is renamed sops across namespaces and helper/test references.
 
 ## Library and verification
 
-Discovery/schema helpers and configuration construction replace the former hand-built module aggregation. The old groupImportsByUid helper/export/tests are removed as production uses disappear; its historical prepend fixture does not specify the new builder's behavior. The actual builder accumulates existing per-UID imports before new descriptor contributions. A negative UID fixture moves to an unregistered UID because recursiveUpdate with an empty registry did not clear inherited values. Static interpretation, old check reports and current tests-not-run remain separate.
+The public library is organized by responsibility: types, modules, hosts, features.sops, packages and flakeParts, with flakeParts.types retained. The collection entry mkNixosConfigurations maps to mkNixosSystem. The former unused UID grouping API/tests are removed; current per-UID accumulation belongs to the builder. Configuration adaptation follows declared types, and module internals/interfaces retain their established scopes. This is not a blanket shrinking of every export. The source establishes targeted review for these later moves, not a new Nix pass.
 
 ## Network ownership
 
