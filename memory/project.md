@@ -1,12 +1,14 @@
-# Discovery descriptors and external integration registry
+# Typed outer configuration and NixOS construction
 
 ## Purpose and composition
 
-The root flake retains final selection and input adaptation, now with a modular flake-parts organization, package/tooling inputs and formatter/check integration. A general discovery layer identifies modules through os/default.nix or hm/default.nix, rejects nested modules and keeps root default.nix optional. The old custom self.modules wrappers are being replaced by an explicit moduleRegistry describing module metadata and external OS/HM/overlay integration. Discovery and schema generation are public library mechanics; they do not own deployment policy.
+Flake-parts options describe each system before nixosSystem is called. Configuration values and static metadata have separate schema branches, moduleRegistry owns external OS/HM/overlay adaptation, and nixosBuilder supplies the constructor, HM integration and specialArgs. The builder selects enabled implementations in this outer layer, then produces an internal readOnly OS config.modules view by adapting configuration and merging metadata. HM reads that view through osConfig.modules. Peers still check rather than enable dependencies.
+
+The adapter only calls values whose declared type is functionTo and recursively adapts submodules; it does not guess that arbitrary functions/packages should execute. Outer selection is not a same-level NixOS imports/config cycle. An early overflow came from a declaration aggregator selecting itself during import collection. Session-wrapper readOnly defaults conflicted with real definitions, so intermediate options were removed in favor of direct greeter session-package contributions. The source reports two checks at their respective dirty stages, not a pass for every later change.
 
 ## Users and interfaces
 
-User profiles are directory-named; final composition binds their UID from a host's numeric registry. Enabled identities must be unique, bound and registered; the host may reserve unused UIDs. A minimal profile can receive common HM Features without personal configuration. Feature allowUidList defaults to enabled assigned users when HM-capable, with duplicate/unknown references rejected. Per-user moduleInterfaces schemas are registered separately from selected implementation delivery. Nullable existModule booleans distinguish undeclared roots from explicit implementation facts, checked against files. OS imports are static; HM delivery is recipient-dependent.
+Directory-named user profiles retain unique bound UID and host-subset constraints. Outer configuration chooses user identities and Feature allowUidList. The builder sends user HM implementation to the bound UID and Feature HM implementations/external homeModules to recipients; other kinds contribute through sharedModules. Per-user interfaces and OS internals remain declaration mechanisms distinct from implementation enablement. Parent disablement prevents implementation/external integration loading; a child switch does not independently activate its parent.
 
 ## Host facts and graphics
 
@@ -24,7 +26,7 @@ The secret feature is renamed sops across namespaces and helper/test references.
 
 ## Library and verification
 
-The public llib is instantiated with the receiving nixpkgs lib and passed through OS/HM arguments, with explicit arguments for ordinary imported functions. Stable base key/_file identity resolves a documented library-era duplicate import problem, without proving the same fix for every older complaint. Types, availability assertions, SOPS helpers and UID grouping have registered tests and real module-composition negative cases. The old grouping helper prepends later contributions; its beta-before-alpha fixture was clarified during this reconstruction. Historical check reports are scoped to their exact old stages; the final portal and several later refinements lack fresh validation.
+Discovery/schema helpers and configuration construction replace the former hand-built module aggregation. The old groupImportsByUid helper/export/tests are removed as production uses disappear; its historical prepend fixture does not specify the new builder's behavior. The actual builder accumulates existing per-UID imports before new descriptor contributions. A negative UID fixture moves to an unregistered UID because recursiveUpdate with an empty registry did not clear inherited values. Static interpretation, old check reports and current tests-not-run remain separate.
 
 ## Network ownership
 
