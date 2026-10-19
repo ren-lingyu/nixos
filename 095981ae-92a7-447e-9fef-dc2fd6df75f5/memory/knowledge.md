@@ -8,9 +8,11 @@ The host owns monitor data and its invariants. Niri and greeter require one defa
 
 Keep local types and assertion helpers near their consumers and retain complete option paths in diagnostics. A generated declaration is a source-level contract, not proof of a working display or login session.
 
-Host profiles now form an `attrsOf submodule` namespace with `enable`, `monitors` and `packageGroups`. Importing a host root declares its own enablement. This stage permits zero or one enabled host globally; graphical consumers separately require exactly one host and default monitor. Do not back-project the later global exactly-one rule. Ordinary host OS/hardware effects are guarded by their own enable state; imports stay at module top level rather than under `config.mkIf`. Niri's internal unique monitor value is derived from the enabled host.
+Host profiles are now generated as fixed names from host directories with entry points rather than an open `attrsOf` namespace with `enable`, `monitors` and `packageGroups`. Importing a host root declares its own enablement. This stage permits zero or one enabled host globally; graphical consumers separately require exactly one host and default monitor. Do not back-project the later global exactly-one rule. Ordinary host OS/hardware effects are guarded by their own enable state; imports stay at module top level rather than under `config.mkIf`. Niri's internal unique monitor value is derived from the enabled host. Common fields and host-specific `extra-options.nix` are composed without dropping the defensive entry-point existence assertion.
 
-The source reports a user rebuild test and an agent evaluation confirming ThinkBook selection, removal of the old flat monitor path and the expected Niri/greeter values. It also describes later working-tree edits, so that report cannot establish an exact committed project parent for the complete source state.
+The source also retains an earlier startx/XFCE fallback investigation: it sought a usable native X11 compatibility environment rather than extreme minimalism. A wrapper incorrectly left `$out` for runtime expansion; the fix used build-time absolute paths and the intended XFCE session/xinit packages. This is the initial fallback line, not a claim that XFCE remains the final implementation after the separate IceWM source. Overlay subdirectories gained discovery and explicit enable guards.
+
+The source reports evaluations of desktop, server and WSL compositions and diff checks, without a fresh runtime login test. These are historical reports, not tests run in this task.
 
 ## Continuation
 
