@@ -1,4 +1,4 @@
-# Strict host selection under lazy evaluation
+# Explicit service workloads over host networking
 
 ## Purpose and composition
 
@@ -31,6 +31,10 @@ Interconnect has been removed. Stable WireGuard membership and encrypted key ref
 ## Definition ownership
 
 Internal options designate producer ownership, not access security. Direct internal unique values become readOnly base-typed values where exactly one raw definition is intended; overwritten defaults are removed. Nested element uniqueness is retained where meaningful. User UID remains a public final-composition input; produced host UID metadata remains internal. Provider defaults/fallbacks are consumer views rather than extra readOnly definitions. Nix expression formatting choices do not establish build equivalence. Getter tests and global module assertions have distinct roles. A user-reported check of a whole working tree cannot prove a different partially staged snapshot; the source preserves that staging correction.
+
+## Workload responsibilities
+
+A fourth peer category, workloads, discovers service roots and validates their OS/HM availability. Caddy reverse-proxy and WBO whiteboard containers receive explicit address, port, network-interface and permitted-source inputs; they do not automatically enable from host identity or refer to the removed interconnect namespace. The HTTP port defaults to 18000 and network policy stays explicit, including firewall source/destination restrictions. The source used an earlier containers name; the committed main framework is workloads. Source reviews and wiring do not establish deployed HTTP reachability.
 
 ## Reconstruction and evidence
 
