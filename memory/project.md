@@ -1,4 +1,4 @@
-# Static host facts separated from activation
+# Private connectivity and stable host claims
 
 ## Purpose and composition
 
@@ -23,6 +23,10 @@ The optional secret Feature consumes user-owned encrypted inventory through per-
 ## Library and verification
 
 The public llib is instantiated with the receiving nixpkgs lib and passed through OS/HM arguments, with explicit arguments for ordinary imported functions. Stable base key/_file identity resolves a documented library-era duplicate import problem, without proving the same fix for every older complaint. Types, availability assertions, SOPS helpers and UID grouping have registered tests and real module-composition negative cases. The old grouping helper prepends later contributions; its beta-before-alpha fixture was clarified during this reconstruction. Historical check reports are scoped to their exact old stages; the final portal and several later refinements lack fresh validation.
+
+## Network ownership
+
+Interconnect is an optional OS Feature for private reachability through a cloud entry, not a default route for all internet traffic or a trusted whole interface. Static intranetClaims express network/node membership across host metadata. The active closure determines claimed participation, while a globally unique claimant supplies derived node fields. Unknown names/counts are checked; zero means unlimited for a count direction and cannot express exactly zero. A multi-claim-capable schema does not imply complete multi-claim generation. Offline peers should not block boot, service ports remain explicit, and no successful handshake/deployment is established.
 
 ## Reconstruction and evidence
 
