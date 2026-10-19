@@ -10,6 +10,10 @@ Declaration aggregation initially selected its own share declaration file and ov
 
 Responsibilities are regrouped under llib.types, modules, hosts, features.sops, packages and flakeParts. Collection construction uses mkNixosConfigurations, internally mapping mkNixosSystem. Keep flakeParts.types rather than introducing an extra configurations namespace. The now-unused groupImportsByUid implementation/export/tests are removed; its former role is preserved historically rather than presented as a current API. No comprehensive export reduction or new check is established after this cleanup.
 
+Declaration registration becomes a private construction responsibility in lib/flakeParts.configurations.nix. Private generators return OS and HM declaration modules to the builder. OS declarations enter system modules and HM interfaces enter each user's sharedModules independently of share.enable. Share owns common behavior only. Proposed public builder.nixosModules/homeModules and inline flake aggregators were withdrawn.
+
+User HM delivery binds the selected UID; Feature HM delivery follows allowUidList; other HM implementations and registry integrations use sharedModules. Declared interfaces do not imply enabled behavior. The existing internal/interface namespaces retain their value/type/merge semantics. This private-generation stage has targeted source/diff evidence, not a new Nix pass.
+
 ## Continuation
 
 Compare these conclusions with the relevant project snapshot before Formal adoption. Preserve unresolved questions, distinguish proposals from adopted behavior and do not extend a historical successful check to later changes.
