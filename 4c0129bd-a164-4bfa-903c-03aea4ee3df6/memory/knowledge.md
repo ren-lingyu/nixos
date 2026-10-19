@@ -28,6 +28,10 @@ ExistModule types/assertion generators centralize paired declarations, enable wi
 
 `groupImportsByUid` accepts separate UID and import selectors, each taking item name and value. It only traverses attributes, stringifies UIDs and accumulates imports in order. Callers own feature filtering, enable/availability semantics and file layout. The nested folds remain; no opaque result-record callback or unrelated mkMerge abstraction is introduced. Static review at this step is not yet a new check result.
 
+Tests are registered through per-system checks with category derivations. They cover monitor/availability types, UID import grouping and SOPS generation, plus actual module-composition assertions rejecting unbound users, unregistered UIDs and invalid feature recipients. The source reports earlier successful category and composition checks for that stage. Later type, shell and documentation refinements have only static diff evidence, so success must not be extended automatically.
+
+Nonempty monitor names move into the shared type with a negative case. Shell package options and diagnostics are clarified. An attempted wholesale README replacement was withdrawn; the adopted documentation preserves directory sections and adds contracts before the structural overview. Remaining wrapper-path/diagnostic cleanup was optional work, not falsely declared complete.
+
 ## Continuation
 
 Compare these conclusions with the relevant project snapshot before Formal adoption. Preserve unresolved questions, distinguish proposals from adopted behavior and do not extend a historical successful check to later changes.
