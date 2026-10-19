@@ -1,4 +1,4 @@
-# Directory-based host discovery
+# Explicit module availability contracts
 
 ## Composition and ownership
 
@@ -45,6 +45,14 @@ Host declarations are now generated from directories with `default.nix`; the pri
 This changes what names are available, not who activates them. Global host cardinality remains at most one, and graphical consumers retain stronger selection/display prerequisites. Import availability and enable effects must be checked separately. The monitor source's later state preserves the transition and an earlier XFCE wrapper lesson; that XFCE investigation does not supersede the already-adopted IceWM result.
 
 Local `cfg` aliases abbreviate own-configuration reads; schema definition paths, cross-module references and diagnostic paths remain explicit. The alias source reports one host's unchanged active closure after a historical check/rebuild, not a universal or freshly repeated runtime equivalence result.
+
+## Imported state is not missing implementation
+
+Feature availability markers now use unique nullable booleans, default null. Null means the root has not declared availability; explicit true/false must match the OS/HM entry-point files. Both sides are declared together, and an enabled feature needs a declared root. HM delivery checks explicit true. This avoids treating a feature not imported by WSL as a malformed declared implementation.
+
+The flake remains the external adapter and final composition owner. Base is shared infrastructure; hosts/users/features retain peer responsibilities. Moving all reusable policy into host wrappers was considered and withdrawn. The editor wrapper now includes its base dependency and remote declares no OS implementation. Personal settings need not be extracted merely to make directories look more uniform. At this horizon recipient defaults still use UID 1000 for HM-capable features; later enabled-user-derived defaults are not back-projected.
+
+The composition source preserves reported checks at specific old working stages. The inspected source contract establishes the committed declarations, without proving a new evaluation or resolving every original regression.
 
 ## Evidence and maintenance boundaries
 

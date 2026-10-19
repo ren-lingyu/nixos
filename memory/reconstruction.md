@@ -20,7 +20,7 @@ The reported Niri service/portal regression and duplicate base declarations are 
 
 ## Coverage and next action
 
-All 18 archived source boundaries and their memory states have been surveyed. 9 new independent Auxiliary histories now exist under `.gaw-clean/`; their coverage and retained states are recorded in [sources.md](sources.md). Formal has progressed in main order through directory-discovery. Current project memory describes that historical horizon, not today's deployed system. Continue to the next architectural or functional transition in main; reconstruct and compare the remaining discovery lines as their subjects become relevant. The owner dossier remains reference only.
+All 18 archived source boundaries and their memory states have been surveyed. 9 new independent Auxiliary histories now exist under `.gaw-clean/`; their coverage and retained states are recorded in [sources.md](sources.md). Formal has progressed in main order through availability-contract. Current project memory describes that historical horizon, not today's deployed system. Continue to the next architectural or functional transition in main; reconstruct and compare the remaining discovery lines as their subjects become relevant. The owner dossier remains reference only.
 
 Current review directly checked the module-protocol merge's `flake.nix`, June 6 feature/user schemas, and cloud/greeter diffs. Conversation positions remain attributed paraphrases. Complete early conversations, comprehensive historical build evidence, precise regression resolution and the full intermediate HM routing sequence are unavailable. No Nix evaluation, build, deployment or runtime test has been run in this reconstruction.
 
