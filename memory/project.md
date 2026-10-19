@@ -1,4 +1,4 @@
-# Host namespaces and graphics contracts
+# Host contracts with a native X11 fallback
 
 ## Composition and ownership
 
@@ -12,7 +12,13 @@ Hosts own monitor facts. A logical monitor attribute key may differ from its act
 
 Graphical consumers add contextual requirements: enabled Niri and greeter require exactly one enabled host and exactly one default monitor. Thus headless compositions may have no default display without weakening graphical validation. Derivations check list cardinality before selecting its first member, so malformed metadata can reach meaningful assertions rather than failing on an empty list.
 
-Greeter has become an independent Feature. It owns login service implementation and consumes session packages provided by desktop features; Niri owns its session wrapper and user compositor. The greetd service's temporary Sway/gtkgreet session is not the user's Niri session. Provider registration and later X11 session support continue after this horizon.
+Greeter has become an independent Feature. It owns login service implementation and consumes session packages provided by desktop features; Niri owns its session wrapper and user compositor. The greetd service's temporary Sway/gtkgreet session is not the user's Niri session. The greeter registers the session providers, and a separate native X11 compatibility path is now available.
+
+## X11 compatibility responsibility
+
+The initial XFCE fallback has been replaced with IceWM. This is a general compatibility session alongside Niri, accessible at login or from another TTY, not a bespoke meeting-app environment. The OS owns Xorg/startx/IceWM and the `X11-Session` entry. HM owns minimal launcher configuration. The wrapper starts `icewm-session` under a new D-Bus session and clears inherited display/compositor variables. It does not attach itself to the main user graphical target or hardcode input-method startup.
+
+The first phase provides xrandr/xdg tools without automatic host-monitor layout or cross-VT clipboard policy. The independent source reports a successful user rebuild test, TTY login and broadly working meeting software; the browser could still reuse a Niri instance, without a confirmed resolution. These are attributed historical observations, not tests executed now. Inspect `modules/features/x11-session/{default.nix,os/default.nix,hm/default.nix}` for the interface and implementation split.
 
 ## Maintenance and evidence
 
