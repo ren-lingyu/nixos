@@ -1,4 +1,4 @@
-# Native terminal and portal capability contracts
+# Framebuffer initialization and console ownership limits
 
 ## Composition and ownership
 
@@ -93,6 +93,12 @@ Yazi is the cross-environment directory handler and Wayfile supplies a desktop a
 An independent FileChooser flag controls termfilechooser portal configuration and the native terminal prerequisite. The chain runs portal to terminal selector to terminal to Yazi, only for clients that use XDG FileChooser. OS `pathsToLink` adds application/portal resources conditionally for HM useUserPackages, including WSL. Directory MIME association is not itself portal selection, and no claim is made that every GUI toolkit uses this path.
 
 The source reports corrected stash/index conflict remnants and an assertions/config syntax problem, but no successful check after the final fixes. These failures are not declared current reproducible bugs merely because they occurred historically; the current static wiring and the missing final runtime evidence are separate facts. Inspect `modules/features/{file-manager,terminal}/` and the relevant HM consumers.
+
+## Console implementation versus lifecycle proposals
+
+ThinkBook's OS virtual-terminal module adds an fbset oneshot before display-manager startup, guarded by fb0 identifying as xedrmfb. A graphics-device add rule handles late appearance. The requested geometry is 3072x1920 at 32-bit depth; kmscon separately manages its own display/font policy. Host enablement guards these machine-specific effects.
+
+The independent assessment explains why ordering alone does not pull dependencies in, why Conflicts does not restore a stopped service, and why stopping a completed oneshot does not undo framebuffer geometry. Multi-VT kmscon ownership remains an unresolved design consideration. Suggested pre/post commands and conflict relationships were not adopted patches or runtime tests. Preserve that distinction when maintaining `modules/hosts/thinkbook/os/virtual-terminal.nix`.
 
 ## Evidence and maintenance boundaries
 

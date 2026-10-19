@@ -14,6 +14,6 @@ The table distinguishes reconstruction from Formal knowledge adoption and retain
 | cfg-aliases | `e2d4174c-a510-4981-8b72-a1e976724861/memory/knowledge.md` | directory-discovery | 2 of 2 reconstructed states |
 | module-composition | `4c0129bd-a164-4bfa-903c-03aea4ee3df6/memory/knowledge.md` | availability-contract, hm-interfaces, user-profiles, public-library, composition-contracts | 7 of 7 reconstructed states |
 | file-manager-terminal-portal | `e040d9ac-e63f-434f-95b0-230010b21dd3/memory/knowledge.md` | portal-terminal | 3 of 3 reconstructed states |
-| framebuffer-kmscon | `137ed987-bbc6-4b09-8ea4-c69a62232a47/memory/knowledge.md` | Not yet adopted | 0 of 1 reconstructed states |
+| framebuffer-kmscon | `137ed987-bbc6-4b09-8ea4-c69a62232a47/memory/knowledge.md` | framebuffer | 1 of 1 reconstructed states |
 
 9 of 18 independent source histories are reconstructed. Remaining source scopes await their planned reconstruction and comparison. A retained source state does not establish adoption of all its claims. No source is retired automatically, and branch-tip reachability is checked separately from knowledge coverage.
