@@ -1,4 +1,4 @@
-# Host-owned WireGuard networking
+# Strict host selection under lazy evaluation
 
 ## Purpose and composition
 
@@ -10,7 +10,7 @@ User profiles are directory-named; final composition binds their UID from a host
 
 ## Host facts and graphics
 
-Host metadata is now loaded independently of enablement. UID slots and monitor facts remain available for all hosts without activating their OS configuration. Data integrity applies even to disabled hosts. Monitor output names are nonempty/unique and at most one has the default role; dimensions and non-null scale/refresh are positive. The global host rule now requires exactly one enabled host; graphical consumers additionally require a default monitor. The available default monitor is selected safely after cardinality checks. This separates hardware facts from consumer requirements. SSH host identity separates material from runtime paths, with age recipients derived from SSH public identity rather than a second independent identity. At this phase the shared getter still returns an empty set for non-unique selection, relying on global assertions; its later lazy-evaluation failure is not yet repaired.
+Host metadata is now loaded independently of enablement. UID slots and monitor facts remain available for all hosts without activating their OS configuration. Data integrity applies even to disabled hosts. Monitor output names are nonempty/unique and at most one has the default role; dimensions and non-null scale/refresh are positive. The global host rule now requires exactly one enabled host; graphical consumers additionally require a default monitor. The available default monitor is selected safely after cardinality checks. This separates hardware facts from consumer requirements. SSH host identity separates material from runtime paths, with age recipients derived from SSH public identity rather than a second independent identity. The shared getter now throws for zero/multiple selected hosts with contextual names. A global exactly-one assertion remains because laziness can avoid calling the getter; tryEval lets the assertion report the invariant. Returning an empty set had produced unrelated missing-field failures before assertions.
 
 ## Desktop and native capabilities
 
@@ -30,7 +30,7 @@ Interconnect has been removed. Stable WireGuard membership and encrypted key ref
 
 ## Definition ownership
 
-Internal options designate producer ownership, not access security. Direct internal unique values become readOnly base-typed values where exactly one raw definition is intended; overwritten defaults are removed. Nested element uniqueness is retained where meaningful. User UID remains a public final-composition input; produced host UID metadata remains internal. Provider defaults/fallbacks are consumer views rather than extra readOnly definitions. Nix expression formatting choices do not establish build equivalence.
+Internal options designate producer ownership, not access security. Direct internal unique values become readOnly base-typed values where exactly one raw definition is intended; overwritten defaults are removed. Nested element uniqueness is retained where meaningful. User UID remains a public final-composition input; produced host UID metadata remains internal. Provider defaults/fallbacks are consumer views rather than extra readOnly definitions. Nix expression formatting choices do not establish build equivalence. Getter tests and global module assertions have distinct roles. A user-reported check of a whole working tree cannot prove a different partially staged snapshot; the source preserves that staging correction.
 
 ## Reconstruction and evidence
 
