@@ -6,7 +6,7 @@ This independent source history reconstructs one existing archived discovery lin
 
 The owner wanted complete removal of vscode-server integration instead of extracting it into another module. The historical agent supplied manual history-editing guidance rather than rewriting project history itself. The selected changes removed the flake input, lock nodes, wrapper/WSL imports and independent integration module. A user-reported flake check concerns that working stage, not a check performed during reconstruction. Original working-tree provenance is incomplete.
 
-Later read-only historical output confirmed completion of the owner's rebase, a clean worktree and no remaining vscode-server input/import/service wiring in the inspected result. No new Nix check followed that verification. This establishes a reviewed result, not a single exact revision for adjacent dirty work.
+The completed result was inspected read-only and the integration references were absent. The owner chose semantic classification over imitating earlier titles: removing a real integration is not a behavior-preserving extraction, and the resulting title used `chore(wsl)`. Do not rewrite existing history solely for consistency. Later lists of flake-related commit titles are lookup evidence, not project-parent provenance for every listed revision.
 
 ## Continuation
 
