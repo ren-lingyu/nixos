@@ -1,4 +1,4 @@
-# Text-only encrypted retention and scoped rekey tooling
+# Internal ownership and single-definition contracts
 
 ## Purpose and composition
 
@@ -27,6 +27,10 @@ The public llib is instantiated with the receiving nixpkgs lib and passed throug
 ## Network ownership
 
 Interconnect is an optional OS Feature for private reachability through a cloud entry, not a default route for all internet traffic or a trusted whole interface. Static intranetClaims express network/node membership across host metadata. The active closure determines claimed participation, while a globally unique claimant supplies derived node fields. Unknown names/counts are checked; zero means unlimited for a count direction and cannot express exactly zero. A multi-claim-capable schema does not imply complete multi-claim generation. Offline peers should not block boot, service ports remain explicit, and no successful handshake/deployment is established.
+
+## Definition ownership
+
+Internal options designate producer ownership, not access security. Direct internal unique values become readOnly base-typed values where exactly one raw definition is intended; overwritten defaults are removed. Nested element uniqueness is retained where meaningful. User UID remains a public final-composition input; produced host UID metadata remains internal. Provider defaults/fallbacks are consumer views rather than extra readOnly definitions. Nix expression formatting choices do not establish build equivalence.
 
 ## Reconstruction and evidence
 
