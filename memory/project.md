@@ -1,4 +1,4 @@
-# Profile identity separated from host UID allocation
+# Shared library and stable module identity
 
 ## Composition and ownership
 
@@ -69,6 +69,14 @@ Users are discovered by profile directory name, not keyed by UID. The final flak
 The former bidirectional equality check is replaced by subset membership: enabled user UIDs must belong to the selected host's registry, which may reserve unused values. HM-capable Feature recipients default to the enabled assigned users instead of hardcoded 1000. Shared interface discovery is centralized across module kinds.
 
 Hosts/users now also declare private OS/HM availability. Their roots are NixOS coordination modules: static OS imports cannot depend on config, while HM delivery can be conditional. A false private HM availability marker does not disable HM as a whole. Remote is removed as an extra feature layer because native rclone options suffice; personal remotes move into the user profile, with secret-backed entries conditional on secret support. The owner intentionally removed the explicit sops-service requirement rather than preserving it by habit.
+
+## Public construction helpers without hidden ownership
+
+The root `lib/` is exposed as a flake library, instantiated with the receiving module system's nixpkgs lib. Base passes `llib` through OS `_module.args` and HM `extraSpecialArgs`; ordinary imported option/interface functions still need explicit arguments. Secret generators and monitor option types move into public namespaces. Hosts retain per-monitor definition uniqueness and Niri retains whole-value uniqueness.
+
+Repeated anonymous base wrappers caused duplicate library-argument definitions during the historical migration. The inspected flake gives base a stable `_file` and `key` while preserving its function arguments. This is a supported later resolution of that specific library-era identity failure, not proof that every early-June base complaint had the same exact fix. The source also records an earlier shadowing failure reverted by the owner.
+
+Availability contracts and profile responsibilities remain separate from library mechanics. Keep schemas/assertions with the responsible module collection; OS imports are static, HM imports may be recipient-dependent. The source reports a successful historical check for this phase; no new evaluation is run now.
 
 ## Evidence and maintenance boundaries
 

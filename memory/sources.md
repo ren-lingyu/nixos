@@ -12,7 +12,7 @@ The table distinguishes reconstruction from Formal knowledge adoption and retain
 | registry-nix-app | `8d20905b-0cf1-435c-8a43-e370486c0113/memory/knowledge.md` | flake-parts | 1 of 1 reconstructed states |
 | wsl-removal-commit-semantics | `2dedeee1-c72f-4231-a7a0-47e47b413a81/memory/knowledge.md` | wsl-removal | 3 of 3 reconstructed states |
 | cfg-aliases | `e2d4174c-a510-4981-8b72-a1e976724861/memory/knowledge.md` | directory-discovery | 2 of 2 reconstructed states |
-| module-composition | `4c0129bd-a164-4bfa-903c-03aea4ee3df6/memory/knowledge.md` | availability-contract, hm-interfaces, user-profiles | 3 of 6 reconstructed states |
+| module-composition | `4c0129bd-a164-4bfa-903c-03aea4ee3df6/memory/knowledge.md` | availability-contract, hm-interfaces, user-profiles, public-library | 4 of 6 reconstructed states |
 | file-manager-terminal-portal | `e040d9ac-e63f-434f-95b0-230010b21dd3/memory/knowledge.md` | Not yet adopted | 0 of 3 reconstructed states |
 | framebuffer-kmscon | `137ed987-bbc6-4b09-8ea4-c69a62232a47/memory/knowledge.md` | Not yet adopted | 0 of 1 reconstructed states |
 
