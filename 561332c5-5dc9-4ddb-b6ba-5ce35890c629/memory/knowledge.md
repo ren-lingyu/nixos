@@ -16,6 +16,8 @@ Global host cardinality changes from at most one to exactly one. At this phase t
 
 WireGuard secrets move to age-managed rekey files and runtime paths. This is reviewed staging, not proof that keys deployed or peers connected. The owner requires text-only Git content: default binary age output is an encoding issue rather than encryption failure. A dedicated rekey wrapper is preferable to overriding global rage behavior.
 
+The rage-armored package uses overrideAttrs, retains old installation behavior and renames the original executable. Nix reads the Scheme source body with builtins.readFile, adds a Guile shebang with no-auto-compile and substitutes an exact executable token using replace-fail. Interpolating the source path alone would insert a store path rather than Scheme code. Only encryption without an existing armor/decrypt flag gains --armor. It is scoped to agenix-rekey's agePackage. Final review is static; no final wrapper build/evaluation/runtime result is established.
+
 ## Continuation
 
 Compare these conclusions with the relevant project snapshot before Formal adoption. Preserve unresolved questions, distinguish proposals from adopted behavior and do not extend a historical successful check to later changes.
