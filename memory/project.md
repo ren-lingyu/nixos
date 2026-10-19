@@ -1,8 +1,8 @@
-# Project knowledge after cloud extraction
+# Project knowledge after the greetd login change
 
 ## Purpose and evidence horizon
 
-This is a retrospective, maintainable knowledge baseline for the committed main state at cloud extraction on 2026-05-20. The associated project parent identifies the inspected snapshot. This GAW checkpoint is created during the present reconstruction, not at the time of that project change, and does not describe today's deployed machines.
+This is a retrospective, maintainable knowledge baseline for the committed main state at the greetd introduction on 2026-05-31 (repository local date). The associated project parent identifies the inspected snapshot. This GAW checkpoint is created during the present reconstruction, not at the time of that project change, and does not describe today's deployed machines.
 
 The owner explains during this reconstruction that the NixOS-WSL environment came first, followed by native NixOS on ThinkBook. Sharing user-level configuration between them was an important goal. This is an owner-supplied recollection, distinguished from contemporaneous execution evidence.
 
@@ -29,7 +29,15 @@ The implementation entry points are the selected snapshot's `flake.nix`, `module
 
 The desktop composition includes Niri/Noctalia-related integrations, office and media functionality, fonts, and native host support. The WSL composition supplies the WSL platform with a shared personal environment rather than the desktop's complete OS module list. SOPS integrations are present on both OS and HM sides. These are inspected wiring facts, not a statement that each application, graphical session, secret operation, or host deployment was exercised.
 
-Cloud functionality has moved unchanged from `modules/users/lingyu/cloud.nix` to `modules/cloud/hm/default.nix`. Both system compositions explicitly import the new path, and the personal module no longer does. This separates reusable capability ownership from one user without yet introducing a general Feature protocol. File extraction is not automatic registration: adding or changing recipients still requires explicit flake composition. This is a source-level responsibility change, not a demonstrated new cloud runtime capability. The later greetd session and UID routing are not present yet.
+Cloud functionality has moved unchanged from `modules/users/lingyu/cloud.nix` to `modules/cloud/hm/default.nix`. Both system compositions explicitly import the new path, and the personal module no longer does. This separates reusable capability ownership from one user without yet introducing a general Feature protocol. File extraction is not automatic registration: adding or changing recipients still requires explicit flake composition. This is a source-level responsibility change, not a demonstrated new cloud runtime capability. General UID routing is not present yet.
+
+## Login and system/user boundaries
+
+`modules/niri/os/greeter.nix` now disables GDM and enables greetd on VT 1. A dedicated system `greeter` user runs a temporary Sway session containing gtkgreet. Its environment removes inherited display/socket variables, avoids portal use for GTK, selects logind and DRM/libinput, and focuses the configured laptop output. After authentication, a packaged `Niri` command executes the configured Niri package's `niri-session`. The temporary Sway greeter is not the user's persistent compositor.
+
+The Niri package definition moved from HM to the OS module immediately before this change. Maintain the OS-provided session command and HM desktop settings together, but distinguish their responsibilities. Inspect `modules/niri/os/default.nix`, `modules/niri/os/greeter.nix` and `modules/niri/hm/default.nix`; this state still has fixed greeter output assumptions rather than the later host-monitor metadata contract. Windows font sharing was also introduced through the ThinkBook mount module and system font configuration; it is host-specific, not a requirement imposed on WSL. Nixvim no longer follows the root nixpkgs pin after a recorded compatibility correction.
+
+The owner reference says the GDM-to-greetd choice was intentional. That does not establish the cause or resolution of later reported Niri service/portal disappearance. The static diff establishes the login design, not successful login, service activation or portal operation.
 
 ## Verification and next maintenance questions
 
