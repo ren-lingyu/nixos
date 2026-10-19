@@ -8,7 +8,9 @@ Niri remains the main desktop. X11 is a general compatibility fallback, accessib
 
 Clear inherited DISPLAY, WAYLAND_DISPLAY, SWAYSOCK and NIRI_SOCKET. Do not hardcode input-method startup or couple this independent session to the shared user graphical target. Cross-VT clipboard sharing and automatic host-monitor layout are outside this first phase; provide tools without inventing a new monitor interface.
 
-This is the adopted design boundary; implementation and runtime outcomes are not yet established in this state.
+The implementation declares an HM side, keeps the `X11-Session` entry and starts `icewm-session` through `dbus-run-session`. It removes XFCE, enables IceWM/startx on the OS side and adds minimal rofi launcher configuration plus xdg-utils/xrandr without automatic layout policy.
+
+The user reported a successful rebuild test, TTY2 login and broadly usable meeting software. A browser could still open in an existing Niri instance; the source ended without a confirmed diagnosis or fix. Neither a reboot nor a different rebuild action is established as its solution. These runtime statements are historical reports, not fresh verification.
 
 ## Continuation
 
