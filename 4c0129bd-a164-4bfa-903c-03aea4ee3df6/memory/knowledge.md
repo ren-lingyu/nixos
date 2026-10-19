@@ -24,6 +24,10 @@ The root public library is instantiated using the receiving module system's nixp
 
 Greeter session packages retain interface-presence probing, non-null values and package metadata validation; enabled greeter requires a nonempty provider list. The source reports a successful check at this library stage, without proving earlier failures or later edits successful.
 
+ExistModule types/assertion generators centralize paired declarations, enable witnesses and file consistency while callers retain real paths and contextual diagnostics. Ordinary imported functions do not inherit module arguments automatically: extra-options and interface functions must explicitly receive `llib`.
+
+`groupImportsByUid` accepts separate UID and import selectors, each taking item name and value. It only traverses attributes, stringifies UIDs and accumulates imports in order. Callers own feature filtering, enable/availability semantics and file layout. The nested folds remain; no opaque result-record callback or unrelated mkMerge abstraction is introduced. Static review at this step is not yet a new check result.
+
 ## Continuation
 
 Compare these conclusions with the relevant project snapshot before Formal adoption. Preserve unresolved questions, distinguish proposals from adopted behavior and do not extend a historical successful check to later changes.
