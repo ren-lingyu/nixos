@@ -22,20 +22,6 @@ let
       ];
     }).config.value;
 
-  evalExistModule =
-    modules_:
-    (lib.evalModules {
-      modules = [
-        {
-          options.value = lib.mkOption {
-            type = llib.types.existModule { optionPath = "value"; };
-            default = { };
-          };
-        }
-      ]
-      ++ modules_;
-    }).config.value;
-
   monitor_ =
     (evalMonitors {
       "eDP-1" = {
@@ -65,32 +51,6 @@ let
             height = 1080;
           };
         }).broken.mode.width
-      )
-    ))
-    (assertEqual "existModule defaults" {
-      os = null;
-      hm = null;
-    } (evalExistModule [ ]))
-    (assertEqual "existModule values"
-      {
-        os = true;
-        hm = false;
-      }
-      (evalExistModule [
-        {
-          config.value = {
-            os = true;
-            hm = false;
-          };
-        }
-      ])
-    )
-    (assertTrue "existModule rejects duplicate os definitions" (
-      evaluationFails (
-        (evalExistModule [
-          { config.value.os = true; }
-          { config.value.os = false; }
-        ]).os
       )
     ))
   ];

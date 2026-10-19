@@ -43,19 +43,6 @@ in
         (builtins.concatLists (
           lib.mapAttrsToList (
             hostName_: host_:
-            llib.modules.assertions.existModule {
-              enable = host_.enable;
-              value = host_.existModule;
-              optionPath = "modules.hosts.${hostName_}.existModule";
-              osModulePath = ./. + "/${hostName_}/os/default.nix";
-              hmModulePath = ./. + "/${hostName_}/hm/default.nix";
-              enabledMessage = "`modules.hosts.${hostName_}.enable = true` requires the host profile to declare `existModule.os` and `existModule.hm`.";
-            }
-          ) cfg
-        ))
-        (builtins.concatLists (
-          lib.mapAttrsToList (
-            hostName_: host_:
             (builtins.concatLists [
               (
                 let

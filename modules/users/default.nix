@@ -1,10 +1,4 @@
-{
-  config,
-  lib,
-  llib,
-  ...
-}:
-{
+{ config, lib, ... }: {
 
   config = {
 
@@ -34,48 +28,35 @@
         ]
 
         (builtins.concatLists (
-          lib.mapAttrsToList (
-            userName_: user_:
-            builtins.concatLists [
-              [
-                {
-                  assertion = (
-                    builtins.any (x_: x_) [
-                      (!user_.enable)
-                      (user_.uid != null)
-                    ]
-                  );
-                  message = "`modules.users.${userName_}.enable = true` requires `modules.users.${userName_}.uid` to be assigned by the final flake composition.";
-                }
-                {
-                  assertion = (
-                    builtins.any (x_: x_) [
-                      (user_.uid == null)
-                      (user_.uid >= 1000)
-                    ]
-                  );
-                  message = "`modules.users.${userName_}.uid` must be greater than or equal to 1000 when assigned.";
-                }
-                {
-                  assertion = (
-                    builtins.any (x_: x_) [
-                      (!user_.enable)
-                      (lib.hasPrefix "/" user_.homeDirectory)
-                    ]
-                  );
-                  message = "`modules.users.${userName_}.homeDirectory` must be an absolute path when this user is enabled.";
-                }
-              ]
-              (llib.modules.assertions.existModule {
-                enable = user_.enable;
-                value = user_.existModule;
-                optionPath = "modules.users.${userName_}.existModule";
-                osModulePath = ./. + "/${userName_}/os/default.nix";
-                hmModulePath = ./. + "/${userName_}/hm/default.nix";
-                enabledMessage = "`modules.users.${userName_}.enable = true` requires the user profile to declare `existModule.os` and `existModule.hm`.";
-              })
-            ]
-          ) config.modules.users
+          lib.mapAttrsToList (userName_: user_: [
+            {
+              assertion = (
+                builtins.any (x_: x_) [
+                  (!user_.enable)
+                  (user_.uid != null)
+                ]
+              );
+              message = "`modules.users.${userName_}.enable = true` requires `modules.users.${userName_}.uid` to be assigned by the final flake composition.";
+            }
+            {
+              assertion = (
+                builtins.any (x_: x_) [
+                  (user_.uid == null)
+                  (user_.uid >= 1000)
+                ]
+              );
+              message = "`modules.users.${userName_}.uid` must be greater than or equal to 1000 when assigned.";
+            }
+            {
+              assertion = (
+                builtins.any (x_: x_) [
+                  (!user_.enable)
+                  (lib.hasPrefix "/" user_.homeDirectory)
+                ]
+              );
+              message = "`modules.users.${userName_}.homeDirectory` must be an absolute path when this user is enabled.";
+            }
+          ]) config.modules.users
         ))
 
         (builtins.concatLists (

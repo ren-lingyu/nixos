@@ -63,6 +63,7 @@ let
         wsl = import ../../modules/hosts/wsl/_metadata.nix;
       };
 
+  # Simulated NixOS inputs; production availability is derived by the Registry.
   userFixture_ = {
     lingyu = {
       enable = false;

@@ -1,10 +1,5 @@
 rec {
 
-  existModule = {
-    os = true;
-    hm = false;
-  };
-
   number = 3;
 
   bootManager = {

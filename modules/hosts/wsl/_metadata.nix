@@ -1,10 +1,5 @@
 {
 
-  existModule = {
-    os = true;
-    hm = false;
-  };
-
   number = 1;
 
   bootManager = {

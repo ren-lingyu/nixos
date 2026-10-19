@@ -29,13 +29,11 @@ share 没有 profile 名这一层, 对应 =nixosConfigurations.<system>.modules.
 
 ** =enable= 与 =existModule=
 
-=nixosConfigurations.<system>.modules.<kind>.<name>.enable= 表示在当前最终配置中启用该 profile, 默认关闭. =existModule.{os,hm}= 是 =_metadata.nix= 声明的内部事实信息:
+=nixosConfigurations.<system>.modules.<kind>.<name>.enable= 表示在当前最终配置中启用该 profile, 默认关闭. =existModule.{os,hm}= 由模块发现 descriptor 自动派生, 是内部只读布尔值: =true= 表示对应实现存在, =false= 表示不存在, 不再使用 =null= 或手动 metadata 声明.
 
-- =true= 表示对应实现存在.
-- =false= 表示对应实现不存在.
-- =null= 表示尚未声明对应实现的性质.
+模块发现要求至少存在 =os/default.nix= 或 =hm/default.nix= 之一; 两侧都不存在的目录不会作为模块进入 Registry. =moduleRegistry.<kind>.<name>.metadata.existModule= 与 NixOS 的 =config.modules.<kind>.<name>.existModule= 保持原有访问路径.
 
-=existModule= 不控制 profile 是否启用, 也不表示 Home Manager 本身是否存在. 统一断言会将它与 =os/default.nix= 和 =hm/default.nix= 的实际情况比较. 构建函数根据目录发现结果加载已启用模块的实现; metadata 也参与 feature 的默认 HM 用户选择.
+=existModule= 与 profile 的 =enable= 无关, 也不表示 Home Manager 本身是否存在. 构建函数根据目录发现结果加载已启用模块的实现; 派生 metadata 也参与 feature 的默认 HM 用户选择.
 
 NixOS 的 =config.modules= 是外层 configuration 经适配后与 metadata 合并的只读视图; Home Manager 通过 =osConfig.modules= 读取它. 禁用父模块时, 其实现和外部集成不加载, 子选项不会单独启用实现.
 
@@ -116,10 +114,8 @@ nixosConfigurations.nixos.modules.features.editor.emacs.programs.package =
 ├── flakeParts.configurations.nix
 ├── flakeParts.types.nix
 ├── hosts.nix
-├── modules.assertions.exist-module.nix
 ├── modules.nix
 ├── packages.nix
-├── types.exist-module.nix
 └── types.monitor.nix
 #+end_example
 
@@ -190,12 +186,11 @@ nixosConfigurations.nixos.modules.features.editor.emacs.programs.package =
 └── workloads/
 #+end_example
 
-=modules/_options.fp.nix= 定义所有模块共享的 configuration 与 metadata schema. 模块发现和系统组装由 =llib.modules= 与 =llib.flakeParts= 完成; 各类别的 =default.nix= 保留公共配置与断言, =share/= 提供公共 OS/HM 配置.
+=modules/_options.fp.nix= 定义所有模块共享的 configuration schema, 并保留 metadata 声明分支. 模块发现和系统组装由 =llib.modules= 与 =llib.flakeParts= 完成; 各类别的 =default.nix= 保留公共配置与断言, =share/= 提供公共 OS/HM 配置.
 
 **** [[file:./modules/share/][/modules/share]]
 #+begin_example
 /modules/share/
-├── _metadata.nix
 ├── _options.fp.nix
 ├── hm/
 │   └── default.nix
@@ -227,14 +222,13 @@ nixosConfigurations.nixos.modules.features.editor.emacs.programs.package =
 └── x11-session/
 #+end_example
 
-[[file:./modules/features/default.nix][modules/features/default.nix]] 校验 feature 的 OS/HM 结构和 HM 用户选择. =_options.fp.nix= 定义公共 =allowUidList= schema; 发现, option tree 生成与 HM 送达由构建库统一处理.
+[[file:./modules/features/default.nix][modules/features/default.nix]] 校验 feature 的 HM 用户选择. =_options.fp.nix= 定义公共 =allowUidList= schema; 发现, option tree 生成与 HM 送达由构建库统一处理.
 
-每个 feature 通过 =_metadata.nix= 声明实现性质, 通过可选的 =_options.fp.nix= 定义配置 schema, 按需提供 =os/= 和 =hm/= 实现. 可选根 =default.nix= 保存跨实现的内部状态, 会话包贡献或断言.
+每个 feature 的实现可用性由目录发现结果派生, 通过可选的 =_options.fp.nix= 定义配置 schema, 按需提供 =os/= 和 =hm/= 实现. 可选根 =default.nix= 保存跨实现的内部状态, 会话包贡献或断言.
 
 ***** [[file:./modules/features/agent/][/modules/features/agent]]
 #+begin_example
 /modules/features/agent/
-├── _metadata.nix
 ├── hm/
 │   ├── context/
 │   │   ├── default.nix
@@ -253,7 +247,6 @@ nixosConfigurations.nixos.modules.features.editor.emacs.programs.package =
 ***** [[file:./modules/features/diagnostics/][/modules/features/diagnostics]]
 #+begin_example
 /modules/features/diagnostics/
-├── _metadata.nix
 └── hm/
     └── default.nix
 #+end_example
@@ -263,7 +256,6 @@ nixosConfigurations.nixos.modules.features.editor.emacs.programs.package =
 ***** [[file:./modules/features/editor/][/modules/features/editor]]
 #+begin_example
 /modules/features/editor/
-├── _metadata.nix
 ├── _options.fp.nix
 └── hm/
     └── default.nix
@@ -274,7 +266,6 @@ nixosConfigurations.nixos.modules.features.editor.emacs.programs.package =
 ***** [[file:./modules/features/file-manager/][/modules/features/file-manager]]
 #+begin_example
 /modules/features/file-manager/
-├── _metadata.nix
 ├── _options.fp.nix
 ├── hm/
 │   └── default.nix
@@ -287,7 +278,6 @@ nixosConfigurations.nixos.modules.features.editor.emacs.programs.package =
 ***** [[file:./modules/features/font/][/modules/features/font]]
 #+begin_example
 /modules/features/font/
-├── _metadata.nix
 ├── hm/
 │   └── default.nix
 └── os/
@@ -299,7 +289,6 @@ nixosConfigurations.nixos.modules.features.editor.emacs.programs.package =
 ***** [[file:./modules/features/greeter/][/modules/features/greeter]]
 #+begin_example
 /modules/features/greeter/
-├── _metadata.nix
 ├── default.nix
 └── os/
     ├── default.nix
@@ -311,7 +300,6 @@ nixosConfigurations.nixos.modules.features.editor.emacs.programs.package =
 ***** [[file:./modules/features/media/][/modules/features/media]]
 #+begin_example
 /modules/features/media/
-├── _metadata.nix
 └── os/
     └── default.nix
 #+end_example
@@ -321,7 +309,6 @@ nixosConfigurations.nixos.modules.features.editor.emacs.programs.package =
 ***** [[file:./modules/features/niri/][/modules/features/niri]]
 #+begin_example
 /modules/features/niri/
-├── _metadata.nix
 ├── _options.fp.nix
 ├── default.nix
 ├── hm/
@@ -353,7 +340,6 @@ nixosConfigurations.nixos.modules.features.editor.emacs.programs.package =
 ***** [[file:./modules/features/office/][/modules/features/office]]
 #+begin_example
 /modules/features/office/
-├── _metadata.nix
 └── hm/
     └── default.nix
 #+end_example
@@ -363,7 +349,6 @@ nixosConfigurations.nixos.modules.features.editor.emacs.programs.package =
 ***** [[file:./modules/features/proxy/][/modules/features/proxy]]
 #+begin_example
 /modules/features/proxy/
-├── _metadata.nix
 ├── _options.fp.nix
 ├── default.nix
 └── os/
@@ -375,7 +360,6 @@ nixosConfigurations.nixos.modules.features.editor.emacs.programs.package =
 ***** [[file:./modules/features/shell/][/modules/features/shell]]
 #+begin_example
 /modules/features/shell/
-├── _metadata.nix
 ├── default.nix
 ├── hm/
 │   └── default.nix
@@ -389,7 +373,6 @@ nixosConfigurations.nixos.modules.features.editor.emacs.programs.package =
 ***** [[file:./modules/features/sops/][/modules/features/sops]]
 #+begin_example
 /modules/features/sops/
-├── _metadata.nix
 ├── default.nix
 ├── hm/
 │   ├── default.nix
@@ -405,7 +388,6 @@ nixosConfigurations.nixos.modules.features.editor.emacs.programs.package =
 ***** [[file:./modules/features/terminal/][/modules/features/terminal]]
 #+begin_example
 /modules/features/terminal/
-├── _metadata.nix
 └── hm/
     └── default.nix
 #+end_example
@@ -415,7 +397,6 @@ nixosConfigurations.nixos.modules.features.editor.emacs.programs.package =
 ***** [[file:./modules/features/texlive/][/modules/features/texlive]]
 #+begin_example
 /modules/features/texlive/
-├── _metadata.nix
 └── os/
     └── default.nix
 #+end_example
@@ -425,7 +406,6 @@ nixosConfigurations.nixos.modules.features.editor.emacs.programs.package =
 ***** [[file:./modules/features/x11-session/][/modules/features/x11-session]]
 #+begin_example
 /modules/features/x11-session/
-├── _metadata.nix
 ├── default.nix
 ├── hm/
 │   └── default.nix
@@ -439,19 +419,16 @@ nixosConfigurations.nixos.modules.features.editor.emacs.programs.package =
 #+begin_example
 /modules/workloads/
 ├── caddy/
-│   ├── _metadata.nix
 │   ├── _options.fp.nix
 │   └── os/
 │       └── default.nix
-├── default.nix
 └── wbo/
-    ├── _metadata.nix
     ├── _options.fp.nix
     └── os/
         └── default.nix
 #+end_example
 
-[[file:./modules/workloads/default.nix][modules/workloads/default.nix]] 通过 =existModule= 断言核对 OS/HM 实现结构. 各 workload 的 =_options.fp.nix= 定义 configuration schema, 依赖 NixOS 网络配置的值通过函数延迟解析.
+Workload 的 OS/HM 可用性由模块发现结果派生, 无需类别级一致性断言. 各 workload 的 =_options.fp.nix= 定义 configuration schema, 依赖 NixOS 网络配置的值通过函数延迟解析.
 
 =caddy= workload 配置 Caddy container, 通过指定 network interface, upstream IP 和 port 反向代理服务, 并用 nftables 限制出站路径. =wbo= workload 配置 whitebophir container, 通过指定 listen IP, port, network interface 和 allowed source IP 暴露白板服务.
 
@@ -560,7 +537,6 @@ NixOS-WSL host, hostname =nixos-wsl=.
 ***** [[file:./modules/users/lingyu/][/modules/users/lingyu]]
 #+begin_example
 /modules/users/lingyu/
-├── _metadata.nix
 └── hm/
     ├── default.nix
     ├── home/
@@ -591,7 +567,6 @@ NixOS-WSL host, hostname =nixos-wsl=.
 ***** [[file:./modules/users/lingyu-minimal/][/modules/users/lingyu-minimal]]
 #+begin_example
 /modules/users/lingyu-minimal/
-├── _metadata.nix
 └── hm/
     └── default.nix
 #+end_example
@@ -599,7 +574,7 @@ NixOS-WSL host, hostname =nixos-wsl=.
 最小用户 profile, 提供空的 =hm/default.nix= 实现, 可以接收最终配置启用的公共 HM features.
 
 * 测试
-=tests/= 通过 =perSystem.checks= 接入 flake, 覆盖自定义类型, =existModule= 断言, host 与 SOPS 相关函数, 配置适配器, 以及 user/host/feature 的负向组合约束. treefmt 格式检查也通过 flake checks 接入.
+=tests/= 通过 =perSystem.checks= 接入 flake, 覆盖自定义类型, Registry 的 =existModule= 派生与只读约束, host 与 SOPS 相关函数, 配置适配器, 以及 user/host/feature 的负向组合约束. treefmt 格式检查也通过 flake checks 接入.
 
 #+begin_src sh
 nix flake check

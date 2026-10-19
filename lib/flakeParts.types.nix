@@ -64,6 +64,26 @@
                   type = lib.types.submoduleWith {
                     modules = builtins.concatLists [
                       [
+                        {
+                          options.existModule = lib.mkOption {
+                            type = lib.types.submodule {
+                              options = lib.genAttrs [ "os" "hm" ] (
+                                unused_side:
+                                lib.mkOption {
+                                  type = lib.types.bool;
+                                  readOnly = true;
+                                }
+                              );
+                            };
+                            readOnly = true;
+                            internal = true;
+                            description = "Availability derived from module discovery.";
+                          };
+                          config.existModule = {
+                            os = descriptor.os != null;
+                            hm = descriptor.hm != null;
+                          };
+                        }
                         ({ config, options, ... }: {
                           imports = mkOptionModules.metadata {
                             inherit root;

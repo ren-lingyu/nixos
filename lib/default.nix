@@ -2,17 +2,13 @@
 
   types = rec {
 
-    existModule = import ./types.exist-module.nix { inherit lib; };
-
     monitor = import ./types.monitor.nix { inherit lib; };
 
     monitors = lib.types.attrsOf monitor;
 
   };
 
-  modules = (import ./modules.nix { inherit lib; }) // {
-    assertions.existModule = import ./modules.assertions.exist-module.nix;
-  };
+  modules = import ./modules.nix { inherit lib; };
 
   hosts = import ./hosts.nix { inherit lib; };
 
