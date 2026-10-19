@@ -12,7 +12,7 @@ A non-unique host helper returning an empty set failed with a missing wireguard 
 
 After a fixture/message correction the owner reported a successful check. Later staged tests and unstaged assertions diverged, so that worktree result did not prove the index snapshot. Getter/unit-test and assertion/composition changes were separately reviewed, without assuming draft messages were executed commits.
 
-Caddy/WBO orchestration must not retain references to the removed interconnect feature. The owner required complete registry and OS-module wiring with explicit IP, port, interface and allowed-source inputs rather than hardcoded wg0 or automatic enablement from a host. The HTTP port defaults to 18000; other network decisions remain explicit. Firewall scope includes the intended destination/source and TCP port. Derive the caddy UID from the system registry.
+Caddy/WBO orchestration must not retain references to the removed interconnect feature. The owner required complete registry and OS-module wiring with explicit IP, port, interface and allowed-source inputs rather than hardcoded wg0 or automatic enablement from a host. The historical summary called 18000 a default; direct inspection of committed workloads shows a nullable port with default null and 18000 only as an example. Supply the actual port explicitly. Firewall scope includes the intended destination/source and TCP port. Derive the caddy UID from the system registry.
 
 The source's earlier term was containers; the eventual main implementation is workloads and must be checked separately. Examples and partially staged reviews are not deployment proof.
 
@@ -23,3 +23,7 @@ Package shell generation preserves ordered arguments and runtime quoting; this s
 ## Continuation
 
 Compare these conclusions with the relevant project snapshot before Formal adoption. Preserve unresolved questions, distinguish proposals from adopted behavior and do not extend a historical successful check to later changes.
+
+## Reconstruction-time committed-schema correction
+
+The WBO extra-options schema at the inspected workload-wiring and topology stages has default null for port. An earlier Formal summary copied the old 18000-default claim and is corrected in the following topology state. The older containers draft cannot establish the committed workload schema. This is static source evidence, without running Nix or deploying the service.
