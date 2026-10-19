@@ -1,4 +1,4 @@
-# Explicit module availability contracts
+# Per-user interfaces and managed UID registries
 
 ## Composition and ownership
 
@@ -53,6 +53,14 @@ Feature availability markers now use unique nullable booleans, default null. Nul
 The flake remains the external adapter and final composition owner. Base is shared infrastructure; hosts/users/features retain peer responsibilities. Moving all reusable policy into host wrappers was considered and withdrawn. The editor wrapper now includes its base dependency and remote declares no OS implementation. Personal settings need not be extracted merely to make directories look more uniform. At this horizon recipient defaults still use UID 1000 for HM-capable features; later enabled-user-derived defaults are not back-projected.
 
 The composition source preserves reported checks at specific old working stages. The inspected source contract establishes the committed declarations, without proving a new evaluation or resolving every original regression.
+
+## Per-user data, shared schemas and secret bootstrap
+
+Features can declare HM interface schemas under `hm/interface-options.nix`. Each user's HM scope registers `moduleInterfaces.features.<feature>`, while implementations are sent only to selected recipients. A user supplies data; the feature owns schema and implementation. Schema availability does not enable behavior for every user.
+
+SOPS inputs move behind that interface. The system-to-HM age key file remains a bootstrap bridge, supplied with root ownership and a `sops-decrypt` group at mode 0440; selected users become group members. Encrypted inventory belongs with the user's input data. The secret feature remains disableable independently from base operation. A historical permission failure concerned stale process group credentials despite correct NSS membership; the owner reported recovery after boot. This is not a newly exercised runtime result.
+
+Hosts now register canonical decimal UIDs independently of login names and profile contents. User-side consistency checks at this intermediate state require the enabled host's UID registry and enabled users to match in both directions. Later subset membership is a separate correction. Feature recipient lists reject duplicate UIDs and invalid user references. Root inputs and wrapper adaptation remain explicit.
 
 ## Evidence and maintenance boundaries
 
