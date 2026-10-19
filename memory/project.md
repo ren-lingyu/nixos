@@ -1,4 +1,4 @@
-# Shared library and stable module identity
+# Tested composition contracts and reusable aggregation
 
 ## Composition and ownership
 
@@ -77,6 +77,14 @@ The root `lib/` is exposed as a flake library, instantiated with the receiving m
 Repeated anonymous base wrappers caused duplicate library-argument definitions during the historical migration. The inspected flake gives base a stable `_file` and `key` while preserving its function arguments. This is a supported later resolution of that specific library-era identity failure, not proof that every early-June base complaint had the same exact fix. The source also records an earlier shadowing failure reverted by the owner.
 
 Availability contracts and profile responsibilities remain separate from library mechanics. Keep schemas/assertions with the responsible module collection; OS imports are static, HM imports may be recipient-dependent. The source reports a successful historical check for this phase; no new evaluation is run now.
+
+## Generic helpers, real assertions and documentation
+
+Availability types/assertions are centralized without hiding real file paths and diagnostic context. `groupImportsByUid` takes two explicit name/value selectors for recipient UIDs and imports. It groups values with prepend semantics: later traversed item names precede earlier ones for a shared UID. The committed fixture expects beta-hm before alpha-hm. This ordering was clarified by static reinspection during reconstruction; callers still own filtering and paths. Module arguments do not automatically flow through ordinary function application, so option/interface import functions receive `llib` explicitly.
+
+Per-system checks register type, availability, UID grouping and SOPS generator categories plus real module-composition negative cases. They exercise missing UID bindings, unregistered enabled users and invalid recipient references using actual assertions rather than copying the rules. The shared monitor type enforces nonempty names, with a negative test; package options and diagnostics are clarified. README preserves its directory overview and adds the ownership/assembly contracts rather than replacing all structure with a new document.
+
+Historical sources report successful category/composition checks for specific intermediate trees. Subsequent type, shell and documentation changes had static review only, so this stage does not acquire a blanket fresh pass. Browser cross-session reuse, the older Niri service/portal lead and comprehensive original working-tree provenance remain limited evidence.
 
 ## Evidence and maintenance boundaries
 
