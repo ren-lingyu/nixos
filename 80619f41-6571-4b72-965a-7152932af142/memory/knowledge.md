@@ -14,6 +14,10 @@ Declaration registration becomes a private construction responsibility in lib/fl
 
 User HM delivery binds the selected UID; Feature HM delivery follows allowUidList; other HM implementations and registry integrations use sharedModules. Declared interfaces do not imply enabled behavior. The existing internal/interface namespaces retain their value/type/merge semantics. This private-generation stage has targeted source/diff evidence, not a new Nix pass.
 
+The final project discovery convention is _options.fp.nix for prefixed outer configuration/metadata schema, os/_options.os.nix for native OS declaration modules, and hm/_options.hm.nix for feature-name/HM-context interface fragments. The suffix selects interpretation environment, not a fixed namespace or common function signature. _metadata.nix remains static data. There is no compatibility fallback for old filenames.
+
+The source records 18 byte-identical declaration-file renames with matching loader/README changes and static old-path checks. Existing tests had no old declaration-path references. These are repository loader conventions, not native automatic loading rules of the three module systems. The final renamed candidate was staged and reviewed, without a demonstrated final Nix check or a share-disabled declaration test. Earlier successful checks must not be extended to this state.
+
 ## Continuation
 
 Compare these conclusions with the relevant project snapshot before Formal adoption. Preserve unresolved questions, distinguish proposals from adopted behavior and do not extend a historical successful check to later changes.
