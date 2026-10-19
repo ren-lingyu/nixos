@@ -12,7 +12,7 @@ Claims express stable host membership, not runtime online exclusivity. Duplicate
 
 The schema names networks/nodes and checks unknown claims and counts. Historical min/max zero means no limit in that direction, so the pair cannot express exactly zero claimants. Count all metadata claimants rather than the active closure's boolean. A flexible schema does not establish complete multiple-claim generation support.
 
-An early mkNet callback exposed excessive internal context; narrowing it avoids presenting incidental state as a stable API.
+The final helper becomes a curried three-argument mkNode function: network name, node name and derivation callback. Current-closure membership and global unique claimant metadata have distinct roles. Assertions are generated directly with contextual network/node messages. Multiple-claim derived attributes remain deferred. The last changes were on top of staged work and had only diff-format review, not a successful Nix check.
 
 ## Continuation
 
