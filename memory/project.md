@@ -1,4 +1,4 @@
-# Per-user interfaces and managed UID registries
+# Profile identity separated from host UID allocation
 
 ## Composition and ownership
 
@@ -8,7 +8,7 @@ The public hierarchical module registry is now the custom `self.modules`, contai
 
 The convenience nixos-anywhere app uses the per-system `inputs'` projection and explicit executable lookup and now has a description. Editor has a separate public wrapper and configurable Emacs package selection, with the external distribution exposed through an overlay. Nixvim's independent dependency pin is preserved rather than forcing all dependencies to share a version.
 
-Three configurations still compose desktop ThinkBook, WSL and Aliyun, common base policy, reusable features and UID-keyed users. Shared shell/editor/remote and XDG responsibilities remain separated from private profiles. The minimal server user has no private profile import but retains common HM participation. Provider imports still live partly in public wrappers: this is not the much later flake-parts configuration-builder architecture.
+Three configurations still compose desktop ThinkBook, WSL and Aliyun, common base policy, reusable features and directory-named user profiles. Shared shell/editor and XDG responsibilities remain separated from private profiles. Remote data now uses native rclone configuration in the user; the minimal profile retains common HM participation. Provider imports still live partly in public wrappers: this is not the much later flake-parts configuration-builder architecture.
 
 `modules/hosts` now generates its namespace from host directories with entry points. Each profile has its own `enable`, `monitors` and package-group settings. Importing the host entry declares that host enabled; ordinary hardware and OS effects are guarded by its own enable state while imports remain at module top level. The global assertion currently permits zero or one enabled host. It is not yet the later exactly-one invariant.
 
@@ -50,7 +50,7 @@ Local `cfg` aliases abbreviate own-configuration reads; schema definition paths,
 
 Feature availability markers now use unique nullable booleans, default null. Null means the root has not declared availability; explicit true/false must match the OS/HM entry-point files. Both sides are declared together, and an enabled feature needs a declared root. HM delivery checks explicit true. This avoids treating a feature not imported by WSL as a malformed declared implementation.
 
-The flake remains the external adapter and final composition owner. Base is shared infrastructure; hosts/users/features retain peer responsibilities. Moving all reusable policy into host wrappers was considered and withdrawn. The editor wrapper now includes its base dependency and remote declares no OS implementation. Personal settings need not be extracted merely to make directories look more uniform. At this horizon recipient defaults still use UID 1000 for HM-capable features; later enabled-user-derived defaults are not back-projected.
+The flake remains the external adapter and final composition owner. Base is shared infrastructure; hosts/users/features retain peer responsibilities. Moving all reusable policy into host wrappers was considered and withdrawn. The editor wrapper gained its base dependency; before removal, remote was corrected to declare no OS implementation. Personal settings need not be extracted merely to make directories look more uniform. That availability step still defaulted recipients to UID 1000; profile composition subsequently replaced the default with enabled assigned users.
 
 The composition source preserves reported checks at specific old working stages. The inspected source contract establishes the committed declarations, without proving a new evaluation or resolving every original regression.
 
@@ -60,7 +60,15 @@ Features can declare HM interface schemas under `hm/interface-options.nix`. Each
 
 SOPS inputs move behind that interface. The system-to-HM age key file remains a bootstrap bridge, supplied with root ownership and a `sops-decrypt` group at mode 0440; selected users become group members. Encrypted inventory belongs with the user's input data. The secret feature remains disableable independently from base operation. A historical permission failure concerned stale process group credentials despite correct NSS membership; the owner reported recovery after boot. This is not a newly exercised runtime result.
 
-Hosts now register canonical decimal UIDs independently of login names and profile contents. User-side consistency checks at this intermediate state require the enabled host's UID registry and enabled users to match in both directions. Later subset membership is a separate correction. Feature recipient lists reject duplicate UIDs and invalid user references. Root inputs and wrapper adaptation remain explicit.
+Hosts now register canonical decimal UIDs independently of login names and profile contents. The initial registry step used bidirectional equality, subsequently corrected to subset membership as explained below. Feature recipient lists reject duplicate UIDs and invalid user references. Root inputs and wrapper adaptation remain explicit.
+
+## Identity binding and corrected membership
+
+Users are discovered by profile directory name, not keyed by UID. The final flake binds a profile's UID from a host registry; username and home-directory defaults can be overridden. Enabled users need a bound UID and unique identity; disabled profiles may be prebound. The earlier home/manager/source switches are replaced by this profile model. A minimal user without private HM files still participates in generated HM users and common Features.
+
+The former bidirectional equality check is replaced by subset membership: enabled user UIDs must belong to the selected host's registry, which may reserve unused values. HM-capable Feature recipients default to the enabled assigned users instead of hardcoded 1000. Shared interface discovery is centralized across module kinds.
+
+Hosts/users now also declare private OS/HM availability. Their roots are NixOS coordination modules: static OS imports cannot depend on config, while HM delivery can be conditional. A false private HM availability marker does not disable HM as a whole. Remote is removed as an extra feature layer because native rclone options suffice; personal remotes move into the user profile, with secret-backed entries conditional on secret support. The owner intentionally removed the explicit sops-service requirement rather than preserving it by habit.
 
 ## Evidence and maintenance boundaries
 
