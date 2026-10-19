@@ -1,4 +1,4 @@
-# SSH host identity and independent OS secrets
+# Text-only encrypted retention and scoped rekey tooling
 
 ## Purpose and composition
 
@@ -18,7 +18,7 @@ Niri is the main native desktop; greetd uses temporary Sway/gtkgreet before laun
 
 ## Secrets and agent inputs
 
-The secret feature is renamed sops across namespaces and helper/test references. Per-user SOPS inventory remains optional and supplies the bootstrap key bridge with restricted group access. Agent-first provider interfaces expose enablement and an API-key file path, without assuming its secret manager. The personal user guards SOPS-derived inputs; Agent drops a global SOPS dependency. A nullable model-interface proposal was withdrawn; enabled providers determine default model fields and an explicit enabled-provider list. No final runtime/model request is tested. OS age/agenix-rekey infrastructure is now independent of optional HM/application SOPS, motivated by keeping base secret deployment usable when SOPS tooling builds/downloads block. Host runtime SSH identity and its public key feed rekey setup; master identities are separate inputs. The initial age-recipient hostPubkey wiring has been corrected to SSH public key. Public/ciphertext review does not establish private-key custody or runtime decryptability.
+The secret feature is renamed sops across namespaces and helper/test references. Per-user SOPS inventory remains optional and supplies the bootstrap key bridge with restricted group access. Agent-first provider interfaces expose enablement and an API-key file path, without assuming its secret manager. The personal user guards SOPS-derived inputs; Agent drops a global SOPS dependency. A nullable model-interface proposal was withdrawn; enabled providers determine default model fields and an explicit enabled-provider list. No final runtime/model request is tested. OS age/agenix-rekey infrastructure is now independent of optional HM/application SOPS, motivated by keeping base secret deployment usable when SOPS tooling builds/downloads block. Host runtime SSH identity and its public key feed rekey setup; master identities are separate inputs. The initial age-recipient hostPubkey wiring has been corrected to SSH public key. Public/ciphertext review does not establish private-key custody or runtime decryptability. The owner requires text-only encrypted files in Git. Dedicated rage-armored is scoped to rekey tooling and adds armor to ordinary encryption without changing decrypt/already-armored calls. It preserves the underlying package, embeds Scheme body with builtins.readFile, adds the Guile shebang and substitutes an exact executable token. Binary age output was an encoding concern, not evidence of encryption failure. The final wrapper has static evidence, without a new build or runtime proof.
 
 ## Library and verification
 
