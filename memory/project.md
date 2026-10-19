@@ -1,4 +1,4 @@
-# Responsibility-based library namespaces
+# Declaration registration independent of shared behavior
 
 ## Purpose and composition
 
@@ -51,6 +51,12 @@ The package framework discovers local packages, overlays and optional OS/HM modu
 Pi's wrapper preserves outputs/metadata/resource layout, scopes startup-offline behavior and uses native extraPackages for fd/ripgrep. Startup offline does not prohibit model API calls. A missing wrapper-space error was corrected before a reported user rebuild; later skill changes lack fresh validation. Shared Git instructions reduce duplicated agent/command workflows, while permission enforcement remains outside skills. A proposed restricted Git-action extension was not implemented in that historical source; later Pi resource extensions are distinct functionality.
 
 Clash's package-data override reportedly rebuilt, but the original missing geosite-list error was not proven resolved. Packaged versus runtime user-cache data remained ambiguous, and later MMDB download EOF was a separate failure. Keep the issue as an evidence gap, not a current reproduced incident or a guaranteed fixed defect. The local package collection becomes lazy, package HM entry naming is normalized, and agent context/skills are supplied through composable package resources. GAW and git-maintenance are project tool dependencies, not permission to bypass host policy. Treefmt configuration and its flake check are wired, without running them during reconstruction.
+
+## Declaration registration
+
+Private construction helpers in lib/flakeParts.configurations.nix discover OS internal options and HM interface fragments, return declaration modules and supply them to system construction. Registration is independent of share.enable; share owns common OS/HM behavior, while declarations remain available for selected consumers. A self-selecting share declaration file caused the earlier import overflow, so aggregation stays outside discovered declarations.
+
+Public builder.nixosModules/homeModules additions and inline-flake aggregators were considered and withdrawn. User UID delivery, Feature recipients and other shared HM integrations remain distinct. Parent positions are not business-role declarations, and registration does not activate a Feature. No later share-disabled behavior test or fresh Nix success is established by this source.
 
 ## Reconstruction and evidence
 
