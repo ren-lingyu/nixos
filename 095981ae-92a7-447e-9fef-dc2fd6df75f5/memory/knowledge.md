@@ -8,7 +8,9 @@ The host owns monitor data and its invariants. Niri and greeter require one defa
 
 Keep local types and assertion helpers near their consumers and retain complete option paths in diagnostics. A generated declaration is a source-level contract, not proof of a working display or login session.
 
-Historical evidence reports a staged top-level derivation-path evaluation and static review succeeding. Earlier mode checks apply only to their own stage. No evaluation was rerun during this reconstruction; original exact working-tree provenance is unavailable.
+Host profiles now form an `attrsOf submodule` namespace with `enable`, `monitors` and `packageGroups`. Importing a host root declares its own enablement. This stage permits zero or one enabled host globally; graphical consumers separately require exactly one host and default monitor. Do not back-project the later global exactly-one rule. Ordinary host OS/hardware effects are guarded by their own enable state; imports stay at module top level rather than under `config.mkIf`. Niri's internal unique monitor value is derived from the enabled host.
+
+The source reports a user rebuild test and an agent evaluation confirming ThinkBook selection, removal of the old flat monitor path and the expected Niri/greeter values. It also describes later working-tree edits, so that report cannot establish an exact committed project parent for the complete source state.
 
 ## Continuation
 
