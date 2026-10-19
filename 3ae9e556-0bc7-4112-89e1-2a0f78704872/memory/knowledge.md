@@ -8,6 +8,8 @@ The agent interface is agent-first: opencode/providers and pi/providers expose s
 
 The interface, consumers and personal user data must be reviewed as one complete staged change. A valid start-of-session revision does not identify the working tree after these edits. No check, build or completed project commit is established by the source.
 
+Agent consumes an API-key file path from any secret manager and drops its global SOPS dependency. The personal profile uses SOPS and guards its supplied inputs accordingly. A proposed nullable model/small-model interface was withdrawn. Default model fields are supplied only for the enabled provider; enabled_providers is always explicit, including an empty list. A partial stage that omitted the user guard was rejected; the final reviewed set was coherent but not runtime-verified.
+
 ## Continuation
 
 Compare these conclusions with the relevant project snapshot before Formal adoption. Preserve unresolved questions, distinguish proposals from adopted behavior and do not extend a historical successful check to later changes.
