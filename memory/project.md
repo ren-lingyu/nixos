@@ -1,8 +1,8 @@
-# Local package discovery and reusable agent tooling
+# Discovery descriptors and external integration registry
 
 ## Purpose and composition
 
-Maintain native ThinkBook and MateBook, WSL and Aliyun configurations while sharing selected user capabilities without erasing platform differences. The owner explains that a whole HM profile was too coarse a sharing unit. The root flake owns external inputs, provider adaptation and final selection; hosts own hardware/resources, users own identity/private settings and Features own reusable implementation. Modules check dependencies rather than enabling peers. The flake-parts root exposes top-level NixOS configurations and per-system tools, with a custom hierarchical self.modules registry.
+The root flake retains final selection and input adaptation, now with a modular flake-parts organization, package/tooling inputs and formatter/check integration. A general discovery layer identifies modules through os/default.nix or hm/default.nix, rejects nested modules and keeps root default.nix optional. The old custom self.modules wrappers are being replaced by an explicit moduleRegistry describing module metadata and external OS/HM/overlay integration. Discovery and schema generation are public library mechanics; they do not own deployment policy.
 
 ## Users and interfaces
 
@@ -48,7 +48,7 @@ The package framework discovers local packages, overlays and optional OS/HM modu
 
 Pi's wrapper preserves outputs/metadata/resource layout, scopes startup-offline behavior and uses native extraPackages for fd/ripgrep. Startup offline does not prohibit model API calls. A missing wrapper-space error was corrected before a reported user rebuild; later skill changes lack fresh validation. Shared Git instructions reduce duplicated agent/command workflows, while permission enforcement remains outside skills. A proposed restricted Git-action extension was not implemented in that historical source; later Pi resource extensions are distinct functionality.
 
-Clash's package-data override reportedly rebuilt, but the original missing geosite-list error was not proven resolved. Packaged versus runtime user-cache data remained ambiguous, and later MMDB download EOF was a separate failure. Keep the issue as an evidence gap, not a current reproduced incident or a guaranteed fixed defect.
+Clash's package-data override reportedly rebuilt, but the original missing geosite-list error was not proven resolved. Packaged versus runtime user-cache data remained ambiguous, and later MMDB download EOF was a separate failure. Keep the issue as an evidence gap, not a current reproduced incident or a guaranteed fixed defect. The local package collection becomes lazy, package HM entry naming is normalized, and agent context/skills are supplied through composable package resources. GAW and git-maintenance are project tool dependencies, not permission to bypass host policy. Treefmt configuration and its flake check are wired, without running them during reconstruction.
 
 ## Reconstruction and evidence
 
