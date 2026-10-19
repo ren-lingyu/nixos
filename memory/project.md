@@ -1,4 +1,4 @@
-# Flake-parts composition and a public module registry
+# WSL integration removal
 
 ## Composition and ownership
 
@@ -31,6 +31,12 @@ The first phase provides xrandr/xdg tools without automatic host-monitor layout 
 Inspect `modules/hosts/default.nix`, the selected host `default.nix`, and `modules/features/{niri,greeter}/default.nix`. Keep monitor data in hosts and graphical prerequisites in consumers. Do not weaken name/cardinality checks simply because a default display works on ThinkBook. Do not put imports under an enable-dependent `config` branch.
 
 The independent monitor source preserves the motivation, earlier schema and namespace transition. Its reported rebuild/evaluation successes apply to historical working trees with incomplete exact provenance, not to every tree associated here. The source is used for rationale while the directly inspected main snapshot determines the committed interface. The earlier Niri service/portal investigation is not retrospectively declared resolved by this extraction.
+
+## Platform scope correction
+
+WSL no longer includes vscode-server integration. The inspected main change removes its flake input and wrapper import; the associated lock/platform result no longer needs that integration. NixOS-WSL remains the platform dependency. This is an intentional capability removal, not just an extraction that preserves all behavior.
+
+The independent source preserves the owner's intent and historical read-only completion checks. It also corrected an earlier commit-title recommendation: classify the actual removal semantically rather than mechanically following earlier refactor titles. No history rewrite is performed by this reconstruction. The source's user-reported check and later clean-worktree inspection do not establish fresh verification of this project parent.
 
 ## Evidence and maintenance boundaries
 
