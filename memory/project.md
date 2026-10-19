@@ -1,4 +1,4 @@
-# Noctalia v5 and explicit lockscreen ownership
+# Local package discovery and reusable agent tooling
 
 ## Purpose and composition
 
@@ -41,6 +41,14 @@ A fourth peer category, workloads, discovers service roots and validates their O
 ## Virtualization and host resources
 
 ThinkBook integrates a declarative libvirt Windows guest through NixVirt, with domain/network/storage XML templates, GPU SR-IOV, guest tooling and Samba sharing. Display experiments return to SPICE after GTK trials; virtualized Windows is a host-owned workload/resource rather than another NixOS host profile. Mount policy distinguishes Windows and shared filesystems, with the Windows partition mounted read-only at this horizon. Static configuration does not establish a successful guest boot, GPU assignment, filesystem safety under every external OS or runtime display result.
+
+## Local packages and tools
+
+The package framework discovers local packages, overlays and optional OS/HM module entry points, replacing the external self-nixpkgs collection. Local and namespace overlays are both retained; derivation attrsets must not be mistaken for namespaces. Package exports include the lazy-friendly legacyPackages collection rather than requiring every leaf to be a flat package output.
+
+Pi's wrapper preserves outputs/metadata/resource layout, scopes startup-offline behavior and uses native extraPackages for fd/ripgrep. Startup offline does not prohibit model API calls. A missing wrapper-space error was corrected before a reported user rebuild; later skill changes lack fresh validation. Shared Git instructions reduce duplicated agent/command workflows, while permission enforcement remains outside skills. A proposed restricted Git-action extension was not implemented in that historical source; later Pi resource extensions are distinct functionality.
+
+Clash's package-data override reportedly rebuilt, but the original missing geosite-list error was not proven resolved. Packaged versus runtime user-cache data remained ambiguous, and later MMDB download EOF was a separate failure. Keep the issue as an evidence gap, not a current reproduced incident or a guaranteed fixed defect.
 
 ## Reconstruction and evidence
 
