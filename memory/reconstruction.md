@@ -2,7 +2,7 @@
 
 ## Purpose and evidence
 
-The establishment task recovered architectural evolution from the mature May 18 baseline through the committed project state described in [project.md](project.md). Formal first-parent history follows evidence-supported main transitions and important functional boundaries, rather than one checkpoint per session or Auxiliary. These commits were created during reconstruction without backdating; they are not original project events.
+The establishment task recovered architectural evolution from the mature May 18 baseline through the baseline preceding the derived-availability refactor. See [architecture.md](architecture.md) for maintained architecture and [current.md](current.md) for subsequent work and verification. Formal first-parent history follows evidence-supported main transitions and important functional boundaries, rather than one checkpoint per session or Auxiliary. These commits were created during reconstruction without backdating; they are not original project events.
 
 Auxiliary reconstruction primarily used previously distilled source memory, rather than original session rollouts. Original command output and exact working-tree states therefore cannot generally be recovered independently from these summaries. Raw rollouts, tool transcripts, old archive snapshots and old GAW trees were not imported into the reconstructed histories. Reconstructed knowledge is not byte-for-byte original evidence.
 
@@ -44,3 +44,7 @@ Current navigation is provided by the project memory entry skill. Routine mainte
 After owner authorization, the reconstructed Auxiliary branches were safely retired: their clean worktrees were removed, deletion readiness was checked, and branches were deleted through `git gaw branch -d`. Every source tip was verified as retained in the selected Formal ancestry before and after deletion. Historical source material remains recoverable through Git parents and committed trees; recovery does not require recreating the retired branches or worktrees. This operation did not establish that every historical claim was adopted or independently verified.
 
 No forced abandonment, history rewriting or garbage collection was performed. Formal and ordinary project branch tips were unchanged by retirement. Any later lifecycle changes or garbage collection require their own decision and authorization.
+
+## First-stage plan retention assessment
+
+No raw archive was selected. The ignored local plan was 14,747 bytes with SHA-256 `13892b64c8947d79abcbd2045d620a604fe1bf7bc7ea7cd3026bc3578cc9f552`; this identifies reviewed bytes, not original authorship or provenance. Distilled scope, rationale, safeguards and results suffice for continuation, without retaining illustrative code as independent evidence. Reassess if future work requires exact-byte recovery.
