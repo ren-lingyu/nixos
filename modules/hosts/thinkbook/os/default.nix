@@ -134,7 +134,7 @@ in
                 zoom-us
                 feishu
                 zotero
-                calibre
+                (calibre.override { speechSupport = false; })
                 xournalpp
                 rnote
                 rar
