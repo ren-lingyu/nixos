@@ -145,14 +145,16 @@ nixosConfigurations.nixos.modules.features.editor.emacs.programs.package =
 #+end_example
 
 [[file:./lib/default.nix][lib/default.nix]] 导出 =llib= 的公共命名空间:
-- =types=: 模块可用性与显示器类型.
-- =modules=: 模块发现, option tree/schema 生成和结构断言.
+- =types=: 显示器及显示器集合类型.
+- =modules=: 模块与 validator 文件发现, option tree/schema 组织及框架结构检查.
 - =hosts=: host 选择与 WireGuard 拓扑生成.
 - =features.sops=: per-user SOPS 输入处理.
 - =packages=: 本地包集合, overlays 和 OS/HM 模块入口生成.
-- =flakeParts=: 配置适配, =mkNixosSystem= 与 =mkNixosConfigurations=; =flakeParts.types= 声明 registry, builder 和系统配置类型.
+- =flakeParts=: 配置适配, 系统构造与 =mkValidatorApplications= 验证组合/执行; =flakeParts.types= 声明 registry, builder 和系统配置类型.
 
 [[file:./lib/flakeParts.configurations.nix][flakeParts.configurations.nix]] 私有封装内部与接口 options 的生成, 并在系统构造时统一加载.
+
+通用库中的 =assert= / =throw= 检查框架结构与函数前置条件, 例如发现路径范围, 禁止嵌套模块及 configuration/metadata 顶层字段不相交. 这些检查保留在通用库, 模块业务静态约束由所属 =_validators.fp.nix= 维护, 最终 NixOS/HM 状态相关检查使用原生 assertions.
 
 *** [[file:./pkgs/][/pkgs]]
 #+begin_example
