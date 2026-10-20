@@ -16,7 +16,6 @@
 
 * Option 和组装协议
 ** Configuration 与 metadata
-
 =modules/= 下包含 =os/default.nix= 或 =hm/default.nix= 的目录会被识别为模块. 两侧实现是统一目录约定, 模块之间不允许嵌套. 模块根目录的 =default.nix= 是可选的 NixOS 配置补充, 不再承担模块发现入口的职责.
 
 从 =modules/_options.fp.nix= 到模块目录沿途的 =_options.fp.nix= 共同定义 schema, 分为 =configuration= 和 =metadata= 两部分. =configuration= 用于 flake-parts 层的 =nixosConfigurations.<system>.modules=; =metadata= 用于 =moduleRegistry.<kind>.<name>.metadata=. 模块的 =_metadata.fp.nix= 提供静态 metadata 值. =.fp.nix= 标识解释文件的配置层; metadata 文件仍返回普通 Nix 属性集, 不要求成为 flake-parts module. =_validators.fp.nix= 提供检查已求值 FP 数据的谓词函数, 由两个 FP option 的 =apply= 执行.
@@ -28,7 +27,6 @@ share 没有 profile 名这一层, 对应 =nixosConfigurations.<system>.modules.
 =moduleRegistry= 同时登记模块需要的外部 =nixosModules=, =homeModules= 和 =nixpkgsOverlays=. =nixosBuilder= 提供 =nixosSystem= 构造函数, Home Manager 集成模块和公共 =specialArgs=. =llib.flakeParts.mkNixosConfigurations= 将配置集合转换为最终 =flake.nixosConfigurations=.
 
 ** FP validator 协议
-
 =_validators.fp.nix= 是返回属性集的普通 Nix 函数, 不属于 Nix module. =metadata= 和 =configuration= 两个分支均可省略; 已声明的分支必须是返回布尔值的函数. =true= 表示通过, =false= 表示失败; 可以通过 =assert lib.assertMsg= 或 =throw= 提供具体诊断. 非布尔返回值, 未知分支或无效文件结构都会被拒绝.
 
 #+begin_src nix
@@ -52,7 +50,6 @@ share 没有 profile 名这一层, 对应 =nixosConfigurations.<system>.modules.
 Niri, Greeter, Proxy 和 ThinkBook 在各自目录维护静态约束. Niri 的子功能父级依赖与互斥, Proxy 四个子功能的父级依赖及仅 clash-verge/mihomo 的互斥, ThinkBook Flatpak 的父级依赖会在父模块禁用时仍被检查. Niri 和 Greeter 启用时要求选中 Host 恰有一个默认 monitor. Noctalia 对实际系统服务的要求, Greeter 会话包的 =meta.mainProgram= 与 provider 非空检查, 以及 HM 的 SOPS/provider/terminal-exec 检查仍保留为原生 assertions.
 
 ** =enable= 与 =existModule=
-
 =nixosConfigurations.<system>.modules.<kind>.<name>.enable= 表示在当前最终配置中启用该 profile, 默认关闭. =existModule.{os,hm}= 由模块发现 descriptor 自动派生, 是内部只读布尔值: =true= 表示对应实现存在, =false= 表示不存在, 不再使用 =null= 或手动 metadata 声明.
 
 模块发现要求至少存在 =os/default.nix= 或 =hm/default.nix= 之一; 两侧都不存在的目录不会作为模块进入 Registry. =moduleRegistry.<kind>.<name>.metadata.existModule= 与 NixOS 的 =config.modules.<kind>.<name>.existModule= 保持原有访问路径.
