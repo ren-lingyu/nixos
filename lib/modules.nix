@@ -86,6 +86,36 @@
       relativePath
       null;
 
+  discoverValidatorFiles =
+    { root, modulesDir }:
+    let
+      base = lib.drop (builtins.length (lib.splitString "/" (toString root))) (
+        lib.splitString "/" (toString modulesDir)
+      );
+      paths = lib.unique (
+        [ base ]
+        ++ builtins.concatMap (
+          descriptor:
+          builtins.map (length: lib.take length descriptor.path) (
+            lib.range (builtins.length base) (builtins.length descriptor.path)
+          )
+        ) (discoverModules root modulesDir)
+      );
+      ordered = builtins.sort (
+        a: b:
+        if builtins.length a == builtins.length b then
+          lib.concatStringsSep "/" a < lib.concatStringsSep "/" b
+        else
+          builtins.length a < builtins.length b
+      ) paths;
+    in
+    builtins.filter (entry: builtins.pathExists entry.file) (
+      builtins.map (path: {
+        inherit path;
+        file = root + "/${lib.concatStringsSep "/" path}/_validators.fp.nix";
+      }) ordered
+    );
+
   mkOptionModules = rec {
     default =
       {

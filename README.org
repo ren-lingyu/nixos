@@ -19,13 +19,33 @@
 
 =modules/= 下包含 =os/default.nix= 或 =hm/default.nix= 的目录会被识别为模块. 两侧实现是统一目录约定, 模块之间不允许嵌套. 模块根目录的 =default.nix= 是可选的 NixOS 配置补充, 不再承担模块发现入口的职责.
 
-从 =modules/_options.fp.nix= 到模块目录沿途的 =_options.fp.nix= 共同定义 schema, 分为 =configuration= 和 =metadata= 两部分. =configuration= 用于 flake-parts 层的 =nixosConfigurations.<system>.modules=; =metadata= 用于 =moduleRegistry.<kind>.<name>.metadata=. 模块的 =_metadata.fp.nix= 提供静态 metadata 值. =.fp.nix= 标识解释文件的配置层; metadata 文件仍返回普通 Nix 属性集, 不要求成为 flake-parts module. =_validators.fp.nix= 计划承载验证函数, 当前尚未实现文件或加载协议.
+从 =modules/_options.fp.nix= 到模块目录沿途的 =_options.fp.nix= 共同定义 schema, 分为 =configuration= 和 =metadata= 两部分. =configuration= 用于 flake-parts 层的 =nixosConfigurations.<system>.modules=; =metadata= 用于 =moduleRegistry.<kind>.<name>.metadata=. 模块的 =_metadata.fp.nix= 提供静态 metadata 值. =.fp.nix= 标识解释文件的配置层; metadata 文件仍返回普通 Nix 属性集, 不要求成为 flake-parts module. =_validators.fp.nix= 提供检查已求值 FP 数据的谓词函数, 由两个 FP option 的 =apply= 执行.
 
 仓库使用 =_options.<system>.nix= 标识按约定发现的 option declaration 文件: =fp= 对应 flake-parts, =os= 对应 NixOS, =hm= 对应 Home Manager. 这些文件由仓库加载器发现, 文件名标识解释环境, 不限定声明的 option namespace. 三者保留各自接口: FP 返回 configuration/metadata 声明分支, OS 返回原生 NixOS module, HM 返回以模块名和求值上下文为参数的声明片段. 统一命名不要求统一返回值结构或函数签名.
 
 share 没有 profile 名这一层, 对应 =nixosConfigurations.<system>.modules.share= 和 =moduleRegistry.share.metadata=.
 
 =moduleRegistry= 同时登记模块需要的外部 =nixosModules=, =homeModules= 和 =nixpkgsOverlays=. =nixosBuilder= 提供 =nixosSystem= 构造函数, Home Manager 集成模块和公共 =specialArgs=. =llib.flakeParts.mkNixosConfigurations= 将配置集合转换为最终 =flake.nixosConfigurations=.
+
+** FP validator 协议
+
+=_validators.fp.nix= 是返回属性集的普通 Nix 函数, 不属于 Nix module. =metadata= 和 =configuration= 两个分支均可省略; 已声明的分支必须是返回布尔值的函数. =true= 表示通过, =false= 表示失败; 可以通过 =assert lib.assertMsg= 或 =throw= 提供具体诊断. 非布尔返回值, 未知分支或无效文件结构都会被拒绝.
+
+#+begin_src nix
+{ lib, llib, path, ... }:
+{
+  metadata = { registry, ... }: true;
+  configuration = { name, configuration, registry, ... }: true;
+}
+#+end_src
+
+导入时仅传入静态 =lib=, =llib= 和文件所属目录的 =path=, 例如 =[ "modules" "features" "niri" ]=. 不隐式提供 FP =config/options= 或 OS/HM =config=. 分支通过参数显式接收合并后的 Registry 或单个系统的 FP configuration; 文件位置表示约束的归属, 不限制其只能检查同目录的数据.
+
+=llib.modules.discoverValidatorFiles= 基于现有 =discoverModules= descriptors 收集路径前缀中的文件, 包括 =modules/= 根级, 类别级及模块级. 不搜索 =os/= 或 =hm/=; 中间层文件可缺省. 文件按目录深度及同层路径顺序排列, 去重后每个文件在一次验证边界中至多执行一次. 各文件的约束按逻辑与组合, 不通过属性集覆盖合并函数.
+
+=llib.flakeParts.mkValidatorApplications= 生成与测试共用的两个 =apply= 函数. =moduleRegistry.apply= 用其参数中的 Registry 执行 =metadata= 验证并原样返回值, 不读取 =nixosConfigurations=. =nixosConfigurations.apply= 为各系统保留惰性验证: 消费该系统时执行 =configuration= 分支并返回原值, 不强制其他系统. 诊断包含文件, 分支以及配置分支的系统名称; =--show-trace= 保留谓词的具体错误上下文.
+
+验证器只检查相关字段, 不修改数据, 不通过顶层已经处理过的同名 option 重新取得输入, 不对完整 Registry 或 configuration 使用 =deepSeq=. 外部 module, overlay 和 =functionTo= 值应保持惰性, 不应为了检查其存在而调用函数. 当前协议不迁移业务 assertions; 依赖最终 NixOS/Home Manager 状态的检查继续留在对应原生 module system 中.
 
 ** =enable= 与 =existModule=
 
@@ -113,6 +133,7 @@ nixosConfigurations.nixos.modules.features.editor.emacs.programs.package =
 ├── features.sops.nix
 ├── flakeParts.configurations.nix
 ├── flakeParts.types.nix
+├── flakeParts.validators.nix
 ├── hosts.nix
 ├── modules.nix
 ├── packages.nix
@@ -574,7 +595,7 @@ NixOS-WSL host, hostname =nixos-wsl=.
 最小用户 profile, 提供空的 =hm/default.nix= 实现, 可以接收最终配置启用的公共 HM features.
 
 * 测试
-=tests/= 通过 =perSystem.checks= 接入 flake, 覆盖自定义类型, Registry 的 =existModule= 派生与只读约束, host 与 SOPS 相关函数, 配置适配器, 以及 user/host/feature 的负向组合约束. treefmt 格式检查也通过 flake checks 接入.
+=tests/= 通过 =perSystem.checks= 接入 flake, 覆盖 FP validator 发现/组合/惰性边界, 自定义类型, Registry 的 =existModule= 派生与只读约束, host 与 SOPS 相关函数, 配置适配器, 以及 user/host/feature 的负向组合约束. treefmt 格式检查也通过 flake checks 接入.
 
 #+begin_src sh
 nix flake check

@@ -21,6 +21,20 @@
       inherit lib;
       moduleTools = modules;
     })
+    // (import ./flakeParts.validators.nix {
+      inherit lib;
+      llib = {
+        inherit
+          types
+          modules
+          hosts
+          features
+          packages
+          flakeParts
+          ;
+      };
+      moduleTools = modules;
+    })
     // {
       types = {
         inherit

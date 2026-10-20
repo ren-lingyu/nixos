@@ -126,6 +126,12 @@
           lib,
           ...
         }:
+        let
+          validatorApplications = llib.flakeParts.mkValidatorApplications {
+            root = ./.;
+            modulesDir = ./modules;
+          };
+        in
         {
 
           imports = [
@@ -139,6 +145,7 @@
               readOnly = true;
             };
             moduleRegistry = lib.mkOption {
+              apply = validatorApplications.moduleRegistry;
               type = llib.flakeParts.types.moduleRegistry {
                 root = ./.;
                 modulesDir = ./modules;
@@ -146,6 +153,7 @@
               readOnly = true;
             };
             nixosConfigurations = lib.mkOption {
+              apply = validatorApplications.nixosConfigurations config.moduleRegistry;
               type = llib.flakeParts.types.nixosConfigurations {
                 root = ./.;
                 modulesDir = ./modules;
@@ -516,7 +524,7 @@
 
                 legacyPackages = lpkgs.mkLegacyPackages pkgs;
 
-                checks = import ./tests { inherit pkgs llib; };
+                checks = import ./tests { inherit pkgs llib rootPath; };
 
                 devShells = {
                   deploy = pkgs.mkShell { nativeBuildInputs = [ inputs'.nixos-anywhere.packages.default ]; };

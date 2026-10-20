@@ -1,4 +1,11 @@
-{ pkgs, llib }: {
+{
+  pkgs,
+  llib,
+  rootPath,
+}:
+{
+
+  validators = import ./validators { inherit pkgs llib rootPath; };
 
   lib-types = import ./lib-types { inherit pkgs llib; };
 
