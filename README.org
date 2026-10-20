@@ -45,7 +45,11 @@ share 没有 profile 名这一层, 对应 =nixosConfigurations.<system>.modules.
 
 =llib.flakeParts.mkValidatorApplications= 生成与测试共用的两个 =apply= 函数. =moduleRegistry.apply= 用其参数中的 Registry 执行 =metadata= 验证并原样返回值, 不读取 =nixosConfigurations=. =nixosConfigurations.apply= 为各系统保留惰性验证: 消费该系统时执行 =configuration= 分支并返回原值, 不强制其他系统. 诊断包含文件, 分支以及配置分支的系统名称; =--show-trace= 保留谓词的具体错误上下文.
 
-验证器只检查相关字段, 不修改数据, 不通过顶层已经处理过的同名 option 重新取得输入, 不对完整 Registry 或 configuration 使用 =deepSeq=. 外部 module, overlay 和 =functionTo= 值应保持惰性, 不应为了检查其存在而调用函数. 当前协议不迁移业务 assertions; 依赖最终 NixOS/Home Manager 状态的检查继续留在对应原生 module system 中.
+验证器只检查相关字段, 不修改数据, 不通过顶层已经处理过的同名 option 重新取得输入, 不对完整 Registry 或 configuration 使用 =deepSeq=. 外部 module, overlay 和 =functionTo= 值应保持惰性, 不应为了检查其存在而调用函数. 仅依赖 FP configuration 与 Registry metadata 的静态约束由所属目录的 validators 执行; 依赖最终 NixOS/Home Manager 状态的检查继续留在对应原生 module system 中.
+
+静态约束按职责归属组织: =hosts/_validators.fp.nix= 检查所有 Host 的 number, monitor, UID registry 和 WireGuard endpoint/listenPort 关系, 并检查每个系统恰好启用一个 Host; =users/_validators.fp.nix= 检查 UID, username, home directory 和选中 Host 的 UID 注册关系; =features/_validators.fp.nix= 只对启用且具有 HM 实现的 Feature 检查 =allowUidList=. 非空 User UID 的下界对禁用 User 同样适用, Host 可以登记未分配给启用 User 的 UID, 禁用 Feature 可以保留非空默认接收列表.
+
+Niri, Greeter, Proxy 和 ThinkBook 在各自目录维护静态约束. Niri 的子功能父级依赖与互斥, Proxy 四个子功能的父级依赖及仅 clash-verge/mihomo 的互斥, ThinkBook Flatpak 的父级依赖会在父模块禁用时仍被检查. Niri 和 Greeter 启用时要求选中 Host 恰有一个默认 monitor. Noctalia 对实际系统服务的要求, Greeter 会话包的 =meta.mainProgram= 与 provider 非空检查, 以及 HM 的 SOPS/provider/terminal-exec 检查仍保留为原生 assertions.
 
 ** =enable= 与 =existModule=
 
@@ -65,7 +69,7 @@ nixosConfigurations.nixos.modules.users.lingyu.uid =
   config.moduleRegistry.hosts.thinkbook.metadata.users."1000";
 #+end_src
 
-断言保证启用的 user 已绑定 UID, 启用用户的用户名和 UID 各自唯一, 且 UID 已在启用 host 中登记. host registry 可以包含尚未绑定给当前 user profile 的 UID. NixOS 与 Home Manager 实现读取适配后的 =modules.hosts.<host>.users= 和 =modules.users.<profile>=.
+FP User validator 保证启用的 user 已绑定 UID, 启用用户的用户名和 UID 各自唯一, 且 UID 已在启用 host 中登记. host registry 可以包含尚未绑定给当前 user profile 的 UID. NixOS 与 Home Manager 实现读取适配后的 =modules.hosts.<host>.users= 和 =modules.users.<profile>=.
 
 ** Feature 的 HM 送达
 =modules.features.<name>.allowUidList= 指定应向哪些 Home Manager 用户导入该 feature 的 =hm/default.nix= 及 registry 中的 =homeModules=. 当 feature 存在 HM 模块时, 它默认包含所有已启用且已绑定 UID 的 user; 否则默认为空. 启用且声明 HM 实现的 feature 会校验列表不能包含重复 UID, 也不能引用未分配给启用 user 的 UID.
@@ -207,7 +211,7 @@ nixosConfigurations.nixos.modules.features.editor.emacs.programs.package =
 └── workloads/
 #+end_example
 
-=modules/_options.fp.nix= 定义所有模块共享的 configuration schema, 并保留 metadata 声明分支. 模块发现和系统组装由 =llib.modules= 与 =llib.flakeParts= 完成; 各类别的 =default.nix= 保留公共配置与断言, =share/= 提供公共 OS/HM 配置.
+=modules/_options.fp.nix= 定义所有模块共享的 configuration schema, 并保留 metadata 声明分支. 模块发现和系统组装由 =llib.modules= 与 =llib.flakeParts= 完成; 类别的可选 =default.nix= 保留公共配置, 静态约束由 =_validators.fp.nix= 自动发现, =share/= 提供公共 OS/HM 配置.
 
 **** [[file:./modules/share/][/modules/share]]
 #+begin_example
@@ -225,8 +229,8 @@ nixosConfigurations.nixos.modules.features.editor.emacs.programs.package =
 #+begin_example
 /modules/features/
 ├── _options.fp.nix
+├── _validators.fp.nix
 ├── agent/
-├── default.nix
 ├── diagnostics/
 ├── editor/
 ├── file-manager/
@@ -243,7 +247,7 @@ nixosConfigurations.nixos.modules.features.editor.emacs.programs.package =
 └── x11-session/
 #+end_example
 
-[[file:./modules/features/default.nix][modules/features/default.nix]] 校验 feature 的 HM 用户选择. =_options.fp.nix= 定义公共 =allowUidList= schema; 发现, option tree 生成与 HM 送达由构建库统一处理.
+[[file:./modules/features/_validators.fp.nix][modules/features/_validators.fp.nix]] 在 FP 层校验 feature 的 HM 用户选择. =_options.fp.nix= 定义公共 =allowUidList= schema; 发现, option tree 生成与 HM 送达由构建库统一处理.
 
 每个 feature 的实现可用性由目录发现结果派生, 通过可选的 =_options.fp.nix= 定义配置 schema, 按需提供 =os/= 和 =hm/= 实现. 可选根 =default.nix= 保存跨实现的内部状态, 会话包贡献或断言.
 
@@ -310,13 +314,14 @@ nixosConfigurations.nixos.modules.features.editor.emacs.programs.package =
 ***** [[file:./modules/features/greeter/][/modules/features/greeter]]
 #+begin_example
 /modules/features/greeter/
+├── _validators.fp.nix
 ├── default.nix
 └── os/
     ├── default.nix
     └── _options.os.nix
 #+end_example
 
-=default.nix= 根据启用的 host 推导默认显示器, 并校验会话提供者贡献的 =sessionPackages=. =os/_options.os.nix= 声明 greeter 的内部显示器与会话包接口. =os/default.nix= 配置系统级 greeter 相关服务和 session 列表.
+=_validators.fp.nix= 检查启用时 Host 的默认 monitor; =default.nix= 推导内部显示器状态, 并保留会话包和 provider 检查. =os/_options.os.nix= 声明 greeter 的内部显示器与会话包接口. =os/default.nix= 配置系统级 greeter 相关服务和 session 列表.
 
 ***** [[file:./modules/features/media/][/modules/features/media]]
 #+begin_example
@@ -331,6 +336,7 @@ nixosConfigurations.nixos.modules.features.editor.emacs.programs.package =
 #+begin_example
 /modules/features/niri/
 ├── _options.fp.nix
+├── _validators.fp.nix
 ├── default.nix
 ├── hm/
 │   ├── default.nix
@@ -356,7 +362,7 @@ nixosConfigurations.nixos.modules.features.editor.emacs.programs.package =
     └── _options.os.nix
 #+end_example
 
-通过 registry 中的 =niri-flake= 集成窗口管理器. =default.nix= 从 host 读取显示器信息, 保存到 =moduleInternals.features.niri.monitors=, 并向 greeter 贡献 Niri session wrapper. =hm/default.nix= 导入用户级 Niri 配置; =hm/settings/default.nix= 汇总输入, 布局, 输出, 绑定, 动画和窗口规则; =hm/noctalia/default.nix= 配置 Noctalia shell/bar; =hm/waybar/default.nix= 配置 Waybar; =os/default.nix= 配置系统级 Niri 支持.
+通过 registry 中的 =niri-flake= 集成窗口管理器. =_validators.fp.nix= 检查子功能依赖, 互斥及默认 monitor; =default.nix= 保留 Noctalia 的实际系统服务检查, 从 host 读取显示器信息, 保存到 =moduleInternals.features.niri.monitors=, 并向 greeter 贡献 Niri session wrapper. =hm/default.nix= 导入用户级 Niri 配置; =hm/settings/default.nix= 汇总输入, 布局, 输出, 绑定, 动画和窗口规则; =hm/noctalia/default.nix= 配置 Noctalia shell/bar; =hm/waybar/default.nix= 配置 Waybar; =os/default.nix= 配置系统级 Niri 支持.
 
 ***** [[file:./modules/features/office/][/modules/features/office]]
 #+begin_example
@@ -371,12 +377,12 @@ nixosConfigurations.nixos.modules.features.editor.emacs.programs.package =
 #+begin_example
 /modules/features/proxy/
 ├── _options.fp.nix
-├── default.nix
+├── _validators.fp.nix
 └── os/
     └── default.nix
 #+end_example
 
-=_options.fp.nix= 定义 clash-verge, throne, mihomo 和 v2raya 等开关. =default.nix= 保留相关断言; =os/default.nix= 配置系统级代理组件的 package 与运行模式.
+=_options.fp.nix= 定义 clash-verge, throne, mihomo 和 v2raya 等开关. =_validators.fp.nix= 检查子功能的父级依赖及 clash-verge/mihomo 互斥; =os/default.nix= 配置系统级代理组件的 package 与运行模式.
 
 ***** [[file:./modules/features/shell/][/modules/features/shell]]
 #+begin_example
@@ -457,6 +463,7 @@ Workload 的 OS/HM 可用性由模块发现结果派生, 无需类别级一致�
 #+begin_example
 /modules/hosts/
 ├── _options.fp.nix
+├── _validators.fp.nix
 ├── aliyun/
 ├── boot-manager.nix
 ├── default.nix
@@ -468,7 +475,7 @@ Workload 的 OS/HM 可用性由模块发现结果派生, 无需类别级一致�
 └── wsl/
 #+end_example
 
-[[file:./modules/hosts/default.nix][modules/hosts/default.nix]] 导入 boot-manager, identity, shared 和 WireGuard 相关通用模块, 校验 UID registry, monitor 和 OS/HM 结构, 并确保恰好启用一个 host. =_options.fp.nix= 定义 host metadata schema.
+[[file:./modules/hosts/default.nix][modules/hosts/default.nix]] 导入 boot-manager, identity, shared 和 WireGuard 相关通用模块. =_validators.fp.nix= 在 metadata 分支校验全部 Host 的静态属性, 在 configuration 分支确保恰好启用一个 host. =_options.fp.nix= 定义 host metadata schema.
 
 [[file:./modules/hosts/boot-manager.nix][modules/hosts/boot-manager.nix]], [[file:./modules/hosts/identity.nix][modules/hosts/identity.nix]], [[file:./modules/hosts/shared.nix][modules/hosts/shared.nix]] 和 [[file:./modules/hosts/wireguard.nix][modules/hosts/wireguard.nix]] 分别消费 host metadata, 生成 boot manager, identity, shared capability 和 WireGuard topology/secret 的配置.
 
@@ -506,7 +513,7 @@ MateBook bare metal NixOS host, hostname =nixos-matebook=, 配置本机硬件, �
 /modules/hosts/thinkbook/
 ├── _metadata.fp.nix
 ├── _options.fp.nix
-├── default.nix
+├── _validators.fp.nix
 ├── os/
 │   ├── default.nix
 │   ├── flatpak.nix
@@ -548,12 +555,13 @@ NixOS-WSL host, hostname =nixos-wsl=.
 #+begin_example
 /modules/users/
 ├── _options.fp.nix
+├── _validators.fp.nix
 ├── default.nix
 ├── lingyu/
 └── lingyu-minimal/
 #+end_example
 
-[[file:./modules/users/default.nix][modules/users/default.nix]] 校验用户绑定, 创建 NixOS user, 并向 UID-keyed 的 =home-manager.users= 提供 UID, username 和 home directory. =_options.fp.nix= 定义 user configuration schema, HM 实现由构建函数送达.
+[[file:./modules/users/default.nix][modules/users/default.nix]] 创建 NixOS user, 并向 UID-keyed 的 =home-manager.users= 提供 UID, username 和 home directory. =_options.fp.nix= 定义 user configuration schema, =_validators.fp.nix= 负责静态绑定约束, HM 实现由构建函数送达.
 
 ***** [[file:./modules/users/lingyu/][/modules/users/lingyu]]
 #+begin_example
@@ -595,7 +603,7 @@ NixOS-WSL host, hostname =nixos-wsl=.
 最小用户 profile, 提供空的 =hm/default.nix= 实现, 可以接收最终配置启用的公共 HM features.
 
 * 测试
-=tests/= 通过 =perSystem.checks= 接入 flake, 覆盖 FP validator 发现/组合/惰性边界, 自定义类型, Registry 的 =existModule= 派生与只读约束, host 与 SOPS 相关函数, 配置适配器, 以及 user/host/feature 的负向组合约束. treefmt 格式检查也通过 flake checks 接入.
+=tests/= 通过 =perSystem.checks= 接入 flake, 覆盖 FP validator 发现/组合/惰性边界, 自定义类型, Registry 的 =existModule= 派生与只读约束, host 与 SOPS 相关函数, 配置适配器. treefmt 格式检查也通过 flake checks 接入.
 
 #+begin_src sh
 nix flake check

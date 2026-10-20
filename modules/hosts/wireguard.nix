@@ -61,19 +61,6 @@ in
         { wireguard.topology = wireguardNetworks_.topology; }
       ]);
 
-    assertions = (
-      lib.mapAttrsToList (hostName_: host_: {
-        assertion = (
-          builtins.any (x_: x_) [
-            (host_.wireguard == null)
-            (host_.wireguard.endpoint == null)
-            (host_.wireguard.listenPort != null)
-          ]
-        );
-        message = "Host `${hostName_}` with a WireGuard endpoint must provide `wireguard.listenPort`.";
-      }) cfg
-    );
-
   };
 
 }

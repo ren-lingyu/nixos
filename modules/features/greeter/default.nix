@@ -41,21 +41,6 @@ in
         message = "Every package in `moduleInternals.features.greeter.sessionPackages` must declare a non-empty `meta.mainProgram`.";
       }
       {
-        assertion =
-          let
-            defaultMonitors_ = (
-              builtins.attrValues (
-                lib.filterAttrs (unused_name_: monitor_: (monitor_.role == "default")) enabledHost_.monitors
-              )
-            );
-          in
-          (builtins.any (x_: x_) [
-            (!cfg.enable)
-            ((builtins.length defaultMonitors_) == 1)
-          ]);
-        message = "`modules.features.greeter.enable = true` requires exactly one monitor in the enabled host's `monitors` to set `role = \"default\"`.";
-      }
-      {
         assertion = (
           builtins.any (x_: x_) [
             (!cfg.enable)

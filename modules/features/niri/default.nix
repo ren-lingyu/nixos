@@ -52,41 +52,6 @@ in
 
     assertions = [
       {
-        assertion =
-          let
-            defaultMonitors_ = (
-              builtins.attrValues (
-                lib.filterAttrs (
-                  unused_name_: monitor_: (monitor_.role == "default")
-                ) config.moduleInternals.features.niri.monitors
-              )
-            );
-          in
-          (builtins.any (x_: x_) [
-            (!cfg.enable)
-            ((builtins.length defaultMonitors_) == 1)
-          ]);
-        message = "`modules.features.niri.enable = true` requires exactly one monitor in the enabled host's `monitors` to set `role = \"default\"`.";
-      }
-      {
-        assertion = (
-          builtins.any (x_: x_) [
-            (!cfg.waybar.enable)
-            cfg.enable
-          ]
-        );
-        message = "`modules.features.niri.waybar.enable = true` is only allowed when `modules.features.niri.enable = true;`.";
-      }
-      {
-        assertion = (
-          builtins.any (x_: x_) [
-            (!cfg.noctalia.enable)
-            cfg.enable
-          ]
-        );
-        message = "`modules.features.niri.noctalia.enable = true` is only allowed when `modules.features.niri.enable = true;`.";
-      }
-      {
         assertion = (
           builtins.any (x_: x_) [
             (!cfg.noctalia.enable)
@@ -94,14 +59,6 @@ in
           ]
         );
         message = "`modules.features.niri.noctalia.enable = true` requires system-level features (NetworkManager, Bluetooth, power-profiles-daemon/tuned, UPower) to be enabled.";
-      }
-      {
-        assertion =
-          !(builtins.all (x_: x_) [
-            cfg.waybar.enable
-            cfg.noctalia.enable
-          ]);
-        message = "`modules.features.niri.waybar.enable` and `modules.features.niri.noctalia.enable` cannot be true simultaneously.";
       }
     ];
 
