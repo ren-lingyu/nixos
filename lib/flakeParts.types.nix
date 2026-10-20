@@ -98,10 +98,10 @@
                           } descriptor.path;
                         })
                       ]
-                      (lib.optionals (builtins.pathExists (descriptor.module + "/_metadata.nix")) [
+                      (lib.optionals (builtins.pathExists (descriptor.module + "/_metadata.fp.nix")) [
                         {
-                          _file = descriptor.module + "/_metadata.nix";
-                          config = import (descriptor.module + "/_metadata.nix");
+                          _file = descriptor.module + "/_metadata.fp.nix";
+                          config = import (descriptor.module + "/_metadata.fp.nix");
                         }
                       ])
                     ];

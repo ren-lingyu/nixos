@@ -19,7 +19,7 @@
 
 =modules/= 下包含 =os/default.nix= 或 =hm/default.nix= 的目录会被识别为模块. 两侧实现是统一目录约定, 模块之间不允许嵌套. 模块根目录的 =default.nix= 是可选的 NixOS 配置补充, 不再承担模块发现入口的职责.
 
-从 =modules/_options.fp.nix= 到模块目录沿途的 =_options.fp.nix= 共同定义 schema, 分为 =configuration= 和 =metadata= 两部分. =configuration= 用于 flake-parts 层的 =nixosConfigurations.<system>.modules=; =metadata= 用于 =moduleRegistry.<kind>.<name>.metadata=. 模块的 =_metadata.nix= 提供静态 metadata 值.
+从 =modules/_options.fp.nix= 到模块目录沿途的 =_options.fp.nix= 共同定义 schema, 分为 =configuration= 和 =metadata= 两部分. =configuration= 用于 flake-parts 层的 =nixosConfigurations.<system>.modules=; =metadata= 用于 =moduleRegistry.<kind>.<name>.metadata=. 模块的 =_metadata.fp.nix= 提供静态 metadata 值. =.fp.nix= 标识解释文件的配置层; metadata 文件仍返回普通 Nix 属性集, 不要求成为 flake-parts module. =_validators.fp.nix= 计划承载验证函数, 当前尚未实现文件或加载协议.
 
 仓库使用 =_options.<system>.nix= 标识按约定发现的 option declaration 文件: =fp= 对应 flake-parts, =os= 对应 NixOS, =hm= 对应 Home Manager. 这些文件由仓库加载器发现, 文件名标识解释环境, 不限定声明的 option namespace. 三者保留各自接口: FP 返回 configuration/metadata 声明分支, OS 返回原生 NixOS module, HM 返回以模块名和求值上下文为参数的声明片段. 统一命名不要求统一返回值结构或函数签名.
 
@@ -451,12 +451,12 @@ Workload 的 OS/HM 可用性由模块发现结果派生, 无需类别级一致�
 
 [[file:./modules/hosts/boot-manager.nix][modules/hosts/boot-manager.nix]], [[file:./modules/hosts/identity.nix][modules/hosts/identity.nix]], [[file:./modules/hosts/shared.nix][modules/hosts/shared.nix]] 和 [[file:./modules/hosts/wireguard.nix][modules/hosts/wireguard.nix]] 分别消费 host metadata, 生成 boot manager, identity, shared capability 和 WireGuard topology/secret 的配置.
 
-各 host 的 =_metadata.nix= 由 registry 的 metadata 子模块加载, 用于声明 UID registry, monitor, public IP, WireGuard 和 identity metadata. =ssh.private.age= 与 =wireguard.private.age= 分别保存该 host 的加密 SSH host private key 与 WireGuard private key, 并由 =_metadata.nix= 引用.
+各 host 的 =_metadata.fp.nix= 由 registry 的 metadata 子模块加载, 用于声明 UID registry, monitor, public IP, WireGuard 和 identity metadata. =ssh.private.age= 与 =wireguard.private.age= 分别保存该 host 的加密 SSH host private key 与 WireGuard private key, 并由 =_metadata.fp.nix= 引用.
 
 ***** [[file:./modules/hosts/aliyun/][/modules/hosts/aliyun]]
 #+begin_example
 /modules/hosts/aliyun/
-├── _metadata.nix
+├── _metadata.fp.nix
 ├── os/
 │   ├── default.nix
 │   ├── disk-config.nix
@@ -470,7 +470,7 @@ Workload 的 OS/HM 可用性由模块发现结果派生, 无需类别级一致�
 ***** [[file:./modules/hosts/matebook/][/modules/hosts/matebook]]
 #+begin_example
 /modules/hosts/matebook/
-├── _metadata.nix
+├── _metadata.fp.nix
 ├── os/
 │   ├── default.nix
 │   └── hardware-configuration.nix
@@ -483,7 +483,7 @@ MateBook bare metal NixOS host, hostname =nixos-matebook=, 配置本机硬件, �
 ***** [[file:./modules/hosts/thinkbook/][/modules/hosts/thinkbook]]
 #+begin_example
 /modules/hosts/thinkbook/
-├── _metadata.nix
+├── _metadata.fp.nix
 ├── _options.fp.nix
 ├── default.nix
 ├── os/
@@ -514,7 +514,7 @@ ThinkBook bare metal NixOS host, hostname =nixos=, 配置本机硬件, 启动, F
 ***** [[file:./modules/hosts/wsl/][/modules/hosts/wsl]]
 #+begin_example
 /modules/hosts/wsl/
-├── _metadata.nix
+├── _metadata.fp.nix
 ├── os/
 │   └── default.nix
 ├── ssh.private.age

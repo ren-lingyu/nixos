@@ -103,7 +103,7 @@ let
         hm = true;
       }
     )
-    (!(builtins.pathExists (root_ + "/modules/features/editor/_metadata.nix")))
+    (!(builtins.pathExists (root_ + "/modules/features/editor/_metadata.fp.nix")))
     (builtins.all (
       descriptor:
       let

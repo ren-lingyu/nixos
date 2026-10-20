@@ -57,10 +57,10 @@ let
         ]
       )
       {
-        thinkbook = import ../../modules/hosts/thinkbook/_metadata.nix;
-        matebook = import ../../modules/hosts/matebook/_metadata.nix;
-        aliyun = import ../../modules/hosts/aliyun/_metadata.nix;
-        wsl = import ../../modules/hosts/wsl/_metadata.nix;
+        thinkbook = import ../../modules/hosts/thinkbook/_metadata.fp.nix;
+        matebook = import ../../modules/hosts/matebook/_metadata.fp.nix;
+        aliyun = import ../../modules/hosts/aliyun/_metadata.fp.nix;
+        wsl = import ../../modules/hosts/wsl/_metadata.fp.nix;
       };
 
   # Simulated NixOS inputs; production availability is derived by the Registry.
