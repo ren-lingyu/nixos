@@ -62,7 +62,7 @@ The repository loader uses three environment-specific interfaces:
 - `os/_options.os.nix` is a native NixOS declaration module.
 - `hm/_options.hm.nix` returns an HM interface fragment parameterized by module name and evaluation context.
 
-`_metadata.fp.nix` stores static values in the current naming-only worktree migration; the committed baseline still uses `_metadata.nix`. The suffix identifies interpretation environment, without imposing one namespace or function signature. This is a repository convention, with no old-name fallback, rather than native automatic loading. The declaration-file renames were byte-identical with paired loader/documentation changes; reconstruction did not establish a final evaluated check or share-disabled behavior test. Later worktree checks are recorded in [current.md](current.md); a dedicated share-disabled test remains unestablished.
+`_metadata.fp.nix` stores static values under the committed metadata filename convention; `_metadata.nix` is retired without a compatibility fallback. Metadata files return ordinary attribute sets, not flake-parts modules. `_validators.fp.nix` is planned and unimplemented. The suffix identifies interpretation environment, without imposing one namespace or function signature. This is a repository convention, with no old-name fallback, rather than native automatic loading. The declaration-file renames were byte-identical with paired loader/documentation changes; reconstruction did not establish a final evaluated check or share-disabled behavior test. Later worktree checks are recorded in [current.md](current.md); a dedicated share-disabled test remains unestablished.
 
 ## Derived module availability
 

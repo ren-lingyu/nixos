@@ -48,3 +48,9 @@ No forced abandonment, history rewriting or garbage collection was performed. Fo
 ## First-stage plan retention assessment
 
 No raw archive was selected. The ignored local plan was 14,747 bytes with SHA-256 `13892b64c8947d79abcbd2045d620a604fe1bf7bc7ea7cd3026bc3578cc9f552`; this identifies reviewed bytes, not original authorship or provenance. Distilled scope, rationale, safeguards and results suffice for continuation, without retaining illustrative code as independent evidence. Reassess if future work requires exact-byte recovery.
+
+## Metadata filename migration evidence
+
+The naming-only follow-up was implemented and committed after the derived-availability stage. Its ignored local plan was 5,681 bytes with SHA-256 `5e4eba180d7121930e5d4392a1144b6a94aa727dad59faeebccee0a77f646539`; this identifies reviewed bytes, not original authorship or project-commit provenance. No raw archive was selected: distilled scope, safeguards and results suffice, and historical source filenames were not rewritten. This assessment applies to that acquisition rather than automatically covering future plan versions or issue updates.
+
+The first formatter invocation exited on conflicting tree-root flags without modifying project files. Automatic approval review then rejected direct worktree formatting because its write scope could exceed the rename. No such write was performed. A subsequent isolated snapshot treefmt check passed; that is the formatting evidence, not a successful `nix fmt` run. Other validation and the retained working-lockfile boundary are recorded in [current.md](current.md).
