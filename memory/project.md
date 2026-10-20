@@ -92,6 +92,10 @@ For implementation, compare renamed bytes with the original files and check all 
 
 No raw archive was selected for this new acquisition. The reviewed file was 5,681 bytes with SHA-256 `5e4eba180d7121930e5d4392a1144b6a94aa727dad59faeebccee0a77f646539`. It is an ignored local planning document with unestablished original provenance, not bytes supplied by project HEAD. This distilled goal, scope, rationale, reference checklist and evidence limits are sufficient for continuation; repeated acquisition and changed content alone do not justify a raw snapshot. No project edits, formatting, Nix evaluation or tests were performed during this review. Implementation awaits a separate request.
 
+## Backlog
+
+- Refactor `tests/` dependency injection. After this refactor, direct dependencies through parent-relative paths such as `../*` or `../../*` are prohibited throughout tests, including imports and repository-root path references. Dependencies outside a test's directory must be supplied through function parameters rather than obtained by traversing parent directories. This is an owner-adopted target constraint for the future refactor, not a claim that current tests already comply. No test-code change is authorized by this backlog entry alone.
+
 ## Evidence boundary
 
 The architecture describes committed implementation; the first-stage section distinguishes its inspected committed result from earlier dirty-worktree verification. Neither asserts what machines currently deploy. Memory maintenance alone does not establish fresh Nix evaluation, build, deployment, decryption or runtime results; project verification must be attributed to the commands and workspace actually checked. See [reconstruction.md](reconstruction.md) for historical evidence, important corrections and original-provenance limitations.
