@@ -217,43 +217,33 @@
                 editor = {
                   nixpkgsOverlays = [
                     inputs.lem.overlays.default
-                    (final_: prev_: {
-                      lem-webview = final_.symlinkJoin {
-                        name = "${prev_.lem-webview.name}-with-desktop";
-                        paths = [
-                          prev_.lem-webview
-                          (final_.makeDesktopItem {
-                            name = "lem";
-                            desktopName = "Lem";
-                            genericName = "Text Editor";
-                            comment = "Common Lisp editor/IDE with high expansibility";
-                            exec = "${prev_.lib.getExe prev_.lem-webview} %F";
-                            icon = "lem";
-                            terminal = false;
-                            categories = [
-                              "Development"
-                              "TextEditor"
-                            ];
-                            mimeTypes = [
-                              "text/english"
-                              "text/plain"
-                              "text/x-makefile"
-                              "text/x-c++hdr"
-                              "text/x-c++src"
-                              "application/x-shellscript"
-                              "text/x-c"
-                              "text/x-c++"
-                            ];
-                          })
-                          (final_.writeTextFile {
-                            name = "lem-icon";
-                            destination = "/share/icons/hicolor/scalable/apps/lem.svg";
-                            text = builtins.readFile "${inputs.lem}/scripts/install/lem.svg";
-                          })
-                        ];
-                        meta = prev_.lem-webview.meta;
-                      };
-                    })
+                    (
+                      final_: prev_:
+                      let
+                        lem = prev_.lem-webview;
+                      in
+                      {
+                        lem-webview = final_.symlinkJoin {
+                          name = "${lem.name}-with-desktop";
+                          paths = [
+                            lem
+                            (final_.writeTextFile {
+                              name = "lem-desktop";
+                              destination = "/share/applications/lem.desktop";
+                              text = builtins.replaceStrings [ "/usr/local/bin/lem -i webview" ] [ "${final_.lib.getExe lem}" ] (
+                                builtins.readFile "${inputs.lem}/scripts/install/lem-webview.desktop"
+                              );
+                            })
+                            (final_.writeTextFile {
+                              name = "lem-icon";
+                              destination = "/share/icons/hicolor/scalable/apps/lem.svg";
+                              text = builtins.readFile "${inputs.lem}/scripts/install/lem.svg";
+                            })
+                          ];
+                          meta = lem.meta;
+                        };
+                      }
+                    )
                   ];
                   homeModules = [ inputs.nixvim.homeModules.nixvim ];
                 };
