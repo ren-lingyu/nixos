@@ -94,7 +94,7 @@ No raw archive was selected for this new acquisition. The reviewed file was 5,68
 
 ## Backlog
 
-- Refactor `tests/` dependency injection. After this refactor, direct dependencies through parent-relative paths such as `../*` or `../../*` are prohibited throughout tests, including imports and repository-root path references. Dependencies outside a test's directory must be supplied through function parameters rather than obtained by traversing parent directories. This is an owner-adopted target constraint for the future refactor, not a claim that current tests already comply. No test-code change is authorized by this backlog entry alone.
+See [backlog.md](backlog.md) for pending work and adopted target constraints.
 
 ## Evidence boundary
 
