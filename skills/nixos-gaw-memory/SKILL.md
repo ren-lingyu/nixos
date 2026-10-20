@@ -9,7 +9,7 @@ Use the available `git-agent-workflow` skill and public GAW CLI. Run `git gaw st
 
 ## Read current knowledge first
 
-Begin with [memory/project.md](../../memory/project.md) for architectural responsibilities, interfaces, conventions, current work and verification boundaries. Consult [memory/backlog.md](../../memory/backlog.md) for pending work and adopted target constraints. Read [memory/reconstruction.md](../../memory/reconstruction.md) when interpreting historical claims, corrections, source limitations or reported verification.
+Begin with [memory/current.md](../../memory/current.md) for project scope, confirmed state, active constraints, verification boundaries and next actions. Read [memory/architecture.md](../../memory/architecture.md) for stable responsibilities, interfaces, conventions and design rationale. Consult [memory/backlog.md](../../memory/backlog.md) for pending work and adopted target constraints. Read [memory/reconstruction.md](../../memory/reconstruction.md) when interpreting historical claims, corrections, source limitations or reported verification.
 
 These are Formal-worktree-root-relative data paths. The links resolve from this skill's declared `skills/nixos-gaw-memory/` layout; the memory files are workspace data, not resources bundled with the skill in isolation.
 
@@ -25,6 +25,6 @@ Select relevant trees by their content and checkpoint context. UUIDs are structu
 
 Distinguish current knowledge, reconstructed historical reports and actual project implementation. Use relevant committed implementation to resolve material factual uncertainty; distinguish static inspection from evaluation, build, deployment and runtime evidence. Uncommitted work is outside this memory's committed-project baseline. Historical investigations require present evidence before being called current defects.
 
-Keep pending work in `memory/backlog.md`, with its motivation, adopted constraints and necessary context. Keep active progress and verification in `memory/project.md`, which links to the backlog. When an item is completed, remove it from the backlog after retaining useful conclusions in current knowledge; first-parent history preserves its evolution. A backlog entry does not itself authorize implementation.
+Keep pending work in `memory/backlog.md`, with its motivation, adopted constraints and necessary context. Keep current state, active progress, verification and next actions in `memory/current.md`, which links to the other memory documents. Keep stable architecture and design rationale in `memory/architecture.md`. When an item is completed, remove it from the backlog after retaining useful conclusions in current knowledge; first-parent history preserves its evolution. A backlog entry does not itself authorize implementation.
 
 Maintain this entry point when memory layout or interpretation conventions change, not after every memory edit. Keep substantive architecture in memory and exact historical relationships in Git. Follow the GAW workflow for content review, sensitive material, explicit staging and checkpoints.
