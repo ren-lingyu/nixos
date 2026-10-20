@@ -12,7 +12,7 @@ Directory-named user profiles retain unique bound UID and host-subset constraint
 
 ## Host facts and graphics
 
-Static _metadata.nix facts are available independently of activation. Exactly one host must be enabled; a strict getter and a global tryEval-based assertion protect both eager field use and lazy non-use. Hosts own numeric UID registries, identity, boot/shared resources, WireGuard facts and monitor data. Enabled users need registry membership, while spare UID slots are valid. Monitor names are nonempty/unique, at most one is default, and enabled graphical consumers impose the stronger default-monitor requirement. Default monitors require a mode for coordinate derivation. SSH identity is under identity.keys; rootAccess is separate policy, not a synonym for knowing a host public key.
+Static metadata facts are available independently of activation. Exactly one host must be enabled; a strict getter and a global tryEval-based assertion protect both eager field use and lazy non-use. Hosts own numeric UID registries, identity, boot/shared resources, WireGuard facts and monitor data. Enabled users need registry membership, while spare UID slots are valid. Monitor names are nonempty/unique, at most one is default, and enabled graphical consumers impose the stronger default-monitor requirement. Default monitors require a mode for coordinate derivation. SSH identity is under identity.keys; rootAccess is separate policy, not a synonym for knowing a host public key.
 
 ## Desktop and native capabilities
 
@@ -62,7 +62,7 @@ The repository loader uses three environment-specific interfaces:
 - `os/_options.os.nix` is a native NixOS declaration module.
 - `hm/_options.hm.nix` returns an HM interface fragment parameterized by module name and evaluation context.
 
-`_metadata.nix` stores static values. The suffix identifies interpretation environment, without imposing one namespace or function signature. This is a repository convention, with no old-name fallback, rather than native automatic loading. The declaration-file renames were byte-identical with paired loader/documentation changes; reconstruction did not establish a final evaluated check or share-disabled behavior test. Later worktree checks are recorded in [current.md](current.md); a dedicated share-disabled test remains unestablished.
+`_metadata.fp.nix` stores static values in the current naming-only worktree migration; the committed baseline still uses `_metadata.nix`. The suffix identifies interpretation environment, without imposing one namespace or function signature. This is a repository convention, with no old-name fallback, rather than native automatic loading. The declaration-file renames were byte-identical with paired loader/documentation changes; reconstruction did not establish a final evaluated check or share-disabled behavior test. Later worktree checks are recorded in [current.md](current.md); a dedicated share-disabled test remains unestablished.
 
 ## Derived module availability
 
