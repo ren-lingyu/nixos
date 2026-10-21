@@ -222,7 +222,12 @@
                     (
                       final_: prev_:
                       let
-                        lem = prev_.lem-webview;
+                        lem = prev_.lem-webview.overrideLispAttrs (old: {
+                          lispLibs = builtins.concatLists [
+                            old.lispLibs
+                            [ final_.sbclPackages.cl-template ]
+                          ];
+                        });
                       in
                       {
                         lem-webview = final_.symlinkJoin {
