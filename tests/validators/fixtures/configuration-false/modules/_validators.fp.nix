@@ -1,1 +1,1 @@
-{ ... }: { configuration = _: false; }
+{ path }: { configuration = _: false; }

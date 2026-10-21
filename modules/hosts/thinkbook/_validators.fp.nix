@@ -1,6 +1,6 @@
-{ lib, path, ... }: {
+{ path }: {
   configuration =
-    { configuration, ... }:
+    { lib, configuration, ... }:
     let
       cfg = configuration.modules.hosts.${lib.last path};
     in

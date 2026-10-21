@@ -1,7 +1,12 @@
-{ lib, ... }: {
+{ path }: {
   metadata = { registry, ... }: registry.hosts.thinkbook.metadata.users."1000" == 1000;
   configuration =
-    { configuration, registry, ... }:
+    {
+      lib,
+      configuration,
+      registry,
+      ...
+    }:
     let
       m = configuration.modules;
     in

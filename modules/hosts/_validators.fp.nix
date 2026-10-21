@@ -1,6 +1,6 @@
-{ lib, ... }: {
+{ path }: {
   metadata =
-    { registry, ... }:
+    { lib, registry, ... }:
     let
       hosts = registry.hosts;
       numbers = builtins.map (host: host.metadata.number) (builtins.attrValues hosts);
@@ -40,7 +40,12 @@
     );
 
   configuration =
-    { name, configuration, ... }:
+    {
+      lib,
+      name,
+      configuration,
+      ...
+    }:
     let
       enabled = builtins.attrNames (lib.filterAttrs (_: host: host.enable) configuration.modules.hosts);
     in

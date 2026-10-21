@@ -1,41 +1,42 @@
-{
-  lib,
-  llib,
-  moduleTools,
-}:
-{
+{ lib, discoverValidatorFiles }: {
   mkValidatorApplications =
-    { root, modulesDir }:
+    {
+      root,
+      modulesDir,
+      llib,
+    }:
     let
-      validators = builtins.map (
-        entry:
-        let
-          imported = import entry.file;
-          declaration = imported {
-            inherit lib llib;
-            inherit (entry) path;
-          };
-          valid =
-            builtins.isFunction imported
-            && builtins.isAttrs declaration
-            && builtins.all (
-              branch:
-              builtins.elem branch [
-                "metadata"
-                "configuration"
-              ]
-              && builtins.isFunction declaration.${branch}
-            ) (builtins.attrNames declaration);
-        in
-        entry
-        // {
-          branches =
-            if valid then
-              declaration
-            else
-              throw "Invalid FP validator declaration in ${toString entry.file}: expected a function returning optional metadata/configuration functions.";
-        }
-      ) (moduleTools.discoverValidatorFiles { inherit root modulesDir; });
+      validators =
+        builtins.map
+          (
+            entry:
+            let
+              imported = import entry.file;
+              declaration = imported { inherit (entry) path; };
+              valid =
+                builtins.isFunction imported
+                && builtins.isAttrs declaration
+                && builtins.all (
+                  branch:
+                  builtins.elem branch [
+                    "metadata"
+                    "configuration"
+                  ]
+                  && builtins.isFunction declaration.${branch}
+                ) (builtins.attrNames declaration);
+            in
+            entry
+            // {
+              branches =
+                if valid then
+                  declaration
+                else
+                  throw "Invalid FP validator declaration in ${toString entry.file}: expected a function returning optional metadata/configuration functions.";
+            }
+          )
+          (discoverValidatorFiles {
+            inherit root modulesDir;
+          });
       validate =
         branch: args:
         builtins.all (
@@ -44,7 +45,7 @@
             context =
               "FP validator ${toString validator.file}, branch ${branch}"
               + lib.optionalString (branch == "configuration") " (system ${args.name})";
-            result = validator.branches.${branch} args;
+            result = validator.branches.${branch} (args // { inherit lib llib; });
           in
           builtins.addErrorContext context (
             if !(builtins.hasAttr branch validator.branches) then

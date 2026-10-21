@@ -1,1 +1,1 @@
-{ ... }: { metadata = _: 1; }
+{ path }: { metadata = _: 1; }

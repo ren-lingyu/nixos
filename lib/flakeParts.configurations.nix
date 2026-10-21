@@ -1,4 +1,8 @@
-{ lib, moduleTools }:
+{
+  lib,
+  discoverModules,
+  mkOptionTree,
+}:
 let
   mkInternalOptionsModules =
     { root, modulesDir }:
@@ -7,7 +11,7 @@ let
       lib.optional (builtins.pathExists (descriptor.module + "/os/_options.os.nix")) (
         descriptor.module + "/os/_options.os.nix"
       )
-    ) (moduleTools.discoverModules root modulesDir);
+    ) (discoverModules root modulesDir);
 
   mkInterfaceOptionsModule =
     { root, modulesDir }:
@@ -21,7 +25,7 @@ let
       ...
     }:
     {
-      options.moduleInterfaces = moduleTools.mkOptionTree {
+      options.moduleInterfaces = mkOptionTree {
         inherit root modulesDir;
         pathMapper = lib.drop 1;
         optionMaker =
@@ -149,7 +153,7 @@ rec {
       systemConfiguration,
     }:
     let
-      descriptors = moduleTools.discoverModules rootPath (rootPath + "/modules");
+      descriptors = discoverModules rootPath (rootPath + "/modules");
       enabled = enabledModules descriptors systemConfiguration;
       declarationModules = mkDeclarationModules {
         root = rootPath;

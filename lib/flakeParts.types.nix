@@ -1,6 +1,5 @@
 {
   lib,
-  llib,
   mkOptionTree,
   mkOptionModules,
   mkOptionName,
@@ -25,7 +24,11 @@
   };
 
   moduleRegistry =
-    { root, modulesDir }:
+    {
+      root,
+      modulesDir,
+      llib,
+    }:
     lib.types.submodule {
       options = mkOptionTree {
         inherit root modulesDir;

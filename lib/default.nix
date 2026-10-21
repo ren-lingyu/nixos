@@ -16,31 +16,20 @@
 
   packages = import ./packages.nix { inherit lib; };
 
-  flakeParts =
+  flakeParts = lib.mergeAttrsList [
     (import ./flakeParts.configurations.nix {
       inherit lib;
-      moduleTools = modules;
+      inherit (modules) discoverModules mkOptionTree;
     })
-    // (import ./flakeParts.validators.nix {
+    (import ./flakeParts.validators.nix {
       inherit lib;
-      llib = {
-        inherit
-          types
-          modules
-          hosts
-          features
-          packages
-          flakeParts
-          ;
-      };
-      moduleTools = modules;
+      inherit (modules) discoverValidatorFiles;
     })
-    // {
+    {
       types = {
         inherit
           (import ./flakeParts.types.nix {
             inherit lib;
-            llib = { inherit types modules; };
             inherit (modules) mkOptionTree mkOptionModules mkOptionName;
           })
           nixosBuilder
@@ -48,6 +37,7 @@
           nixosConfigurations
           ;
       };
-    };
+    }
+  ];
 
 }

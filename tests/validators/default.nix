@@ -9,6 +9,10 @@ let
   applications =
     name:
     llib.flakeParts.mkValidatorApplications {
+      llib = {
+        marker = 42;
+        unused = throw "unrelated validator context forced";
+      };
       root = fixture name;
       modulesDir = fixture name + "/modules";
     };
@@ -30,6 +34,7 @@ let
         ({ config, ... }: {
           options.moduleRegistry = lib.mkOption {
             type = llib.flakeParts.types.moduleRegistry {
+              inherit llib;
               inherit root;
               modulesDir = root + "/modules";
             };
@@ -146,7 +151,7 @@ let
       }).valid.marker == 42
     ))
     (check "optional branches" ((applications "empty-branches").moduleRegistry { } == { }))
-    (check "valid typed registry and system" (
+    (check "typed registry and system receive branch-only library context lazily" (
       evaluated.moduleRegistry.features.alpha.metadata.number == 1
       && evaluated.nixosConfigurations.valid.system == "x86_64-linux"
     ))

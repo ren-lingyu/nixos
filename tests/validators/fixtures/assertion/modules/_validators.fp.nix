@@ -1,6 +1,6 @@
-{ lib, ... }: {
+{ path }: {
   metadata =
-    _:
+    { lib, ... }:
     assert lib.assertMsg false "specific fixture constraint";
     true;
 }

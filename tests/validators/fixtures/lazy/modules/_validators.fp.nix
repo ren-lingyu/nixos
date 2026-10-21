@@ -1,1 +1,1 @@
-{ ... }: { configuration = { configuration, ... }: configuration.specialArgs.check; }
+{ path }: { configuration = { configuration, ... }: configuration.specialArgs.check; }

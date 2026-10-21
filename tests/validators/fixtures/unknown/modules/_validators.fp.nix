@@ -1,1 +1,1 @@
-{ ... }: { typo = _: true; }
+{ path }: { typo = _: true; }

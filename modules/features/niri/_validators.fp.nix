@@ -1,6 +1,11 @@
-{ lib, path, ... }: {
+{ path }: {
   configuration =
-    { configuration, registry, ... }:
+    {
+      lib,
+      configuration,
+      registry,
+      ...
+    }:
     let
       cfg = configuration.modules.features.${lib.last path};
       hosts = builtins.attrNames (lib.filterAttrs (_: host: host.enable) configuration.modules.hosts);

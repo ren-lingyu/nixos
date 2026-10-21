@@ -30,18 +30,18 @@ share 没有 profile 名这一层, 对应 =nixosConfigurations.<system>.modules.
 =_validators.fp.nix= 是返回属性集的普通 Nix 函数, 不属于 Nix module. =metadata= 和 =configuration= 两个分支均可省略; 已声明的分支必须是返回布尔值的函数. =true= 表示通过, =false= 表示失败; 可以通过 =assert lib.assertMsg= 或 =throw= 提供具体诊断. 非布尔返回值, 未知分支或无效文件结构都会被拒绝.
 
 #+begin_src nix
-{ lib, llib, path, ... }:
+{ path }:
 {
-  metadata = { registry, ... }: true;
-  configuration = { name, configuration, registry, ... }: true;
+  metadata = { lib, llib, registry, ... }: true;
+  configuration = { lib, llib, name, configuration, registry, ... }: true;
 }
 #+end_src
 
-导入时仅传入静态 =lib=, =llib= 和文件所属目录的 =path=, 例如 =[ "modules" "features" "niri" ]=. 不隐式提供 FP =config/options= 或 OS/HM =config=. 分支通过参数显式接收合并后的 Registry 或单个系统的 FP configuration; 文件位置表示约束的归属, 不限制其只能检查同目录的数据.
+导入声明时仅传入文件所属目录的 =path=, 例如 =[ "modules" "features" "niri" ]=. 不隐式提供 FP =config/options= 或 OS/HM =config=. 执行分支时显式传入 =lib=, =llib= 和合并后的 Registry 或单个系统的 FP configuration; 文件位置表示约束的归属, 不限制其只能检查同目录的数据.
 
 =llib.modules.discoverValidatorFiles= 基于现有 =discoverModules= descriptors 收集路径前缀中的文件, 包括 =modules/= 根级, 类别级及模块级. 不搜索 =os/= 或 =hm/=; 中间层文件可缺省. 文件按目录深度及同层路径顺序排列, 去重后每个文件在一次验证边界中至多执行一次. 各文件的约束按逻辑与组合, 不通过属性集覆盖合并函数.
 
-=llib.flakeParts.mkValidatorApplications= 生成与测试共用的两个 =apply= 函数. =moduleRegistry.apply= 用其参数中的 Registry 执行 =metadata= 验证并原样返回值, 不读取 =nixosConfigurations=. =nixosConfigurations.apply= 为各系统保留惰性验证: 消费该系统时执行 =configuration= 分支并返回原值, 不强制其他系统. 诊断包含文件, 分支以及配置分支的系统名称; =--show-trace= 保留谓词的具体错误上下文.
+=llib.flakeParts.mkValidatorApplications= 接收 =root=, =modulesDir= 和调用时的 =llib= 验证上下文, 生成与测试共用的两个 =apply= 函数. =moduleRegistry.apply= 用其参数中的 Registry 执行 =metadata= 验证并原样返回值, 不读取 =nixosConfigurations=. =nixosConfigurations.apply= 为各系统保留惰性验证: 消费该系统时执行 =configuration= 分支并返回原值, 不强制其他系统. 诊断包含文件, 分支以及配置分支的系统名称; =--show-trace= 保留谓词的具体错误上下文.
 
 验证器只检查相关字段, 不修改数据, 不通过顶层已经处理过的同名 option 重新取得输入, 不对完整 Registry 或 configuration 使用 =deepSeq=. 外部 module, overlay 和 =functionTo= 值应保持惰性, 不应为了检查其存在而调用函数. 仅依赖 FP configuration 与 Registry metadata 的静态约束由所属目录的 validators 执行; 依赖最终 NixOS/Home Manager 状态的检查继续留在对应原生 module system 中.
 
@@ -150,6 +150,8 @@ nixosConfigurations.nixos.modules.features.editor.emacs.programs.package =
 - =flakeParts=: 配置适配, 系统构造与 =mkValidatorApplications= 验证组合/执行; =flakeParts.types= 声明 registry, builder 和系统配置类型.
 
 [[file:./lib/flakeParts.configurations.nix][flakeParts.configurations.nix]] 私有封装内部与接口 options 的生成, 并在系统构造时统一加载.
+
+=lib/default.nix= 按实际依赖逐项构造各 flakeParts 子库, 不注入递归的整库 =llib=. =moduleRegistry= 类型函数在调用时通过 =root=, =modulesDir= 和 =llib= 接收模块路径及 metadata 声明上下文, validator 在 =mkValidatorApplications= 调用时接收验证上下文; 两者均与库的构造依赖分开.
 
 通用库中的 =assert= / =throw= 检查框架结构与函数前置条件, 例如发现路径范围, 禁止嵌套模块及 configuration/metadata 顶层字段不相交. 这些检查保留在通用库, 模块业务静态约束由所属 =_validators.fp.nix= 维护, 最终 NixOS/HM 状态相关检查使用原生 assertions.
 

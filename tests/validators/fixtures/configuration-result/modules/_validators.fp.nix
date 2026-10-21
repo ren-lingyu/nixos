@@ -1,1 +1,1 @@
-{ ... }: { configuration = _: "wrong"; }
+{ path }: { configuration = _: "wrong"; }

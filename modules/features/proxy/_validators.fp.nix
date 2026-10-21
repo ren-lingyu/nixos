@@ -1,6 +1,6 @@
-{ lib, path, ... }: {
+{ path }: {
   configuration =
-    { configuration, ... }:
+    { lib, configuration, ... }:
     let
       cfg = configuration.modules.features.${lib.last path};
     in

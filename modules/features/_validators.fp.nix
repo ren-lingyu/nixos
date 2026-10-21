@@ -1,6 +1,7 @@
-{ lib, ... }: {
+{ path }: {
   configuration =
     {
+      lib,
       name,
       configuration,
       registry,

@@ -128,6 +128,7 @@
         }:
         let
           validatorApplications = llib.flakeParts.mkValidatorApplications {
+            inherit llib;
             root = ./.;
             modulesDir = ./modules;
           };
@@ -147,6 +148,7 @@
             moduleRegistry = lib.mkOption {
               apply = validatorApplications.moduleRegistry;
               type = llib.flakeParts.types.moduleRegistry {
+                inherit llib;
                 root = ./.;
                 modulesDir = ./modules;
               };

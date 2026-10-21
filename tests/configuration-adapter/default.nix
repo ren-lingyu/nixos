@@ -26,6 +26,7 @@ let
 
   root_ = ../..;
   registryType_ = llib.flakeParts.types.moduleRegistry {
+    inherit llib;
     root = root_;
     modulesDir = root_ + "/modules";
   };

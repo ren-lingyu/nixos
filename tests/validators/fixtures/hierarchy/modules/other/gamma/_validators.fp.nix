@@ -1,4 +1,4 @@
-{ ... }: {
+{ path }: {
   configuration =
     { name, ... }:
     assert name != "assertion";
