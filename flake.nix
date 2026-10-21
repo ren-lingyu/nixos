@@ -36,6 +36,10 @@
       url = "git+https://github.com/numtide/treefmt-nix.git?ref=refs/heads/main&shallow=1";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+    local-nixpkgs = {
+      url = "path:./pkgs";
+      inputs.treefmt-nix.follows = "treefmt-nix";
+    };
     home-manager = {
       url = "git+https://github.com/nix-community/home-manager.git?ref=refs/heads/master&shallow=1";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -53,18 +57,6 @@
     };
     sops-nix = {
       url = "git+https://github.com/Mic92/sops-nix.git?ref=refs/heads/master&shallow=1";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
-    emarccs = {
-      url = "git+https://github.com/ren-lingyu/emarccs.git?ref=refs/heads/main&shallow=1";
-      inputs.treefmt-nix.follows = "treefmt-nix";
-    };
-    nixvim = {
-      # the main branch of nixvim must be use in nixos-unstable
-      url = "git+https://github.com/nix-community/nixvim.git?ref=refs/heads/main&shallow=1";
-    };
-    lem = {
-      url = "git+https://github.com/lem-project/lem.git?ref=refs/heads/main&shallow=1";
       inputs.nixpkgs.follows = "nixpkgs";
     };
     niri-flake = {
@@ -90,17 +82,6 @@
       # url = "git+https://github.com/nix-community/disko.git?ref=refs/heads/master&shallow=1";
       follows = "nixos-anywhere/disko";
     };
-    lean4-nix = {
-      url = "git+https://github.com/lenianiva/lean4-nix.git?ref=refs/heads/main&shallow=1";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
-    zotero-fix-nixpkgs = {
-      url = "git+https://github.com/NixOS/nixpkgs.git?rev=363fdbe57ed052c76e816e6270206b0cb348e53a&shallow=1";
-    };
-    git-agent-workflow = {
-      url = "git+https://github.com/ren-lingyu/git-agent-workflow.git?ref=refs/heads/main&shallow=1";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
   };
 
   outputs =
@@ -113,7 +94,6 @@
         specialArgs = rec {
           rootPath = ./.;
           llib = import ./lib { lib = inputs.nixpkgs.lib; };
-          lpkgs = import ./pkgs { inherit llib; };
         };
 
       }
@@ -121,7 +101,6 @@
         {
           rootPath,
           llib,
-          lpkgs,
           config,
           lib,
           ...
@@ -186,18 +165,10 @@
                 nixosModules = [
                   inputs.agenix.nixosModules.default
                   inputs.agenix-rekey.nixosModules.default
-                  config.flake.nixosModules.default
+                  inputs.local-nixpkgs.nixosModules.share
                 ];
-                nixpkgsOverlays = [
-                  inputs.emarccs.overlays.default
-                  (final: prev: {
-                    lean4 = inputs.lean4-nix.packages.${final.stdenv.hostPlatform.system}.lean-bin;
-                    zotero = inputs.zotero-fix-nixpkgs.legacyPackages.${final.stdenv.hostPlatform.system}.zotero;
-                  })
-                  inputs.git-agent-workflow.overlays.default
-                  config.flake.overlays.default
-                ];
-                homeModules = [ config.flake.homeModules.default ];
+                nixpkgsOverlays = [ inputs.local-nixpkgs.overlays.share ];
+                homeModules = [ inputs.local-nixpkgs.homeModules.share ];
               };
 
               hosts = {
@@ -217,42 +188,8 @@
 
               features = {
                 editor = {
-                  nixpkgsOverlays = [
-                    inputs.lem.overlays.default
-                    (
-                      final_: prev_:
-                      let
-                        lem = prev_.lem-webview.overrideLispAttrs (old: {
-                          lispLibs = builtins.concatLists [
-                            old.lispLibs
-                            [ final_.sbclPackages.cl-template ]
-                          ];
-                        });
-                      in
-                      {
-                        lem-webview = final_.symlinkJoin {
-                          name = "${lem.name}-with-desktop";
-                          paths = [
-                            lem
-                            (final_.writeTextFile {
-                              name = "lem-desktop";
-                              destination = "/share/applications/lem.desktop";
-                              text = builtins.replaceStrings [ "/usr/local/bin/lem -i webview" ] [ "${final_.lib.getExe lem}" ] (
-                                builtins.readFile "${inputs.lem}/scripts/install/lem-webview.desktop"
-                              );
-                            })
-                            (final_.writeTextFile {
-                              name = "lem-icon";
-                              destination = "/share/icons/hicolor/scalable/apps/lem.svg";
-                              text = builtins.readFile "${inputs.lem}/scripts/install/lem.svg";
-                            })
-                          ];
-                          meta = lem.meta;
-                        };
-                      }
-                    )
-                  ];
-                  homeModules = [ inputs.nixvim.homeModules.nixvim ];
+                  nixpkgsOverlays = [ inputs.local-nixpkgs.overlays.editor ];
+                  homeModules = [ inputs.local-nixpkgs.homeModules.editor ];
                 };
                 niri = {
                   nixpkgsOverlays = [ inputs.niri-flake.overlays.niri ];
@@ -487,18 +424,6 @@
 
             flake = {
 
-              nixosModules = {
-                default = lpkgs.nixosModule;
-              };
-
-              homeModules = {
-                default = lpkgs.homeModule;
-              };
-
-              overlays = {
-                default = lpkgs.overlay;
-              };
-
               nixosConfigurations = llib.flakeParts.mkNixosConfigurations {
                 inherit rootPath;
                 builder = config.nixosBuilder;
@@ -519,8 +444,6 @@
               }:
               {
 
-                legacyPackages = lpkgs.mkLegacyPackages pkgs;
-
                 checks = import ./tests { inherit pkgs llib rootPath; };
 
                 devShells = {
@@ -533,7 +456,7 @@
                   };
                 };
 
-                agenix-rekey.agePackage = config.legacyPackages.rage-armored;
+                agenix-rekey.agePackage = (pkgs.extend inputs.local-nixpkgs.overlays.default).rage-armored;
 
                 treefmt = {
                   flakeFormatter = true;
@@ -542,6 +465,7 @@
                   projectRootFile = builtins.baseNameOf __curPos.file;
                   settings.excludes = [
                     "flake.lock"
+                    "pkgs/flake.lock"
                     "*.patch"
                     ".gitignore"
                     "LICENSE"

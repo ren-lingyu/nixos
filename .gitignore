@@ -12,13 +12,22 @@
 !lib/**/*.nix
 
 !pkgs/
-!pkgs/**/
-!pkgs/**/*.md
-!pkgs/**/*.mjs
-!pkgs/**/*.nix
-!pkgs/**/*.patch
-!pkgs/**/*.scm
-!pkgs/**/*.sh
+
+!pkgs/flake.lock
+!pkgs/flake.nix
+
+!pkgs/lib/
+!pkgs/lib/**/
+!pkgs/lib/**/*.nix
+
+!pkgs/pkgs/
+!pkgs/pkgs/**/
+!pkgs/pkgs/**/*.md
+!pkgs/pkgs/**/*.mjs
+!pkgs/pkgs/**/*.nix
+!pkgs/pkgs/**/*.patch
+!pkgs/pkgs/**/*.scm
+!pkgs/pkgs/**/*.sh
 
 !modules/
 !modules/**/

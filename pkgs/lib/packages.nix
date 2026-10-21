@@ -119,6 +119,28 @@ let
       ]
     ));
 
+  mkOverlays_ =
+    overlayPath_: root_:
+    lib.mapAttrs
+      (
+        name_: child_:
+        lib.composeManyExtensions (
+          builtins.concatLists [
+            (lib.optional (hasPath_ overlayPath_ child_) (import (resolvePath_ overlayPath_ child_)))
+            (lib.optional (hasEntries_ overlayPath_ child_) (mkNamespaceOverlay_ overlayPath_ name_ child_))
+          ]
+        )
+      )
+      (
+        lib.filterAttrs (
+          unused_name_: child_:
+          builtins.any (x_: x_) [
+            (hasPath_ overlayPath_ child_)
+            (hasEntries_ overlayPath_ child_)
+          ]
+        ) (getDirectories_ root_)
+      );
+
   mkModule_ = modulePath_: root_: {
 
     imports = (
@@ -146,7 +168,7 @@ in
     }:
     (mkLegacyPackages_ packagePath pkgs root);
 
-  mkOverlay = { root, overlayPath }: (mkOverlay_ overlayPath root);
+  mkOverlays = { root, overlayPath }: (mkOverlays_ overlayPath root);
 
   mkNixosModule = { root, modulePath }: (mkModule_ modulePath root);
 

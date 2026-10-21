@@ -1,0 +1,383 @@
+{
+  "nodes": {
+    "elisp-helpers": {
+      "inputs": {
+        "fromElisp": "fromElisp"
+      },
+      "locked": {
+        "lastModified": 1782098990,
+        "narHash": "sha256-cdzwG8NRXtwlG25Tjfvscx9nKllZbNbEHvK/q7Sdmak=",
+        "owner": "emacs-twist",
+        "repo": "elisp-helpers",
+        "rev": "6ed8c5617af3d62a456ad1407c2e22feefd48b1b",
+        "type": "github"
+      },
+      "original": {
+        "owner": "emacs-twist",
+        "repo": "elisp-helpers",
+        "type": "github"
+      }
+    },
+    "elpa-gnu": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1790099159,
+        "narHash": "sha256-6+FpcgrScg5uIM+PFfNOK7Da6UTg9GagU+q3JNbJbc8=",
+        "ref": "refs/heads/main",
+        "rev": "2129d367ed03c8e5d6e3cedca1c4224b62d03eb6",
+        "shallow": true,
+        "type": "git",
+        "url": "https://https.git.savannah.gnu.org/git/elpa/gnu.git"
+      },
+      "original": {
+        "ref": "refs/heads/main",
+        "shallow": true,
+        "type": "git",
+        "url": "https://https.git.savannah.gnu.org/git/elpa/gnu.git"
+      }
+    },
+    "elpa-nongnu": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1791923522,
+        "narHash": "sha256-MffHYfUmIi3i7d5O5S/pNttfu+9DtaD2+LpTyXo05W4=",
+        "ref": "refs/heads/main",
+        "rev": "c39098d5ab4b1252ee44aefcfd604044bcca7861",
+        "shallow": true,
+        "type": "git",
+        "url": "https://https.git.savannah.gnu.org/git/elpa/nongnu.git"
+      },
+      "original": {
+        "ref": "refs/heads/main",
+        "shallow": true,
+        "type": "git",
+        "url": "https://https.git.savannah.gnu.org/git/elpa/nongnu.git"
+      }
+    },
+    "emarccs": {
+      "inputs": {
+        "elpa-gnu": "elpa-gnu",
+        "elpa-nongnu": "elpa-nongnu",
+        "flake-parts": [
+          "flake-parts"
+        ],
+        "melpa": "melpa",
+        "nix-to-lisp": "nix-to-lisp",
+        "nixpkgs": [
+          "nixpkgs"
+        ],
+        "treefmt-nix": [
+          "treefmt-nix"
+        ],
+        "twist": "twist"
+      },
+      "locked": {
+        "lastModified": 1792544947,
+        "narHash": "sha256-JpIaV6Kwotxki+/ao2H0FbZo6SXTDmHvMQCdFhGyRf8=",
+        "ref": "refs/heads/main",
+        "rev": "1d1e08df0447afd81c3192dd7824acf4a980de90",
+        "shallow": true,
+        "type": "git",
+        "url": "https://github.com/ren-lingyu/emarccs.git"
+      },
+      "original": {
+        "ref": "refs/heads/main",
+        "shallow": true,
+        "type": "git",
+        "url": "https://github.com/ren-lingyu/emarccs.git"
+      }
+    },
+    "flake-parts": {
+      "inputs": {
+        "nixpkgs-lib": [
+          "nixpkgs"
+        ]
+      },
+      "locked": {
+        "lastModified": 1790898470,
+        "narHash": "sha256-zTwuwezD0w3hpga6a6P8emidzAZFyWqlNeRBlpWOOl8=",
+        "ref": "refs/heads/main",
+        "rev": "024633cd702b10285db5cb19b40ad48d2399ba60",
+        "shallow": true,
+        "type": "git",
+        "url": "https://github.com/hercules-ci/flake-parts.git"
+      },
+      "original": {
+        "ref": "refs/heads/main",
+        "shallow": true,
+        "type": "git",
+        "url": "https://github.com/hercules-ci/flake-parts.git"
+      }
+    },
+    "fromElisp": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1723987997,
+        "narHash": "sha256-OhaVgTG6zjLByzl+uPTvtCld3p2uqgbCXmOl/s3LVRo=",
+        "owner": "talyz",
+        "repo": "fromElisp",
+        "rev": "f071a0e262c02c0895b575c4e322b7fd90713543",
+        "type": "github"
+      },
+      "original": {
+        "owner": "talyz",
+        "repo": "fromElisp",
+        "type": "github"
+      }
+    },
+    "git-agent-workflow": {
+      "inputs": {
+        "flake-parts": [
+          "flake-parts"
+        ],
+        "nixpkgs": [
+          "nixpkgs"
+        ]
+      },
+      "locked": {
+        "lastModified": 1792503030,
+        "narHash": "sha256-cVa6bd80904bJFL74YSppLD1T2Pjr6y8zEv2/lfe8wA=",
+        "ref": "refs/heads/main",
+        "rev": "54f8f360850b3299a748053ea73edb485a18a4c0",
+        "shallow": true,
+        "type": "git",
+        "url": "https://github.com/ren-lingyu/git-agent-workflow.git"
+      },
+      "original": {
+        "ref": "refs/heads/main",
+        "shallow": true,
+        "type": "git",
+        "url": "https://github.com/ren-lingyu/git-agent-workflow.git"
+      }
+    },
+    "lean4-nix": {
+      "inputs": {
+        "flake-parts": [
+          "flake-parts"
+        ],
+        "nixpkgs": [
+          "nixpkgs"
+        ]
+      },
+      "locked": {
+        "lastModified": 1792471284,
+        "narHash": "sha256-wjribfkTSWwqTFPbe8b7cjw4bSVA5WOb1j1kIP9qBNc=",
+        "ref": "refs/heads/main",
+        "rev": "6067688bc484f50f16dde1f2749bbb3e373198c9",
+        "shallow": true,
+        "type": "git",
+        "url": "https://github.com/lenianiva/lean4-nix.git"
+      },
+      "original": {
+        "ref": "refs/heads/main",
+        "shallow": true,
+        "type": "git",
+        "url": "https://github.com/lenianiva/lean4-nix.git"
+      }
+    },
+    "lem": {
+      "inputs": {
+        "flake-parts": [
+          "flake-parts"
+        ],
+        "nixpkgs": [
+          "nixpkgs"
+        ]
+      },
+      "locked": {
+        "lastModified": 1792502252,
+        "narHash": "sha256-t47IIP75XcFVw/VjHzZNYQ+5ATRZM0q8dwBy1H+Bgd8=",
+        "ref": "refs/heads/main",
+        "rev": "db85cfb10f8506bf9a645937fd6abcd7e4564ea2",
+        "shallow": true,
+        "type": "git",
+        "url": "https://github.com/lem-project/lem.git"
+      },
+      "original": {
+        "ref": "refs/heads/main",
+        "shallow": true,
+        "type": "git",
+        "url": "https://github.com/lem-project/lem.git"
+      }
+    },
+    "melpa": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1791739963,
+        "narHash": "sha256-VGF1fiSTDkQZC+J4JsfypgGomubGWYj3JEGgKKPmLEQ=",
+        "ref": "refs/heads/master",
+        "rev": "62b1143e6d9019a689b293bb8080838c69f6cf7a",
+        "shallow": true,
+        "type": "git",
+        "url": "https://github.com/melpa/melpa.git"
+      },
+      "original": {
+        "ref": "refs/heads/master",
+        "shallow": true,
+        "type": "git",
+        "url": "https://github.com/melpa/melpa.git"
+      }
+    },
+    "nix-to-lisp": {
+      "inputs": {
+        "flake-parts": [
+          "emarccs",
+          "flake-parts"
+        ],
+        "nixpkgs": [
+          "emarccs",
+          "nixpkgs"
+        ]
+      },
+      "locked": {
+        "lastModified": 1786893193,
+        "narHash": "sha256-u+0OAt2Y3w9gTr4JdP11mM/NDbQN40laKSJQelLmUCE=",
+        "ref": "refs/heads/main",
+        "rev": "69e760eb522700ed81f736ea1a05b8286dff2c04",
+        "shallow": true,
+        "type": "git",
+        "url": "https://github.com/ren-lingyu/nix-to-lisp.git"
+      },
+      "original": {
+        "ref": "refs/heads/main",
+        "shallow": true,
+        "type": "git",
+        "url": "https://github.com/ren-lingyu/nix-to-lisp.git"
+      }
+    },
+    "nixpkgs": {
+      "locked": {
+        "lastModified": 1792506237,
+        "narHash": "sha256-Q/8KLB6jNfpaUN1HAedE/u/Et9feE/zYSsutBLKrCFk=",
+        "ref": "refs/heads/nixpkgs-unstable",
+        "rev": "5adc50831c259f87faeb09ddf930d43597197473",
+        "shallow": true,
+        "type": "git",
+        "url": "https://github.com/NixOS/nixpkgs"
+      },
+      "original": {
+        "ref": "refs/heads/nixpkgs-unstable",
+        "shallow": true,
+        "type": "git",
+        "url": "https://github.com/NixOS/nixpkgs"
+      }
+    },
+    "nixvim": {
+      "inputs": {
+        "flake-parts": [
+          "flake-parts"
+        ],
+        "nixpkgs": [
+          "nixpkgs"
+        ],
+        "systems": "systems"
+      },
+      "locked": {
+        "lastModified": 1792203519,
+        "narHash": "sha256-yJ072hxngo/srNdLTp4BlFeo0hedwnKicI3TGlSXLFE=",
+        "ref": "refs/heads/main",
+        "rev": "453dc9c5037e6d1bec81d2a51ddacd58a2f44e9c",
+        "shallow": true,
+        "type": "git",
+        "url": "https://github.com/nix-community/nixvim.git"
+      },
+      "original": {
+        "ref": "refs/heads/main",
+        "shallow": true,
+        "type": "git",
+        "url": "https://github.com/nix-community/nixvim.git"
+      }
+    },
+    "root": {
+      "inputs": {
+        "emarccs": "emarccs",
+        "flake-parts": "flake-parts",
+        "git-agent-workflow": "git-agent-workflow",
+        "lean4-nix": "lean4-nix",
+        "lem": "lem",
+        "nixpkgs": "nixpkgs",
+        "nixvim": "nixvim",
+        "treefmt-nix": "treefmt-nix",
+        "zotero-fix-nixpkgs": "zotero-fix-nixpkgs"
+      }
+    },
+    "systems": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1791244623,
+        "narHash": "sha256-uuanbkFk8a313Zfrxdcz8Us/yQtaxNnKJtX8v0ZPpd8=",
+        "owner": "nix-systems",
+        "repo": "default",
+        "rev": "d36eeed142f88b5a636f2e3856a53c61654cf29b",
+        "type": "github"
+      },
+      "original": {
+        "owner": "nix-systems",
+        "ref": "future-26.11",
+        "repo": "default",
+        "type": "github"
+      }
+    },
+    "treefmt-nix": {
+      "inputs": {
+        "nixpkgs": [
+          "nixpkgs"
+        ]
+      },
+      "locked": {
+        "lastModified": 1791885023,
+        "narHash": "sha256-C3alQ2MEt0zVrUSho5NUDo3jmhbff72++bfwoqT9Omo=",
+        "ref": "refs/heads/main",
+        "rev": "0d6d739a833ba9a9c93034862e4a7b061a062a1c",
+        "shallow": true,
+        "type": "git",
+        "url": "https://github.com/numtide/treefmt-nix.git"
+      },
+      "original": {
+        "ref": "refs/heads/main",
+        "shallow": true,
+        "type": "git",
+        "url": "https://github.com/numtide/treefmt-nix.git"
+      }
+    },
+    "twist": {
+      "inputs": {
+        "elisp-helpers": "elisp-helpers"
+      },
+      "locked": {
+        "lastModified": 1790049679,
+        "narHash": "sha256-lr1sv26RxQqy8APt48mdqMsua46StI1+JQTqFT8jSCk=",
+        "ref": "refs/heads/master",
+        "rev": "cfdb9127d9be7444f7eafcb7a15780165fea3486",
+        "shallow": true,
+        "type": "git",
+        "url": "https://github.com/emacs-twist/twist.nix.git"
+      },
+      "original": {
+        "ref": "refs/heads/master",
+        "shallow": true,
+        "type": "git",
+        "url": "https://github.com/emacs-twist/twist.nix.git"
+      }
+    },
+    "zotero-fix-nixpkgs": {
+      "locked": {
+        "lastModified": 1789322069,
+        "narHash": "sha256-eaIzbbImStaHMgxftbumWoZuMC+Xm7TraQSsf6da+VI=",
+        "ref": "refs/heads/master",
+        "rev": "363fdbe57ed052c76e816e6270206b0cb348e53a",
+        "shallow": true,
+        "type": "git",
+        "url": "https://github.com/NixOS/nixpkgs.git"
+      },
+      "original": {
+        "rev": "363fdbe57ed052c76e816e6270206b0cb348e53a",
+        "shallow": true,
+        "type": "git",
+        "url": "https://github.com/NixOS/nixpkgs.git"
+      }
+    }
+  },
+  "root": "root",
+  "version": 7
+}

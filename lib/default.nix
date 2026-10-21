@@ -14,8 +14,6 @@
 
   features.sops = import ./features.sops.nix;
 
-  packages = import ./packages.nix { inherit lib; };
-
   flakeParts = lib.mergeAttrsList [
     (import ./flakeParts.configurations.nix {
       inherit lib;
