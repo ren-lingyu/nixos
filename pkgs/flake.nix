@@ -170,8 +170,11 @@
               };
             };
 
-            perSystem = { inputs', pkgs, ... }: {
-              _module.args.pkgs = inputs'.nixpkgs.legacyPackages.appendOverlays [ lpkgs.overlays.default ];
+            perSystem = { system, pkgs, ... }: {
+              _module.args.pkgs = import inputs.nixpkgs {
+                inherit system;
+                overlays = [ lpkgs.overlays.default ];
+              };
 
               legacyPackages = lpkgs.mkLegacyPackages pkgs;
             };
