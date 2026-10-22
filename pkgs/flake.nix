@@ -41,6 +41,7 @@
         nixpkgs.follows = "nixpkgs";
         flake-parts.follows = "flake-parts";
         treefmt-nix.follows = "treefmt-nix";
+        personal-nixpkgs.follows = "personal-nixpkgs";
       };
     };
     nixvim = {

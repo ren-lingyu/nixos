@@ -231,7 +231,7 @@
                       emacs = {
                         enable = true;
                         programs.package = { pkgs, ... }: pkgs.emacs-pgtk;
-                        services.package = { pkgs, ... }: pkgs.emacs-pgtk-twist;
+                        services.package = { pkgs, ... }: pkgs.emarccs-pgtk;
                       };
                       lem = {
                         enable = true;
@@ -302,7 +302,7 @@
                       emacs = {
                         enable = true;
                         programs.package = { pkgs, ... }: pkgs.emacs-pgtk;
-                        services.package = { pkgs, ... }: pkgs.emacs-pgtk-twist;
+                        services.package = { pkgs, ... }: pkgs.emarccs-pgtk;
                       };
                       lem = {
                         enable = true;
