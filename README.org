@@ -155,8 +155,7 @@ nixosConfigurations.nixos.modules.features.editor.emacs.programs.package =
 ├── flake.lock
 ├── flake.nix
 ├── lib/
-│   ├── default.nix
-│   └── packages.nix
+│   └── default.nix
 └── pkgs/
     ├── default.nix
     ├── codex/
@@ -182,16 +181,17 @@ nixosConfigurations.nixos.modules.features.editor.emacs.programs.package =
 [[file:./pkgs/flake.nix][pkgs/flake.nix]] 使用独立的 inputs 和 [[file:./pkgs/flake.lock][flake.lock]] 管理应用依赖, =nixpkgs= 使用 =nixpkgs-unstable=, 不跟随根系统的 =nixpkgs=. 应用依赖可相对独立地维护和更新; 根 flake 仍决定模块启用, overlay 接入和最终系统构建. 根消费子项目时还通过自己的 lock graph 记录其依赖, 更新子项目后也应核对根消费的依赖状态.
 
 子项目 inputs 包括:
+- =personal-nixpkgs=: 提供通用 package library, 其 =nixpkgs=, =flake-parts= 和 =treefmt-nix= 跟随子项目对应输入.
 - =flake-parts= 和 =treefmt-nix=: 组织子 flake 及其应用依赖的 =follows= 关系. =treefmt-nix= 当前未在子项目中配置独立 formatter/checks.
 - =emarccs=, =lem= 和 =nixvim=: 提供 editor 所需的 overlays 和 Home Manager module.
 - =git-agent-workflow=: 通过 =share= overlay 提供持久记忆工具.
 - =lean4-nix=: 通过 =share= overlay 提供 =lean4= 二进制包.
 - =zotero-fix-nixpkgs=: 固定 nixpkgs revision, 通过 =share= overlay 提供对应 =zotero= 包.
 
-[[file:./pkgs/lib/default.nix][pkgs/lib/default.nix]] 导出子项目自己的 =llib.packages=, 与根 =llib= 分开. [[file:./pkgs/pkgs/default.nix][pkgs/pkgs/default.nix]] 使用它生成本地包集合, overlays 和 OS/HM 模块入口. =package.nix= 定义包, =overlay.nix= 注入包或命名空间; =os/default.nix= 和 =hm/default.nix= 提供包附带的模块. =mkOverlays= 按目录返回扩展集合, 再组合成本地 overlay 分组; 非 =default= 分组必须互不重叠, 且都是 =default= 的子集.
+=pkgs/flake.nix= 将 =personal-nixpkgs.lib= 与 [[file:./pkgs/lib/default.nix][pkgs/lib/default.nix]] 的本地扩展通过 =mergeAttrsRecursive { allowOverrides = false; }= 合并为子项目的 =llib=, 禁止覆盖同名定义. 通用 =llib.packages= 由外部库提供; 本地扩展入口当前为空, 子项目 =llib= 与根 =llib= 分开. [[file:./pkgs/pkgs/default.nix][pkgs/pkgs/default.nix]] 使用它生成本地包集合, overlays 和 OS/HM 模块入口. =package.nix= 定义包, =overlay.nix= 注入包或命名空间; =os/default.nix= 和 =hm/default.nix= 提供包附带的模块. =mkOverlays= 按目录返回扩展集合, 再组合成本地 overlay 分组; 非 =default= 分组必须互不重叠, 且都是 =default= 的子集.
 
 子 flake 当前提供 =x86_64-linux= 软件包输出及以下集成入口:
-- =legacyPackages.x86_64-linux=: 使用子项目的 package set 构造本地 recipes, 保留 =piPackages= 和 =texlivePackages= 等命名空间. 此集合不自动应用导出的上游应用 overlays.
+- =legacyPackages.x86_64-linux=: 先通过 =appendOverlays= 将 =overlays.default= 的本地扩展应用到子项目的 package set, 再调用 =mkLegacyPackages=, 以 =overlayFile = "overlay.nix"= 指定发现入口. =share= 和 =editor= 的上游应用集成仍由相应 overlays 提供.
 - =overlays.default=: 包含全部本地包扩展.
 - =overlays.share=: 本地包扩展中排除 =rage-armored=, 并加入 GAW, Lean 和 Zotero 的集成.
 - =overlays.editor=: 组合 emarccs 和 Lem 的 overlays, 并为 Lem 补充依赖及桌面入口.

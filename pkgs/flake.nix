@@ -27,6 +27,14 @@
       url = "git+https://github.com/numtide/treefmt-nix.git?ref=refs/heads/main&shallow=1";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+    personal-nixpkgs = {
+      url = "git+https://github.com/ren-lingyu/nixpkgs?ref=refs/heads/main&shallow=1";
+      inputs = {
+        nixpkgs.follows = "nixpkgs";
+        flake-parts.follows = "flake-parts";
+        treefmt-nix.follows = "treefmt-nix";
+      };
+    };
     emarccs = {
       url = "git+https://github.com/ren-lingyu/emarccs.git?ref=refs/heads/main&shallow=1";
       inputs = {
@@ -80,7 +88,10 @@
             lib = inputs.nixpkgs.lib;
           in
           (rec {
-            llib = import ./lib { inherit lib; };
+            llib = inputs.personal-nixpkgs.lib.mergeAttrsRecursive { allowOverrides = false; } [
+              inputs.personal-nixpkgs.lib
+              (import ./lib { inherit lib; })
+            ];
             lpkgs = import ./pkgs { inherit lib llib; };
           });
       }
@@ -159,7 +170,11 @@
               };
             };
 
-            perSystem = { pkgs, ... }: { legacyPackages = lpkgs.mkLegacyPackages pkgs; };
+            perSystem = { inputs', pkgs, ... }: {
+              _module.args.pkgs = inputs'.nixpkgs.legacyPackages.appendOverlays [ lpkgs.overlays.default ];
+
+              legacyPackages = lpkgs.mkLegacyPackages pkgs;
+            };
           };
         }
       );

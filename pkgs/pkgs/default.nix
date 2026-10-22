@@ -3,7 +3,7 @@
     pkgs:
     llib.packages.mkLegacyPackages {
       root = ./.;
-      packagePath = "package.nix";
+      overlayFile = "overlay.nix";
       inherit pkgs;
     };
 
@@ -27,7 +27,7 @@
     assert_ (rec {
       default = llib.packages.mkOverlays {
         root = ./.;
-        overlayPath = "overlay.nix";
+        overlayFile = "overlay.nix";
       };
 
       share = builtins.removeAttrs default [ "rage-armored" ];

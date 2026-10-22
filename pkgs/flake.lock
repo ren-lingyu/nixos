@@ -288,6 +288,34 @@
         "url": "https://github.com/nix-community/nixvim.git"
       }
     },
+    "personal-nixpkgs": {
+      "inputs": {
+        "flake-parts": [
+          "flake-parts"
+        ],
+        "nixpkgs": [
+          "nixpkgs"
+        ],
+        "treefmt-nix": [
+          "treefmt-nix"
+        ]
+      },
+      "locked": {
+        "lastModified": 1792674130,
+        "narHash": "sha256-uV4txGSr7IEn14TyimBYbGDJfP5KiHjGfNX6Q4mIi5Y=",
+        "ref": "refs/heads/main",
+        "rev": "e461ed75abb9c00fb3393094f883bba418a8cbb3",
+        "shallow": true,
+        "type": "git",
+        "url": "https://github.com/ren-lingyu/nixpkgs"
+      },
+      "original": {
+        "ref": "refs/heads/main",
+        "shallow": true,
+        "type": "git",
+        "url": "https://github.com/ren-lingyu/nixpkgs"
+      }
+    },
     "root": {
       "inputs": {
         "emarccs": "emarccs",
@@ -297,6 +325,7 @@
         "lem": "lem",
         "nixpkgs": "nixpkgs",
         "nixvim": "nixvim",
+        "personal-nixpkgs": "personal-nixpkgs",
         "treefmt-nix": "treefmt-nix",
         "zotero-fix-nixpkgs": "zotero-fix-nixpkgs"
       }
