@@ -1,1 +1,1 @@
-final: prev: { lib-types = final.callPackage ./default.nix { }; }
+final: prev: { lib-types = final.callPackage ./test.nix { types = final.llibTypes; }; }

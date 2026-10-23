@@ -1,1 +1,1 @@
-final: prev: { host-functions = final.callPackage ./default.nix { }; }
+final: prev: { host-functions = final.callPackage ./test.nix { hosts = final.llibHosts; }; }

@@ -1,25 +1,20 @@
 {
+  lib,
   pkgs,
   llib,
   rootPath,
 }:
-let
-  args_ = {
-    root = ./.;
-    overlayFile = "test-overlay.nix";
-    separator = "/";
-  };
-in
 llib.tests.mkChecks {
-  inherit (args_) root overlayFile separator;
-
-  scope =
-    (pkgs.lib.makeScope pkgs.newScope (_: {
-      inherit pkgs llib rootPath;
-    })).overrideScope
-      (
-        pkgs.lib.composeManyExtensions (
-          builtins.attrValues (llib.tests.mkOverlays { inherit (args_) root overlayFile; })
-        )
-      );
+  root = ./.;
+  overlayFile = "test-overlay.nix";
+  separator = "-";
+  args = {
+    inherit lib rootPath;
+    inherit (pkgs) runCommand;
+    llibFeatures = llib.features;
+    llibFlakeParts = llib.flakeParts;
+    llibHosts = llib.hosts;
+    llibModules = llib.modules;
+    llibTypes = llib.types;
+  };
 }

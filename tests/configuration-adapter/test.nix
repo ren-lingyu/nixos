@@ -1,10 +1,13 @@
 {
-  pkgs,
-  llib,
+  lib,
+  runCommand,
   rootPath,
+  flakeParts,
+  modules,
+  types,
 }:
 let
-  lib = pkgs.lib;
+  declarationLib_ = { inherit types; };
 
   options_ = {
     plain = lib.mkOption { type = lib.types.bool; };
@@ -26,11 +29,11 @@ let
     };
   };
 
-  result_ = llib.flakeParts.adaptOptions options_ config_ { value = "resolved"; };
+  result_ = flakeParts.adaptOptions options_ config_ { value = "resolved"; };
 
   root_ = rootPath;
-  registryType_ = llib.flakeParts.types.moduleRegistry {
-    inherit llib;
+  registryType_ = flakeParts.types.moduleRegistry {
+    llib = declarationLib_;
     root = root_;
     modulesDir = root_ + "/modules";
   };
@@ -53,11 +56,11 @@ let
       modules = [
         {
           options.systems = lib.mkOption {
-            type = llib.flakeParts.types.nixosConfigurations {
+            type = flakeParts.types.nixosConfigurations {
               root = root_;
               modulesDir = root_ + "/modules";
               scope = {
-                inherit llib;
+                llib = declarationLib_;
                 moduleRegistry = registry_;
               };
             };
@@ -73,7 +76,7 @@ let
       ];
     }).config.systems.test;
   # Inspect the real builder's generated bridge without evaluating OS services.
-  bridge_ = llib.flakeParts.mkNixosSystem {
+  bridge_ = flakeParts.mkNixosSystem {
     rootPath = root_;
     registry = registry_;
     systemConfiguration = configuration_;
@@ -83,7 +86,8 @@ let
       nixosSystem =
         args:
         (builtins.elemAt args.modules 1) {
-          inherit lib pkgs;
+          inherit lib;
+          pkgs = { };
           config = { };
         };
     };
@@ -118,7 +122,7 @@ let
       builtins.isBool availability.os
       && builtins.isBool availability.hm
       && (lib.getAttrFromPath path bridge_.config.modules).existModule == availability
-    ) (llib.modules.discoverModules root_ (root_ + "/modules")))
+    ) (modules.discoverModules root_ (root_ + "/modules")))
     (evaluationFails_
       (evalRegistry_ [ { registry.features.editor.metadata.existModule.os = true; } ])
       .features.editor.metadata.existModule
@@ -144,6 +148,6 @@ assert result_.plain;
 assert result_.package == "resolved";
 assert result_.nested.value == "nested-resolved";
 assert builtins.isFunction result_.untouched.function;
-pkgs.runCommand "nixos-configuration-adapter" { } ''
+runCommand "nixos-configuration-adapter" { } ''
   touch $out
 ''

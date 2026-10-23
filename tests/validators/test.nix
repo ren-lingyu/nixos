@@ -1,14 +1,17 @@
 {
-  pkgs,
-  llib,
+  lib,
+  runCommand,
   rootPath,
+  flakeParts,
+  modules,
+  types,
 }:
 let
-  lib = pkgs.lib;
+  declarationLib_ = { inherit types; };
   fixture = name: ./. + "/fixtures/${name}";
   applications =
     name:
-    llib.flakeParts.mkValidatorApplications {
+    flakeParts.mkValidatorApplications {
       llib = {
         marker = 42;
         unused = throw "unrelated validator context forced";
@@ -33,8 +36,8 @@ let
       modules = [
         ({ config, ... }: {
           options.moduleRegistry = lib.mkOption {
-            type = llib.flakeParts.types.moduleRegistry {
-              inherit llib;
+            type = flakeParts.types.moduleRegistry {
+              llib = declarationLib_;
               inherit root;
               modulesDir = root + "/modules";
             };
@@ -42,11 +45,11 @@ let
             apply = apply.moduleRegistry;
           };
           options.nixosConfigurations = lib.mkOption {
-            type = llib.flakeParts.types.nixosConfigurations {
+            type = flakeParts.types.nixosConfigurations {
               inherit root;
               modulesDir = root + "/modules";
               scope = {
-                inherit llib;
+                llib = declarationLib_;
                 moduleRegistry = config.moduleRegistry;
               };
             };
@@ -104,7 +107,7 @@ let
       ];
     };
   };
-  discovered = llib.modules.discoverValidatorFiles {
+  discovered = modules.discoverValidatorFiles {
     root = fixture "hierarchy";
     modulesDir = fixture "hierarchy" + "/modules";
   };
@@ -129,7 +132,7 @@ let
       ]
     ))
     (check "no validators" (
-      llib.modules.discoverValidatorFiles {
+      modules.discoverValidatorFiles {
         root = fixture "empty";
         modulesDir = fixture "empty" + "/modules";
       } == [ ]
@@ -222,6 +225,6 @@ let
   ];
 in
 assert builtins.all (test: test) tests;
-pkgs.runCommand "nixos-fp-validators" { } ''
+runCommand "nixos-fp-validators" { } ''
   touch $out
 ''

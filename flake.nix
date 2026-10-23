@@ -455,7 +455,14 @@
               }:
               {
 
-                checks = import ./tests { inherit pkgs llib rootPath; };
+                checks = import ./tests {
+                  inherit
+                    lib
+                    pkgs
+                    llib
+                    rootPath
+                    ;
+                };
 
                 devShells = {
                   deploy = pkgs.mkShell { nativeBuildInputs = [ inputs'.nixos-anywhere.packages.default ]; };

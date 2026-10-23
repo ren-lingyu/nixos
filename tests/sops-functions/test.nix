@@ -1,16 +1,16 @@
-{ pkgs, llib }:
+{ runCommand, features }:
 let
 
   assertEqual =
     name_: expected_: actual_:
     if actual_ == expected_ then true else throw "Test `${name_}` failed: values differ.";
 
-  sopsFunctions_ = llib.features.sops {
+  sopsFunctions_ = features.sops {
     config = {
       home.uid = 1000;
       sops = {
         defaultSopsFormat = "yaml";
-        defaultSopsFile = ./default.nix;
+        defaultSopsFile = ./test.nix;
       };
     };
   };
@@ -63,7 +63,7 @@ let
       mode = "0440";
       path = "/run/secrets/database.password";
       format = "yaml";
-      sopsFile = ./default.nix;
+      sopsFile = ./test.nix;
       neededForUsers = false;
       uid = 0;
       gid = 0;
@@ -73,6 +73,6 @@ let
 
 in
 assert builtins.deepSeq tests_ true;
-pkgs.runCommand "nixos-sops-functions" { } ''
+runCommand "nixos-sops-functions" { } ''
   touch $out
 ''

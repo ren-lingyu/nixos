@@ -1,7 +1,9 @@
-{ pkgs, llib }:
+{
+  lib,
+  runCommand,
+  types,
+}:
 let
-
-  lib = pkgs.lib;
 
   assertEqual =
     name_: expected_: actual_:
@@ -16,7 +18,7 @@ let
     (lib.evalModules {
       modules = [
         {
-          options.value = lib.mkOption { type = llib.types.monitors; };
+          options.value = lib.mkOption { type = types.monitors; };
           config.value = value_;
         }
       ];
@@ -57,6 +59,6 @@ let
 
 in
 assert builtins.deepSeq tests_ true;
-pkgs.runCommand "nixos-lib-types" { } ''
+runCommand "nixos-lib-types" { } ''
   touch $out
 ''
