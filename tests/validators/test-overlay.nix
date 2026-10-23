@@ -1,4 +1,4 @@
-final: prev: {
+{ }: final: prev: {
   validators = final.callPackage ./test.nix {
     flakeParts = final.llibFlakeParts;
     modules = final.llibModules;
