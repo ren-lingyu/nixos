@@ -726,6 +726,34 @@
         "url": "https://github.com/ren-lingyu/nixpkgs"
       }
     },
+    "personal-nixpkgs_2": {
+      "inputs": {
+        "flake-parts": [
+          "flake-parts"
+        ],
+        "nixpkgs": [
+          "nixpkgs"
+        ],
+        "treefmt-nix": [
+          "treefmt-nix"
+        ]
+      },
+      "locked": {
+        "lastModified": 1792741527,
+        "narHash": "sha256-wezE2/tAplX61fEkf9YSkx/jdl1X+8aRqmRNuHWuHNU=",
+        "ref": "refs/heads/main",
+        "rev": "bb56aacd372e283c65a4060bb45e116171e58fbe",
+        "shallow": true,
+        "type": "git",
+        "url": "https://github.com/ren-lingyu/nixpkgs"
+      },
+      "original": {
+        "ref": "refs/heads/main",
+        "shallow": true,
+        "type": "git",
+        "url": "https://github.com/ren-lingyu/nixpkgs"
+      }
+    },
     "pre-commit-hooks": {
       "inputs": {
         "flake-compat": "flake-compat_2",
@@ -766,6 +794,7 @@
         "nixos-wsl": "nixos-wsl",
         "nixpkgs": "nixpkgs_3",
         "nixvirt": "nixvirt",
+        "personal-nixpkgs": "personal-nixpkgs_2",
         "sops-nix": "sops-nix",
         "treefmt-nix": "treefmt-nix"
       }

@@ -3,16 +3,23 @@
   llib,
   rootPath,
 }:
-{
+let
+  args_ = {
+    root = ./.;
+    overlayFile = "test-overlay.nix";
+    separator = "/";
+  };
+in
+llib.tests.mkChecks {
+  inherit (args_) root overlayFile separator;
 
-  validators = import ./validators { inherit pkgs llib rootPath; };
-
-  lib-types = import ./lib-types { inherit pkgs llib; };
-
-  host-functions = import ./host-functions { inherit pkgs llib; };
-
-  configuration-adapter = import ./configuration-adapter { inherit pkgs llib; };
-
-  sops-functions = import ./sops-functions { inherit pkgs llib; };
-
+  scope =
+    (pkgs.lib.makeScope pkgs.newScope (_: {
+      inherit pkgs llib rootPath;
+    })).overrideScope
+      (
+        pkgs.lib.composeManyExtensions (
+          builtins.attrValues (llib.tests.mkOverlays { inherit (args_) root overlayFile; })
+        )
+      );
 }

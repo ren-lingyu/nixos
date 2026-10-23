@@ -1,4 +1,8 @@
-{ pkgs, llib }:
+{
+  pkgs,
+  llib,
+  rootPath,
+}:
 let
   lib = pkgs.lib;
 
@@ -24,7 +28,7 @@ let
 
   result_ = llib.flakeParts.adaptOptions options_ config_ { value = "resolved"; };
 
-  root_ = ../..;
+  root_ = rootPath;
   registryType_ = llib.flakeParts.types.moduleRegistry {
     inherit llib;
     root = root_;
