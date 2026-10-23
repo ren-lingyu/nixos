@@ -15,17 +15,19 @@ let
 
 in
 {
-  pi-coding-agent = (pi-coding-agent.overrideAttrs (oldAttrs_: {
+  pi-coding-agent = (
+    pi-coding-agent.overrideAttrs (oldAttrs_: {
 
-    nativeBuildInputs = builtins.concatLists [
-      (oldAttrs_.nativeBuildInputs or [ ])
-      [ makeWrapper ]
-    ];
+      nativeBuildInputs = builtins.concatLists [
+        (oldAttrs_.nativeBuildInputs or [ ])
+        [ makeWrapper ]
+      ];
 
-    postFixup = builtins.concatStringsSep "\n" [
-      (oldAttrs_.postFixup or "")
-      "wrapProgram \"${prevExeOutputVar_}${prevExeRelPath_}\" --set PI_OFFLINE 1"
-    ];
+      postFixup = builtins.concatStringsSep "\n" [
+        (oldAttrs_.postFixup or "")
+        "wrapProgram \"${prevExeOutputVar_}${prevExeRelPath_}\" --set PI_OFFLINE 1"
+      ];
 
-  }));
+    })
+  );
 }
