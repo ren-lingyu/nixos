@@ -104,10 +104,7 @@
           "local-nixpkgs",
           "nixpkgs"
         ],
-        "personal-nixpkgs": [
-          "local-nixpkgs",
-          "personal-nixpkgs"
-        ],
+        "personal-nixpkgs": "personal-nixpkgs",
         "treefmt-nix": [
           "local-nixpkgs",
           "treefmt-nix"
@@ -124,6 +121,7 @@
       },
       "original": {
         "ref": "refs/heads/main",
+        "rev": "c54849019abba42bb5feeabd71548958fe0f0407",
         "shallow": true,
         "type": "git",
         "url": "https://github.com/ren-lingyu/emarccs.git"
@@ -377,7 +375,7 @@
         "lem": "lem",
         "nixpkgs": "nixpkgs",
         "nixvim": "nixvim",
-        "personal-nixpkgs": "personal-nixpkgs",
+        "personal-nixpkgs": "personal-nixpkgs_2",
         "treefmt-nix": [
           "treefmt-nix"
         ],
@@ -699,22 +697,25 @@
       "inputs": {
         "flake-parts": [
           "local-nixpkgs",
+          "emarccs",
           "flake-parts"
         ],
         "nixpkgs": [
           "local-nixpkgs",
+          "emarccs",
           "nixpkgs"
         ],
         "treefmt-nix": [
           "local-nixpkgs",
+          "emarccs",
           "treefmt-nix"
         ]
       },
       "locked": {
-        "lastModified": 1792730347,
-        "narHash": "sha256-AZpIc/+n+exPez0dxgfgHbdLolKvoQ18PdyYmop4FEk=",
+        "lastModified": 1792674130,
+        "narHash": "sha256-uV4txGSr7IEn14TyimBYbGDJfP5KiHjGfNX6Q4mIi5Y=",
         "ref": "refs/heads/main",
-        "rev": "8ec686abab7b774f148e60bdae55a2f00e6cb4f9",
+        "rev": "e461ed75abb9c00fb3393094f883bba418a8cbb3",
         "shallow": true,
         "type": "git",
         "url": "https://github.com/ren-lingyu/nixpkgs"
@@ -727,6 +728,37 @@
       }
     },
     "personal-nixpkgs_2": {
+      "inputs": {
+        "flake-parts": [
+          "local-nixpkgs",
+          "flake-parts"
+        ],
+        "nixpkgs": [
+          "local-nixpkgs",
+          "nixpkgs"
+        ],
+        "treefmt-nix": [
+          "local-nixpkgs",
+          "treefmt-nix"
+        ]
+      },
+      "locked": {
+        "lastModified": 1792762694,
+        "narHash": "sha256-SDLOUSqlap9PGNFbsB+vPrgEYo/GvPKToQImTtWZhSc=",
+        "ref": "refs/heads/main",
+        "rev": "06a8fa43a112c4b1f0f9576eceee466b6b730f38",
+        "shallow": true,
+        "type": "git",
+        "url": "https://github.com/ren-lingyu/nixpkgs"
+      },
+      "original": {
+        "ref": "refs/heads/main",
+        "shallow": true,
+        "type": "git",
+        "url": "https://github.com/ren-lingyu/nixpkgs"
+      }
+    },
+    "personal-nixpkgs_3": {
       "inputs": {
         "flake-parts": [
           "flake-parts"
@@ -794,7 +826,7 @@
         "nixos-wsl": "nixos-wsl",
         "nixpkgs": "nixpkgs_3",
         "nixvirt": "nixvirt",
-        "personal-nixpkgs": "personal-nixpkgs_2",
+        "personal-nixpkgs": "personal-nixpkgs_3",
         "sops-nix": "sops-nix",
         "treefmt-nix": "treefmt-nix"
       }

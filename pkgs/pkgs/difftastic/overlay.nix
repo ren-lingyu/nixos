@@ -1,3 +1,4 @@
+{ }:
 final: prev:
 let
   inherit (final) fetchpatch2 rustPlatform;

@@ -36,12 +36,12 @@
       };
     };
     emarccs = {
-      url = "git+https://github.com/ren-lingyu/emarccs.git?ref=refs/heads/main&shallow=1";
+      url = "git+https://github.com/ren-lingyu/emarccs.git?ref=refs/heads/main&rev=c54849019abba42bb5feeabd71548958fe0f0407&shallow=1";
       inputs = {
         nixpkgs.follows = "nixpkgs";
         flake-parts.follows = "flake-parts";
         treefmt-nix.follows = "treefmt-nix";
-        personal-nixpkgs.follows = "personal-nixpkgs";
+        # personal-nixpkgs.follows = "personal-nixpkgs";
       };
     };
     nixvim = {

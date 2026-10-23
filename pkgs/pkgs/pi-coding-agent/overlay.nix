@@ -1,3 +1,4 @@
+{ }:
 final_: prev_:
 let
   inherit (final_) lib makeWrapper;
