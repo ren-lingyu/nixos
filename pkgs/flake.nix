@@ -90,7 +90,7 @@
           in
           (rec {
             llib = inputs.personal-nixpkgs.lib.mergeAttrsRecursive { allowOverrides = false; } [
-              inputs.personal-nixpkgs.lib
+              { inherit (inputs.personal-nixpkgs.lib) packages; }
               (import ./lib { inherit lib; })
             ];
             lpkgs = import ./pkgs { inherit lib llib; };
