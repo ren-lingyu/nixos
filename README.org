@@ -111,6 +111,7 @@ nixosConfigurations.nixos.modules.features.editor.emacs.programs.package =
 
 根 flake inputs 按使用位置集中传递:
 - =nixpkgs=: 提供最终系统与 =perSystem= 的 package set, 也是多个 inputs 的 =follows= 目标.
+- =personal-nixpkgs=: 提供 =llib.tests= 测试组织接口, 与 package 子项目中的同名输入各自锁定.
 - =local-nixpkgs=: 通过 =path:./pkgs= 引用 package 子项目, 将其 =share= 和 =editor= overlays/modules 注入对应 Registry 条目; 子项目的 =treefmt-nix= 跟随根输入.
 - =flake-parts=: 组装 flake outputs, =nixpkgs-lib= 跟随根 =nixpkgs=.
 - =treefmt-nix=: 提供 formatter 与格式检查, 启用 nixfmt, shfmt 和 prettier.
@@ -143,6 +144,8 @@ nixosConfigurations.nixos.modules.features.editor.emacs.programs.package =
 - =features.sops=: per-user SOPS 输入处理.
 - =flakeParts=: 配置适配, 系统构造与 =mkValidatorApplications= 验证组合/执行; =flakeParts.types= 声明 registry, builder 和系统配置类型.
 
+根 flake 将本地库与 =personal-nixpkgs.lib.tests= 合并为运行时 =llib=, 不引入外部库的其他命名空间.
+
 [[file:./lib/flakeParts.configurations.nix][flakeParts.configurations.nix]] 私有封装内部与接口 options 的生成, 并在系统构造时统一加载.
 
 =lib/default.nix= 按实际依赖逐项构造各 flakeParts 子库, 不注入递归的整库 =llib=. =moduleRegistry= 类型函数在调用时通过 =root=, =modulesDir= 和 =llib= 接收模块路径及 metadata 声明上下文, validator 在 =mkValidatorApplications= 调用时接收验证上下文; 两者均与库的构造依赖分开.
@@ -170,8 +173,7 @@ nixosConfigurations.nixos.modules.features.editor.emacs.programs.package =
     │   └── pi-workspace-history/
     ├── rage-armored/
     ├── texlivePackages/
-    │   ├── luadraw/
-    │   └── overlay.nix
+    │   └── luadraw/
     └── wayfile/
         ├── hm/
         ├── overlay.nix
@@ -183,12 +185,23 @@ nixosConfigurations.nixos.modules.features.editor.emacs.programs.package =
 子项目 inputs 包括:
 - =personal-nixpkgs=: 提供通用 package library, 其 =nixpkgs=, =flake-parts= 和 =treefmt-nix= 跟随子项目对应输入.
 - =flake-parts= 和 =treefmt-nix=: 组织子 flake 及其应用依赖的 =follows= 关系. =treefmt-nix= 当前未在子项目中配置独立 formatter/checks.
-- =emarccs=, =lem= 和 =nixvim=: 提供 editor 所需的 overlays 和 Home Manager module; =emarccs= 的 =personal-nixpkgs= 跟随子项目对应输入.
+- =emarccs=: 提供 editor 的 Emacs overlay, 固定 revision, 其内部 =personal-nixpkgs= 依赖由自身锁定.
+- =lem= 和 =nixvim=: 提供 editor 所需的 overlay 和 Home Manager module.
 - =git-agent-workflow=: 通过 =share= overlay 提供持久记忆工具.
 - =lean4-nix=: 通过 =share= overlay 提供 =lean4= 二进制包.
 - =zotero-fix-nixpkgs=: 固定 nixpkgs revision, 通过 =share= overlay 提供对应 =zotero= 包.
 
-=pkgs/flake.nix= 将 =personal-nixpkgs.lib= 与 [[file:./pkgs/lib/default.nix][pkgs/lib/default.nix]] 的本地扩展通过 =mergeAttrsRecursive { allowOverrides = false; }= 合并为子项目的 =llib=, 禁止覆盖同名定义. 通用 =llib.packages= 由外部库提供; 本地扩展入口当前为空, 子项目 =llib= 与根 =llib= 分开. [[file:./pkgs/pkgs/default.nix][pkgs/pkgs/default.nix]] 使用它生成本地包集合, overlays 和 OS/HM 模块入口. =package.nix= 定义包, =overlay.nix= 注入包或命名空间; =os/default.nix= 和 =hm/default.nix= 提供包附带的模块. =mkOverlays= 按目录返回扩展集合, 再组合成本地 overlay 分组; 非 =default= 分组必须互不重叠, 且都是 =default= 的子集.
+=pkgs/flake.nix= 仅选取 =personal-nixpkgs.lib.packages=, 与 [[file:./pkgs/lib/default.nix][pkgs/lib/default.nix]] 的本地扩展通过 =mergeAttrsRecursive { allowOverrides = false; }= 合并为子项目的 =llib=, 禁止覆盖同名定义. 通用 =llib.packages= 由外部库提供; 本地扩展入口当前为空, 子项目 =llib= 与根 =llib= 分开. [[file:./pkgs/pkgs/default.nix][pkgs/pkgs/default.nix]] 使用它生成本地包集合, overlays 和 OS/HM 模块入口. =package.nix= 定义独立包, =overlay.nix= 注入包或命名空间; 对已有包的纯定制直接写在 =overlay.nix= 中; =os/default.nix= 和 =hm/default.nix= 提供包附带的模块. =mkOverlays= 按目录返回扩展集合, 再组合成本地 overlay 分组; 非 =default= 分组必须互不重叠, 且都是 =default= 的子集.
+
+包与测试的 overlay 源文件使用带参数的构造函数, 返回标准的双参数 overlay. 无构造参数时写作:
+
+#+begin_src nix
+{ }: final: prev: {
+  example = final.callPackage ./package.nix { };
+}
+#+end_src
+
+外层构造参数与内层 =final= / =prev= 分开, =mkOverlays= 返回的仍是可供 Nixpkgs 使用的标准 overlays. =texlivePackages= 的聚合由外部 package library 内置规则处理, 本地只保留 =luadraw= 等包的定义.
 
 子 flake 当前提供 =x86_64-linux= 软件包输出及以下集成入口:
 - =legacyPackages.x86_64-linux=: 在 =perSystem= 中直接 =import inputs.nixpkgs=, 传入 =system= 和本地 =overlays.default= 构造 package set, 再调用 =mkLegacyPackages=, 以 =overlayFile = "overlay.nix"= 指定发现入口. =share= 和 =editor= 的上游应用集成仍由相应 overlays 提供.
@@ -613,7 +626,15 @@ NixOS-WSL host, hostname =nixos-wsl=.
 最小用户 profile, 提供空的 =hm/default.nix= 实现, 可以接收最终配置启用的公共 HM features.
 
 * 测试
-=tests/= 通过 =perSystem.checks= 接入 flake, 覆盖 FP validator 发现/组合/惰性边界, 自定义类型, Registry 的 =existModule= 派生与只读约束, host 与 SOPS 相关函数, 配置适配器. treefmt 格式检查也通过根 flake checks 接入, 两个 =flake.lock= 均列入格式检查排除项.
+[[file:./tests/default.nix][tests/default.nix]] 调用 =llib.tests.mkChecks=, 按 =test-overlay.nix= 发现各组测试入口, 在独立测试 scope 中组合定义并收集检查派生物. 嵌套 check 名称以 =-= 连接. 测试覆盖 FP validator 发现/组合/惰性边界, 自定义类型, Registry 的 =existModule= 派生与只读约束, host 与 SOPS 相关函数, 配置适配器.
+
+各组测试的 =test-overlay.nix= 使用与包相同的外层构造协议, 通过 =final.callPackage ./test.nix= 调用测试体. =test.nix= 保存断言和检查派生物, fixtures 保留在所属组内; 专用入口文件名避免将 fixtures 误识别为测试组.
+
+根 flake 向测试总入口传入 =lib=, =pkgs=, =llib= 和 =rootPath=. 总入口通过 =mkChecks.args= 注入 =lib=, =rootPath=, 从 =pkgs= 提取的 =runCommand= 及选定库命名空间, 不向各组测试传递整套 =pkgs= 或 =llib=. 库依赖展平为 =llibFlakeParts=, =llibModules= 等小驼峰名称, 含 =-= 的名称也按词转换, 各组 overlay 再显式映射为 =flakeParts=, =modules= 等普通参数名, 保留测试体中的 =namespace.member= 调用形式. =mkChecks.args= 用于测试 scope 和 =callPackage= 注入, 不属于 overlay 外层构造参数.
+
+测试对所在目录之外的依赖通过函数参数传入, 禁止使用 =../*= 或 =../../*= 等父目录相对路径直接取得依赖. 需要真实模块树的测试保留显式 =rootPath= 参数.
+
+检查集合通过根 =perSystem.checks= 导出. treefmt 格式检查也通过根 flake checks 接入, 两个 =flake.lock= 均列入格式检查排除项.
 
 #+begin_src sh
 nix flake check
