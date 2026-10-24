@@ -1,47 +1,47 @@
 *
 */
 
-!.gitignore
-!LICENSE
-!README.org
-!flake.lock
-!flake.nix
+!/.gitignore
+!/LICENSE
+!/README.org
+!/flake.lock
+!/flake.nix
 
-!lib/
-!lib/**/
-!lib/**/*.nix
+!/lib/
+!/lib/**/
+!/lib/**/*.nix
 
-!pkgs/
+!/pkgs/
 
-!pkgs/flake.nix
+!/pkgs/flake.nix
 
-!pkgs/lib/
-!pkgs/lib/**/
-!pkgs/lib/**/*.nix
+!/pkgs/lib/
+!/pkgs/lib/**/
+!/pkgs/lib/**/*.nix
 
-!pkgs/pkgs/
-!pkgs/pkgs/**/
-!pkgs/pkgs/**/*.md
-!pkgs/pkgs/**/*.mjs
-!pkgs/pkgs/**/*.nix
-!pkgs/pkgs/**/*.patch
-!pkgs/pkgs/**/*.scm
-!pkgs/pkgs/**/*.sh
+!/pkgs/pkgs/
+!/pkgs/pkgs/**/
+!/pkgs/pkgs/**/*.md
+!/pkgs/pkgs/**/*.mjs
+!/pkgs/pkgs/**/*.nix
+!/pkgs/pkgs/**/*.patch
+!/pkgs/pkgs/**/*.scm
+!/pkgs/pkgs/**/*.sh
 
-!modules/
-!modules/**/
-!modules/**/*.age
-!modules/**/*.css
-!modules/**/*.md
-!modules/**/*.nix
-!modules/**/*.scm
-!modules/**/*.sh
-!modules/**/*.xml
-!modules/**/*.yaml
+!/modules/
+!/modules/**/
+!/modules/**/*.age
+!/modules/**/*.css
+!/modules/**/*.md
+!/modules/**/*.nix
+!/modules/**/*.scm
+!/modules/**/*.sh
+!/modules/**/*.xml
+!/modules/**/*.yaml
 
-!tests/
-!tests/**/
-!tests/**/*.nix
+!/tests/
+!/tests/**/
+!/tests/**/*.nix
 
 *~
 *#*
