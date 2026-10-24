@@ -291,7 +291,7 @@ nixosConfigurations.nixos.modules.features.editor.emacs.programs.package =
     └── default.nix
 #+end_example
 
-=hm/default.nix= 配置用户级 AI/agent 工具, 包括 =opencode=, =pi-coding-agent=, =codex= 和 =github-copilot-cli= 及其 provider 配置. =hm/context/default.nix= 组装 agent 上下文, skills 由 =git-maintenance= 和 =git-agent-workflow= 等包提供. =os/default.nix= 将包的 =/share/skills= 链接到系统环境.
+=hm/default.nix= 配置用户级 AI/agent 工具, 包括 =pi-coding-agent=, =codex= 和 =github-copilot-cli= 及其 provider 配置. =hm/context/default.nix= 组装 agent 上下文, skills 由 =git-maintenance= 和 =git-agent-workflow= 等包提供. =os/default.nix= 将包的 =/share/skills= 链接到系统环境.
 
 ***** [[file:./modules/features/diagnostics/][/modules/features/diagnostics]]
 #+begin_example

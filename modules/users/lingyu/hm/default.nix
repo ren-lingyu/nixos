@@ -47,24 +47,13 @@
               template = "user";
               structure = {
                 "deepseek" = {
-                  "apiKey" = [
-                    "opencode"
-                    "pi"
-                  ];
+                  "apiKey" = [ "pi" ];
                 };
               };
             }
           ];
         };
         agent = lib.mkIf osConfig.modules.features.sops.enable {
-          opencode = {
-            providers = {
-              deepseek = {
-                enable = true;
-                apiKey = config.sops.secrets."deepseek.apiKey.opencode".path;
-              };
-            };
-          };
           pi = {
             providers = {
               deepseek = {

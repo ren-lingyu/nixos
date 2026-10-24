@@ -29,15 +29,11 @@ feature_:
         }) providers_;
       })
       {
-        opencode = {
-          deepseek = { };
-        };
         pi = {
           deepseek = { };
         };
       }
     )
-    opencode
     pi
     ;
 }

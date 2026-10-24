@@ -75,51 +75,6 @@ in
         };
       };
 
-    programs.opencode = {
-      enable = true;
-      package = pkgs.opencode;
-      enableMcpIntegration = false;
-      extraPackages = [ ];
-
-      settings = lib.mergeAttrsList [
-        (lib.optionalAttrs mif.opencode.providers.deepseek.enable {
-          model = "deepseek/deepseek-v4-pro";
-          small_model = "deepseek/deepseek-v4-flash";
-        })
-        {
-          permission = "ask";
-          autoupdate = false;
-
-          enabled_providers = (
-            builtins.attrNames (lib.filterAttrs (name_: value_: value_.enable == true) mif.opencode.providers)
-          );
-
-          provider = {
-            deepseek = lib.mkIf mif.opencode.providers.deepseek.enable {
-              name = "DeepSeek";
-              options = {
-                baseURL = "https://api.deepseek.com";
-                apiKey = "{file:${mif.opencode.providers.deepseek.apiKey}}";
-              };
-            };
-          };
-        }
-      ];
-
-      context = context_;
-      agents = { };
-      commands = { };
-      tools = { };
-      themes = { };
-      tui = { };
-
-      web = {
-        enable = false;
-        extraArgs = [ ];
-        environmentFile = null;
-      };
-    };
-
     programs.pi-coding-agent = {
       enable = true;
       package = pkgs.pi-coding-agent;
