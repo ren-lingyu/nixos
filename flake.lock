@@ -825,10 +825,10 @@
         "treefmt-nix": "treefmt-nix"
       },
       "locked": {
-        "lastModified": 1792870538,
-        "narHash": "sha256-nqc+CxeTXFHopjfy0MZDRiitnT2CJjd3vIfGaUM/oQo=",
+        "lastModified": 1792873123,
+        "narHash": "sha256-Yz/IfJ0VDeV1D0dThHHeZG75sld6UNQEakdL30ylMOg=",
         "ref": "refs/heads/main",
-        "rev": "aab41ddf5fcab885f3686d131fda3dfdd910f9a7",
+        "rev": "31587077c4763754b877c5a3606bdcf631f278b1",
         "shallow": true,
         "type": "git",
         "url": "https://github.com/ren-lingyu/nixpkgs"
@@ -850,10 +850,10 @@
         "treefmt-nix": "treefmt-nix_2"
       },
       "locked": {
-        "lastModified": 1792870538,
-        "narHash": "sha256-nqc+CxeTXFHopjfy0MZDRiitnT2CJjd3vIfGaUM/oQo=",
+        "lastModified": 1792873123,
+        "narHash": "sha256-Yz/IfJ0VDeV1D0dThHHeZG75sld6UNQEakdL30ylMOg=",
         "ref": "refs/heads/main",
-        "rev": "aab41ddf5fcab885f3686d131fda3dfdd910f9a7",
+        "rev": "31587077c4763754b877c5a3606bdcf631f278b1",
         "shallow": true,
         "type": "git",
         "url": "https://github.com/ren-lingyu/nixpkgs"

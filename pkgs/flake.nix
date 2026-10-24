@@ -68,12 +68,12 @@
   outputs =
     { self, ... }@inputs:
     inputs.personal-nixpkgs.lib.mkFlake inputs.nixpkgs
-      (rec {
+      ({ lib }: rec {
         inherit inputs;
         moduleLocation = __curPos.file;
         llib = inputs.personal-nixpkgs.lib.mergeAttrsRecursive { allowOverrides = false; } [
           { inherit (inputs.personal-nixpkgs.lib) packages; }
-          (import ./lib { lib = inputs.nixpkgs; })
+          (import ./lib { inherit lib; })
         ];
         lpkgs = import ./pkgs { inherit llib; };
       })

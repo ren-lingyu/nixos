@@ -81,17 +81,17 @@
   outputs =
     { self, ... }@inputs:
     inputs.personal-nixpkgs.lib.mkFlake inputs.nixpkgs
-      {
+      ({ lib }: {
         inherit inputs;
         moduleLocation = __curPos.file;
         llib = inputs.personal-nixpkgs.lib.mergeAttrsRecursive { allowOverrides = false; } [
           { inherit (inputs.personal-nixpkgs.lib) tests; }
-          (import ./lib { lib = inputs.nixpkgs.lib; })
+          (import ./lib { inherit lib; })
         ];
-        specialArgs = rec {
+        specialArgs = {
           rootPath = ./.;
         };
-      }
+      })
       (
         {
           rootPath,
