@@ -442,7 +442,7 @@
                 agenix-rekey.agePackage = pkgs.rage-armored;
 
                 treefmt = {
-                  flakeCheck = false;
+                  flakeCheck = true;
                   settings.excludes = [
                     "*.patch"
                     ".gitignore"

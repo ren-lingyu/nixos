@@ -1,10 +1,9 @@
+<?xml version="1.0"?>
 <volume>
   <name>@volume_name@</name>
-
-  <capacity unit='GiB'>128</capacity>
-  <allocation unit='bytes'>0</allocation>
-
+  <capacity unit="GiB">128</capacity>
+  <allocation unit="bytes">0</allocation>
   <target>
-    <format type='qcow2'/>
+    <format type="qcow2"/>
   </target>
 </volume>
