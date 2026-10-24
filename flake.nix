@@ -471,7 +471,6 @@
                   projectRootFile = builtins.baseNameOf __curPos.file;
                   settings.excludes = [
                     "flake.lock"
-                    "pkgs/flake.lock"
                     "*.patch"
                     ".gitignore"
                     "LICENSE"

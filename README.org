@@ -5,7 +5,7 @@
 这是一个基于 Flake 的 NixOS 配置仓库.
 
 * 架构约定
-=flake.nix= 是最终组装层, 使用 flake-parts 声明每台系统的配置, 管理系统级 flake inputs, 并统一接入外部 NixOS/Home Manager modules 和 overlays. =pkgs/= 是独立的 package 子项目, 管理应用级 inputs, 依赖锁定和软件包输出. 具体配置由四类平级 profile 提供:
+=flake.nix= 是最终组装层, 使用 flake-parts 声明每台系统的配置, 管理系统级 flake inputs, 并统一接入外部 NixOS/Home Manager modules 和 overlays. =pkgs/= 是独立的 package 子项目, 管理应用级 inputs 和软件包输出, 根 =flake.lock= 记录系统消费的依赖版本. 具体配置由四类平级 profile 提供:
 
 - =modules/hosts/= 描述主机身份, 硬件和主机拥有的资源. host 只通过 UID registry 声明可管理的用户, 不声明用户名或 user profile.
 - =modules/users/= 描述 user profile 和个人 Home Manager 配置. user 不决定自己属于哪台 host.
@@ -111,7 +111,7 @@ nixosConfigurations.nixos.modules.features.editor.emacs.programs.package =
 
 根 flake inputs 按使用位置集中传递:
 - =nixpkgs=: 提供最终系统与 =perSystem= 的 package set, 也是多个 inputs 的 =follows= 目标.
-- =personal-nixpkgs=: 提供 =llib.tests= 测试组织接口, 与 package 子项目中的同名输入各自锁定.
+- =personal-nixpkgs=: 提供 =llib.tests= 测试组织接口, 与 package 子项目中的同名输入在根 lock graph 中分别记录版本.
 - =local-nixpkgs=: 通过 =path:./pkgs= 引用 package 子项目, 将其 =share= 和 =editor= overlays/modules 注入对应 Registry 条目; 子项目的 =treefmt-nix= 跟随根输入.
 - =flake-parts=: 组装 flake outputs, =nixpkgs-lib= 跟随根 =nixpkgs=.
 - =treefmt-nix=: 提供 formatter 与格式检查, 启用 nixfmt, shfmt 和 prettier.
@@ -157,7 +157,6 @@ nixosConfigurations.nixos.modules.features.editor.emacs.programs.package =
 *** [[file:./pkgs/][/pkgs]]
 #+begin_example
 /pkgs/
-├── flake.lock
 ├── flake.nix
 ├── lib/
 │   └── default.nix
@@ -182,7 +181,7 @@ nixosConfigurations.nixos.modules.features.editor.emacs.programs.package =
         └── package.nix
 #+end_example
 
-[[file:./pkgs/flake.nix][pkgs/flake.nix]] 使用独立的 inputs 和 [[file:./pkgs/flake.lock][flake.lock]] 管理应用依赖, =nixpkgs= 使用 =nixpkgs-unstable=, 不跟随根系统的 =nixpkgs=. 应用依赖可相对独立地维护和更新; 根 flake 仍决定模块启用, overlay 接入和最终系统构建. 根消费子项目时还通过自己的 lock graph 记录其依赖, 更新子项目后也应核对根消费的依赖状态.
+[[file:./pkgs/flake.nix][pkgs/flake.nix]] 使用独立的 inputs 声明应用依赖, =nixpkgs= 使用 =nixpkgs-unstable=, 不跟随根系统的 =nixpkgs=. 根 flake 消费子项目时通过根 [[file:./flake.lock][flake.lock]] 记录其依赖版本, 仓库不跟踪 =pkgs/flake.lock=. 应用依赖可相对独立地维护和更新; 根 flake 仍决定模块启用, overlay 接入和最终系统构建. 更新子项目 inputs 后应同步根 lock graph. 单独使用子 flake 时, 本地 lockfile 不纳入版本控制; 没有本地 lockfile 时, 子 flake 不提供独立的已提交锁定基线.
 
 子项目 inputs 包括:
 - =personal-nixpkgs=: 提供通用 package library, 其 =nixpkgs=, =flake-parts= 和 =treefmt-nix= 跟随子项目对应输入.
@@ -636,7 +635,7 @@ NixOS-WSL host, hostname =nixos-wsl=.
 
 测试对所在目录之外的依赖通过函数参数传入, 禁止使用 =../*= 或 =../../*= 等父目录相对路径直接取得依赖. 需要真实模块树的测试通过 =modules= 参数接收该目录, 不依赖仓库根路径.
 
-检查集合通过根 =perSystem.checks= 导出. treefmt 格式检查也通过根 flake checks 接入, 两个 =flake.lock= 均列入格式检查排除项.
+检查集合通过根 =perSystem.checks= 导出. treefmt 格式检查也通过根 flake checks 接入, 根 =flake.lock= 列入格式检查排除项.
 
 #+begin_src sh
 nix flake check

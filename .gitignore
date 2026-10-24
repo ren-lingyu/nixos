@@ -13,7 +13,6 @@
 
 !pkgs/
 
-!pkgs/flake.lock
 !pkgs/flake.nix
 
 !pkgs/lib/
