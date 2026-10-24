@@ -124,9 +124,9 @@
 
                 share = [
                   inputs.git-agent-workflow.overlays.default
-                  (final: prev: {
-                    lean4 = inputs.lean4-nix.packages.${final.stdenv.hostPlatform.system}.lean-bin;
-                    zotero = inputs.zotero-fix-nixpkgs.legacyPackages.${final.stdenv.hostPlatform.system}.zotero;
+                  (final_: prev_: {
+                    lean4 = inputs.lean4-nix.packages.${final_.stdenv.hostPlatform.system}.lean-bin;
+                    zotero = inputs.zotero-fix-nixpkgs.legacyPackages.${final_.stdenv.hostPlatform.system}.zotero;
                   })
                   lpkgs.overlays.share
                 ];

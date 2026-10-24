@@ -1,7 +1,7 @@
-{ }: final: prev: {
-  configuration-adapter = final.callPackage ./test.nix {
-    flakeParts = final.llibFlakeParts;
-    moduleLib = final.llibModules;
-    types = final.llibTypes;
+{ }: final_: prev_: {
+  configuration-adapter = final_.callPackage ./test.nix {
+    flakeParts = final_.llibFlakeParts;
+    moduleLib = final_.llibModules;
+    types = final_.llibTypes;
   };
 }

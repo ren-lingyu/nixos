@@ -1,1 +1,1 @@
-{ }: final: prev: { luadraw = final.callPackage ./package.nix { }; }
+{ }: final_: prev_: { luadraw = final_.callPackage ./package.nix { }; }

@@ -1,7 +1,7 @@
 { }:
-final: prev:
+final_: prev_:
 let
-  inherit (final) fetchpatch2 rustPlatform;
+  inherit (final_) fetchpatch2 rustPlatform;
 
   fixHaskellParser = fetchpatch2 {
     url = "https://github.com/Wilfred/difftastic/commit/c64ad0a587563af2018ce9bd47590740a606043f.diff?full_index=1";
@@ -14,7 +14,7 @@ let
 
 in
 {
-  difftastic = prev.difftastic.overrideAttrs (
+  difftastic = prev_.difftastic.overrideAttrs (
     finalAttrs: old: {
       patches = (old.patches or [ ]) ++ [ fixHaskellParser ];
 
