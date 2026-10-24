@@ -27,12 +27,7 @@
     };
     emarccs = {
       url = "git+https://github.com/ren-lingyu/emarccs.git?ref=refs/heads/main&rev=c54849019abba42bb5feeabd71548958fe0f0407&shallow=1";
-      inputs = {
-        nixpkgs.follows = "nixpkgs";
-        flake-parts.follows = "personal-nixpkgs/flake-parts";
-        treefmt-nix.follows = "personal-nixpkgs/treefmt-nix";
-        # personal-nixpkgs.follows = "personal-nixpkgs";
-      };
+      inputs.nixpkgs.follows = "nixpkgs";
     };
     nixvim = {
       # the main branch of nixvim must be use in nixpkgs-unstable
