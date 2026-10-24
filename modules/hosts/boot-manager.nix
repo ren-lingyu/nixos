@@ -30,9 +30,7 @@ let
 
 in
 {
-
   config = lib.mkIf enabledHost_.bootManager.enable {
-
     environment.systemPackages = (
       lib.optionals (config.boot.loader.limine.enable) (
         with pkgs;
@@ -99,7 +97,5 @@ in
         };
       };
     };
-
   };
-
 }

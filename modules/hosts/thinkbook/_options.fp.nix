@@ -1,6 +1,5 @@
 { lib, ... }: {
   configuration = {
-
     flatpak = {
       enable = lib.mkOption {
         type = lib.types.bool;
@@ -9,7 +8,6 @@
         description = "Whether to enable Flatpak.";
       };
     };
-
   };
   metadata = { };
 }

@@ -10,9 +10,7 @@ let
 
 in
 {
-
   config = lib.mkIf cfg.enable {
-
     # boot = {
     #   extraModulePackages = with config.boot.kernelPackages; [
     #     v4l2loopback
@@ -50,7 +48,5 @@ in
       enableVirtualCamera = false;
       plugins = with pkgs.obs-studio-plugins; [ obs-composite-blur ];
     };
-
   };
-
 }

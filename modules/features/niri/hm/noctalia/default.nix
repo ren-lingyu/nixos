@@ -24,7 +24,6 @@ let
 
 in
 {
-
   config =
     lib.mkIf
       (builtins.all (x_: x_) [
@@ -32,19 +31,15 @@ in
         cfg.noctalia.enable
       ])
       {
-
         programs.noctalia = {
-
           enable = cfg.noctalia.enable;
           package = pkgs.noctalia;
           settings = {
-
             accessibility = {
               ui_scale = 1.0;
             };
 
             shell = {
-
               corner_radius_scale = 1.0;
               font_family = (
                 if builtins.elem pkgs.lxgw-wenkai osConfig.fonts.packages then "LXGW WenKai" else "sans-serif"
@@ -99,7 +94,6 @@ in
               };
 
               launcher = {
-
                 categories = true;
                 show_icons = true;
                 show_app_origin_indicator = true;
@@ -112,7 +106,6 @@ in
                 auto_paste = "auto";
 
                 providers = {
-
                   calculator = {
                     prefix = "calc";
                     global = true;
@@ -135,9 +128,7 @@ in
                     prefix = "win";
                     global = true;
                   };
-
                 };
-
               };
 
               mpris = {
@@ -145,7 +136,6 @@ in
               };
 
               session = {
-
                 grid = false;
                 grid_columns = 3;
                 show_shortcuts = true;
@@ -212,15 +202,11 @@ in
                     countdown_seconds = 10.0;
                   }
                 ];
-
               };
-
             };
 
             bar = {
-
               main = {
-
                 position = "top";
                 auto_hide = false;
                 smart_auto_hide = false;
@@ -293,13 +279,10 @@ in
                     scroll_down = "none";
                   };
                 };
-
               };
-
             };
 
             widget = {
-
               notifications = {
                 hide_when_no_unread = false;
               };
@@ -502,11 +485,9 @@ in
                 custom_image = "${pkgs.nixos-icons}/share/icons/hicolor/scalable/apps/nix-snowflake.svg";
                 custom_image_colorize = true;
               };
-
             };
 
             wallpaper = {
-
               enabled = false;
               fill_mode = "crop";
               fill_color = "#000000";
@@ -535,7 +516,6 @@ in
                 order = "random";
                 recursive = true;
               };
-
             };
 
             backdrop = {
@@ -637,7 +617,6 @@ in
             };
 
             control_center = {
-
               sidebar = "compact";
               sidebar_section = "compact";
               show_shortcut_labels = true;
@@ -657,7 +636,6 @@ in
                 show_events_card = true;
                 show_week_numbers = false;
               };
-
             };
 
             system = {
@@ -698,7 +676,6 @@ in
             };
 
             osd = {
-
               position = "top_right";
               position_vertical = "top_center";
               orientation = "horizontal";
@@ -726,7 +703,6 @@ in
                 keyboard_backlight = false;
                 privacy = false;
               };
-
             };
 
             audio = {
@@ -781,7 +757,6 @@ in
             };
 
             keybinds = {
-
               validate = [
                 "return"
                 "kp_enter"
@@ -802,7 +777,6 @@ in
               tab_previous = [ "shift+iso_left_tab" ];
 
               delete = [ "del" ];
-
             };
 
             dock = {
@@ -845,11 +819,7 @@ in
             desktop_widgets = {
               enabled = false;
             };
-
           };
-
         };
-
       };
-
 }

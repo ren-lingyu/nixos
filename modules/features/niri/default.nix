@@ -41,9 +41,7 @@ let
 
 in
 {
-
   config = {
-
     moduleInternals.features.niri.monitors = enabledHost_.monitors;
 
     moduleInternals.features.greeter.sessionPackages = lib.mkIf cfg.enable (
@@ -61,7 +59,5 @@ in
         message = "`modules.features.niri.noctalia.enable = true` requires system-level features (NetworkManager, Bluetooth, power-profiles-daemon/tuned, UPower) to be enabled.";
       }
     ];
-
   };
-
 }

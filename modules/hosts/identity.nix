@@ -14,15 +14,11 @@ let
 
 in
 {
-
   config = lib.mkIf enabledHost_.identity.rootAccess {
-
     environment.systemPackages = with pkgs; [ yubikey-manager ];
 
     services.pcscd = {
       enable = lib.mkDefault true;
     };
-
   };
-
 }

@@ -11,12 +11,9 @@ let
 
 in
 {
-
   config = lib.mkIf cfg.waybar.enable {
-
     programs.waybar.settings = [
       {
-
         height = 30;
         spacing = 4;
         margin-top = 0;
@@ -206,7 +203,6 @@ in
             hibernate = "systemctl hibernate";
           };
         };
-
       }
     ];
 
@@ -216,7 +212,5 @@ in
       target = "./waybar/power-menu.xml";
       executable = true;
     };
-
   };
-
 }

@@ -6,6 +6,5 @@
       readOnly = true;
       description = "Monitor declarations used by Niri.";
     };
-
   };
 }

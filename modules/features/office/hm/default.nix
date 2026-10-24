@@ -11,9 +11,7 @@ let
 
 in
 {
-
   config = lib.mkIf cfg.enable {
-
     home.packages = with pkgs; [ libreoffice-qt-stable ];
 
     programs.onlyoffice = {
@@ -26,7 +24,5 @@ in
         titlebar = "custom";
       };
     };
-
   };
-
 }

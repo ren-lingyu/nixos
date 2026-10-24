@@ -5,10 +5,8 @@
   ...
 }:
 {
-
   config = {
     moduleInternals.features.shell = {
-
       zsh = {
         package = pkgs.zsh;
       };
@@ -17,5 +15,4 @@
       };
     };
   };
-
 }

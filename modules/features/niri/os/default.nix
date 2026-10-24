@@ -10,9 +10,7 @@ let
 
 in
 {
-
   config = lib.mkIf cfg.enable {
-
     programs.niri = {
       enable = cfg.enable;
       package = pkgs.niri;
@@ -29,7 +27,5 @@ in
 
     services.desktopManager.gnome.enable = lib.mkForce false;
     services.gnome.gnome-keyring.enable = lib.mkForce false;
-
   };
-
 }

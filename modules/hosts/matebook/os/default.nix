@@ -13,11 +13,9 @@ let
 
 in
 {
-
   imports = [ ./hardware-configuration.nix ];
 
   config = lib.mkIf cfg.enable {
-
     nix.settings = {
       trusted-users = [
         "@wheel"
@@ -236,5 +234,4 @@ in
     # (e.g. man configuration.nix or on https://nixos.org/nixos/options.html).
     system.stateVersion = "26.11"; # Did you read the comment?
   };
-
 }

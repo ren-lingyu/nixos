@@ -1,6 +1,5 @@
 { lib, llib, ... }: {
   options.moduleInternals.features.sops = {
-
     allowUsernameList = lib.mkOption {
       type = lib.types.listOf lib.types.nonEmptyStr;
       internal = true;
@@ -24,6 +23,5 @@
         };
       };
     };
-
   };
 }

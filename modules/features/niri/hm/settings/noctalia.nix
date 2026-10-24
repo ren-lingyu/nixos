@@ -17,14 +17,11 @@ let
 
 in
 {
-
   config = lib.mkIf noctaliaNiriSettingsEnable {
     programs.niri.settings = {
-
       spawn-at-startup = lib.mkAfter [ { argv = noctaliaCommand; } ];
 
       binds = {
-
         "Mod+D" = lib.mkForce {
           hotkey-overlay = {
             title = "Toggle Noctalia Launcher";
@@ -152,10 +149,7 @@ in
             ]
           ];
         };
-
       };
     };
-
   };
-
 }

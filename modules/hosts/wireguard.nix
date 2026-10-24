@@ -16,9 +16,7 @@ let
 
 in
 {
-
   options = {
-
     networking.wireguard.topology = lib.mkOption {
       type = lib.types.attrsOf (
         lib.types.submodule {
@@ -31,11 +29,9 @@ in
       internal = true;
       readOnly = true;
     };
-
   };
 
   config = {
-
     age.secrets = lib.mkIf (enabledHost_.wireguard != null) {
       wireguard = {
         rekeyFile = enabledHost_.wireguard.privateKey;
@@ -60,7 +56,5 @@ in
         wireguardNetworks_.config
         { wireguard.topology = wireguardNetworks_.topology; }
       ]);
-
   };
-
 }

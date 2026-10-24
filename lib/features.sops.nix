@@ -3,7 +3,6 @@
   osConfig ? config,
 }:
 rec {
-
   fromStructure =
     { ... }@attrs:
     let
@@ -84,5 +83,4 @@ rec {
         builtins.map (x: fun x) (builtins.filter builtins.isAttrs attrsList)
       )
     );
-
 }

@@ -6,9 +6,7 @@
   ...
 }:
 {
-
   config = {
-
     nix = {
       settings = {
         experimental-features = [
@@ -92,7 +90,5 @@
       useUserPackages = true;
       backupFileExtension = "bak";
     };
-
   };
-
 }

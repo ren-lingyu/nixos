@@ -9,7 +9,6 @@ let
   cfg = config.modules.hosts.thinkbook;
 
   vm = rec {
-
     media = {
       directory = "/var/lib/libvirt/boot";
       windows.iso = "${media.directory}/Windows_x64.iso";
@@ -76,14 +75,11 @@ let
         volumes.system.name = "system.qcow2";
       };
     };
-
   };
 
 in
 {
-
   config = lib.mkIf cfg.enable {
-
     environment.systemPackages = with pkgs; [
       freerdp
       virt-viewer
@@ -156,7 +152,6 @@ in
     };
 
     virtualisation = {
-
       libvirtd = {
         enable = true;
         package = pkgs.libvirt;
@@ -168,7 +163,6 @@ in
         verbose = true;
         swtpm.enable = true;
         connections."qemu:///system" = {
-
           domains = [
             {
               definition =
@@ -273,12 +267,8 @@ in
               ];
             }
           ];
-
         };
       };
-
     };
-
   };
-
 }

@@ -10,14 +10,12 @@ let
 
 in
 {
-
   imports = [
     ./hardware-configuration.nix
     ./disk-config.nix
   ];
 
   config = lib.mkIf cfg.enable {
-
     nix.settings = {
       trusted-users = [
         "@wheel"
@@ -86,7 +84,5 @@ in
     security.sudo.wheelNeedsPassword = false;
 
     system.stateVersion = "26.11";
-
   };
-
 }

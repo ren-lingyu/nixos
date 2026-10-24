@@ -12,9 +12,7 @@ let
 
 in
 {
-
   config = lib.mkIf cfg.enable {
-
     users.groups.${sopsGroup} = {
       name = sopsGroup;
       members = config.moduleInternals.features.sops.allowUsernameList;
@@ -35,7 +33,5 @@ in
         mode = "0440";
       };
     };
-
   };
-
 }

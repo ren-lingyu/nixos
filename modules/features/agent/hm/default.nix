@@ -45,9 +45,7 @@ let
 
 in
 {
-
   config = lib.mkIf cfg.enable {
-
     home =
       let
         packages_ = lib.optionals config.programs.git.enable (
@@ -78,7 +76,6 @@ in
       };
 
     programs.opencode = {
-
       enable = true;
       package = pkgs.opencode;
       enableMcpIntegration = false;
@@ -90,7 +87,6 @@ in
           small_model = "deepseek/deepseek-v4-flash";
         })
         {
-
           permission = "ask";
           autoupdate = false;
 
@@ -99,7 +95,6 @@ in
           );
 
           provider = {
-
             deepseek = lib.mkIf mif.opencode.providers.deepseek.enable {
               name = "DeepSeek";
               options = {
@@ -107,9 +102,7 @@ in
                 apiKey = "{file:${mif.opencode.providers.deepseek.apiKey}}";
               };
             };
-
           };
-
         }
       ];
 
@@ -125,11 +118,9 @@ in
         extraArgs = [ ];
         environmentFile = null;
       };
-
     };
 
     programs.pi-coding-agent = {
-
       enable = true;
       package = pkgs.pi-coding-agent;
 
@@ -167,7 +158,6 @@ in
           "${pkgs.piPackages.pi-workspace-history}"
         ];
       };
-
     };
 
     programs.codex = {
@@ -196,7 +186,5 @@ in
         }) agentConfig_.providers
       ) mif
     );
-
   };
-
 }

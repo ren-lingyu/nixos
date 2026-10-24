@@ -5,7 +5,6 @@
   ...
 }:
 {
-
   home.packages = with pkgs; [
     bash-language-server # Shell
     clang-tools # C / C++ (clangd)
@@ -40,5 +39,4 @@
     vscode-langservers-extracted # HTML / CSS / JSON
     yaml-language-server # YAML
   ];
-
 }

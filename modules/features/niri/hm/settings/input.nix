@@ -11,9 +11,7 @@ let
 
 in
 {
-
   config = lib.mkIf config.programs.niri.enable {
-
     programs.niri.settings.input = {
       focus-follows-mouse = {
         enable = true;
@@ -50,7 +48,5 @@ in
           )).name;
       };
     };
-
   };
-
 }

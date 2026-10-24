@@ -1,7 +1,5 @@
 { config, lib, ... }: {
-
   config = {
-
     users.users = builtins.listToAttrs (
       lib.mapAttrsToList
         (unused_userName_: user_: {
@@ -47,7 +45,5 @@
           ) config.modules.users
         )
     );
-
   };
-
 }

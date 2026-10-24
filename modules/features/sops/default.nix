@@ -39,10 +39,8 @@ let
 
 in
 {
-
   config = {
     moduleInternals.features.sops = {
-
       allowUsernameList = lib.optionals cfg.enable (builtins.map getUsernameByUid_ cfg.allowUidList);
       ageKeys.hm = {
         name = "sops.hm";
@@ -50,5 +48,4 @@ in
       };
     };
   };
-
 }

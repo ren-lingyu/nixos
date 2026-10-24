@@ -10,7 +10,6 @@ let
 
 in
 {
-
   config = lib.mkIf cfg.enable {
     environment.systemPackages = with pkgs; [
       (texliveFull.withPackages (
@@ -23,5 +22,4 @@ in
       mupdf
     ];
   };
-
 }

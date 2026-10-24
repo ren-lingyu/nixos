@@ -4,7 +4,6 @@ let
 in
 {
   configuration = {
-
     ip = lib.mkOption {
       type = lib.types.functionTo (lib.types.nullOr lib.types.nonEmptyStr);
       default = _: null;
@@ -32,7 +31,6 @@ in
       example = "10.100.3.3";
       description = "Source IP address allowed to access the ${workload_} workload.";
     };
-
   };
   metadata = { };
 }

@@ -10,7 +10,6 @@ let
 in
 {
   configuration = {
-
     noctalia.enable = lib.mkOption {
       type = lib.types.bool;
       default = config.modules.features.${feature_}.enable;
@@ -29,7 +28,6 @@ in
       example = false;
       description = "Whether to enable the Waybar status bar for Niri.";
     };
-
   };
   metadata = { };
 }

@@ -4,7 +4,6 @@
   fetchFromGitHub,
 }:
 (stdenvNoCC.mkDerivation (unused_finalAttrs_: {
-
   pname = "pi-mono-context";
   version = "0.1.1";
 
@@ -47,5 +46,4 @@
     homepage = "https://github.com/emanuelcasco/pi-mono-extensions";
     platforms = lib.platforms.all;
   };
-
 }))

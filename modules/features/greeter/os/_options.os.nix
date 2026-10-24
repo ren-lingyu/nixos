@@ -1,6 +1,5 @@
 { lib, llib, ... }: {
   options.moduleInternals.features.greeter = {
-
     sessionPackages = lib.mkOption {
       type = lib.types.listOf lib.types.package;
       default = [ ];
@@ -28,6 +27,5 @@
       };
       description = "Metadata of the default monitor.";
     };
-
   };
 }

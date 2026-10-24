@@ -10,14 +10,10 @@ let
 
 in
 {
-
   config = lib.mkIf cfg.enable {
-
     environment.pathsToLink = lib.optionals cfg.fileChooser.enable [
       "/share/applications"
       "/share/xdg-desktop-portal"
     ];
-
   };
-
 }

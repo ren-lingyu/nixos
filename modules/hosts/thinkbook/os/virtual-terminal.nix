@@ -10,9 +10,7 @@ let
 
 in
 {
-
   config = lib.mkIf cfg.enable {
-
     environment.systemPackages = with pkgs; [ fbset ];
 
     systemd.services.fbset-xedrmfb = {
@@ -71,7 +69,5 @@ in
         sb-size = 10000;
       };
     };
-
   };
-
 }

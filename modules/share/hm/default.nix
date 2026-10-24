@@ -6,7 +6,6 @@
   ...
 }:
 {
-
   config = {
     programs.fastfetch = {
       enable = lib.mkDefault true;
@@ -40,5 +39,4 @@
       preferXdgDirectories = config.xdg.enable;
     };
   };
-
 }

@@ -14,9 +14,7 @@ let
 
 in
 {
-
   config = {
-
     networking.networkmanager = lib.mkIf enabledHost_.shared.networkmanager.enable { enable = true; };
 
     hardware.bluetooth = lib.mkIf enabledHost_.shared.bluetooth.enable {
@@ -48,7 +46,5 @@ in
       ignoreLid = false;
       noPollBatteries = false;
     };
-
   };
-
 }

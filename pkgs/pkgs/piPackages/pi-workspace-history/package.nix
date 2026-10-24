@@ -18,7 +18,6 @@ let
 
 in
 (buildNpmPackage (finalAttrs_: {
-
   pname = "pi-workspace-history";
   version = "0.4.8";
 
@@ -95,5 +94,4 @@ in
     license = lib.licenses.mit;
     platforms = lib.platforms.unix;
   };
-
 }))

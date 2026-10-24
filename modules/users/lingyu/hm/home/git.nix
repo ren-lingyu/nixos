@@ -6,7 +6,6 @@
   ...
 }:
 {
-
   home.packages = with pkgs; [ git-filter-repo ];
 
   programs.ssh.settings =
@@ -104,5 +103,4 @@
       tab-width = 4;
     };
   };
-
 }

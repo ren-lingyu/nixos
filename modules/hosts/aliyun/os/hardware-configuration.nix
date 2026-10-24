@@ -14,11 +14,9 @@ let
 
 in
 {
-
   imports = [ (modulesPath + "/profiles/qemu-guest.nix") ];
 
   config = lib.mkIf cfg.enable {
-
     boot.initrd.availableKernelModules = [
       "ata_piix"
       "uhci_hcd"
@@ -30,7 +28,5 @@ in
     boot.extraModulePackages = [ ];
 
     nixpkgs.hostPlatform = lib.mkDefault "x86_64-linux";
-
   };
-
 }

@@ -9,7 +9,6 @@ feature_:
   ...
 }:
 {
-
   secretsInput = lib.mkOption {
     type = lib.types.listOf (
       lib.types.submodule {
@@ -53,5 +52,4 @@ feature_:
     readOnly = true;
     description = "Encrypted SOPS file containing secrets for this Home Manager user.";
   };
-
 }

@@ -13,11 +13,8 @@ let
 
 in
 {
-
   config = {
-
     moduleInternals.features.greeter = {
-
       monitor =
         let
           defaultMonitors_ = (
@@ -30,7 +27,6 @@ in
           name =
             if (builtins.length defaultMonitors_) == 1 then (builtins.head defaultMonitors_).name else null;
         };
-
     };
 
     assertions = [
@@ -50,7 +46,5 @@ in
         message = "`modules.features.greeter.enable = true` requires at least one session provider.";
       }
     ];
-
   };
-
 }

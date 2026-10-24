@@ -5,7 +5,6 @@
   ...
 }:
 {
-
   programs.ssh.settings = lib.mkIf config.programs.ssh.enable {
     "aliyun" = {
       hostname = "39.97.244.246";
@@ -22,5 +21,4 @@
       identitiesOnly = true;
     };
   };
-
 }

@@ -1,6 +1,5 @@
 { lib, llib, ... }: {
   configuration = {
-
     defaultEditor = lib.mkOption {
       type = lib.types.nullOr (
         lib.types.enum [
@@ -63,7 +62,6 @@
         description = "The Lem package added in `home.packages`.";
       };
     };
-
   };
   metadata = { };
 }

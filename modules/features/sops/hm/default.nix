@@ -24,16 +24,13 @@ let
 
 in
 {
-
   config = lib.mkIf cfg.enable {
-
     home.sessionVariables = {
       SOPS_AGE_KEY_FILE = osConfig.moduleInternals.features.sops.ageKeys.hm.path;
     };
 
     sops = lib.mergeAttrsList [
       {
-
         defaultSopsKey = null;
         keepGenerations = 1;
         validateSopsFiles = true;
@@ -52,7 +49,6 @@ in
         };
 
         secrets = lmf.mkSopsSecrets secretsInput_;
-
       }
       (lib.optionalAttrs mifOptions_.defaultSopsFormat.isDefined {
         defaultSopsFormat = mif.defaultSopsFormat;
@@ -74,7 +70,5 @@ in
         message = "A non-empty `moduleInterfaces.features.sops.secretsInput` requires `defaultSopsFormat` and `defaultSopsFile` to be defined.";
       }
     ];
-
   };
-
 }

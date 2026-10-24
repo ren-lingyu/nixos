@@ -1,6 +1,5 @@
 { lib, llib, ... }: {
   options.moduleInternals.features.shell = {
-
     zsh = {
       package = lib.mkOption {
         type = lib.types.package;
@@ -20,6 +19,5 @@
         description = "Bash package shared by the NixOS and Home Manager shell configurations.";
       };
     };
-
   };
 }

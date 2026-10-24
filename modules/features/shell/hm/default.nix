@@ -11,9 +11,7 @@ let
 
 in
 {
-
   config = lib.mkIf cfg.enable {
-
     programs.bash = {
       enable = !osConfig.programs.zsh.enable;
       package = osConfig.moduleInternals.features.shell.bash.package;
@@ -84,7 +82,5 @@ in
         line_break.disabled = true;
       };
     };
-
   };
-
 }

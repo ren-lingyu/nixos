@@ -1,5 +1,4 @@
 {
-
   description = "NixOS configuration";
 
   nixConfig = {
@@ -96,7 +95,6 @@
     { self, ... }@inputs:
     inputs.flake-parts.lib.mkFlake
       {
-
         inherit inputs;
 
         specialArgs = rec {
@@ -106,7 +104,6 @@
             (import ./lib { lib = inputs.nixpkgs.lib; })
           ];
         };
-
       }
       (
         {
@@ -117,7 +114,6 @@
           ...
         }:
         {
-
           imports = [
             inputs.treefmt-nix.flakeModule
             inputs.agenix-rekey.flakeModule
@@ -151,7 +147,6 @@
             };
 
           config = {
-
             debug = true;
 
             systems = [ "x86_64-linux" ];
@@ -163,7 +158,6 @@
             };
 
             moduleRegistry = {
-
               share = {
                 nixosModules = [
                   inputs.agenix.nixosModules.default
@@ -203,11 +197,9 @@
                   homeModules = [ inputs.sops-nix.homeManagerModules.sops ];
                 };
               };
-
             };
 
             nixosConfigurations = {
-
               nixos = {
                 system = "x86_64-linux";
                 modules = {
@@ -422,18 +414,15 @@
                   };
                 };
               };
-
             };
 
             flake = {
-
               nixosConfigurations = llib.flakeParts.mkNixosConfigurations {
                 modules = ./modules;
                 builder = config.nixosBuilder;
                 registry = config.moduleRegistry;
                 configurations = config.nixosConfigurations;
               };
-
             };
 
             perSystem =
@@ -446,7 +435,6 @@
                 ...
               }:
               {
-
                 checks = import ./tests {
                   inherit lib pkgs llib;
                   modules = ./modules;
@@ -501,12 +489,8 @@
                     };
                   };
                 };
-
               };
-
           };
-
         }
       );
-
 }

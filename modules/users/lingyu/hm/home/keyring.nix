@@ -61,7 +61,6 @@ let
 
 in
 {
-
   programs.gpg = {
     enable = true;
     package = pkgs.gnupg;
@@ -96,5 +95,4 @@ in
     # hosts = [ "github.com" ];
     groups = [ "Git" ];
   };
-
 }

@@ -14,11 +14,9 @@ let
 
 in
 {
-
   imports = [ (modulesPath + "/installer/scan/not-detected.nix") ];
 
   config = lib.mkIf cfg.enable {
-
     boot.initrd.availableKernelModules = [
       "xhci_pci"
       "nvme"
@@ -52,7 +50,5 @@ in
 
     nixpkgs.hostPlatform = lib.mkDefault "x86_64-linux";
     hardware.cpu.intel.updateMicrocode = lib.mkDefault config.hardware.enableRedistributableFirmware;
-
   };
-
 }

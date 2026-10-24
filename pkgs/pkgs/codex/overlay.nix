@@ -12,7 +12,6 @@ let
 in
 {
   codex = symlinkJoin {
-
     name = codex.name;
 
     paths = [ codex ];
@@ -31,6 +30,5 @@ in
     ];
 
     meta = codex.meta;
-
   };
 }

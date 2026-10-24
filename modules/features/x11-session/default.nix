@@ -44,7 +44,5 @@ let
 
 in
 {
-
   config.moduleInternals.features.greeter.sessionPackages = lib.mkIf cfg.enable [ sessionWrapper ];
-
 }

@@ -6,9 +6,7 @@
   ...
 }:
 {
-
   config = lib.mkIf config.programs.niri.enable {
-
     programs.niri.settings.window-rules = [
       {
         matches = [ { app-id = "Emacs"; } ];
@@ -26,7 +24,5 @@
         };
       }
     ];
-
   };
-
 }

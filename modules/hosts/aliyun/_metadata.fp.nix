@@ -1,5 +1,4 @@
 rec {
-
   number = 3;
 
   bootManager = {
@@ -46,5 +45,4 @@ rec {
       };
     };
   };
-
 }

@@ -1,5 +1,4 @@
 { lib }: rec {
-
   mkOptionName = path: lib.showOption path;
 
   discoverModules =
@@ -180,5 +179,4 @@
       else
         lib.recursiveUpdate tree (lib.setAttrByPath path (optionMaker module))
     ) { } (discoverModules modules);
-
 }

@@ -15,9 +15,7 @@ let
 
 in
 {
-
   config = lib.mkIf config.programs.niri.enable {
-
     programs.niri.settings.outputs = lib.foldlAttrs (
       x_: hostMonitorName_: hostMonitor_:
       (builtins.foldl' (
@@ -55,7 +53,5 @@ in
         )
       ) x_ ([ hostMonitor_.name ]))
     ) { } osConfig.moduleInternals.features.niri.monitors;
-
   };
-
 }

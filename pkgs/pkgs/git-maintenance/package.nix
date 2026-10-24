@@ -4,7 +4,6 @@
   installAgentSkills,
 }:
 stdenvNoCC.mkDerivation {
-
   pname = "git-maintenance";
   version = "0.3.0";
 
@@ -20,5 +19,4 @@ stdenvNoCC.mkDerivation {
     license = lib.licenses.mit;
     platforms = lib.platforms.all;
   };
-
 }

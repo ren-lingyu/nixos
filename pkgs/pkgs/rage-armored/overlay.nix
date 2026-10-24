@@ -1,5 +1,1 @@
-{ }: final: prev: {
-
-  rage-armored = final.callPackage ./package.nix { };
-
-}
+{ }: final: prev: { rage-armored = final.callPackage ./package.nix { }; }

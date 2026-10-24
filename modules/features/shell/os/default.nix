@@ -10,9 +10,7 @@ let
 
 in
 {
-
   config = lib.mkIf cfg.enable {
-
     users = {
       defaultUserShell = (
         if (config.programs.zsh.enable == true) then
@@ -37,7 +35,5 @@ in
         histFile = "$HOME/.zsh_history";
       };
     };
-
   };
-
 }

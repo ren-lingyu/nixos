@@ -5,7 +5,6 @@
   ...
 }:
 {
-
   imports = [
     ./keyring.nix
     ./git.nix
@@ -16,7 +15,6 @@
   ];
 
   config = {
-
     home = {
       packages = with pkgs; [
         adwaita-icon-theme
@@ -117,7 +115,5 @@
         };
       };
     };
-
   };
-
 }

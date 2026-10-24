@@ -10,9 +10,7 @@ let
 
 in
 {
-
   config = lib.mkIf cfg.enable {
-
     networking = {
       nftables = {
         tables = {
@@ -54,7 +52,5 @@ in
         };
       };
     };
-
   };
-
 }

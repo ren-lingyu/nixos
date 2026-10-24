@@ -1,5 +1,4 @@
 {
-
   lib,
   stdenv,
   fetchFromGitHub,
@@ -26,10 +25,8 @@
   bzip2,
   p7zip,
   libarchive,
-
 }:
 stdenv.mkDerivation rec {
-
   pname = "wayfile";
   version = "1.1.0";
 
@@ -68,7 +65,6 @@ stdenv.mkDerivation rec {
   qtWrapperArgs = [
     "--prefix PATH : ${
       lib.makeBinPath [
-
         # MIME and external application integration:
         # - gio open
         # - gtk-launch
@@ -98,7 +94,6 @@ stdenv.mkDerivation rec {
         bzip2
         p7zip
         libarchive
-
       ]
     }"
   ];
@@ -122,5 +117,4 @@ stdenv.mkDerivation rec {
     platforms = lib.platforms.linux;
     mainProgram = "wayfile";
   };
-
 }

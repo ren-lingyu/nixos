@@ -9,12 +9,10 @@ feature_:
   ...
 }:
 {
-
   inherit
     (lib.mapAttrs
       (agent_: providers_: {
         providers = lib.mapAttrs (provider_: unused_: {
-
           enable = lib.mkOption {
             type = lib.types.bool;
             internal = true;
@@ -28,7 +26,6 @@ feature_:
             readOnly = true;
             description = "Path to the file containing the ${provider_} API key used by ${agent_}.";
           };
-
         }) providers_;
       })
       {
@@ -43,5 +40,4 @@ feature_:
     opencode
     pi
     ;
-
 }

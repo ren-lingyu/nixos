@@ -18,7 +18,6 @@ in
 {
   pi-coding-agent = (
     pi-coding-agent.overrideAttrs (oldAttrs_: {
-
       nativeBuildInputs = builtins.concatLists [
         (oldAttrs_.nativeBuildInputs or [ ])
         [ makeWrapper ]
@@ -28,7 +27,6 @@ in
         (oldAttrs_.postFixup or "")
         "wrapProgram \"${prevExeOutputVar_}${prevExeRelPath_}\" --set PI_OFFLINE 1"
       ];
-
     })
   );
 }

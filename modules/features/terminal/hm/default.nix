@@ -11,9 +11,7 @@ let
 
 in
 {
-
   config = lib.mkIf cfg.enable {
-
     programs.alacritty = {
       enable = false;
       settings = {
@@ -46,7 +44,5 @@ in
         default = [ "kitty.desktop" ];
       };
     };
-
   };
-
 }

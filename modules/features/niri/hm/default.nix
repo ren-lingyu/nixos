@@ -26,7 +26,6 @@ let
 
 in
 {
-
   imports = [
     ./settings
     ./waybar
@@ -34,7 +33,6 @@ in
   ];
 
   config = lib.mkIf cfg.enable {
-
     home.packages = with pkgs; [ adwaita-icon-theme ];
 
     xdg.portal = {
@@ -64,7 +62,6 @@ in
       enable = true;
       package = pkgs.swaylock-effects;
       settings = {
-
         clock = true;
         daemonize = true;
         ignore-empty-password = false;
@@ -123,7 +120,6 @@ in
         layout-bg-color = "00000000";
         layout-border-color = "00000000";
         layout-text-color = "ffffff";
-
       };
     };
 
@@ -217,7 +213,5 @@ in
         useCustomTheme = false;
       };
     };
-
   };
-
 }

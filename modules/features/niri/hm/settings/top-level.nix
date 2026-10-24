@@ -6,9 +6,7 @@
   ...
 }:
 {
-
   config = lib.mkIf config.programs.niri.enable {
-
     home.packages = with pkgs; [ adwaita-icon-theme ];
 
     systemd.user.sessionVariables = (
@@ -37,7 +35,5 @@
         path = "${lib.getExe pkgs.xwayland-satellite}";
       };
     };
-
   };
-
 }

@@ -1,5 +1,4 @@
 {
-
   description = "Local nixpkgs used by the nixos configuration";
 
   nixConfig = {

@@ -5,7 +5,6 @@
   nodejs_22,
 }:
 (buildNpmPackage (unused_finalAttrs_: {
-
   pname = "pi-agentic-search";
   version = "0.5.2";
 
@@ -73,5 +72,4 @@
     license = lib.licenses.mit;
     platforms = lib.platforms.unix;
   };
-
 }))

@@ -10,7 +10,6 @@ let
 
 in
 {
-
   config =
     lib.mkIf
       (builtins.all (x_: x_) [
@@ -18,7 +17,6 @@ in
         cfg.flatpak.enable
       ])
       {
-
         xdg.portal.enable = lib.mkIf config.services.flatpak.enable (lib.mkForce true);
 
         services.flatpak =
@@ -106,7 +104,5 @@ in
               };
             };
           };
-
       };
-
 }

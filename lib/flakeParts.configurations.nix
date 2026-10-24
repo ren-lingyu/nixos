@@ -51,7 +51,6 @@ let
   };
 in
 rec {
-
   # Adapt only functions explicitly declared with functionTo; do not inspect Nix values
   # to guess whether arbitrary functions, packages or overlays should be called.
   adaptType =
@@ -251,5 +250,4 @@ rec {
           ;
       }
     ) configurations;
-
 }

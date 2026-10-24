@@ -11,7 +11,6 @@ let
 
 in
 {
-
   imports = [ ./settings.nix ];
 
   config =
@@ -33,5 +32,4 @@ in
           style = builtins.readFile ./style.css;
         };
       };
-
 }

@@ -36,9 +36,7 @@ let
 
 in
 {
-
   config = lib.mkIf cfg.enable {
-
     environment.systemPackages = with pkgs; [ bindfs ];
 
     programs.fuse = {
@@ -47,7 +45,6 @@ in
     };
 
     systemd = {
-
       tmpfiles = {
         rules = [
           "d ${config.fileSystems.windows.mountPoint} 0700 ${nixosRootName} root - -"
@@ -64,7 +61,6 @@ in
       };
 
       mounts = builtins.concatLists [
-
         (lib.optionals config.fileSystems.windows.enable [
           {
             what = "${config.fileSystems.windows.mountPoint}/Windows/Fonts";
@@ -98,11 +94,7 @@ in
               Videos = "Videos";
             }
         ))
-
       ];
-
     };
-
   };
-
 }

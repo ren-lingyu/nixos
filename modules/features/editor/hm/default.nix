@@ -11,9 +11,7 @@ let
 
 in
 {
-
   config = lib.mkIf cfg.enable {
-
     home.packages = lib.optionals cfg.lem.enable [ cfg.lem.package ];
 
     programs.nixvim = {
@@ -108,7 +106,5 @@ in
         arguments = [ "-c" ];
       };
     };
-
   };
-
 }

@@ -4,7 +4,6 @@
   lib,
 }:
 stdenvNoCC.mkDerivation rec {
-
   pname = "luadraw";
   version = "3.4";
 
@@ -59,5 +58,4 @@ stdenvNoCC.mkDerivation rec {
     platforms = platforms.all;
     maintainers = [ ];
   };
-
 }

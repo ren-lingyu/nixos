@@ -6,11 +6,8 @@
   ...
 }:
 {
-
   config = {
-
     accounts.email.accounts = {
-
       "Ren_Lingyu@outlook.com" = {
         # https://support.microsoft.com/office/pop-imap-and-smtp-settings-for-outlook-com-d088b986-291d-42b8-9564-9c414e2aa040
 
@@ -55,11 +52,9 @@
           enable = config.programs.thunderbird.enable;
           profiles = [ "${config.home.username}" ];
         };
-
       };
 
       "lingyurenmail@gmail.com" = {
-
         enable = true;
         primary = false;
         address = "lingyurenmail@gmail.com";
@@ -100,11 +95,9 @@
           enable = config.programs.thunderbird.enable;
           profiles = [ "${config.home.username}" ];
         };
-
       };
 
       "ah.renn.coco@gmail.com" = {
-
         enable = true;
         primary = false;
         address = "ah.renn.coco@gmail.com";
@@ -145,13 +138,10 @@
           enable = config.programs.thunderbird.enable;
           profiles = [ "${config.home.username}" ];
         };
-
       };
-
     };
 
     programs.thunderbird = {
-
       enable = osConfig.programs.thunderbird.enable;
       package = pkgs.thunderbird;
       nativeMessagingHosts = [ ];
@@ -172,7 +162,6 @@
 
         in
         {
-
           "${config.home.username}" = rec {
             isDefault = true;
             withExternalGnupg = true;
@@ -218,11 +207,7 @@
             userChrome = "";
             userContent = "";
           };
-
         };
-
     };
-
   };
-
 }

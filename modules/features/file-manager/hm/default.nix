@@ -13,9 +13,7 @@ let
 
 in
 {
-
   config = lib.mkIf cfg.enable {
-
     assertions = [
       {
         assertion = (
@@ -75,7 +73,5 @@ in
         };
       };
     };
-
   };
-
 }

@@ -10,9 +10,7 @@ let
 
 in
 {
-
   config = lib.mkIf cfg.enable {
-
     programs.clash-verge = lib.mkIf cfg.clash-verge.enable {
       enable = cfg.clash-verge.enable;
       package = pkgs.clash-verge-rev.override {
@@ -48,7 +46,5 @@ in
       package = pkgs.v2raya;
       cliPackage = pkgs.xray;
     };
-
   };
-
 }

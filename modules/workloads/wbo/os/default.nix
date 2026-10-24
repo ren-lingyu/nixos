@@ -10,9 +10,7 @@ let
 
 in
 {
-
   config = lib.mkIf cfg.enable {
-
     networking = {
       firewall.extraInputRules = "iifname \"${cfg.networkInterface}\" ip saddr ${cfg.allowedSourceIp} ip daddr ${cfg.ip} tcp dport ${builtins.toString cfg.port} accept";
     };
@@ -30,7 +28,5 @@ in
         };
       };
     };
-
   };
-
 }

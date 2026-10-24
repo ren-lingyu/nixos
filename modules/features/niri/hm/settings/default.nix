@@ -6,7 +6,6 @@
   ...
 }:
 {
-
   imports = [
     ./top-level.nix
     ./input.nix
@@ -17,5 +16,4 @@
     ./binds.nix
     ./noctalia.nix
   ];
-
 }

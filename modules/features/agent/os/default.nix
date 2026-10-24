@@ -10,11 +10,5 @@ let
 
 in
 {
-
-  config = lib.mkIf cfg.enable {
-
-    environment.pathsToLink = [ "/share/skills" ];
-
-  };
-
+  config = lib.mkIf cfg.enable { environment.pathsToLink = [ "/share/skills" ]; };
 }

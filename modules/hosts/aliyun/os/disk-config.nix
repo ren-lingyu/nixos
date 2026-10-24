@@ -10,9 +10,7 @@ let
 
 in
 {
-
   config = lib.mkIf cfg.enable {
-
     disko.devices.disk = {
       system = {
         type = "disk";
@@ -44,7 +42,5 @@ in
         };
       };
     };
-
   };
-
 }

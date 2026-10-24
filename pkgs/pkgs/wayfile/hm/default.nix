@@ -10,9 +10,7 @@ let
 
 in
 {
-
   options.programs.wayfile = {
-
     enable = lib.mkEnableOption "Wayfile";
 
     package = lib.mkOption {
@@ -35,15 +33,12 @@ in
       example = [ "inode/directory" ];
       description = "MIME types to associate with Wayfile when `programs.wayfile.mimeTypes` is not null.";
     };
-
   };
 
   config = lib.mkMerge [
-
     { programs.wayfile.desktopFileName = "io.github.blackbartblues.Wayfile.desktop"; }
 
     (lib.mkIf cfg.enable {
-
       home.packages = [ cfg.package ];
 
       xdg.mimeApps = lib.mkIf (cfg.mimeTypes != null) {
@@ -55,9 +50,6 @@ in
           }) cfg.mimeTypes
         );
       };
-
     })
-
   ];
-
 }

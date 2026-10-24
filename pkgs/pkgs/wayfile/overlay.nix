@@ -1,5 +1,1 @@
-{ }: final: prev: {
-
-  wayfile = final.callPackage ./package.nix { };
-
-}
+{ }: final: prev: { wayfile = final.callPackage ./package.nix { }; }

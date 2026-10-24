@@ -10,7 +10,6 @@ let
 
 in
 {
-
   config = lib.mkIf cfg.enable {
     fonts = {
       packages = with pkgs; [
@@ -81,5 +80,4 @@ in
       };
     };
   };
-
 }

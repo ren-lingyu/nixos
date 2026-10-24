@@ -16,7 +16,6 @@ in
 {
   difftastic = prev.difftastic.overrideAttrs (
     finalAttrs: old: {
-
       patches = (old.patches or [ ]) ++ [ fixHaskellParser ];
 
       cargoHash = "sha256-m3LCB5FHDPxgOciPDDa1jwqJ5l3hiB5oWqNhGgcdktU=";
@@ -26,7 +25,6 @@ in
         patches = (old.cargoPatches or [ ]) ++ [ fixHaskellParser ];
         hash = finalAttrs.cargoHash;
       };
-
     }
   );
 }

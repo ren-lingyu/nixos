@@ -4,7 +4,6 @@ let
 in
 {
   configuration = {
-
     ip = lib.mkOption {
       type = lib.types.functionTo (lib.types.nullOr lib.types.nonEmptyStr);
       default = _: null;
@@ -25,7 +24,6 @@ in
       example = "wg3";
       description = "Host network interface used by the ${workload_} workload to reach its upstream service.";
     };
-
   };
   metadata = { };
 }

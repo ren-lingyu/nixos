@@ -8,7 +8,6 @@
   pnpmConfigHook,
 }:
 (stdenvNoCC.mkDerivation (finalAttrs_: {
-
   pname = "pi-mono-web-search";
   version = "0.1.0";
 
@@ -116,5 +115,4 @@
     homepage = "https://github.com/emanuelcasco/pi-mono-extensions";
     platforms = lib.platforms.all;
   };
-
 }))

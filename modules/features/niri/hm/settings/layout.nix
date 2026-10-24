@@ -6,9 +6,7 @@
   ...
 }:
 {
-
   config = lib.mkIf config.programs.niri.enable {
-
     programs.niri.settings.layout = rec {
       gaps = 0;
       background-color = "#000000";
@@ -78,7 +76,5 @@
         };
       };
     };
-
   };
-
 }

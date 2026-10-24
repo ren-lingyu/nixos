@@ -10,9 +10,7 @@ let
 
 in
 {
-
   config = lib.mkIf cfg.enable {
-
     services.xserver = {
       enable = true;
 
@@ -23,14 +21,11 @@ in
       windowManager.icewm = {
         enable = true;
       };
-
     };
 
     environment.systemPackages = with pkgs; [
       xdg-utils
       xrandr
     ];
-
   };
-
 }

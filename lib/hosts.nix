@@ -1,5 +1,4 @@
 { lib }: rec {
-
   getUniqueEnabledHost =
     hosts_:
     let
@@ -67,7 +66,6 @@
 
     in
     {
-
       topology = (
         lib.mapAttrs (unused_networkNumber_: network_: {
           name = network_.name;
@@ -82,14 +80,12 @@
             enabledHostNumber_ = builtins.toString enabledHost_.number;
 
             wgConfigRule_ = self_: peers_: {
-
               ips = [ "${self_.ip}/24" ];
 
               listenPort = self_.listenPort;
 
               peers = (
                 builtins.map (peer_: {
-
                   publicKey = peer_.publicKey;
 
                   allowedIPs = [ "${peer_.ip}/32" ];
@@ -110,10 +106,8 @@
                   );
 
                   persistentKeepalive = (if peer_.endpoint == null then null else 25);
-
                 }) peers_
               );
-
             };
 
             interfaceOf_ =
@@ -147,7 +141,6 @@
 
               in
               (lib.mergeAttrsList [
-
                 ({
                   type = "wireguard";
                   privateKeyFile = privateKeyFile_;
@@ -155,12 +148,10 @@
                 })
 
                 (wgConfigRule_ self_ peers_)
-
               ]);
 
           in
           {
-
             wireguard = {
               enable = true;
               interfaces = (
@@ -177,11 +168,8 @@
                 (enabledHost_.wireguard.listenPort != null)
               ]) { allowedUDPPorts = [ enabledHost_.wireguard.listenPort ]; }
             );
-
           }
         )
       );
-
     };
-
 }

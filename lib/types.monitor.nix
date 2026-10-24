@@ -8,9 +8,7 @@ let
 in
 lib.types.submodule (
   { name, ... }: {
-
     options = {
-
       name = lib.mkOption {
         type = lib.types.nonEmptyStr;
         default = name;
@@ -62,8 +60,6 @@ lib.types.submodule (
         example = 1.6;
         description = "Scale factor applied to the monitor.";
       };
-
     };
-
   }
 )
