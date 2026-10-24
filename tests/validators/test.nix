@@ -1,9 +1,9 @@
 {
   lib,
   runCommand,
-  rootPath,
   flakeParts,
   modules,
+  moduleLib,
   types,
 }:
 let
@@ -16,8 +16,7 @@ let
         marker = 42;
         unused = throw "unrelated validator context forced";
       };
-      root = fixture name;
-      modulesDir = fixture name + "/modules";
+      modules = fixture name + "/modules";
     };
   fails = value: !(builtins.tryEval (builtins.seq value true)).success;
   check = name: value: if value then true else throw "FP validator test failed: ${name}";
@@ -29,7 +28,7 @@ let
       systems ? { },
     }:
     let
-      root = if actual then rootPath else fixture "hierarchy";
+      moduleDirectory = if actual then modules else fixture "hierarchy" + "/modules";
       apply = applications validators;
     in
     (lib.evalModules {
@@ -38,20 +37,16 @@ let
           options.moduleRegistry = lib.mkOption {
             type = flakeParts.types.moduleRegistry {
               llib = declarationLib_;
-              inherit root;
-              modulesDir = root + "/modules";
+              modules = moduleDirectory;
             };
             readOnly = true;
             apply = apply.moduleRegistry;
           };
           options.nixosConfigurations = lib.mkOption {
             type = flakeParts.types.nixosConfigurations {
-              inherit root;
-              modulesDir = root + "/modules";
-              scope = {
-                llib = declarationLib_;
-                moduleRegistry = config.moduleRegistry;
-              };
+              modules = moduleDirectory;
+              llib = declarationLib_;
+              registry = config.moduleRegistry;
             };
             readOnly = true;
             apply = apply.nixosConfigurations config.moduleRegistry;
@@ -107,11 +102,34 @@ let
       ];
     };
   };
-  discovered = modules.discoverValidatorFiles {
-    root = fixture "hierarchy";
-    modulesDir = fixture "hierarchy" + "/modules";
-  };
+  discovered = moduleLib.discoverValidatorFiles { modules = fixture "hierarchy" + "/modules"; };
+  relocatedModules = fixture "directory-interface";
+  relocatedPath = [
+    "modules"
+    "features"
+    "alpha"
+  ];
+  relocatedDeclarations =
+    (lib.evalModules {
+      modules = moduleLib.mkOptionModules.metadata {
+        modules = relocatedModules;
+        scope = { inherit lib; };
+      } relocatedPath;
+    }).config;
   tests = [
+    (check "module directory is independent of its physical name and repository root" (
+      builtins.map (descriptor: descriptor.path) (moduleLib.discoverModules relocatedModules)
+      == [ relocatedPath ]
+      && relocatedDeclarations.marker == 42
+      &&
+        (flakeParts.mkValidatorApplications {
+          modules = relocatedModules;
+          llib = { };
+        }).moduleRegistry
+          relocatedDeclarations == {
+          marker = 42;
+        }
+    ))
     (check "ordered, deduplicated hierarchy including missing intermediate file" (
       builtins.map (entry: entry.path) discovered == [
         [ "modules" ]
@@ -132,10 +150,7 @@ let
       ]
     ))
     (check "no validators" (
-      modules.discoverValidatorFiles {
-        root = fixture "empty";
-        modulesDir = fixture "empty" + "/modules";
-      } == [ ]
+      moduleLib.discoverValidatorFiles { modules = fixture "empty" + "/modules"; } == [ ]
     ))
     (check "identity with no validators" (
       (applications "empty").moduleRegistry { marker = 42; } == { marker = 42; }

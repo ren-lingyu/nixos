@@ -5,16 +5,16 @@
 }:
 let
   mkInternalOptionsModules =
-    { root, modulesDir }:
+    { modules }:
     builtins.concatMap (
       descriptor:
       lib.optional (builtins.pathExists (descriptor.module + "/os/_options.os.nix")) (
         descriptor.module + "/os/_options.os.nix"
       )
-    ) (discoverModules root modulesDir);
+    ) (discoverModules modules);
 
   mkInterfaceOptionsModule =
-    { root, modulesDir }:
+    { modules }:
     {
       options,
       config,
@@ -26,7 +26,7 @@ let
     }:
     {
       options.moduleInterfaces = mkOptionTree {
-        inherit root modulesDir;
+        inherit modules;
         pathMapper = lib.drop 1;
         optionMaker =
           descriptor:
@@ -136,29 +136,24 @@ rec {
     );
 
   categoryModules =
-    rootPath: descriptors:
+    modules: descriptors:
     builtins.filter builtins.pathExists (
       lib.unique (
-        builtins.map (
-          descriptor: rootPath + "/modules/${builtins.elemAt descriptor.path 1}/default.nix"
-        ) descriptors
+        builtins.map (descriptor: modules + "/${builtins.elemAt descriptor.path 1}/default.nix") descriptors
       )
     );
 
   mkNixosSystem =
     {
-      rootPath,
+      modules,
       builder,
       registry,
       systemConfiguration,
     }:
     let
-      descriptors = discoverModules rootPath (rootPath + "/modules");
+      descriptors = discoverModules modules;
       enabled = enabledModules descriptors systemConfiguration;
-      declarationModules = mkDeclarationModules {
-        root = rootPath;
-        modulesDir = rootPath + "/modules";
-      };
+      declarationModules = mkDeclarationModules { inherit modules; };
     in
     builder.nixosSystem {
       inherit (systemConfiguration) system;
@@ -224,7 +219,7 @@ rec {
           )
         ]
         declarationModules.nixosModules
-        (categoryModules rootPath descriptors)
+        (categoryModules modules descriptors)
         (builtins.concatMap (
           descriptor:
           builtins.concatLists [
@@ -240,7 +235,7 @@ rec {
 
   mkNixosConfigurations =
     {
-      rootPath,
+      modules,
       builder,
       registry,
       configurations,
@@ -249,7 +244,7 @@ rec {
       unused_name: systemConfiguration:
       mkNixosSystem {
         inherit
-          rootPath
+          modules
           builder
           registry
           systemConfiguration

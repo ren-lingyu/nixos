@@ -1,9 +1,9 @@
 {
   lib,
   runCommand,
-  rootPath,
   flakeParts,
   modules,
+  moduleLib,
   types,
 }:
 let
@@ -31,11 +31,9 @@ let
 
   result_ = flakeParts.adaptOptions options_ config_ { value = "resolved"; };
 
-  root_ = rootPath;
   registryType_ = flakeParts.types.moduleRegistry {
     llib = declarationLib_;
-    root = root_;
-    modulesDir = root_ + "/modules";
+    inherit modules;
   };
   evalRegistry_ =
     definitions:
@@ -57,12 +55,9 @@ let
         {
           options.systems = lib.mkOption {
             type = flakeParts.types.nixosConfigurations {
-              root = root_;
-              modulesDir = root_ + "/modules";
-              scope = {
-                llib = declarationLib_;
-                moduleRegistry = registry_;
-              };
+              inherit modules;
+              llib = declarationLib_;
+              registry = registry_;
             };
           };
           config.systems.test = {
@@ -77,7 +72,7 @@ let
     }).config.systems.test;
   # Inspect the real builder's generated bridge without evaluating OS services.
   bridge_ = flakeParts.mkNixosSystem {
-    rootPath = root_;
+    inherit modules;
     registry = registry_;
     systemConfiguration = configuration_;
     builder = {
@@ -112,7 +107,7 @@ let
         hm = true;
       }
     )
-    (!(builtins.pathExists (root_ + "/modules/features/editor/_metadata.fp.nix")))
+    (!(builtins.pathExists (modules + "/features/editor/_metadata.fp.nix")))
     (builtins.all (
       descriptor:
       let
@@ -122,7 +117,7 @@ let
       builtins.isBool availability.os
       && builtins.isBool availability.hm
       && (lib.getAttrFromPath path bridge_.config.modules).existModule == availability
-    ) (modules.discoverModules root_ (root_ + "/modules")))
+    ) (moduleLib.discoverModules modules))
     (evaluationFails_
       (evalRegistry_ [ { registry.features.editor.metadata.existModule.os = true; } ])
       .features.editor.metadata.existModule
@@ -137,7 +132,7 @@ let
     (!configuration_.modules.features.editor.enable)
     (
       !(builtins.elem (
-        root_ + "/modules/features/editor/hm/default.nix"
+        modules + "/features/editor/hm/default.nix"
       ) bridge_.config.home-manager.users."1000".imports)
     )
   ];

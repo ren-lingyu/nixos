@@ -116,13 +116,6 @@
           lib,
           ...
         }:
-        let
-          validatorApplications = llib.flakeParts.mkValidatorApplications {
-            inherit llib;
-            root = ./.;
-            modulesDir = ./modules;
-          };
-        in
         {
 
           imports = [
@@ -130,33 +123,32 @@
             inputs.agenix-rekey.flakeModule
           ];
 
-          options = {
-            nixosBuilder = lib.mkOption {
-              type = llib.flakeParts.types.nixosBuilder;
-              readOnly = true;
-            };
-            moduleRegistry = lib.mkOption {
-              apply = validatorApplications.moduleRegistry;
-              type = llib.flakeParts.types.moduleRegistry {
+          options =
+            let
+              args_ = {
                 inherit llib;
-                root = ./.;
-                modulesDir = ./modules;
+                modules = ./modules;
               };
-              readOnly = true;
-            };
-            nixosConfigurations = lib.mkOption {
-              apply = validatorApplications.nixosConfigurations config.moduleRegistry;
-              type = llib.flakeParts.types.nixosConfigurations {
-                root = ./.;
-                modulesDir = ./modules;
-                scope = {
-                  inherit llib;
-                  moduleRegistry = config.moduleRegistry;
+            in
+            {
+              nixosBuilder = lib.mkOption {
+                type = llib.flakeParts.types.nixosBuilder;
+                readOnly = true;
+              };
+              moduleRegistry = lib.mkOption {
+                apply = (llib.flakeParts.mkValidatorApplications args_).moduleRegistry;
+                type = llib.flakeParts.types.moduleRegistry args_;
+                readOnly = true;
+              };
+              nixosConfigurations = lib.mkOption {
+                apply = (llib.flakeParts.mkValidatorApplications args_).nixosConfigurations config.moduleRegistry;
+                type = llib.flakeParts.types.nixosConfigurations {
+                  inherit (args_) modules llib;
+                  registry = config.moduleRegistry;
                 };
+                readOnly = true;
               };
-              readOnly = true;
             };
-          };
 
           config = {
 
@@ -436,7 +428,7 @@
             flake = {
 
               nixosConfigurations = llib.flakeParts.mkNixosConfigurations {
-                inherit rootPath;
+                modules = ./modules;
                 builder = config.nixosBuilder;
                 registry = config.moduleRegistry;
                 configurations = config.nixosConfigurations;
@@ -456,12 +448,8 @@
               {
 
                 checks = import ./tests {
-                  inherit
-                    lib
-                    pkgs
-                    llib
-                    rootPath
-                    ;
+                  inherit lib pkgs llib;
+                  modules = ./modules;
                 };
 
                 devShells = {

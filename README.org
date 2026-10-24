@@ -41,7 +41,7 @@ share 没有 profile 名这一层, 对应 =nixosConfigurations.<system>.modules.
 
 =llib.modules.discoverValidatorFiles= 基于现有 =discoverModules= descriptors 收集路径前缀中的文件, 包括 =modules/= 根级, 类别级及模块级. 不搜索 =os/= 或 =hm/=; 中间层文件可缺省. 文件按目录深度及同层路径顺序排列, 去重后每个文件在一次验证边界中至多执行一次. 各文件的约束按逻辑与组合, 不通过属性集覆盖合并函数.
 
-=llib.flakeParts.mkValidatorApplications= 接收 =root=, =modulesDir= 和调用时的 =llib= 验证上下文, 生成与测试共用的两个 =apply= 函数. =moduleRegistry.apply= 用其参数中的 Registry 执行 =metadata= 验证并原样返回值, 不读取 =nixosConfigurations=. =nixosConfigurations.apply= 为各系统保留惰性验证: 消费该系统时执行 =configuration= 分支并返回原值, 不强制其他系统. 诊断包含文件, 分支以及配置分支的系统名称; =--show-trace= 保留谓词的具体错误上下文.
+=llib.flakeParts.mkValidatorApplications= 接收 =modules= 目录和调用时的 =llib= 验证上下文, 生成与测试共用的两个 =apply= 函数. =moduleRegistry.apply= 用其参数中的 Registry 执行 =metadata= 验证并原样返回值, 不读取 =nixosConfigurations=. =nixosConfigurations.apply= 为各系统保留惰性验证: 消费该系统时执行 =configuration= 分支并返回原值, 不强制其他系统. 诊断包含文件, 分支以及配置分支的系统名称; =--show-trace= 保留谓词的具体错误上下文.
 
 验证器只检查相关字段, 不修改数据, 不通过顶层已经处理过的同名 option 重新取得输入, 不对完整 Registry 或 configuration 使用 =deepSeq=. 外部 module, overlay 和 =functionTo= 值应保持惰性, 不应为了检查其存在而调用函数. 仅依赖 FP configuration 与 Registry metadata 的静态约束由所属目录的 validators 执行; 依赖最终 NixOS/Home Manager 状态的检查继续留在对应原生 module system 中.
 
@@ -148,9 +148,11 @@ nixosConfigurations.nixos.modules.features.editor.emacs.programs.package =
 
 [[file:./lib/flakeParts.configurations.nix][flakeParts.configurations.nix]] 私有封装内部与接口 options 的生成, 并在系统构造时统一加载.
 
-=lib/default.nix= 按实际依赖逐项构造各 flakeParts 子库, 不注入递归的整库 =llib=. =moduleRegistry= 类型函数在调用时通过 =root=, =modulesDir= 和 =llib= 接收模块路径及 metadata 声明上下文, validator 在 =mkValidatorApplications= 调用时接收验证上下文; 两者均与库的构造依赖分开.
+=lib/default.nix= 按实际依赖逐项构造各 flakeParts 子库, 不注入递归的整库 =llib=. =moduleRegistry= 类型函数在调用时通过 =modules= 和 =llib= 接收模块目录及 metadata 声明上下文. =nixosConfigurations= 类型函数显式接收 =modules=, =llib= 和 =registry=, 在声明上下文中保留 =moduleRegistry= 名称. validator 在 =mkValidatorApplications= 调用时接收验证上下文. 这些调用参数与库的构造依赖分开.
 
-通用库中的 =assert= / =throw= 检查框架结构与函数前置条件, 例如发现路径范围, 禁止嵌套模块及 configuration/metadata 顶层字段不相交. 这些检查保留在通用库, 模块业务静态约束由所属 =_validators.fp.nix= 维护, 最终 NixOS/HM 状态相关检查使用原生 assertions.
+模块发现, 声明加载, validator 加载, FP 类型构造及 NixOS 构建统一接收 =modules= 目录. =discoverModules modules= 生成的逻辑路径始终以 =[ "modules" ]= 开头, 不从仓库根路径或目录实际名称推导; 声明与 validator 文件从传入目录定位. =builder.specialArgs= 中的运行时参数与该目录接口独立.
+
+通用库中的 =assert= / =throw= 检查框架结构与函数前置条件, 例如发现目录本身不能作为模块, 禁止嵌套模块及 configuration/metadata 顶层字段不相交. 这些检查保留在通用库, 模块业务静态约束由所属 =_validators.fp.nix= 维护, 最终 NixOS/HM 状态相关检查使用原生 assertions.
 
 *** [[file:./pkgs/][/pkgs]]
 #+begin_example
@@ -630,9 +632,9 @@ NixOS-WSL host, hostname =nixos-wsl=.
 
 各组测试的 =test-overlay.nix= 使用与包相同的外层构造协议, 通过 =final.callPackage ./test.nix= 调用测试体. =test.nix= 保存断言和检查派生物, fixtures 保留在所属组内; 专用入口文件名避免将 fixtures 误识别为测试组.
 
-根 flake 向测试总入口传入 =lib=, =pkgs=, =llib= 和 =rootPath=. 总入口通过 =mkChecks.args= 注入 =lib=, =rootPath=, 从 =pkgs= 提取的 =runCommand= 及选定库命名空间, 不向各组测试传递整套 =pkgs= 或 =llib=. 库依赖展平为 =llibFlakeParts=, =llibModules= 等小驼峰名称, 含 =-= 的名称也按词转换, 各组 overlay 再显式映射为 =flakeParts=, =modules= 等普通参数名, 保留测试体中的 =namespace.member= 调用形式. =mkChecks.args= 用于测试 scope 和 =callPackage= 注入, 不属于 overlay 外层构造参数.
+根 flake 向测试总入口传入 =lib=, =pkgs=, =llib= 和 =modules = ./modules;=. 总入口通过 =mkChecks.args= 注入 =lib=, =modules=, 从 =pkgs= 提取的 =runCommand= 及选定库命名空间, 不向各组测试传递整套 =pkgs= 或 =llib=. 库依赖展平为 =llibFlakeParts=, =llibModules= 等小驼峰名称, 含 =-= 的名称也按词转换, 各组 overlay 再显式映射为 =flakeParts=, =moduleLib= 等普通参数名, 保留测试体中的 =namespace.member= 调用形式. =mkChecks.args= 用于测试 scope 和 =callPackage= 注入, 不属于 overlay 外层构造参数.
 
-测试对所在目录之外的依赖通过函数参数传入, 禁止使用 =../*= 或 =../../*= 等父目录相对路径直接取得依赖. 需要真实模块树的测试保留显式 =rootPath= 参数.
+测试对所在目录之外的依赖通过函数参数传入, 禁止使用 =../*= 或 =../../*= 等父目录相对路径直接取得依赖. 需要真实模块树的测试通过 =modules= 参数接收该目录, 不依赖仓库根路径.
 
 检查集合通过根 =perSystem.checks= 导出. treefmt 格式检查也通过根 flake checks 接入, 两个 =flake.lock= 均列入格式检查排除项.
 

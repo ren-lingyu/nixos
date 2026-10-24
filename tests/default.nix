@@ -2,14 +2,14 @@
   lib,
   pkgs,
   llib,
-  rootPath,
+  modules,
 }:
 llib.tests.mkChecks {
   root = ./.;
   overlayFile = "test-overlay.nix";
   separator = "-";
   args = {
-    inherit lib rootPath;
+    inherit lib modules;
     inherit (pkgs) runCommand;
     llibFeatures = llib.features;
     llibFlakeParts = llib.flakeParts;

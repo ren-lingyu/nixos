@@ -3,16 +3,7 @@
   mkOptionName = path: lib.showOption path;
 
   discoverModules =
-    rootDirectory: searchDirectory:
-    let
-      rootPath = lib.splitString "/" (toString rootDirectory);
-      searchPath = lib.splitString "/" (toString searchDirectory);
-
-      relativePath = lib.drop (builtins.length rootPath) searchPath;
-    in
-    assert lib.assertMsg (
-      lib.take (builtins.length rootPath) searchPath == rootPath
-    ) "discoverModules: searchDirectory must be contained in rootDirectory.";
+    modules:
     (lib.fix (
       traverse: module: path: parentModulePath:
       let
@@ -46,7 +37,7 @@
       if
         builtins.all (condition: condition) [
           isModule
-          (path == relativePath)
+          (path == [ "modules" ])
         ]
       then
         throw "discoverModules: the search directory cannot be a module."
@@ -82,16 +73,14 @@
           ) childDirectories)
         ]
     ))
-      searchDirectory
-      relativePath
+      modules
+      [ "modules" ]
       null;
 
   discoverValidatorFiles =
-    { root, modulesDir }:
+    { modules }:
     let
-      base = lib.drop (builtins.length (lib.splitString "/" (toString root))) (
-        lib.splitString "/" (toString modulesDir)
-      );
+      base = [ "modules" ];
       paths = lib.unique (
         [ base ]
         ++ builtins.concatMap (
@@ -99,7 +88,7 @@
           builtins.map (length: lib.take length descriptor.path) (
             lib.range (builtins.length base) (builtins.length descriptor.path)
           )
-        ) (discoverModules root modulesDir)
+        ) (discoverModules modules)
       );
       ordered = builtins.sort (
         a: b:
@@ -112,14 +101,14 @@
     builtins.filter (entry: builtins.pathExists entry.file) (
       builtins.map (path: {
         inherit path;
-        file = root + "/${lib.concatStringsSep "/" path}/_validators.fp.nix";
+        file = modules + "/${lib.concatStringsSep "/" (lib.drop 1 path)}/_validators.fp.nix";
       }) ordered
     );
 
   mkOptionModules = rec {
     default =
       {
-        root,
+        modules,
         scope,
         target,
       }:
@@ -128,7 +117,7 @@
         prefixes = lib.range 1 (builtins.length path);
         optionFiles = builtins.filter builtins.pathExists (
           builtins.map (
-            length: root + "/${lib.concatStringsSep "/" (lib.take length path)}/_options.fp.nix"
+            length: modules + "/${lib.concatStringsSep "/" (lib.drop 1 (lib.take length path))}/_options.fp.nix"
           ) prefixes
         );
       in
@@ -145,7 +134,7 @@
 
     configuration =
       {
-        root,
+        modules,
         scope,
         metadata,
       }:
@@ -160,23 +149,22 @@
         )
         (
           default {
-            inherit root scope;
+            inherit modules scope;
             target = "configuration";
           } path
         );
 
     metadata =
-      { root, scope }:
+      { modules, scope }:
       default {
-        inherit root scope;
+        inherit modules scope;
         target = "metadata";
       };
   };
 
   mkOptionTree =
     {
-      root,
-      modulesDir,
+      modules,
       pathMapper ? lib.id,
       optionMaker,
     }:
@@ -191,6 +179,6 @@
         throw "mkOptionTree: duplicate option path `${lib.concatStringsSep "." path}`."
       else
         lib.recursiveUpdate tree (lib.setAttrByPath path (optionMaker module))
-    ) { } (discoverModules root modulesDir);
+    ) { } (discoverModules modules);
 
 }

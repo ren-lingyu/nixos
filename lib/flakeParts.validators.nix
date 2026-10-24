@@ -1,10 +1,6 @@
 { lib, discoverValidatorFiles }: {
   mkValidatorApplications =
-    {
-      root,
-      modulesDir,
-      llib,
-    }:
+    { modules, llib }:
     let
       validators =
         builtins.map
@@ -35,7 +31,7 @@
             }
           )
           (discoverValidatorFiles {
-            inherit root modulesDir;
+            inherit modules;
           });
       validate =
         branch: args:

@@ -24,14 +24,10 @@
   };
 
   moduleRegistry =
-    {
-      root,
-      modulesDir,
-      llib,
-    }:
+    { modules, llib }:
     lib.types.submodule {
       options = mkOptionTree {
-        inherit root modulesDir;
+        inherit modules;
         pathMapper = lib.drop 1;
         optionMaker =
           descriptor:
@@ -89,7 +85,7 @@
                         }
                         ({ config, options, ... }: {
                           imports = mkOptionModules.metadata {
-                            inherit root;
+                            inherit modules;
                             scope = {
                               inherit
                                 lib
@@ -124,9 +120,9 @@
 
   nixosConfigurations =
     {
-      root,
-      modulesDir,
-      scope ? { },
+      modules,
+      llib,
+      registry,
     }:
     lib.types.attrsOf (
       lib.types.submodule (
@@ -141,19 +137,24 @@
             system = lib.mkOption { type = lib.types.nonEmptyStr; };
 
             modules = mkOptionTree {
-              inherit root modulesDir;
+              inherit modules;
               pathMapper = lib.drop 1;
               optionMaker =
                 descriptor:
                 lib.mkOption {
                   type = lib.types.submoduleWith {
                     modules = mkOptionModules.configuration {
-                      inherit root;
-                      scope = lib.mergeAttrsList [
-                        scope
-                        { inherit lib config options; }
-                      ];
-                      metadata = lib.getAttrFromPath (lib.drop 1 descriptor.path ++ [ "metadata" ]) scope.moduleRegistry;
+                      inherit modules;
+                      scope = {
+                        inherit
+                          lib
+                          llib
+                          config
+                          options
+                          ;
+                        moduleRegistry = registry;
+                      };
+                      metadata = lib.getAttrFromPath (lib.drop 1 descriptor.path ++ [ "metadata" ]) registry;
                     } descriptor.path;
                   };
                   default = { };
