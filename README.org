@@ -5,7 +5,7 @@
 这是一个基于 Flake 的 NixOS 配置仓库.
 
 * 架构约定
-=flake.nix= 是最终组装层, 使用 flake-parts 声明每台系统的配置, 管理系统级 flake inputs, 导出本地软件包, 并统一接入外部 NixOS/Home Manager modules 和 overlays. =pkgs/= 是独立的 package 子项目, 管理应用级 inputs, 包定义和集成输出, 根 =flake.lock= 记录系统消费的依赖版本. 具体配置由四类平级 profile 提供:
+=flake.nix= 是最终组装层, 通过 =personal-nixpkgs.lib.mkFlake= 组织 flake-parts 配置, 声明每台系统, 管理系统级 flake inputs, 导出本地软件包, 并统一接入外部 NixOS/Home Manager modules 和 overlays. =pkgs/= 是独立的 package 子项目, 管理应用级 inputs, 包定义和集成输出, 根 =flake.lock= 记录系统消费的依赖版本. 具体配置由四类平级 profile 提供:
 
 - =modules/hosts/= 描述主机身份, 硬件和主机拥有的资源. host 只通过 UID registry 声明可管理的用户, 不声明用户名或 user profile.
 - =modules/users/= 描述 user profile 和个人 Home Manager 配置. user 不决定自己属于哪台 host.
@@ -107,22 +107,22 @@ nixosConfigurations.nixos.modules.features.editor.emacs.programs.package =
 └── tests/
 #+end_example
 
-仓库根目录放置系统 flake 入口, lock 文件, README, package 子项目和模块目录. 根 =flake.nix= 使用 =flake-parts= 组织输出, 包括 =nixosConfigurations=, =legacyPackages=, =checks=, =devShells= 和 =formatter=; overlays 和包附带的 OS/HM 模块由 =pkgs/flake.nix= 导出. 根 =nixpkgs= 使用 =nixos-unstable=, 并启用 =nix-command= 与 =flakes=.
+仓库根目录放置系统 flake 入口, lock 文件, README, package 子项目和模块目录. 根 =flake.nix= 使用 =personal-nixpkgs.lib.mkFlake inputs.nixpkgs= 组织输出, 包括 =nixosConfigurations=, =legacyPackages=, =checks=, =devShells= 和 =formatter=; overlays 和包附带的 OS/HM 模块由 =pkgs/flake.nix= 导出. 根 =nixpkgs= 使用 =nixos-unstable=, 并启用 =nix-command= 与 =flakes=.
+
+根 flake 和 package 子项目均向 =mkFlake= 传入接收 =lib= 的配置回调, 用该参数导入本地库, 并声明 =moduleLocation = __curPos.file;=. 根回调提供 =llib= 和 =specialArgs.rootPath=, 子项目回调提供自己的 =llib= 与 =lpkgs=.
 
 根 flake inputs 按使用位置集中传递:
 - =nixpkgs=: 提供最终系统与 =perSystem= 的 package set, 也是多个 inputs 的 =follows= 目标.
-- =personal-nixpkgs=: 提供 =llib.tests= 测试组织接口, 与 package 子项目中的同名输入在根 lock graph 中分别记录版本.
-- =local-nixpkgs=: 通过 =path:./pkgs= 引用 package 子项目, 将其 =share= 和 =editor= overlays/modules 注入对应 Registry 条目; =legacy= overlay 用于构造根 =perSystem= 的 package set 和 =legacyPackages= 输出; 子项目的 =treefmt-nix= 跟随根输入.
-- =flake-parts=: 组装 flake outputs, =nixpkgs-lib= 跟随根 =nixpkgs=.
-- =treefmt-nix=: 提供 formatter 与格式检查, 启用 nixfmt, shfmt 和 prettier.
+- =personal-nixpkgs=: 提供 =mkFlake= 组装入口与 =llib.tests= 测试组织接口, 其 =nixpkgs= 跟随根输入; 与 package 子项目中的同名输入在根 lock graph 中分别记录版本. =flake-parts= 和 =treefmt-nix= 由该输入管理, 不再直接声明为根输入.
+- =local-nixpkgs=: 通过 =path:./pkgs= 引用 package 子项目, 将其 =share= 和 =editor= overlays/modules 注入对应 Registry 条目; =legacy= overlay 用于构造根 =perSystem= 的 package set 和 =legacyPackages= 输出.
 - =home-manager=: 通过 =nixosBuilder.homeManager= 导入每台系统.
-- =agenix= 和 =agenix-rekey=: 提供 age secret 与 rekey module; =agenix-rekey.agePackage= 使用本仓库的 =rage-armored=.
+- =agenix= 和 =agenix-rekey=: 提供 age secret 与 rekey module; =agenix-rekey.agePackage= 使用本仓库的 =rage-armored=, =agenix-rekey= 的 =treefmt-nix= 跟随 =personal-nixpkgs/treefmt-nix=.
 - =sops-nix=: 注入 sops feature 所需的 NixOS 与 Home Manager modules.
 - =niri-flake=: 注入 niri feature 所需的 overlay 和 Home Manager modules.
 - =nix-flatpak=: 注入 thinkbook host 的 Flatpak module.
 - =nixvirt=: 注入 thinkbook host 的 NixVirt module.
 - =nixos-wsl=: 注入 wsl host 的 NixOS-WSL module.
-- =nixos-anywhere= 和 =disko=: 提供部署 devShell 与 aliyun host 的 disko module; =disko= 通过 =follows= 复用 =nixos-anywhere/disko=.
+- =nixos-anywhere= 和 =disko=: 提供部署 devShell 与 aliyun host 的 disko module; =disko= 通过 =follows= 复用 =nixos-anywhere/disko=, =nixos-anywhere= 的 =treefmt-nix= 跟随 =personal-nixpkgs/treefmt-nix=.
 
 *** [[file:./lib/][/lib]]
 #+begin_example
@@ -184,13 +184,14 @@ nixosConfigurations.nixos.modules.features.editor.emacs.programs.package =
 [[file:./pkgs/flake.nix][pkgs/flake.nix]] 使用独立的 inputs 声明应用依赖, =nixpkgs= 使用 =nixpkgs-unstable=, 不跟随根系统的 =nixpkgs=. 根 flake 消费子项目时通过根 [[file:./flake.lock][flake.lock]] 记录其依赖版本, 仓库不跟踪 =pkgs/flake.lock=. 应用依赖可相对独立地维护和更新; 根 flake 仍决定模块启用, overlay 接入和最终系统构建. 更新子项目 inputs 后应同步根 lock graph. 单独使用子 flake 时, 本地 lockfile 不纳入版本控制; 没有本地 lockfile 时, 子 flake 不提供独立的已提交锁定基线.
 
 子项目 inputs 包括:
-- =personal-nixpkgs=: 提供通用 package library, 其 =nixpkgs=, =flake-parts= 和 =treefmt-nix= 跟随子项目对应输入.
-- =flake-parts= 和 =treefmt-nix=: 组织子 flake 及其应用依赖的 =follows= 关系. =treefmt-nix= 当前未在子项目中配置独立 formatter/checks.
+- =personal-nixpkgs=: 提供 =mkFlake= 和通用 package library, 其 =nixpkgs= 跟随子项目输入; =flake-parts= 和 =treefmt-nix= 由该输入管理, 不再直接声明为子项目输入.
 - =emarccs=: 提供 editor 的 Emacs overlay, 固定 revision, 其内部 =personal-nixpkgs= 依赖由自身锁定.
 - =lem= 和 =nixvim=: 提供 editor 所需的 overlay 和 Home Manager module.
 - =git-agent-workflow=: 通过 =share= overlay 提供持久记忆工具.
 - =lean4-nix=: 通过 =share= overlay 提供 =lean4= 二进制包.
 - =zotero-fix-nixpkgs=: 固定 nixpkgs revision, 通过 =share= overlay 提供对应 =zotero= 包.
+
+=emarccs= 的 =flake-parts= 和 =treefmt-nix= 分别跟随子项目 =personal-nixpkgs= 的对应输入; =lem=, =nixvim=, =git-agent-workflow= 和 =lean4-nix= 的 =flake-parts= 也跟随 =personal-nixpkgs/flake-parts=.
 
 =pkgs/flake.nix= 仅选取 =personal-nixpkgs.lib.packages=, 与 [[file:./pkgs/lib/default.nix][pkgs/lib/default.nix]] 的本地扩展通过 =mergeAttrsRecursive { allowOverrides = false; }= 合并为子项目的 =llib=, 禁止覆盖同名定义. 通用 =llib.packages= 由外部库提供; 本地扩展入口当前为空, 子项目 =llib= 与根 =llib= 分开. [[file:./pkgs/pkgs/default.nix][pkgs/pkgs/default.nix]] 使用它生成 overlays 和 OS/HM 模块入口. =package.nix= 定义独立包, =overlay.nix= 注入包或命名空间; 对已有包的纯定制直接写在 =overlay.nix= 中; =os/default.nix= 和 =hm/default.nix= 提供包附带的模块. =mkOverlays= 通过 =groups= 生成本地 overlay 分组: =legacy= 包含全部本地扩展并通过 =export = true;= 提供扩展后 package set 的 =pkgs.legacyPackages=, =share= 排除 =rage-armored=. 各组通过 =exclude= 选择扩展, 可共享同一包定义.
 
@@ -211,7 +212,7 @@ nixosConfigurations.nixos.modules.features.editor.emacs.programs.package =
 - =nixosModules.share= 和 =homeModules.share=: 汇集包附带的 OS/HM 模块.
 - =homeModules.editor=: 提供 Nixvim Home Manager module.
 
-根 flake 在 =perSystem= 中导入根 =inputs.nixpkgs=, 传入 =system= 和 =inputs.local-nixpkgs.overlays.legacy= 构造 package set, 并导出 =legacyPackages = pkgs.legacyPackages;=. checks, devShells 和 rekey 工具共同使用该 =pkgs=; =agenix-rekey.agePackage= 直接取 =pkgs.rage-armored=.
+根 flake 通过 =perSystem.nixpkgs.overlays= 接入 =inputs.local-nixpkgs.overlays.legacy=, 使用 =mkFlake= 提供的 =pkgs= 并导出 =legacyPackages = pkgs.legacyPackages;=. checks, devShells 和 rekey 工具共同使用该 =pkgs=; =agenix-rekey.agePackage= 直接取 =pkgs.rage-armored=.
 
 根 flake 通过 =moduleRegistry.share= 和 =moduleRegistry.features.editor= 接入对应 overlays/modules, 由现有模块启用与 HM 用户分配规则决定加载范围.
 
@@ -638,7 +639,7 @@ NixOS-WSL host, hostname =nixos-wsl=.
 
 测试对所在目录之外的依赖通过函数参数传入, 禁止使用 =../*= 或 =../../*= 等父目录相对路径直接取得依赖. 需要真实模块树的测试通过 =modules= 参数接收该目录, 不依赖仓库根路径.
 
-检查集合通过根 =perSystem.checks= 导出. treefmt 格式检查也通过根 flake checks 接入, 根 =flake.lock= 列入格式检查排除项.
+检查集合通过根 =perSystem.checks= 导出. 根 flake 使用 =treefmt.flakeCheck = true;= 接入格式检查, 本地不再逐项声明 formatter 程序. 本地 =treefmt.settings.excludes= 排除 =*.patch=, =.gitignore=, =LICENSE=, =README.org=, =flake.lock= 和 =*.age=.
 
 #+begin_src sh
 nix flake check
