@@ -5,7 +5,7 @@
 这是一个基于 Flake 的 NixOS 配置仓库.
 
 * 架构约定
-=flake.nix= 是最终组装层, 使用 flake-parts 声明每台系统的配置, 管理系统级 flake inputs, 并统一接入外部 NixOS/Home Manager modules 和 overlays. =pkgs/= 是独立的 package 子项目, 管理应用级 inputs 和软件包输出, 根 =flake.lock= 记录系统消费的依赖版本. 具体配置由四类平级 profile 提供:
+=flake.nix= 是最终组装层, 使用 flake-parts 声明每台系统的配置, 管理系统级 flake inputs, 导出本地软件包, 并统一接入外部 NixOS/Home Manager modules 和 overlays. =pkgs/= 是独立的 package 子项目, 管理应用级 inputs, 包定义和集成输出, 根 =flake.lock= 记录系统消费的依赖版本. 具体配置由四类平级 profile 提供:
 
 - =modules/hosts/= 描述主机身份, 硬件和主机拥有的资源. host 只通过 UID registry 声明可管理的用户, 不声明用户名或 user profile.
 - =modules/users/= 描述 user profile 和个人 Home Manager 配置. user 不决定自己属于哪台 host.
@@ -107,12 +107,12 @@ nixosConfigurations.nixos.modules.features.editor.emacs.programs.package =
 └── tests/
 #+end_example
 
-仓库根目录放置系统 flake 入口, lock 文件, README, package 子项目和模块目录. 根 =flake.nix= 使用 =flake-parts= 组织系统输出, 包括 =nixosConfigurations=, =checks=, =devShells= 和 =formatter=; 本地软件包, overlays 和附带的 OS/HM 模块由 =pkgs/flake.nix= 导出. 根 =nixpkgs= 使用 =nixos-unstable=, 并启用 =nix-command= 与 =flakes=.
+仓库根目录放置系统 flake 入口, lock 文件, README, package 子项目和模块目录. 根 =flake.nix= 使用 =flake-parts= 组织输出, 包括 =nixosConfigurations=, =legacyPackages=, =checks=, =devShells= 和 =formatter=; overlays 和包附带的 OS/HM 模块由 =pkgs/flake.nix= 导出. 根 =nixpkgs= 使用 =nixos-unstable=, 并启用 =nix-command= 与 =flakes=.
 
 根 flake inputs 按使用位置集中传递:
 - =nixpkgs=: 提供最终系统与 =perSystem= 的 package set, 也是多个 inputs 的 =follows= 目标.
 - =personal-nixpkgs=: 提供 =llib.tests= 测试组织接口, 与 package 子项目中的同名输入在根 lock graph 中分别记录版本.
-- =local-nixpkgs=: 通过 =path:./pkgs= 引用 package 子项目, 将其 =share= 和 =editor= overlays/modules 注入对应 Registry 条目; 子项目的 =treefmt-nix= 跟随根输入.
+- =local-nixpkgs=: 通过 =path:./pkgs= 引用 package 子项目, 将其 =share= 和 =editor= overlays/modules 注入对应 Registry 条目; =legacy= overlay 用于构造根 =perSystem= 的 package set 和 =legacyPackages= 输出; 子项目的 =treefmt-nix= 跟随根输入.
 - =flake-parts=: 组装 flake outputs, =nixpkgs-lib= 跟随根 =nixpkgs=.
 - =treefmt-nix=: 提供 formatter 与格式检查, 启用 nixfmt, shfmt 和 prettier.
 - =home-manager=: 通过 =nixosBuilder.homeManager= 导入每台系统.
@@ -192,27 +192,28 @@ nixosConfigurations.nixos.modules.features.editor.emacs.programs.package =
 - =lean4-nix=: 通过 =share= overlay 提供 =lean4= 二进制包.
 - =zotero-fix-nixpkgs=: 固定 nixpkgs revision, 通过 =share= overlay 提供对应 =zotero= 包.
 
-=pkgs/flake.nix= 仅选取 =personal-nixpkgs.lib.packages=, 与 [[file:./pkgs/lib/default.nix][pkgs/lib/default.nix]] 的本地扩展通过 =mergeAttrsRecursive { allowOverrides = false; }= 合并为子项目的 =llib=, 禁止覆盖同名定义. 通用 =llib.packages= 由外部库提供; 本地扩展入口当前为空, 子项目 =llib= 与根 =llib= 分开. [[file:./pkgs/pkgs/default.nix][pkgs/pkgs/default.nix]] 使用它生成本地包集合, overlays 和 OS/HM 模块入口. =package.nix= 定义独立包, =overlay.nix= 注入包或命名空间; 对已有包的纯定制直接写在 =overlay.nix= 中; =os/default.nix= 和 =hm/default.nix= 提供包附带的模块. =mkOverlays= 通过 =groups= 生成本地 overlay 分组: =default= 包含全部本地扩展, =share= 排除 =rage-armored=, =legacy= 包含全部本地扩展并通过 =export = true;= 提供 =pkgs.legacyPackages=. 各组通过 =exclude= 选择扩展, 可共享同一包定义.
+=pkgs/flake.nix= 仅选取 =personal-nixpkgs.lib.packages=, 与 [[file:./pkgs/lib/default.nix][pkgs/lib/default.nix]] 的本地扩展通过 =mergeAttrsRecursive { allowOverrides = false; }= 合并为子项目的 =llib=, 禁止覆盖同名定义. 通用 =llib.packages= 由外部库提供; 本地扩展入口当前为空, 子项目 =llib= 与根 =llib= 分开. [[file:./pkgs/pkgs/default.nix][pkgs/pkgs/default.nix]] 使用它生成 overlays 和 OS/HM 模块入口. =package.nix= 定义独立包, =overlay.nix= 注入包或命名空间; 对已有包的纯定制直接写在 =overlay.nix= 中; =os/default.nix= 和 =hm/default.nix= 提供包附带的模块. =mkOverlays= 通过 =groups= 生成本地 overlay 分组: =legacy= 包含全部本地扩展并通过 =export = true;= 提供扩展后 package set 的 =pkgs.legacyPackages=, =share= 排除 =rage-armored=. 各组通过 =exclude= 选择扩展, 可共享同一包定义.
 
 包与测试的 overlay 源文件使用带参数的构造函数, 返回标准的双参数 overlay. 无构造参数时写作:
 
 #+begin_src nix
-{ }: final: prev: {
-  example = final.callPackage ./package.nix { };
+{ }: final_: prev_: {
+  example = final_.callPackage ./package.nix { };
 }
 #+end_src
 
-外层构造参数与内层 =final= / =prev= 分开, =mkOverlays= 返回的仍是可供 Nixpkgs 使用的标准 overlays. =texlivePackages= 的聚合由外部 package library 内置规则处理, 本地只保留 =luadraw= 等包的定义.
+外层构造参数与内层 =final_= / =prev_= 分开, =mkOverlays= 返回的仍是可供 Nixpkgs 使用的标准 overlays. =texlivePackages= 的聚合由外部 package library 内置规则处理, 本地只保留 =luadraw= 等包的定义.
 
-子 flake 当前提供 =x86_64-linux= 软件包输出及以下集成入口:
-- =legacyPackages.x86_64-linux=: 在 =perSystem= 中直接 =import inputs.nixpkgs=, 传入 =system= 和本地 =overlays.legacy= 构造 package set, 然后导出其 =pkgs.legacyPackages=. 该属性由分组 overlay 按 =overlayFile = "overlay.nix"= 发现的包生成. =share= 和 =editor= 的上游应用集成仍由相应 overlays 提供.
-- =overlays.default=: 包含全部本地包扩展.
+子 flake 当前提供以下集成入口:
+- =overlays.legacy=: 包含全部本地包扩展, 并提供按 =overlayFile = "overlay.nix"= 发现的 =pkgs.legacyPackages= 命名空间.
 - =overlays.share=: 本地包扩展中排除 =rage-armored=, 并加入 GAW, Lean 和 Zotero 的集成.
 - =overlays.editor=: 组合 emarccs 和 Lem 的 overlays, 并为 Lem 补充依赖及桌面入口.
 - =nixosModules.share= 和 =homeModules.share=: 汇集包附带的 OS/HM 模块.
 - =homeModules.editor=: 提供 Nixvim Home Manager module.
 
-根 flake 通过 =moduleRegistry.share= 和 =moduleRegistry.features.editor= 接入对应 overlays/modules, 由现有模块启用与 HM 用户分配规则决定加载范围. rekey 工具使用 =(pkgs.extend inputs.local-nixpkgs.overlays.default).rage-armored=, 在根 =perSystem= 的 package set 上构造 wrapper.
+根 flake 在 =perSystem= 中导入根 =inputs.nixpkgs=, 传入 =system= 和 =inputs.local-nixpkgs.overlays.legacy= 构造 package set, 并导出 =legacyPackages = pkgs.legacyPackages;=. checks, devShells 和 rekey 工具共同使用该 =pkgs=; =agenix-rekey.agePackage= 直接取 =pkgs.rage-armored=.
+
+根 flake 通过 =moduleRegistry.share= 和 =moduleRegistry.features.editor= 接入对应 overlays/modules, 由现有模块启用与 HM 用户分配规则决定加载范围.
 
 本地 package 包括:
 - =codex=: 为 Codex wrapper 补充 Python/PyYAML 运行环境.
@@ -504,6 +505,8 @@ Workload 的 OS/HM 可用性由模块发现结果派生, 无需类别级一致�
 [[file:./modules/hosts/boot-manager.nix][modules/hosts/boot-manager.nix]], [[file:./modules/hosts/identity.nix][modules/hosts/identity.nix]], [[file:./modules/hosts/shared.nix][modules/hosts/shared.nix]] 和 [[file:./modules/hosts/wireguard.nix][modules/hosts/wireguard.nix]] 分别消费 host metadata, 生成 boot manager, identity, shared capability 和 WireGuard topology/secret 的配置.
 
 各 host 的 =_metadata.fp.nix= 由 registry 的 metadata 子模块加载, 用于声明 UID registry, monitor, public IP, WireGuard 和 identity metadata. =ssh.private.age= 与 =wireguard.private.age= 分别保存该 host 的加密 SSH host private key 与 WireGuard private key, 并由 =_metadata.fp.nix= 引用.
+
+=identity.nix= 将当前 host 的非空 SSH 私钥备份引用登记为 =age.secrets.ssh-identity=, 设置 =intermediary = true;=, 使其参与 =agenix edit=, =agenix view= 和 =agenix update-masterkeys=. host rekey 跳过该备份, 上游 agenix module 安装 dummy secret, SSH host 私钥的安装与恢复需单独处理. 备份登记独立于 =identity.rootAccess=; 后者只控制 YubiKey 工具和 =pcscd= 的启用.
 
 ***** [[file:./modules/hosts/aliyun/][/modules/hosts/aliyun]]
 #+begin_example

@@ -428,6 +428,7 @@
             perSystem =
               {
                 inputs',
+                system,
                 config,
                 pkgs,
                 lib,
@@ -435,6 +436,13 @@
                 ...
               }:
               {
+                _module.args.pkgs = import inputs.nixpkgs {
+                  inherit system;
+                  overlays = [ inputs.local-nixpkgs.overlays.legacy ];
+                };
+
+                legacyPackages = pkgs.legacyPackages;
+
                 checks = import ./tests {
                   inherit lib pkgs llib;
                   modules = ./modules;
@@ -450,7 +458,7 @@
                   };
                 };
 
-                agenix-rekey.agePackage = (pkgs.extend inputs.local-nixpkgs.overlays.default).rage-armored;
+                agenix-rekey.agePackage = pkgs.rage-armored;
 
                 treefmt = {
                   flakeFormatter = true;

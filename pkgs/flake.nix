@@ -120,7 +120,7 @@
               };
 
               overlays = builtins.mapAttrs (_: value_: lib.composeManyExtensions value_) {
-                default = [ lpkgs.overlays.default ];
+                legacy = [ lpkgs.overlays.legacy ];
 
                 share = [
                   inputs.git-agent-workflow.overlays.default
@@ -168,15 +168,6 @@
                   )
                 ];
               };
-            };
-
-            perSystem = { system, pkgs, ... }: {
-              _module.args.pkgs = import inputs.nixpkgs {
-                inherit system;
-                overlays = [ lpkgs.overlays.legacy ];
-              };
-
-              legacyPackages = pkgs.legacyPackages;
             };
           };
         }

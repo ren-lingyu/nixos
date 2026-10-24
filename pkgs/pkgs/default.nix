@@ -3,14 +3,12 @@
     root = ./.;
     overlayFile = "overlay.nix";
     groups = {
-      default = { };
+      legacy = {
+        export = true;
+      };
 
       share = {
         exclude = [ "rage-armored" ];
-      };
-
-      legacy = {
-        export = true;
       };
     };
   };
