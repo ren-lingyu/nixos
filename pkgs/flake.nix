@@ -93,7 +93,7 @@
               { inherit (inputs.personal-nixpkgs.lib) packages; }
               (import ./lib { inherit lib; })
             ];
-            lpkgs = import ./pkgs { inherit lib llib; };
+            lpkgs = import ./pkgs { inherit llib; };
           });
       }
       (
@@ -174,10 +174,10 @@
             perSystem = { system, pkgs, ... }: {
               _module.args.pkgs = import inputs.nixpkgs {
                 inherit system;
-                overlays = [ lpkgs.overlays.default ];
+                overlays = [ lpkgs.overlays.legacy ];
               };
 
-              legacyPackages = lpkgs.mkLegacyPackages pkgs;
+              legacyPackages = pkgs.legacyPackages;
             };
           };
         }

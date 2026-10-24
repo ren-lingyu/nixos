@@ -1,37 +1,19 @@
-{ lib, llib }: {
-  mkLegacyPackages =
-    pkgs:
-    llib.packages.mkLegacyPackages {
-      root = ./.;
-      overlayFile = "overlay.nix";
-      inherit pkgs;
-    };
+{ llib }: {
+  overlays = llib.packages.mkOverlays {
+    root = ./.;
+    overlayFile = "overlay.nix";
+    groups = {
+      default = { };
 
-  overlays =
-    let
-      assert_ =
-        sets_:
-        let
-          names_ = builtins.concatMap builtins.attrNames (
-            builtins.attrValues (builtins.removeAttrs sets_ [ "default" ])
-          );
-        in
-        assert lib.assertMsg (
-          builtins.length names_ == builtins.length (lib.unique names_)
-        ) "Overlay sets_ must be pairwise disjoint.";
-        assert lib.assertMsg (
-          lib.subtractLists (builtins.attrNames sets_.default) names_ == [ ]
-        ) "Overlay sets_ must be subsets of default.";
-        lib.mapAttrs (_: value_: lib.composeManyExtensions (builtins.attrValues value_)) sets_;
-    in
-    assert_ (rec {
-      default = llib.packages.mkOverlays {
-        root = ./.;
-        overlayFile = "overlay.nix";
+      share = {
+        exclude = [ "rage-armored" ];
       };
 
-      share = builtins.removeAttrs default [ "rage-armored" ];
-    });
+      legacy = {
+        export = true;
+      };
+    };
+  };
 
   nixosModule = llib.packages.mkNixosModule {
     root = ./.;

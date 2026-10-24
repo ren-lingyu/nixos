@@ -192,7 +192,7 @@ nixosConfigurations.nixos.modules.features.editor.emacs.programs.package =
 - =lean4-nix=: 通过 =share= overlay 提供 =lean4= 二进制包.
 - =zotero-fix-nixpkgs=: 固定 nixpkgs revision, 通过 =share= overlay 提供对应 =zotero= 包.
 
-=pkgs/flake.nix= 仅选取 =personal-nixpkgs.lib.packages=, 与 [[file:./pkgs/lib/default.nix][pkgs/lib/default.nix]] 的本地扩展通过 =mergeAttrsRecursive { allowOverrides = false; }= 合并为子项目的 =llib=, 禁止覆盖同名定义. 通用 =llib.packages= 由外部库提供; 本地扩展入口当前为空, 子项目 =llib= 与根 =llib= 分开. [[file:./pkgs/pkgs/default.nix][pkgs/pkgs/default.nix]] 使用它生成本地包集合, overlays 和 OS/HM 模块入口. =package.nix= 定义独立包, =overlay.nix= 注入包或命名空间; 对已有包的纯定制直接写在 =overlay.nix= 中; =os/default.nix= 和 =hm/default.nix= 提供包附带的模块. =mkOverlays= 按目录返回扩展集合, 再组合成本地 overlay 分组; 非 =default= 分组必须互不重叠, 且都是 =default= 的子集.
+=pkgs/flake.nix= 仅选取 =personal-nixpkgs.lib.packages=, 与 [[file:./pkgs/lib/default.nix][pkgs/lib/default.nix]] 的本地扩展通过 =mergeAttrsRecursive { allowOverrides = false; }= 合并为子项目的 =llib=, 禁止覆盖同名定义. 通用 =llib.packages= 由外部库提供; 本地扩展入口当前为空, 子项目 =llib= 与根 =llib= 分开. [[file:./pkgs/pkgs/default.nix][pkgs/pkgs/default.nix]] 使用它生成本地包集合, overlays 和 OS/HM 模块入口. =package.nix= 定义独立包, =overlay.nix= 注入包或命名空间; 对已有包的纯定制直接写在 =overlay.nix= 中; =os/default.nix= 和 =hm/default.nix= 提供包附带的模块. =mkOverlays= 通过 =groups= 生成本地 overlay 分组: =default= 包含全部本地扩展, =share= 排除 =rage-armored=, =legacy= 包含全部本地扩展并通过 =export = true;= 提供 =pkgs.legacyPackages=. 各组通过 =exclude= 选择扩展, 可共享同一包定义.
 
 包与测试的 overlay 源文件使用带参数的构造函数, 返回标准的双参数 overlay. 无构造参数时写作:
 
@@ -205,7 +205,7 @@ nixosConfigurations.nixos.modules.features.editor.emacs.programs.package =
 外层构造参数与内层 =final= / =prev= 分开, =mkOverlays= 返回的仍是可供 Nixpkgs 使用的标准 overlays. =texlivePackages= 的聚合由外部 package library 内置规则处理, 本地只保留 =luadraw= 等包的定义.
 
 子 flake 当前提供 =x86_64-linux= 软件包输出及以下集成入口:
-- =legacyPackages.x86_64-linux=: 在 =perSystem= 中直接 =import inputs.nixpkgs=, 传入 =system= 和本地 =overlays.default= 构造 package set, 再调用 =mkLegacyPackages=, 以 =overlayFile = "overlay.nix"= 指定发现入口. =share= 和 =editor= 的上游应用集成仍由相应 overlays 提供.
+- =legacyPackages.x86_64-linux=: 在 =perSystem= 中直接 =import inputs.nixpkgs=, 传入 =system= 和本地 =overlays.legacy= 构造 package set, 然后导出其 =pkgs.legacyPackages=. 该属性由分组 overlay 按 =overlayFile = "overlay.nix"= 发现的包生成. =share= 和 =editor= 的上游应用集成仍由相应 overlays 提供.
 - =overlays.default=: 包含全部本地包扩展.
 - =overlays.share=: 本地包扩展中排除 =rage-armored=, 并加入 GAW, Lean 和 Zotero 的集成.
 - =overlays.editor=: 组合 emarccs 和 Lem 的 overlays, 并为 Lem 补充依赖及桌面入口.
