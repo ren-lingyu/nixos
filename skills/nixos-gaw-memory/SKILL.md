@@ -28,3 +28,5 @@ Distinguish current knowledge, reconstructed historical reports and actual proje
 Keep pending work in `memory/backlog.md`, with its motivation, adopted constraints and necessary context. Keep current state, active progress, verification and next actions in `memory/current.md`, which links to the other memory documents. Keep stable architecture and design rationale in `memory/architecture.md`. When an item is completed, remove it from the backlog after retaining useful conclusions in current knowledge; first-parent history preserves its evolution. A backlog entry does not itself authorize implementation.
 
 Maintain this entry point when memory layout or interpretation conventions change, not after every memory edit. Keep substantive architecture in memory and exact historical relationships in Git. Follow the GAW workflow for content review, sensitive material, explicit staging and checkpoints.
+
+When preparing a GAW checkpoint, use the project skill `nixos-gaw-checkpoint-message` for type and scope selection conventions.
