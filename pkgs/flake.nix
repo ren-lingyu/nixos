@@ -20,7 +20,10 @@
     };
     personal-nixpkgs = {
       url = "git+https://github.com/ren-lingyu/nixpkgs?ref=refs/heads/main&shallow=1";
-      inputs.nixpkgs.follows = "nixpkgs";
+      inputs = {
+        nixpkgs.follows = "nixpkgs";
+        local-nixpkgs.url = "git+https://github.com/ren-lingyu/nixpkgs?ref=refs/heads/main&shallow=1&dir=pkgs";
+      };
     };
     emarccs = {
       url = "git+https://github.com/ren-lingyu/emarccs.git?ref=refs/heads/main&rev=c54849019abba42bb5feeabd71548958fe0f0407&shallow=1";
