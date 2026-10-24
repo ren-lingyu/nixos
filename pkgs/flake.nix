@@ -18,28 +18,16 @@
     nixpkgs = {
       url = "git+https://github.com/NixOS/nixpkgs?ref=refs/heads/nixpkgs-unstable&shallow=1";
     };
-    flake-parts = {
-      url = "git+https://github.com/hercules-ci/flake-parts.git?ref=refs/heads/main&shallow=1";
-      inputs.nixpkgs-lib.follows = "nixpkgs";
-    };
-    treefmt-nix = {
-      url = "git+https://github.com/numtide/treefmt-nix.git?ref=refs/heads/main&shallow=1";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
     personal-nixpkgs = {
       url = "git+https://github.com/ren-lingyu/nixpkgs?ref=refs/heads/main&shallow=1";
-      inputs = {
-        nixpkgs.follows = "nixpkgs";
-        flake-parts.follows = "flake-parts";
-        treefmt-nix.follows = "treefmt-nix";
-      };
+      inputs.nixpkgs.follows = "nixpkgs";
     };
     emarccs = {
       url = "git+https://github.com/ren-lingyu/emarccs.git?ref=refs/heads/main&rev=c54849019abba42bb5feeabd71548958fe0f0407&shallow=1";
       inputs = {
         nixpkgs.follows = "nixpkgs";
-        flake-parts.follows = "flake-parts";
-        treefmt-nix.follows = "treefmt-nix";
+        flake-parts.follows = "personal-nixpkgs/flake-parts";
+        treefmt-nix.follows = "personal-nixpkgs/treefmt-nix";
         # personal-nixpkgs.follows = "personal-nixpkgs";
       };
     };
@@ -48,28 +36,28 @@
       url = "git+https://github.com/nix-community/nixvim.git?ref=refs/heads/main&shallow=1";
       inputs = {
         nixpkgs.follows = "nixpkgs";
-        flake-parts.follows = "flake-parts";
+        flake-parts.follows = "personal-nixpkgs/flake-parts";
       };
     };
     lem = {
       url = "git+https://github.com/lem-project/lem.git?ref=refs/heads/main&shallow=1";
       inputs = {
         nixpkgs.follows = "nixpkgs";
-        flake-parts.follows = "flake-parts";
+        flake-parts.follows = "personal-nixpkgs/flake-parts";
       };
     };
     lean4-nix = {
       url = "git+https://github.com/lenianiva/lean4-nix.git?ref=refs/heads/main&shallow=1";
       inputs = {
         nixpkgs.follows = "nixpkgs";
-        flake-parts.follows = "flake-parts";
+        flake-parts.follows = "personal-nixpkgs/flake-parts";
       };
     };
     git-agent-workflow = {
       url = "git+https://github.com/ren-lingyu/git-agent-workflow.git?ref=refs/heads/main&shallow=1";
       inputs = {
         nixpkgs.follows = "nixpkgs";
-        flake-parts.follows = "flake-parts";
+        flake-parts.follows = "personal-nixpkgs/flake-parts";
       };
     };
     zotero-fix-nixpkgs = {
@@ -79,22 +67,16 @@
 
   outputs =
     { self, ... }@inputs:
-    inputs.flake-parts.lib.mkFlake
-      {
+    inputs.personal-nixpkgs.lib.mkFlake inputs.nixpkgs
+      (rec {
         inherit inputs;
-
-        specialArgs =
-          let
-            lib = inputs.nixpkgs.lib;
-          in
-          (rec {
-            llib = inputs.personal-nixpkgs.lib.mergeAttrsRecursive { allowOverrides = false; } [
-              { inherit (inputs.personal-nixpkgs.lib) packages; }
-              (import ./lib { inherit lib; })
-            ];
-            lpkgs = import ./pkgs { inherit llib; };
-          });
-      }
+        moduleLocation = __curPos.file;
+        llib = inputs.personal-nixpkgs.lib.mergeAttrsRecursive { allowOverrides = false; } [
+          { inherit (inputs.personal-nixpkgs.lib) packages; }
+          (import ./lib { lib = inputs.nixpkgs; })
+        ];
+        lpkgs = import ./pkgs { inherit llib; };
+      })
       (
         {
           llib,

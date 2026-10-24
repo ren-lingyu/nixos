@@ -27,25 +27,12 @@
       # url = "git+https://github.com/NixOS/nixpkgs?ref=refs/heads/nixos-unstable&rev=025c852a89be820b3117f604c8ace42e9b4caa08&shallow=1";
       # url = "git+https://mirrors.tuna.tsinghua.edu.cn/git/nixpkgs.git?ref=refs/heads/nixos-unstable&shallow=1";
     };
-    flake-parts = {
-      url = "git+https://github.com/hercules-ci/flake-parts.git?ref=refs/heads/main&shallow=1";
-      inputs.nixpkgs-lib.follows = "nixpkgs";
-    };
-    treefmt-nix = {
-      url = "git+https://github.com/numtide/treefmt-nix.git?ref=refs/heads/main&shallow=1";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
     personal-nixpkgs = {
       url = "git+https://github.com/ren-lingyu/nixpkgs?ref=refs/heads/main&shallow=1";
-      inputs = {
-        nixpkgs.follows = "nixpkgs";
-        flake-parts.follows = "flake-parts";
-        treefmt-nix.follows = "treefmt-nix";
-      };
+      inputs.nixpkgs.follows = "nixpkgs";
     };
     local-nixpkgs = {
       url = "path:./pkgs";
-      inputs.treefmt-nix.follows = "treefmt-nix";
     };
     home-manager = {
       url = "git+https://github.com/nix-community/home-manager.git?ref=refs/heads/master&shallow=1";
@@ -59,7 +46,7 @@
       url = "git+https://github.com/oddlama/agenix-rekey.git?ref=refs/heads/main&shallow=1";
       inputs = {
         nixpkgs.follows = "nixpkgs";
-        treefmt-nix.follows = "treefmt-nix";
+        treefmt-nix.follows = "personal-nixpkgs/treefmt-nix";
       };
     };
     sops-nix = {
@@ -83,7 +70,7 @@
     };
     nixos-anywhere = {
       url = "git+https://github.com/nix-community/nixos-anywhere.git?ref=refs/heads/main&shallow=1";
-      inputs.treefmt-nix.follows = "treefmt-nix";
+      inputs.treefmt-nix.follows = "personal-nixpkgs/treefmt-nix";
     };
     disko = {
       # url = "git+https://github.com/nix-community/disko.git?ref=refs/heads/master&shallow=1";
@@ -93,16 +80,16 @@
 
   outputs =
     { self, ... }@inputs:
-    inputs.flake-parts.lib.mkFlake
+    inputs.personal-nixpkgs.lib.mkFlake inputs.nixpkgs
       {
         inherit inputs;
-
+        moduleLocation = __curPos.file;
+        llib = inputs.personal-nixpkgs.lib.mergeAttrsRecursive { allowOverrides = false; } [
+          { inherit (inputs.personal-nixpkgs.lib) tests; }
+          (import ./lib { lib = inputs.nixpkgs.lib; })
+        ];
         specialArgs = rec {
           rootPath = ./.;
-          llib = inputs.personal-nixpkgs.lib.mergeAttrsRecursive { allowOverrides = false; } [
-            { inherit (inputs.personal-nixpkgs.lib) tests; }
-            (import ./lib { lib = inputs.nixpkgs.lib; })
-          ];
         };
       }
       (
@@ -114,10 +101,7 @@
           ...
         }:
         {
-          imports = [
-            inputs.treefmt-nix.flakeModule
-            inputs.agenix-rekey.flakeModule
-          ];
+          imports = [ inputs.agenix-rekey.flakeModule ];
 
           options =
             let
@@ -436,10 +420,7 @@
                 ...
               }:
               {
-                _module.args.pkgs = import inputs.nixpkgs {
-                  inherit system;
-                  overlays = [ inputs.local-nixpkgs.overlays.legacy ];
-                };
+                nixpkgs.overlays = [ inputs.local-nixpkgs.overlays.legacy ];
 
                 legacyPackages = pkgs.legacyPackages;
 
@@ -461,41 +442,15 @@
                 agenix-rekey.agePackage = pkgs.rage-armored;
 
                 treefmt = {
-                  flakeFormatter = true;
-                  flakeCheck = true;
-                  enableDefaultExcludes = false;
-                  projectRootFile = builtins.baseNameOf __curPos.file;
+                  flakeCheck = false;
                   settings.excludes = [
-                    "flake.lock"
                     "*.patch"
                     ".gitignore"
                     "LICENSE"
+                    "README.org"
+                    "flake.lock"
+                    "*.age"
                   ];
-                  programs = {
-                    nixfmt = {
-                      enable = true;
-                      package = pkgs.nixfmt;
-                      width = 100;
-                      indent = 2;
-                      strict = true;
-                    };
-                    shfmt = {
-                      enable = true;
-                      package = pkgs.shfmt;
-                      indent_size = 2;
-                      simplify = false;
-                    };
-                    prettier = {
-                      enable = true;
-                      package = pkgs.prettier;
-                      settings = {
-                        printWidth = 100;
-                        tabWidth = 2;
-                        proseWrap = "preserve";
-                        endOfLine = "lf";
-                      };
-                    };
-                  };
                 };
               };
           };
