@@ -1,19 +1,4 @@
 {
-  description = "Local nixpkgs used by the nixos configuration";
-
-  nixConfig = {
-    auto-optimise-store = true;
-    substituters = [
-      "https://mirrors.ustc.edu.cn/nix-channels/store"
-      "https://cache.nixos.org"
-      "https://nix-community.cachix.org"
-    ];
-    trusted-public-keys = [
-      "cache.nixos.org-1:6NCHdD59X431o0gWypbMrAURkbJ16ZPMQFGspcDShjY="
-      "nix-community.cachix.org-1:mB9FSh9qf2dCimDSUo8Zy7bkq5CX+/rkCWyvRCYg3Fs="
-    ];
-  };
-
   inputs = {
     nixpkgs = {
       url = "git+https://github.com/NixOS/nixpkgs?ref=refs/heads/nixpkgs-unstable&shallow=1";
@@ -32,31 +17,19 @@
     nixvim = {
       # the main branch of nixvim must be use in nixpkgs-unstable
       url = "git+https://github.com/nix-community/nixvim.git?ref=refs/heads/main&shallow=1";
-      inputs = {
-        nixpkgs.follows = "nixpkgs";
-        flake-parts.follows = "personal-nixpkgs/flake-parts";
-      };
+      inputs.nixpkgs.follows = "nixpkgs";
     };
     lem = {
       url = "git+https://github.com/lem-project/lem.git?ref=refs/heads/main&shallow=1";
-      inputs = {
-        nixpkgs.follows = "nixpkgs";
-        flake-parts.follows = "personal-nixpkgs/flake-parts";
-      };
+      inputs.nixpkgs.follows = "nixpkgs";
     };
     lean4-nix = {
       url = "git+https://github.com/lenianiva/lean4-nix.git?ref=refs/heads/main&shallow=1";
-      inputs = {
-        nixpkgs.follows = "nixpkgs";
-        flake-parts.follows = "personal-nixpkgs/flake-parts";
-      };
+      inputs.nixpkgs.follows = "nixpkgs";
     };
     git-agent-workflow = {
       url = "git+https://github.com/ren-lingyu/git-agent-workflow.git?ref=refs/heads/main&shallow=1";
-      inputs = {
-        nixpkgs.follows = "nixpkgs";
-        flake-parts.follows = "personal-nixpkgs/flake-parts";
-      };
+      inputs.nixpkgs.follows = "nixpkgs";
     };
     zotero-fix-nixpkgs = {
       url = "git+https://github.com/NixOS/nixpkgs.git?rev=363fdbe57ed052c76e816e6270206b0cb348e53a&shallow=1";

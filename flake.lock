@@ -31,10 +31,7 @@
           "nixpkgs"
         ],
         "pre-commit-hooks": "pre-commit-hooks",
-        "treefmt-nix": [
-          "personal-nixpkgs",
-          "treefmt-nix"
-        ]
+        "treefmt-nix": "treefmt-nix"
       },
       "locked": {
         "lastModified": 1791547681,
@@ -103,7 +100,7 @@
           "nixpkgs"
         ],
         "personal-nixpkgs": "personal-nixpkgs",
-        "treefmt-nix": "treefmt-nix"
+        "treefmt-nix": "treefmt-nix_2"
       },
       "locked": {
         "lastModified": 1792694616,
@@ -568,10 +565,7 @@
         "nixos-images": "nixos-images",
         "nixos-stable": "nixos-stable",
         "nixpkgs": "nixpkgs_2",
-        "treefmt-nix": [
-          "personal-nixpkgs",
-          "treefmt-nix"
-        ]
+        "treefmt-nix": "treefmt-nix_4"
       },
       "locked": {
         "lastModified": 1792567263,
@@ -854,7 +848,7 @@
           "local-nixpkgs",
           "nixpkgs"
         ],
-        "treefmt-nix": "treefmt-nix_2"
+        "treefmt-nix": "treefmt-nix_3"
       },
       "locked": {
         "lastModified": 1792873262,
@@ -879,7 +873,7 @@
         "nixpkgs": [
           "nixpkgs"
         ],
-        "treefmt-nix": "treefmt-nix_3"
+        "treefmt-nix": "treefmt-nix_5"
       },
       "locked": {
         "lastModified": 1792873262,
@@ -982,6 +976,27 @@
     "treefmt-nix": {
       "inputs": {
         "nixpkgs": [
+          "agenix-rekey",
+          "nixpkgs"
+        ]
+      },
+      "locked": {
+        "lastModified": 1791885023,
+        "narHash": "sha256-C3alQ2MEt0zVrUSho5NUDo3jmhbff72++bfwoqT9Omo=",
+        "owner": "numtide",
+        "repo": "treefmt-nix",
+        "rev": "0d6d739a833ba9a9c93034862e4a7b061a062a1c",
+        "type": "github"
+      },
+      "original": {
+        "owner": "numtide",
+        "repo": "treefmt-nix",
+        "type": "github"
+      }
+    },
+    "treefmt-nix_2": {
+      "inputs": {
+        "nixpkgs": [
           "local-nixpkgs",
           "emarccs",
           "nixpkgs"
@@ -1003,7 +1018,7 @@
         "url": "https://github.com/numtide/treefmt-nix.git"
       }
     },
-    "treefmt-nix_2": {
+    "treefmt-nix_3": {
       "inputs": {
         "nixpkgs": [
           "local-nixpkgs",
@@ -1027,7 +1042,28 @@
         "url": "https://github.com/numtide/treefmt-nix.git"
       }
     },
-    "treefmt-nix_3": {
+    "treefmt-nix_4": {
+      "inputs": {
+        "nixpkgs": [
+          "nixos-anywhere",
+          "nixpkgs"
+        ]
+      },
+      "locked": {
+        "lastModified": 1791885023,
+        "narHash": "sha256-C3alQ2MEt0zVrUSho5NUDo3jmhbff72++bfwoqT9Omo=",
+        "owner": "numtide",
+        "repo": "treefmt-nix",
+        "rev": "0d6d739a833ba9a9c93034862e4a7b061a062a1c",
+        "type": "github"
+      },
+      "original": {
+        "owner": "numtide",
+        "repo": "treefmt-nix",
+        "type": "github"
+      }
+    },
+    "treefmt-nix_5": {
       "inputs": {
         "nixpkgs": [
           "personal-nixpkgs",
