@@ -2,6 +2,7 @@
   stdenvNoCC,
   fetchFromGitHub,
   lib,
+  nix-update-script,
 }:
 stdenvNoCC.mkDerivation rec {
   pname = "luadraw";
@@ -25,6 +26,14 @@ stdenvNoCC.mkDerivation rec {
   ];
 
   passthru = {
+    updateScript = nix-update-script {
+      attrPath = "legacyPackages.${stdenvNoCC.hostPlatform.system}.texlivePackages.luadraw";
+      extraArgs = [
+        "--flake"
+        "--version=branch=main"
+      ];
+    };
+
     tlType = "run";
     tlDeps =
       ps_: with ps_; [

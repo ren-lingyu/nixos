@@ -6,6 +6,7 @@
   nodejs,
   pnpm_10,
   pnpmConfigHook,
+  nix-update-script,
 }:
 (stdenvNoCC.mkDerivation (finalAttrs_: {
   pname = "pi-mono-web-search";
@@ -109,6 +110,14 @@
     ])
     ""
   ];
+
+  passthru.updateScript = nix-update-script {
+    attrPath = "legacyPackages.${stdenvNoCC.hostPlatform.system}.piPackages.pi-mono-web-search";
+    extraArgs = [
+      "--flake"
+      "--version=branch=main"
+    ];
+  };
 
   meta = {
     description = "Pi extension for web search and page reading using DuckDuckGo and readability extraction";

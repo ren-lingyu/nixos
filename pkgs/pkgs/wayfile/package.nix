@@ -2,6 +2,7 @@
   lib,
   stdenv,
   fetchFromGitHub,
+  nix-update-script,
 
   cmake,
   ninja,
@@ -109,6 +110,14 @@ stdenv.mkDerivation rec {
     # The generated Wayfile QML module misses this helper script, although it is installed in the copied source QML tree.
     "install -Dm644 \"$out/share/wayfile/src/qml/views/DropParse.js\" \"$out/share/wayfile/Wayfile/qml/views/DropParse.js\""
   ];
+
+  passthru.updateScript = nix-update-script {
+    attrPath = "legacyPackages.${stdenv.hostPlatform.system}.wayfile";
+    extraArgs = [
+      "--flake"
+      "--version=branch=main"
+    ];
+  };
 
   meta = {
     description = "Qt6/QML file manager for Wayland";

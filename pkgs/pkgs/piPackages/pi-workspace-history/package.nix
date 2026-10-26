@@ -6,6 +6,8 @@
   jq,
   nodejs_22,
   replaceVarsWith,
+  stdenvNoCC,
+  nix-update-script,
 }:
 let
 
@@ -87,6 +89,14 @@ in
     ])
     ""
   ];
+
+  passthru.updateScript = nix-update-script {
+    attrPath = "legacyPackages.${stdenvNoCC.hostPlatform.system}.piPackages.pi-workspace-history";
+    extraArgs = [
+      "--flake"
+      "--version=branch=main"
+    ];
+  };
 
   meta = {
     description = "Real workspace undo/redo for Pi";

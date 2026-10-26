@@ -3,6 +3,8 @@
   buildNpmPackage,
   fetchFromGitHub,
   nodejs_22,
+  stdenvNoCC,
+  nix-update-script,
 }:
 (buildNpmPackage (unused_finalAttrs_: {
   pname = "pi-agentic-search";
@@ -65,6 +67,14 @@
     ])
     ""
   ];
+
+  passthru.updateScript = nix-update-script {
+    attrPath = "legacyPackages.${stdenvNoCC.hostPlatform.system}.piPackages.pi-agentic-search";
+    extraArgs = [
+      "--flake"
+      "--version=branch=main"
+    ];
+  };
 
   meta = {
     description = "Pi extension for agent-oriented ranked code search and one-call diff context packs";
