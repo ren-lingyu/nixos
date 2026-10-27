@@ -1,6 +1,7 @@
 #!/usr/bin/env sh
 
 total=${1-10}
+rounds=${2-}
 
 case "$total" in
 '' | *[!0-9]*)
@@ -13,6 +14,22 @@ if [ "$total" -eq 0 ]; then
   printf 'Error: seconds must be greater than zero\n' >&2
   exit 1
 fi
+
+case "$rounds" in
+'')
+  :
+  ;;
+*[!0-9]*)
+  printf 'Error: rounds must be a positive integer\n' >&2
+  exit 1
+  ;;
+*)
+  if [ "$rounds" -eq 0 ]; then
+    printf 'Error: rounds must be greater than zero\n' >&2
+    exit 1
+  fi
+  ;;
+esac
 
 repo_root=$(git rev-parse --show-toplevel) || exit 1
 
@@ -40,7 +57,10 @@ wait_progress() (
   printf '\n'
 )
 
-while true; do
+round=0
+while :; do
+  round=$((round + 1))
+
   echo '===== project ====='
   git -C "$repo_root" push
   echo 'waiting ...'
@@ -50,4 +70,6 @@ while true; do
   git -C "$repo_root/.agents" push
   echo 'waiting ...'
   wait_progress "$total"
+
+  [ -n "$rounds" ] && [ "$round" -ge "$rounds" ] && break
 done
