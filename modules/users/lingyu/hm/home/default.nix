@@ -60,6 +60,12 @@
           target = ".local/bin/ssha";
           executable = true;
         };
+        ".local/bin/git-push-loop" = {
+          enable = true;
+          source = ./.local/bin/git-push-loop.sh;
+          target = ".local/bin/git-push-loop";
+          executable = true;
+        };
       };
     };
 
@@ -97,9 +103,7 @@
 
     programs.zathura = {
       enable = true;
-      package = pkgs.zathura.override {
-        plugins = [ pkgs.zathuraPkgs.zathura_pdf_poppler ];
-      };
+      package = pkgs.zathura.override { plugins = [ pkgs.zathuraPkgs.zathura_pdf_poppler ]; };
       options = { };
       mappings = { };
     };
