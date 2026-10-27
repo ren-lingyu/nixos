@@ -783,7 +783,6 @@ in
               enabled = false;
               position = "bottom";
               active_monitor_only = true;
-              monitors = [ ];
               icon_size = 48;
               main_axis_padding = 16;
               cross_axis_padding = 8;
