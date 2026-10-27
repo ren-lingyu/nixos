@@ -97,7 +97,9 @@
 
     programs.zathura = {
       enable = true;
-      package = pkgs.zathura;
+      package = pkgs.zathura.override {
+        plugins = [ pkgs.zathuraPkgs.zathura_pdf_poppler ];
+      };
       options = { };
       mappings = { };
     };
