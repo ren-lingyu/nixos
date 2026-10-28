@@ -43,37 +43,38 @@ let
     git-agent-workflow = pkgs.git-agent-workflow;
   };
 
+  packagesWithSkills_ = lib.optionals config.programs.git.enable (
+    with pkgs;
+    [
+      git-agent-workflow
+      git-maintenance
+    ]
+  );
+
+  skills_ = lib.listToAttrs (
+    map (p_: {
+      name = p_.pname;
+      value = "${p_}/share/skills/${p_.pname}";
+    }) packagesWithSkills_
+  );
+
 in
 {
   config = lib.mkIf cfg.enable {
-    home =
-      let
-        packages_ = lib.optionals config.programs.git.enable (
-          with pkgs;
-          [
-            git-agent-workflow
-            git-maintenance
-          ]
-        );
-      in
-      {
-        packages = packages_;
-        file = {
-          ".agents/AGENTS.md" = {
-            enable = true;
-            text = context_;
-          };
-          ".agents/skills" = {
-            enable = true;
-            source = pkgs.buildEnv {
-              name = "agents-skills";
-              paths = (builtins.map (package_: "${package_}/share/skills/${package_.pname}") packages_);
-              checkCollisionContents = false;
-            };
-            recursive = true;
-          };
+    home = {
+      packages = builtins.concatLists [ packagesWithSkills_ ];
+      file = {
+        ".agents/AGENTS.md" = {
+          enable = true;
+          text = context_;
+        };
+        ".agents/skills" = {
+          enable = true;
+          source = pkgs.linkFarm "agents-skills" skills_;
+          recursive = true;
         };
       };
+    };
 
     programs.pi-coding-agent = {
       enable = true;
@@ -125,6 +126,7 @@ in
       enable = true;
       package = pkgs.github-copilot-cli;
       context = context_;
+      skills = skills_;
     };
 
     assertions = builtins.concatLists (
