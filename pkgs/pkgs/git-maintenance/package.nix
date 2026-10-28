@@ -5,7 +5,7 @@
 }:
 stdenvNoCC.mkDerivation {
   pname = "git-maintenance";
-  version = "0.3.0";
+  version = "0.0.0";
 
   src = ./.;
 
