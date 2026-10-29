@@ -1,6 +1,6 @@
 ---
 name: git-maintenance
-description: Prepare and review evidence-based Conventional Commit messages from staged changes, assess commit readiness, and audit or update repository-facing documentation against an explicit Git baseline. Use for staged diff review, tmp/commit.md maintenance, README synchronization, documentation audits, and changelog drafts; never use it to change Git state.
+description: Prepare and review evidence-based Conventional Commit messages from staged changes, assess commit readiness, and maintain repository-facing documentation against an explicit Git baseline. Use for staged diff review, tmp/commit.md maintenance, README synchronization, documentation audits, and CHANGELOG creation, historical backfill, updates, or audits; never use it to change Git state.
 license: MIT
 metadata:
   domain: git
@@ -17,8 +17,8 @@ This skill is repository-generic. Do not assume that the current repository is a
 
 - `commit`: inspect staged changes, decide whether they form a suitable commit, and prepare or review `tmp/commit.md`. Read [references/commit.md](references/commit.md) completely before acting.
 - `readme`: inspect or update README and other explicitly named repository-descriptive files. Read [references/readme.md](references/readme.md) completely before acting.
-- `audit`: compare repository-facing documentation with repository evidence without modifying files. Read [references/readme.md](references/readme.md) completely before acting.
-- `changelog`: draft a changelog-like summary without introducing release automation or modifying a changelog unless explicitly requested.
+- `audit`: compare README and repository-descriptive documentation with repository evidence without modifying files. Read [references/readme.md](references/readme.md) completely before acting. Use `changelog audit` for CHANGELOG review.
+- `changelog`: create or backfill release history with `initialize`, maintain it with `update`, or review it read-only with `audit`. Read [references/changelog.md](references/changelog.md) completely before acting. For official standards and optional local snapshots, consult [references/standards.md](references/standards.md) when needed.
 - `help`: briefly explain the workflows above.
 
 When the intended workflow is ambiguous and the distinction changes what may be written, ask one concise question. Otherwise infer it from the requested output.
@@ -42,7 +42,8 @@ Establish the source of truth before drafting text:
 - Commit messages use only the staged diff for change claims.
 - README work uses the baseline requested by the user, such as `HEAD`, the staged tree, or the current worktree.
 - If no README baseline is stated, inspect the worktree and its diff, then state which evidence was used when that distinction matters.
-- Unstaged changes may be inspected to detect overlap, but do not silently mix them into a staged commit message or a `HEAD`-based README audit.
+- Changelog work verifies released versions against their actual source trees. Unless the user specifies another target, incremental updates compare the latest confirmed release with `HEAD` and draft `Unreleased`; tags and commit dates alone do not establish release facts.
+- Unstaged changes may be inspected to detect overlap, but do not silently mix them into a staged commit message or a `HEAD`-based documentation baseline. Changelog work uses staged or worktree implementation changes only when explicitly selected.
 
 Use only the evidence needed for the selected workflow. Relevant read-only commands include:
 
@@ -68,11 +69,9 @@ The `commit` workflow may write only the final commit message to `tmp/commit.md`
 
 The `readme` workflow may modify only README or other explicitly named repository-descriptive files, and only when the user has explicitly requested that write. A direct request such as "update README" is sufficient authorization for that named file; it does not authorize staging, testing, formatting unrelated files, or changing Git state.
 
-The `audit` workflow is read-only.
+The `changelog initialize` and `changelog update` operations may write only the corresponding CHANGELOG, and only when the user explicitly requests creation or updating. This includes `CHANGELOG.md`, `CHANGELOG.org`, or the project's corresponding file. A request for a draft does not authorize file writes or changes to README, version numbers, or manifests.
 
-## Changelog workflow
-
-Draft summaries only. Group meaningful changes by effect when useful, and do not present raw `git log` output as a user-facing changelog. Do not modify `CHANGELOG.md` unless the user explicitly requests it.
+The top-level `audit` workflow and `changelog audit` operation are read-only.
 
 ## Failure handling
 
