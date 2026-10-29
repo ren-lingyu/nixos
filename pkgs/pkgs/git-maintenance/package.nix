@@ -90,7 +90,10 @@ stdenvNoCC.mkDerivation (finalAttrs_: {
 
   meta = {
     description = "Repository-generic Git maintenance skill for coding agents";
-    license = lib.licenses.mit;
+    license = with lib.licenses; [
+      mit
+      cc-by-30
+    ];
     platforms = lib.platforms.all;
   };
 })
