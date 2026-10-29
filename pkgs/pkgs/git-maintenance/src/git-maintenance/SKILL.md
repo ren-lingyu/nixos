@@ -42,7 +42,7 @@ Establish the source of truth before drafting text:
 - Commit messages use only the staged diff for change claims.
 - README work uses the baseline requested by the user, such as `HEAD`, the staged tree, or the current worktree.
 - If no README baseline is stated, inspect the worktree and its diff, then state which evidence was used when that distinction matters.
-- Changelog work verifies released versions against their actual source trees. Unless the user specifies another target, incremental updates compare the latest confirmed release with `HEAD` and draft `Unreleased`; tags and commit dates alone do not establish release facts.
+- Changelog work verifies released versions against their actual source trees. Unless the user specifies another target, incremental updates compare the latest confirmed release with `HEAD` and maintain the current development entry: an Org `TODO` version in the adopted Org profile, or the conventional `Unreleased` section. Tags and commit dates alone do not establish release facts.
 - Unstaged changes may be inspected to detect overlap, but do not silently mix them into a staged commit message or a `HEAD`-based documentation baseline. Changelog work uses staged or worktree implementation changes only when explicitly selected.
 
 Use only the evidence needed for the selected workflow. Relevant read-only commands include:
@@ -69,7 +69,9 @@ The `commit` workflow may write only the final commit message to `tmp/commit.md`
 
 The `readme` workflow may modify only README or other explicitly named repository-descriptive files, and only when the user has explicitly requested that write. A direct request such as "update README" is sufficient authorization for that named file; it does not authorize staging, testing, formatting unrelated files, or changing Git state.
 
-The `changelog initialize` and `changelog update` operations may write only the corresponding CHANGELOG, and only when the user explicitly requests creation or updating. This includes `CHANGELOG.md`, `CHANGELOG.org`, or the project's corresponding file. A request for a draft does not authorize file writes or changes to README, version numbers, or manifests.
+The `changelog initialize` and `changelog update` operations may write only the explicitly authorized root CHANGELOG and corresponding selected detailed version files. This includes `CHANGELOG.md`, `CHANGELOG.org`, or the project's equivalent, plus `CHANGELOGS/<version>.org` when the Org profile is adopted and those files are within the authorized scope. A request for a draft does not authorize file writes or changes to README, version numbers, or manifests.
+
+In the Org profile, existing TODO keyword transitions and changes to existing version-level `CLOSED` records are human-only. Read the creation and historical-backfill exceptions in [references/changelog.md](references/changelog.md); content maintenance does not authorize release-state changes.
 
 The top-level `audit` workflow and `changelog audit` operation are read-only.
 
