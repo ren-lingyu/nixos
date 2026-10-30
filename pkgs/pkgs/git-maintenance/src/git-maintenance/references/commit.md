@@ -6,7 +6,7 @@ Use this workflow to judge staged changes, generate a commit message, or review 
 
 1. Confirm the worktree root.
 2. Read `git diff --cached --name-status`, `git diff --cached --stat`, the complete staged diff, and `git status --porcelain`.
-3. Read recent commit subjects, normally the latest 20. Inspect path-specific history when it materially helps choose `type` or `scope`.
+3. Read recent commit subjects, normally the latest 20. Inspect path-specific history when it materially helps understand the change or choose `scope`. Do not infer type conventions from commit history alone.
 4. If `tmp/commit.md` already exists and resolves inside the permitted repository `tmp/`, read it before replacing it. Preserve deliberate user wording or an explicitly supplied motivation when it remains accurate.
 5. Read the minimum relevant source context needed to interpret the diff. Claims in the message must still describe staged changes, not unrelated context.
 
@@ -60,16 +60,16 @@ The body and footer are optional. Prefer a body when the staged change has multi
 
 ### Type
 
-Choose the type from the staged change's primary semantic effect, then check it against recent repository usage:
+Choose the type from the staged change's primary semantic effect using the rules below. Deviations require an explicit user instruction or a documented repository-specific commit convention that prescribes the alternative classification. Repeated historical usage alone does not establish such a convention:
 
 - `feat`: add an externally meaningful capability, option, integration, or behavior.
 - `fix`: correct behavior or a claim that is demonstrably wrong. Do not use `fix` merely because a value changed or the new state is preferable.
 - `docs`: change repository-descriptive documentation, such as README, without changing executable instructions or primary content.
 - `style`: change presentation or formatting without changing intended behavior.
 - `refactor`: restructure implementation or configuration while preserving intended behavior.
-- `test`: add or change tests.
+- `test`: add or change tests, assertions, or repository validation, including lint and formatting checks.
 - `chore`: perform intentional maintenance or configuration adjustment that fits no more specific semantic type.
-- `build`: change the build system, packaging process, dependency wiring, or generated build metadata as the primary effect.
+- `build`: change the build system, packaging process, external dependencies, dependency wiring, or generated build metadata as the primary effect.
 - `ci`: change CI or automation workflows.
 - `perf`: improve performance without otherwise changing external behavior.
 - `revert`: intentionally reverse an earlier commit as the primary purpose.
@@ -77,7 +77,13 @@ Choose the type from the staged change's primary semantic effect, then check it 
 - Distinguish new capabilities from new implementation artifacts. Introducing a usable capability or configuration interface is `feat`, even when existing configuration is migrated to support it. Merely extracting existing behavior into a new module, package, or wrapper does not by itself require `feat`; classify by the primary semantic effect.
 - Classify parameter and value changes by their effect. Prefer `chore` for discretionary configuration tuning that neither introduces a capability nor corrects a demonstrated defect. Use `feat`, `fix`, or another more specific type when justified by the actual change.
 
-A touched lock file does not by itself require `build`. In configuration repositories, routine locked-input refreshes are commonly `chore`; reserve `build` for changes whose primary meaning is build, packaging, or dependency wiring. If a change partially undoes an earlier commit but retains a new coherent state, classify that resulting change rather than automatically using `revert`.
+Routine dependency updates, including lock-only changes, use `build` by default. A touched lock file does not override the primary semantic effect of a change; use a different type when that effect justifies it or an explicit applicable convention requires it.
+
+Classify checks by their purpose rather than their implementation or output location. Prefer `test` for adding, enabling, disabling, or changing repository validation and its coverage, even when checks are build derivations or exposed through build-system outputs. Use `build` for changes primarily concerning check-related build infrastructure, `ci` for CI orchestration, and `refactor` for restructuring checks without changing intended validation behavior. New user-facing validation capabilities or reusable public APIs may warrant `feat`; exposing repository tests as build outputs alone does not. Formatting source files without changing behavior is `style`, not `test`.
+
+Changes to repository file-tracking policy, such as `.gitignore` ignore and allowlist rules, generally use `chore`. Use `fix` for demonstrated matching errors, `style` for formatting-only changes, or another type when the tracking-rule change supports a more specific primary effect.
+
+If a change partially undoes an earlier commit but retains a new coherent state, classify that resulting change rather than automatically using `revert`.
 
 Prompt, command, agent, and skill files can change agent behavior. Choose `feat`, `fix`, `refactor`, or `chore` according to that behavior rather than their `.md` extension.
 
