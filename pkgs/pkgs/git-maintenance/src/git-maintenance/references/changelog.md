@@ -114,6 +114,8 @@ First creation is distinct from conversion: an explicitly requested new developm
 
 Level 2 normally uses the six change types. As the profile's default presentation order, consider `Security`, `Removed`, `Changed`, `Deprecated`, `Fixed`, `Added`; respect established translated categories and ordering. Lower levels may mix TODO headlines, plain headlines, lists, and `- [ ]` / `- [X]` checkboxes. Maintenance progress never replaces classification or user-visible facts. Do not let canceled candidates, blocked tasks, or incomplete checks become an unreviewed formal change inventory. Keep Breaking on the affected `Changed`/`Removed` entry rather than adding a default category.
 
+Prefer native Org headlines and lists over plain paragraphs when the content has a natural structure. Use headlines for distinct topics, unordered lists for independent changes or items, and ordered lists for sequential instructions. Use checkboxes for actionable development, review, or release-preparation tasks, not as the default representation of released changes. Retain plain paragraphs for introductions, explanations, rationale, and other content that benefits from continuous prose. Do not introduce unnecessary headline depth or fragment coherent explanations merely to enforce this preference.
+
 Root structure illustration only; versions, times, and content are not facts to copy into another project:
 
 ```org
