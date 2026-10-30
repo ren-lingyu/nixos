@@ -153,6 +153,10 @@ An illustrative detailed file might contain `#+TITLE: v0.8.0 Release Notes` and 
 
 For new-profile versions, independent publishing tools obtain the sole authoritative Release Notes manuscript from `CHANGELOGS/<version>.org` in the version's release tag, not a later `main` or worktree. Preserve version identity, recorded time, changes, Breaking information, and migration meaning. Root summaries are not an alternate publishing source; missing mandatory details mean a release prerequisite is unmet.
 
+Do not include reverse links to the root `CHANGELOG.org` in `CHANGELOGS/<version>.org` without explicit, case-specific user authorization. Generic release navigation belongs to downstream publication tooling.
+
+Only external links to specific issues or pull requests that directly explain or substantiate a change are allowed by default in these detailed files. All other external links require explicit, case-specific user authorization, including documentation, source-tree, version-comparison, and commit links. Do not infer additional exceptions from apparent stability, relevance, version pinning, or convenience.
+
 For older releases whose own tags lack detailed files, inspect confirmed successor release-tag snapshots and select the first containing that version's detailed file. Establish successor order from the project's confirmed release sequence and Git history relationships, not lexical tag order, tagger time, or an assumption that maintenance branches are linear. Report ambiguous order or missing files; never rewrite old tags to insert backfill.
 
 If no successor tag yet contains the backfill, use an already reviewed mainline document only when explicitly allowed, identifying its source revision and reproducibility limits. When returning a manuscript, report its version and source Git revision. Backfilled historical content may later improve with evidence; no separate backfill branch or snapshot index is required. Preserve old platform notes as historical material and do not silently replace them.
