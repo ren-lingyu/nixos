@@ -60,9 +60,9 @@ Apply these evidence rules and the format rules below to `initialize`, `update`,
 
 ### UTC CLOSED in the Org profile
 
-For new releases, the human `NEXT -> DONE` finalization/release checkpoint records the project's formal release time as version-level UTC `CLOSED`. The release tag normally points to the commit containing `DONE`, `CLOSED`, and the completed detailed file. Do not require that time to equal the release commit's committer timestamp, manipulate `GIT_COMMITTER_DATE`, or replace it with a hosting platform's publication time. Project finalization and successful publication on each platform are distinct facts and must be checked separately.
+All `CLOSED` timestamps in an adopted Org changelog, at version and item levels alike, use UTC. For ordinary human state transitions that produce `CLOSED`, record the UTC time when the human actually performs the transition locally. In particular, a new version's `NEXT -> DONE` records the time of human-confirmed local finalization, not an independently determined release or platform publication time. The release tag normally points to a commit containing `DONE`, `CLOSED`, and the completed detailed file. Do not align `CLOSED` for these transitions with commit, tag, or platform publication timestamps, or manipulate `GIT_COMMITTER_DATE`; verify publication separately.
 
-For authorized backfill of an already existing, confirmed historical release tag, derive the new historical `CLOSED` from the tag's peeled commit committer Unix timestamp, converted to UTC. This is the profile's historical recording convention, not an independent claim about the actual platform publication time; explain that distinction when relevant. Do not substitute tagger time, platform `published_at`, or the current backfill time. If the tag/commit mapping is unavailable or unreliable, report the missing time rather than guessing.
+For authorized backfill of an already existing, confirmed historical release tag, derive the new historical `CLOSED` from the tag's peeled commit committer Unix timestamp, converted to UTC. This is a retrospective recording convention, not evidence of an actual historical Org state transition or platform publication time; explain the distinction in the workflow report when relevant. Do not substitute tagger time, platform `published_at`, or the current backfill time. If the tag/commit mapping is unavailable or unreliable, report the missing time rather than guessing.
 
 Read-only evidence and, where GNU `date` is available, conversion examples:
 
@@ -73,6 +73,8 @@ LC_TIME=C date -u -d "@$release_ts" '+[%Y-%m-%d %a %H:%M]'
 ```
 
 Source timestamps have second precision; ordinary Org `CLOSED` retains minutes, so compare at minute precision. Check existing historical records against the evidence, but leave state or version-time corrections for a human. Unknown versions, interfaces, dates, and coverage remain explicit limitations, not invented facts.
+
+A concise statement in the root `CHANGELOG.org` that all `CLOSED` timestamps use UTC is appropriate as a document-wide interpretation rule. Do not add explanations of timestamp derivation, historical provenance, precision, or publication-time differences to the root changelog or detailed release notes merely to justify recorded times. Keep such evidence, caveats, and verification details in the workflow report unless the user explicitly requests their inclusion in the document.
 
 ## Format and content
 
@@ -98,11 +100,11 @@ Source timestamps have second precision; ordinary Org `CLOSED` retains minutes, 
 
 Use file-local `#+TODO: TODO NEXT WAIT | DONE CANCELED`, `#+STARTUP: logdone`, and `#+PROPERTY: TIMEZONE UTC`. Version level 1 normally follows:
 
-| State | Meaning | Version records |
-| --- | --- | --- |
-| `TODO` | Development; scope and version may be provisional | `TODO Unreleased` or `TODO v0.9.0`; no forced early `CUSTOM_ID` |
-| `NEXT` | Human-frozen version and scope; release material being completed | Definite version and matching `CUSTOM_ID`; detailed file in preparation |
-| `DONE` | Formal finalization/release marking; complete, reviewed detailed notes | Version-level UTC `CLOSED`, matching identity, complete detailed file; verify tag and publication facts separately |
+| State  | Meaning                                                               | Version records                                                                                                                                   |
+| ------ | --------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `TODO` | Development; scope and version may be provisional                     | `TODO Unreleased` or `TODO v0.9.0`; no forced early `CUSTOM_ID`                                                                                   |
+| `NEXT` | Human-frozen version and scope; release material being completed      | Definite version and matching `CUSTOM_ID`; detailed file in preparation                                                                           |
+| `DONE` | Human-confirmed local finalization; not proof of platform publication | Version-level UTC `CLOSED` recording the state transition, matching identity, complete detailed file; verify tag and publication facts separately |
 
 `Unreleased` is an optional name, not an additional stage or permanent inbox. An existing `TODO v0.9.0` can be frozen in place by a human. `WAIT` and `CANCELED` are useful for candidate items; if an entire version is paused or canceled, explain the exceptional version flow rather than treating it as a normal release.
 
@@ -110,7 +112,7 @@ All existing TODO keyword transitions, at both version and item levels, are huma
 
 First creation is distinct from conversion: an explicitly requested new development entry may start as `TODO`. Authorized historical backfill may create a new `DONE` entry and derived `CLOSED` for a confirmed historical release tag. If a version entry/state/time already exists, report discrepancies and leave state/time changes to a human. Checkboxes may be updated under explicit content authorization but cannot bypass these restrictions.
 
-`logdone` can insert `CLOSED` for any terminal keyword, including `CANCELED`; its presence alone does not mean a version was released. Use a standard inactive Org planning timestamp just below the headline, outside the properties drawer. Do not put `%z` or `%Z` inside it or repeat a date in the version title. Under this profile version `CLOSED` is interpreted in UTC, but the file's `TIMEZONE` property does not make Org's native `C-c C-t` generate UTC. The human must check the resulting state and UTC time; phase one supplies no technical enforcement.
+`logdone` can insert `CLOSED` for any terminal keyword, including `CANCELED`; its presence alone does not mean a version was released. Use a standard inactive Org planning timestamp just below the headline, outside the properties drawer. Do not put `%z` or `%Z` inside it or repeat a date in the version title. The `TIMEZONE` property does not make Org's native `C-c C-t` generate UTC. The human must check the resulting state and UTC time for every such transition; phase one supplies no technical enforcement.
 
 Level 2 normally uses the six change types. As the profile's default presentation order, consider `Security`, `Removed`, `Changed`, `Deprecated`, `Fixed`, `Added`; respect established translated categories and ordering. Lower levels may mix TODO headlines, plain headlines, lists, and `- [ ]` / `- [X]` checkboxes. Maintenance progress never replaces classification or user-visible facts. Do not let canceled candidates, blocked tasks, or incomplete checks become an unreviewed formal change inventory. Keep Breaking on the affected `Changed`/`Removed` entry rather than adding a default category.
 
