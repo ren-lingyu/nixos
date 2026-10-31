@@ -26,11 +26,12 @@ Use this operation when no CHANGELOG exists, or when the user explicitly request
 
 Do not rewrite old tags, hosted releases, commits, or historical README files. Historical backfill does not implicitly request an additional update through `HEAD`.
 
-For an adopted Org profile, create or fill the authorized root summary and selected detailed files. Use the historical time and first-creation rules below for new historical entries; inspect existing states and times without changing them. Report missing detailed history rather than inventing it. Check ignore coverage after creating each file as described under authorization.
+For an adopted Org profile, create or fill the authorized root summary and selected detailed files. Use the canonical root header below for a newly created root file; check an existing header for drift without silently changing it. Use the historical time and first-creation rules below for new historical entries; inspect existing states and times without changing them. Report missing detailed history rather than inventing it. Check ignore coverage after creating each file as described under authorization.
 
 ### update: incremental maintenance or release preparation
 
 - Honor a specified version, range, and target state. Otherwise use the latest confirmed release to `HEAD` and maintain the current development entry. In the adopted Org profile this is a `TODO` version, optionally named `Unreleased` until a version is chosen; other formats keep their established convention. Do not require a permanent inbox or choose the base solely by tag name or nearest reachable tag. If a release baseline cannot be established, report that limit rather than inventing one.
+- In the adopted Org profile, compare the existing root header with the canonical template below before updating content. Report any mismatch and request separate authorization to synchronize it; header drift does not prevent unrelated authorized content updates.
 - Use the staged tree or worktree as implementation evidence only when explicitly selected. State the selected scope and keep other states separate. Inspect the current CHANGELOG diff to preserve edits even when implementation claims use `HEAD`.
 - Include changes users need to know, not every commit. Do not mechanically translate Conventional Commit types into changelog categories.
 - For incompatible changes, identify the affected public interface, the actual behavior change, and a supported migration direction. Mark `Breaking` within `Changed` or `Removed` entries when appropriate.
@@ -42,7 +43,7 @@ For an adopted Org profile, create or fill the authorized root summary and selec
 
 Review the existing document against the selected release history and implementation baseline. Check version order, tag/release mapping, date sources, categories, missing important features or fixes, breaking changes and migration guidance, duplicate entries, relative links, Markdown/Org syntax, and established style.
 
-For the adopted Org profile, also check root/detail consistency, detailed-file coverage, version states, `CUSTOM_ID`, filenames, UTC `CLOSED`, and tag/source relationships. Use the historical committer-time rule for backfilled records. Identify unresolved `NEXT` prerequisites, missing mandatory details for new-flow `DONE` versions, and canceled or unfinished work leaking into formal content. Do not equate any terminal state's `CLOSED` with publication. Report legacy coverage gaps separately from new-flow release prerequisites, and give explicit human checks where semantic consistency cannot be established mechanically.
+For the adopted Org profile, compare the root header with the canonical template below; report any mismatch and ask whether to synchronize it through a separately authorized update. Also check root/detail consistency, detailed-file coverage, version states, `CUSTOM_ID`, filenames, UTC `CLOSED`, and tag/source relationships. Use the historical committer-time rule for backfilled records. Identify unresolved `NEXT` prerequisites, missing mandatory details for new-flow `DONE` versions, and canceled or unfinished work leaking into formal content. Do not equate any terminal state's `CLOSED` with publication. Report legacy coverage gaps separately from new-flow release prerequisites, and give explicit human checks where semantic consistency cannot be established mechanically.
 
 Report concrete findings in descending importance, with the relevant entry, evidence and baseline, and a focused suggested correction. If no issue is found, state the coverage and remaining limits. Do not edit the document; actual rewriting requires an authorized `update` operation. This operation is distinct from the top-level README/documentation `audit` route.
 
@@ -74,7 +75,7 @@ LC_TIME=C date -u -d "@$release_ts" '+[%Y-%m-%d %a %H:%M]'
 
 Source timestamps have second precision; ordinary Org `CLOSED` retains minutes, so compare at minute precision. Check existing historical records against the evidence, but leave state or version-time corrections for a human. Unknown versions, interfaces, dates, and coverage remain explicit limitations, not invented facts.
 
-A concise statement in the root `CHANGELOG.org` that all `CLOSED` timestamps use UTC is appropriate as a document-wide interpretation rule. Do not add explanations of timestamp derivation, historical provenance, precision, or publication-time differences to the root changelog or detailed release notes merely to justify recorded times. Keep such evidence, caveats, and verification details in the workflow report unless the user explicitly requests their inclusion in the document.
+The canonical root header below provides the document-wide UTC statement. Do not repeat it in introductory prose or add explanations of timestamp derivation, historical provenance, precision, or publication-time differences to the root changelog or detailed release notes merely to justify recorded times. Keep such evidence, caveats, and verification details in the workflow report unless the user explicitly requests their inclusion in the document.
 
 ## Format and content
 
@@ -88,6 +89,22 @@ A concise statement in the root `CHANGELOG.org` that all `CLOSED` timestamps use
 
 ## Org profile: summary, details, and lifecycle
 
+### Canonical root header
+
+For a project explicitly adopting this Org profile, initialize the root `CHANGELOG.org` with this header:
+
+```org
+#+title: Changelog
+#+description: Follows Keep a Changelog 2.0.0 conventions; all timestamps use UTC.
+#+todo: TODO NEXT WAIT | DONE CANCELED
+#+startup: logdone
+#+property: TIMEZONE UTC
+```
+
+This is the only normative copy of the root header in this workflow. Compare the five managed lines by exact spelling, values, and relative order. Additional project-specific Org metadata, including additional `#+description` lines, is permitted and must be preserved. This template does not apply to detailed `CHANGELOGS/<version>.org` files.
+
+If an existing header differs, report the specific differences and request explicit authorization to synchronize it with this template. Creating a new root file includes its header within the authorized creation; ordinary changelog content updates and audits do not authorize changing an existing header. If synchronization is declined or deferred, leave the header unchanged and continue other authorized work where possible.
+
 ### Content ownership and version identity
 
 - Root `CHANGELOG.org` remains a Keep a Changelog-style history: concise, categorized entries covering important changes, with Breaking and migration directions visible. It also provides development/candidate maintenance entry points. It is not merely a directory or task checklist; long explanations and procedures belong in details or dedicated documentation.
@@ -98,7 +115,7 @@ A concise statement in the root `CHANGELOG.org` that all `CLOSED` timestamps use
 
 ### Native states and human authority
 
-Use file-local `#+TODO: TODO NEXT WAIT | DONE CANCELED`, `#+STARTUP: logdone`, and `#+PROPERTY: TIMEZONE UTC`. Version level 1 normally follows:
+Use the TODO, logging, and timezone settings from the canonical root header above. Version level 1 normally follows:
 
 | State  | Meaning                                                               | Version records                                                                                                                                   |
 | ------ | --------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -118,14 +135,9 @@ Level 2 normally uses the six change types. As the profile's default presentatio
 
 Prefer native Org headlines and lists over plain paragraphs when the content has a natural structure. Use headlines for distinct topics, unordered lists for independent changes or items, and ordered lists for sequential instructions. Use checkboxes for actionable development, review, or release-preparation tasks, not as the default representation of released changes. Retain plain paragraphs for introductions, explanations, rationale, and other content that benefits from continuous prose. Do not introduce unnecessary headline depth or fragment coherent explanations merely to enforce this preference.
 
-Root structure illustration only; versions, times, and content are not facts to copy into another project:
+Root body structure illustration only; prepend the canonical header above. Versions, times, and content are not facts to copy into another project:
 
 ```org
-#+TITLE: Changelog
-#+TODO: TODO NEXT WAIT | DONE CANCELED
-#+STARTUP: logdone
-#+PROPERTY: TIMEZONE UTC
-
 * TODO v0.9.0
 
 ** Added
@@ -169,7 +181,7 @@ Section selection, Org-to-Markdown conversion, excluding properties drawers and 
 
 ## Authorization and delivery
 
-Drafts and audits do not authorize writes. Only an explicit request to create or update the corresponding CHANGELOG permits editing the authorized root and selected detailed version files. For the adopted Org profile this can include `CHANGELOG.org` and corresponding `CHANGELOGS/<version>.org`; it never automatically includes unrelated files. Before editing, inspect staged/worktree differences for existing targets and preserve user changes; clarify overlapping edits only when they cannot safely be reconciled. Existing Org state/time records remain subject to the human-only boundary above, including during historical backfill.
+Drafts and audits do not authorize writes. Only an explicit request to create or update the corresponding CHANGELOG permits editing the authorized root and selected detailed version files. Synchronizing an existing root header requires separate, explicit authorization; a request specifically to align it with the canonical template is sufficient. A general request to maintain changelog content is not. For the adopted Org profile this can include `CHANGELOG.org` and corresponding `CHANGELOGS/<version>.org`; it never automatically includes unrelated files. Before editing, inspect staged/worktree differences for existing targets and preserve user changes; clarify overlapping edits only when they cannot safely be reconciled. Existing Org state/time records remain subject to the human-only boundary above, including during historical backfill.
 
 After creating a root or detailed file, diagnose whether ignore rules prevent tracking it with read-only `git check-ignore -v --no-index -- <path>`. Report matched rules and a separate suggested fix; do not modify `.gitignore`, stage the file, or treat successful content creation as proof it will be committed.
 
