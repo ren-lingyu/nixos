@@ -46,7 +46,20 @@
           { inherit (inputs.personal-nixpkgs.lib) packages; }
           (import ./lib { inherit lib; })
         ];
-        lpkgs = import ./pkgs { inherit llib; };
+        lpkgs = import ./pkgs {
+          inherit lib llib;
+          overlays = {
+            emarccs = inputs.emarccs.overlays.default;
+            git-agent-workflow = inputs.git-agent-workflow.overlays.default;
+            lem = inputs.lem.overlays.default;
+            zotero = final_: prev_: {
+              zotero = inputs.zotero-fix-nixpkgs.legacyPackages.${final_.stdenv.hostPlatform.system}.zotero;
+            };
+            lean4 = final_: prev_: {
+              lean4 = inputs.lean4-nix.packages.${final_.stdenv.hostPlatform.system}.lean-bin;
+            };
+          };
+        };
       })
       (
         {
@@ -72,54 +85,10 @@
                 editor = inputs.nixvim.homeModules.nixvim;
               };
 
-              overlays = builtins.mapAttrs (_: value_: lib.composeManyExtensions value_) {
-                legacy = [ lpkgs.overlays.legacy ];
-
-                share = [
-                  inputs.git-agent-workflow.overlays.default
-                  (final_: prev_: {
-                    lean4 = inputs.lean4-nix.packages.${final_.stdenv.hostPlatform.system}.lean-bin;
-                    zotero = inputs.zotero-fix-nixpkgs.legacyPackages.${final_.stdenv.hostPlatform.system}.zotero;
-                  })
-                  lpkgs.overlays.share
-                ];
-
-                editor = [
-                  inputs.emarccs.overlays.default
-                  inputs.lem.overlays.default
-                  (
-                    final_: prev_:
-                    let
-                      lem = prev_.lem-webview.overrideLispAttrs (old: {
-                        lispLibs = builtins.concatLists [
-                          old.lispLibs
-                          [ final_.sbclPackages.cl-template ]
-                        ];
-                      });
-                    in
-                    {
-                      lem-webview = final_.symlinkJoin {
-                        name = "${lem.name}-with-desktop";
-                        paths = [
-                          lem
-                          (final_.writeTextFile {
-                            name = "lem-desktop";
-                            destination = "/share/applications/lem.desktop";
-                            text = builtins.replaceStrings [ "/usr/local/bin/lem -i webview" ] [ "${final_.lib.getExe lem}" ] (
-                              builtins.readFile "${inputs.lem}/scripts/install/lem-webview.desktop"
-                            );
-                          })
-                          (final_.writeTextFile {
-                            name = "lem-icon";
-                            destination = "/share/icons/hicolor/scalable/apps/lem.svg";
-                            text = builtins.readFile "${inputs.lem}/scripts/install/lem.svg";
-                          })
-                        ];
-                        meta = lem.meta;
-                      };
-                    }
-                  )
-                ];
+              overlays = {
+                legacy = lpkgs.overlays.legacy;
+                share = lpkgs.overlays.share;
+                editor = lpkgs.overlays.editor;
               };
             };
           };
