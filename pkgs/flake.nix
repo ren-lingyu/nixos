@@ -48,12 +48,12 @@
           overlays = {
             emarccs = inputs.emarccs.overlays.default;
             git-agent-workflow = inputs.git-agent-workflow.overlays.default;
+            lean4 = final_: prev_: {
+              lean4 = inputs.lean4-nix.packages.${final_.stdenv.hostPlatform.system}.lean-bin;
+            };
             lem = inputs.lem.overlays.default;
             zotero = final_: prev_: {
               zotero = inputs.zotero-fix-nixpkgs.legacyPackages.${final_.stdenv.hostPlatform.system}.zotero;
-            };
-            lean4 = final_: prev_: {
-              lean4 = inputs.lean4-nix.packages.${final_.stdenv.hostPlatform.system}.lean-bin;
             };
           };
         };
@@ -78,14 +78,14 @@
               };
 
               homeModules = {
-                share = lpkgs.homeModule;
                 editor = inputs.nixvim.homeModules.nixvim;
+                share = lpkgs.homeModule;
               };
 
               overlays = {
+                editor = lpkgs.overlays.editor;
                 legacy = lpkgs.overlays.legacy;
                 share = lpkgs.overlays.share;
-                editor = lpkgs.overlays.editor;
               };
             };
           };
