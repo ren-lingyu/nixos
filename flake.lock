@@ -499,22 +499,17 @@
         "treefmt-nix": "treefmt-nix_4"
       },
       "locked": {
-        "dir": "pkgs",
-        "lastModified": 1793379169,
-        "narHash": "sha256-dx1duV9L8KoL4I+/qrd9Uud1ZQVyEX3JjKuIn7Dq4r0=",
-        "ref": "refs/heads/main",
-        "rev": "3a6c2af012390efd91682b387220ca409a2d30d9",
-        "shallow": true,
-        "type": "git",
-        "url": "https://github.com/ren-lingyu/nixpkgs"
+        "path": "./pkgs",
+        "type": "path"
       },
       "original": {
-        "dir": "pkgs",
-        "ref": "refs/heads/main",
-        "shallow": true,
-        "type": "git",
-        "url": "https://github.com/ren-lingyu/nixpkgs"
-      }
+        "path": "./pkgs",
+        "type": "path"
+      },
+      "parent": [
+        "local-nixpkgs",
+        "personal-nixpkgs"
+      ]
     },
     "local-nixpkgs_4": {
       "inputs": {
@@ -732,13 +727,13 @@
         "rev": "d357a2b54f0b6dc4aeb4e993190a52cf151b6f24",
         "shallow": true,
         "type": "git",
-        "url": "https://github.com/NixOS/nixpkgs"
+        "url": "https://github.com/NixOS/nixpkgs.git"
       },
       "original": {
         "ref": "refs/heads/nixpkgs-unstable",
         "shallow": true,
         "type": "git",
-        "url": "https://github.com/NixOS/nixpkgs"
+        "url": "https://github.com/NixOS/nixpkgs.git"
       }
     },
     "nixpkgs-lib": {
@@ -998,13 +993,13 @@
         "rev": "3a6c2af012390efd91682b387220ca409a2d30d9",
         "shallow": true,
         "type": "git",
-        "url": "https://github.com/ren-lingyu/nixpkgs"
+        "url": "https://github.com/ren-lingyu/nixpkgs.git"
       },
       "original": {
         "ref": "refs/heads/main",
         "shallow": true,
         "type": "git",
-        "url": "https://github.com/ren-lingyu/nixpkgs"
+        "url": "https://github.com/ren-lingyu/nixpkgs.git"
       }
     },
     "personal-nixpkgs_4": {

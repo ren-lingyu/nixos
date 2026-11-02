@@ -1,14 +1,11 @@
 {
   inputs = {
     nixpkgs = {
-      url = "git+https://github.com/NixOS/nixpkgs?ref=refs/heads/nixpkgs-unstable&shallow=1";
+      url = "git+https://github.com/NixOS/nixpkgs.git?ref=refs/heads/nixpkgs-unstable&shallow=1";
     };
     personal-nixpkgs = {
-      url = "git+https://github.com/ren-lingyu/nixpkgs?ref=refs/heads/main&shallow=1";
-      inputs = {
-        nixpkgs.follows = "nixpkgs";
-        local-nixpkgs.url = "git+https://github.com/ren-lingyu/nixpkgs?ref=refs/heads/main&shallow=1&dir=pkgs";
-      };
+      url = "git+https://github.com/ren-lingyu/nixpkgs.git?ref=refs/heads/main&shallow=1";
+      inputs.nixpkgs.follows = "nixpkgs";
     };
     emarccs = {
       url = "git+https://github.com/ren-lingyu/emarccs.git?ref=refs/heads/main&rev=c54849019abba42bb5feeabd71548958fe0f0407&shallow=1";
