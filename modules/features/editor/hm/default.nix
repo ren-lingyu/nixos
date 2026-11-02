@@ -19,6 +19,9 @@ in
       nixpkgs = {
         useGlobalPackages = true;
       };
+      env = {
+        TZ = "UTC0";
+      };
       defaultEditor = cfg.defaultEditor == "neovim";
       viAlias = true;
       vimAlias = true;
