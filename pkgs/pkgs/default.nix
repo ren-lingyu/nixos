@@ -23,7 +23,7 @@
       };
 
       editor = {
-        include = [ "lem-webview" ];
+        include = [ ];
         overlays = with overlays; [
           emarccs
           lem
