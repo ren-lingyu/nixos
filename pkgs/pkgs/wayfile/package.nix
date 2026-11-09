@@ -1,8 +1,7 @@
 {
   lib,
   stdenv,
-  fetchFromGitHub,
-  nix-update-script,
+  src,
 
   cmake,
   ninja,
@@ -28,18 +27,19 @@
   libarchive,
 }:
 stdenv.mkDerivation rec {
-  pname = "wayfile";
-  version = "1.1.0";
+  inherit src;
 
-  src = fetchFromGitHub {
-    owner = "blackbartblues";
-    repo = "Wayfile";
-    # Fixed to the commit corresponding to the packaged upstream snapshot.
-    rev = "e03db0c44d84aab3d3d67f6ae4b8fb6f9b3ae482";
-    # Wayfile uses a git submodule for qml icons.
-    fetchSubmodules = true;
-    hash = "sha256-zwPvFQCNXyqCfscfDtpF88Aal9Ho+3WsIdDaOQ/kNzg=";
-  };
+  pname = "wayfile";
+  version =
+    let
+      matched = builtins.match ".*project\\(wayfile VERSION ([0-9][0-9.]*).*" (
+        builtins.readFile "${src}/CMakeLists.txt"
+      );
+    in
+    if matched == null then
+      throw "wayfile: cannot extract the project version from CMakeLists.txt"
+    else
+      builtins.head matched;
 
   nativeBuildInputs = [
     # Upstream uses CMake with the Ninja generator.
@@ -110,14 +110,6 @@ stdenv.mkDerivation rec {
     # The generated Wayfile QML module misses this helper script, although it is installed in the copied source QML tree.
     "install -Dm644 \"$out/share/wayfile/src/qml/views/DropParse.js\" \"$out/share/wayfile/Wayfile/qml/views/DropParse.js\""
   ];
-
-  passthru.updateScript = nix-update-script {
-    attrPath = "legacyPackages.${stdenv.hostPlatform.system}.wayfile";
-    extraArgs = [
-      "--flake"
-      "--version=branch=main"
-    ];
-  };
 
   meta = {
     description = "Qt6/QML file manager for Wayland";

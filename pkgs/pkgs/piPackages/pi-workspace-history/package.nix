@@ -1,13 +1,11 @@
 {
   lib,
   buildNpmPackage,
-  fetchFromGitHub,
+  src,
   fetchNpmDeps,
   jq,
   nodejs_22,
   replaceVarsWith,
-  stdenvNoCC,
-  nix-update-script,
 }:
 let
 
@@ -20,15 +18,10 @@ let
 
 in
 (buildNpmPackage (finalAttrs_: {
-  pname = "pi-workspace-history";
-  version = "0.4.8";
+  inherit src;
 
-  src = fetchFromGitHub {
-    owner = "wcldyx";
-    repo = "pi-workspace-history";
-    rev = "4c51d3cad723bd8733c73fb36f4b971efb2eb53a";
-    hash = "sha256-1sy/2t1aD6B3iTTNNUTrSzsxxfPuqTtQekXv/U5FECE=";
-  };
+  pname = "pi-workspace-history";
+  version = (builtins.fromJSON (builtins.readFile "${src}/package.json")).version;
 
   nodejs = nodejs_22;
 
@@ -89,14 +82,6 @@ in
     ])
     ""
   ];
-
-  passthru.updateScript = nix-update-script {
-    attrPath = "legacyPackages.${stdenvNoCC.hostPlatform.system}.piPackages.pi-workspace-history";
-    extraArgs = [
-      "--flake"
-      "--version=branch=main"
-    ];
-  };
 
   meta = {
     description = "Real workspace undo/redo for Pi";

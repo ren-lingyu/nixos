@@ -2,6 +2,7 @@
   lib,
   llib,
   overlays,
+  sources,
 }:
 {
   overlays = llib.packages.mkOverlays {
@@ -30,6 +31,7 @@
         ];
       };
     };
+    extraArgs = { inherit sources; };
   };
 
   nixosModule = llib.packages.mkNixosModule {

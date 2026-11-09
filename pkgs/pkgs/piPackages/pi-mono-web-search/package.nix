@@ -1,23 +1,18 @@
 {
   lib,
   stdenvNoCC,
-  fetchFromGitHub,
+  src,
   fetchPnpmDeps,
   nodejs,
   pnpm_10,
   pnpmConfigHook,
-  nix-update-script,
 }:
 (stdenvNoCC.mkDerivation (finalAttrs_: {
-  pname = "pi-mono-web-search";
-  version = "0.1.0";
+  inherit src;
 
-  src = fetchFromGitHub {
-    owner = "emanuelcasco";
-    repo = "pi-mono-extensions";
-    rev = "e4e047a5a203cac78f5e420c92a3115ccd2fe6bb";
-    hash = "sha256-vPLPA3/tHmM+rcHyLeVsotjr8yD0B+a3S5ph05owjWo=";
-  };
+  pname = "pi-mono-web-search";
+  version =
+    (builtins.fromJSON (builtins.readFile "${src}/extensions/web-search/package.json")).version;
 
   pnpmWorkspaces = [
     "pi-common"
@@ -110,14 +105,6 @@
     ])
     ""
   ];
-
-  passthru.updateScript = nix-update-script {
-    attrPath = "legacyPackages.${stdenvNoCC.hostPlatform.system}.piPackages.pi-mono-web-search";
-    extraArgs = [
-      "--flake"
-      "--version=branch=main"
-    ];
-  };
 
   meta = {
     description = "Pi extension for web search and page reading using DuckDuckGo and readability extraction";

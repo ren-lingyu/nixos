@@ -1,20 +1,22 @@
 {
   stdenvNoCC,
-  fetchFromGitHub,
+  src,
   lib,
-  nix-update-script,
 }:
 stdenvNoCC.mkDerivation rec {
-  pname = "luadraw";
-  version = "3.4";
+  inherit src;
 
-  src = fetchFromGitHub {
-    owner = "pfradin";
-    repo = "luadraw";
-    rev = "eba63b144ba788209191a611f461cd65a5e8935a";
-    fetchSubmodules = false;
-    hash = "sha256-PH74e2QhrmzrDrRb/5hz+PUjccWP0q3sG+fj17VGy4w=";
-  };
+  pname = "luadraw";
+  version =
+    let
+      matched = builtins.match ".*ProvidesPackage[^[]*\\[[^]]*version ([0-9][0-9.]*).*" (
+        builtins.readFile "${src}/files/luadraw.sty"
+      );
+    in
+    if matched == null then
+      throw "luadraw: cannot extract the package version from files/luadraw.sty"
+    else
+      builtins.head matched;
 
   dontBuild = true;
   dontStrip = true;
@@ -26,14 +28,6 @@ stdenvNoCC.mkDerivation rec {
   ];
 
   passthru = {
-    updateScript = nix-update-script {
-      attrPath = "legacyPackages.${stdenvNoCC.hostPlatform.system}.texlivePackages.luadraw";
-      extraArgs = [
-        "--flake"
-        "--version=branch=main"
-      ];
-    };
-
     tlType = "run";
     tlDeps =
       ps_: with ps_; [

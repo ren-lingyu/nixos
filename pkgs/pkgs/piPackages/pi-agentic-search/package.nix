@@ -1,21 +1,14 @@
 {
   lib,
   buildNpmPackage,
-  fetchFromGitHub,
+  src,
   nodejs_22,
-  stdenvNoCC,
-  nix-update-script,
 }:
 (buildNpmPackage (unused_finalAttrs_: {
-  pname = "pi-agentic-search";
-  version = "0.5.2";
+  inherit src;
 
-  src = fetchFromGitHub {
-    owner = "dantetekanem";
-    repo = "pi-agentic-search";
-    rev = "fda2434bdfc9ffc810c145f66dc552c2464f1614";
-    hash = "sha256-KLRj9fOBl1tHqBnOzVV81+hFQixVHlaojUc5nWQXsMs=";
-  };
+  pname = "pi-agentic-search";
+  version = (builtins.fromJSON (builtins.readFile "${src}/package.json")).version;
 
   nodejs = nodejs_22;
 
@@ -67,14 +60,6 @@
     ])
     ""
   ];
-
-  passthru.updateScript = nix-update-script {
-    attrPath = "legacyPackages.${stdenvNoCC.hostPlatform.system}.piPackages.pi-agentic-search";
-    extraArgs = [
-      "--flake"
-      "--version=branch=main"
-    ];
-  };
 
   meta = {
     description = "Pi extension for agent-oriented ranked code search and one-call diff context packs";
