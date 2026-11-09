@@ -1,10 +1,17 @@
 {
   lib,
-  stdenvNoCC,
-  installAgentSkills,
+  haskell,
+  haskellPackages,
+  emacs-nox,
+  emacsPackagesFor,
   fetchFromGitHub,
+  git,
+  gh,
+  installAgentSkills,
 }:
 let
+  emacs = (emacsPackagesFor emacs-nox).emacsWithPackages (epkgs: [ epkgs.ox-gfm ]);
+  skillSource = ./skill/git-maintenance;
   standardFiles =
     let
       keepAChangelogSrc_ = fetchFromGitHub {
@@ -34,20 +41,23 @@ let
         path = "references/standards/semver/2.0.0.md";
       }
     ];
+  package_ = haskell.lib.dontHaddock (haskellPackages.callCabal2nix "git-maintenance" ./cabal { });
 in
-stdenvNoCC.mkDerivation (finalAttrs_: {
-  pname = "git-maintenance";
-  version = "0.0.0";
+package_.overrideAttrs (old_: {
+  GIT = lib.getExe git;
+  GH = lib.getExe gh;
+  EMACS = lib.getExe' emacs "emacs";
 
-  src = ./src;
-
-  nativeBuildInputs = [ installAgentSkills ];
-
-  dontConfigure = true;
-  dontBuild = true;
+  nativeBuildInputs = (old_.nativeBuildInputs or [ ]) ++ [ installAgentSkills ];
+  nativeCheckInputs = (old_.nativeCheckInputs or [ ]) ++ [ emacs ];
 
   postPatch = lib.concatLines (
-    builtins.map (
+    [
+      (old_.postPatch or "")
+      "cp -R ${skillSource} git-maintenance"
+      "chmod -R u+w git-maintenance"
+    ]
+    ++ builtins.map (
       standardFile_:
       "install -Dm644 ${
         lib.escapeShellArgs [
@@ -58,42 +68,15 @@ stdenvNoCC.mkDerivation (finalAttrs_: {
     ) standardFiles
   );
 
-  doInstallCheck = true;
-
-  installCheckPhase =
-    let
-      checkFile = src_: path_: [
-        ''test -s "$installedSkills/${path_}"''
-        ''cmp ${lib.escapeShellArg src_} "$installedSkills/${path_}"''
+  meta = lib.mergeAttrsList [
+    (old_.meta or { })
+    {
+      description = "Git maintenance skill and git-gm release CLI";
+      license = with lib.licenses; [
+        mit
+        cc-by-30
       ];
-    in
-    lib.concatLines (
-      builtins.concatLists [
-        [
-          "runHook preInstallCheck"
-          ''installedSkills="$out/share/skills/git-maintenance"''
-        ]
-        (lib.concatMap
-          (file_: checkFile "${file_}" (lib.removePrefix "${toString finalAttrs_.src}/" (toString file_)))
-          (
-            lib.filter (file_: lib.hasSuffix ".md" (toString file_)) (
-              lib.filesystem.listFilesRecursive finalAttrs_.src
-            )
-          )
-        )
-        (lib.concatMap (
-          standardFile_: checkFile standardFile_.src "git-maintenance/${standardFile_.path}"
-        ) standardFiles)
-        [ "runHook postInstallCheck" ]
-      ]
-    );
-
-  meta = {
-    description = "Repository-generic Git maintenance skill for coding agents";
-    license = with lib.licenses; [
-      mit
-      cc-by-30
-    ];
-    platforms = lib.platforms.all;
-  };
+      platforms = lib.platforms.unix;
+    }
+  ];
 })

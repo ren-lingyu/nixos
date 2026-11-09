@@ -1,0 +1,76 @@
+cabal-version:      3.0
+name:               git-maintenance
+version:            0.1.0
+synopsis:           Local Git release maintenance
+license:            MIT
+build-type:         Simple
+extra-source-files: resources/release-org-tests.el
+data-files:         resources/release-org.el
+
+library
+  hs-source-dirs:   src
+  exposed-modules:
+    GitGM.Release
+    GitGM.Version
+
+  other-modules:
+    GitGM.System.ExternalTools
+    Paths_git_maintenance
+
+  autogen-modules:  Paths_git_maintenance
+  build-depends:
+    , aeson
+    , base              >=4.16 && <5
+    , bytestring
+    , process
+    , template-haskell
+    , text
+
+  default-language: Haskell2010
+  ghc-options:      -Wall -Werror
+
+executable git-gm
+  hs-source-dirs:   app
+  main-is:          Main.hs
+  build-depends:
+    , base             >=4.16 && <5
+    , git-maintenance
+
+  default-language: Haskell2010
+  ghc-options:      -Wall -Werror
+
+test-suite git-gm-tests
+  type:             exitcode-stdio-1.0
+  hs-source-dirs:   test
+  main-is:          Main.hs
+  build-depends:
+    , base             >=4.16 && <5
+    , git-maintenance
+
+  default-language: Haskell2010
+  ghc-options:      -Wall -Werror
+
+test-suite git-gm-org-tests
+  type:             exitcode-stdio-1.0
+  hs-source-dirs:   test
+  main-is:          Org.hs
+  build-depends:
+    , base     >=4.16 && <5
+    , process
+
+  default-language: Haskell2010
+  ghc-options:      -Wall -Werror
+
+test-suite git-gm-render-tests
+  type:             exitcode-stdio-1.0
+  hs-source-dirs:   test
+  main-is:          Render.hs
+  build-depends:
+    , base             >=4.16 && <5
+    , directory
+    , filepath
+    , git-maintenance
+    , process
+
+  default-language: Haskell2010
+  ghc-options:      -Wall -Werror
