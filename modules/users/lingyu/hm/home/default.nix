@@ -104,7 +104,13 @@
     programs.zathura = {
       enable = true;
       package = pkgs.zathura.override { plugins = [ pkgs.zathuraPkgs.zathura_pdf_poppler ]; };
-      options = { };
+      options = {
+        recolor = true;
+        recolor-lightcolor = "#000000";
+        recolor-darkcolor = "#707070";
+        recolor-keephue = true;
+        recolor-reverse-video = true;
+      };
       mappings = { };
     };
 
