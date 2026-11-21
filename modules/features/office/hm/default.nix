@@ -12,7 +12,16 @@ let
 in
 {
   config = lib.mkIf cfg.enable {
-    home.packages = with pkgs; [ libreoffice-qt-stable ];
+    programs.libreoffice = {
+      enable = true;
+      package = pkgs.libreoffice-qt-stable.override {
+        extraMakeWrapperArgs = [
+          "--set"
+          "SAL_USE_VCLPLUGIN"
+          "qt6"
+        ];
+      };
+    };
 
     programs.onlyoffice = {
       enable = false;
