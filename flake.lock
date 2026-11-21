@@ -411,9 +411,13 @@
         "lean4-nix": "lean4-nix",
         "lem": "lem",
         "luadraw": "luadraw",
-        "nixpkgs": "nixpkgs",
+        "nixpkgs": [
+          "nixpkgs"
+        ],
         "nixvim": "nixvim",
-        "personal-nixpkgs": "personal-nixpkgs_7",
+        "personal-nixpkgs": [
+          "personal-nixpkgs"
+        ],
         "pi-agentic-search": "pi-agentic-search",
         "pi-mono-extensions": "pi-mono-extensions",
         "pi-workspace-history": "pi-workspace-history",
@@ -553,7 +557,7 @@
         "nix-vm-test": "nix-vm-test",
         "nixos-images": "nixos-images",
         "nixos-stable": "nixos-stable",
-        "nixpkgs": "nixpkgs_2",
+        "nixpkgs": "nixpkgs",
         "treefmt-nix": "treefmt-nix_2"
       },
       "locked": {
@@ -638,19 +642,18 @@
     },
     "nixpkgs": {
       "locked": {
-        "lastModified": 1795187554,
-        "narHash": "sha256-5q5/viwCcXSA4S2cSaKdjdYrHhk64qFbjLhCMlJnyeM=",
-        "ref": "refs/heads/nixpkgs-unstable",
-        "rev": "9996594bd38077de6a018ec17453ba3d99182787",
-        "shallow": true,
-        "type": "git",
-        "url": "https://github.com/NixOS/nixpkgs.git"
+        "lastModified": 1792291545,
+        "narHash": "sha256-LW33+dSrpSw4Xpz3cDKqNARm84z0+bRNsv+7m6exF84=",
+        "owner": "nixos",
+        "repo": "nixpkgs",
+        "rev": "713b2077af0de16b3a02fc1760d233cf55e7dc4e",
+        "type": "github"
       },
       "original": {
-        "ref": "refs/heads/nixpkgs-unstable",
-        "shallow": true,
-        "type": "git",
-        "url": "https://github.com/NixOS/nixpkgs.git"
+        "owner": "nixos",
+        "ref": "nixos-unstable-small",
+        "repo": "nixpkgs",
+        "type": "github"
       }
     },
     "nixpkgs-lib": {
@@ -700,22 +703,6 @@
       }
     },
     "nixpkgs_2": {
-      "locked": {
-        "lastModified": 1792291545,
-        "narHash": "sha256-LW33+dSrpSw4Xpz3cDKqNARm84z0+bRNsv+7m6exF84=",
-        "owner": "nixos",
-        "repo": "nixpkgs",
-        "rev": "713b2077af0de16b3a02fc1760d233cf55e7dc4e",
-        "type": "github"
-      },
-      "original": {
-        "owner": "nixos",
-        "ref": "nixos-unstable-small",
-        "repo": "nixpkgs",
-        "type": "github"
-      }
-    },
-    "nixpkgs_3": {
       "locked": {
         "lastModified": 1795085501,
         "narHash": "sha256-S5keGWzaKpuXo9MNoIC2FfTIuTyTnx8P4NhYJMEsTLI=",
@@ -1081,29 +1068,6 @@
     "personal-nixpkgs_7": {
       "inputs": {
         "nixpkgs": [
-          "local-nixpkgs",
-          "nixpkgs"
-        ]
-      },
-      "locked": {
-        "lastModified": 1794600327,
-        "narHash": "sha256-rqyITRkPda/bsnCURoT9i+r5YeiA38UXRpkTuwnjNPw=",
-        "ref": "refs/heads/main",
-        "rev": "6ab46798ab901e550e0c2840ae489918a3d06df9",
-        "shallow": true,
-        "type": "git",
-        "url": "https://github.com/ren-lingyu/nixpkgs.git"
-      },
-      "original": {
-        "ref": "refs/heads/main",
-        "shallow": true,
-        "type": "git",
-        "url": "https://github.com/ren-lingyu/nixpkgs.git"
-      }
-    },
-    "personal-nixpkgs_8": {
-      "inputs": {
-        "nixpkgs": [
           "nixpkgs"
         ]
       },
@@ -1214,9 +1178,9 @@
         "nix-flatpak": "nix-flatpak",
         "nixos-anywhere": "nixos-anywhere",
         "nixos-wsl": "nixos-wsl",
-        "nixpkgs": "nixpkgs_3",
+        "nixpkgs": "nixpkgs_2",
         "nixvirt": "nixvirt",
-        "personal-nixpkgs": "personal-nixpkgs_8",
+        "personal-nixpkgs": "personal-nixpkgs_7",
         "sops-nix": "sops-nix"
       }
     },

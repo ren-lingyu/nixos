@@ -33,6 +33,10 @@
     };
     local-nixpkgs = {
       url = "path:./pkgs";
+      inputs = {
+        nixpkgs.follows = "nixpkgs";
+        personal-nixpkgs.follows = "personal-nixpkgs";
+      };
     };
     home-manager = {
       url = "git+https://github.com/nix-community/home-manager.git?ref=refs/heads/master&shallow=1";
