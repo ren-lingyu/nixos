@@ -31,6 +31,31 @@ in
         cfg.noctalia.enable
       ])
       {
+        gtk = {
+          enable = true;
+          gtk3.theme = {
+            name =
+              if config.programs.noctalia.settings.theme.mode == "dark" then "adw-gtk3-dark" else "adw-gtk3";
+            package = pkgs.adw-gtk3;
+          };
+          colorScheme = config.programs.noctalia.settings.theme.mode;
+        };
+
+        qt = {
+          enable = true;
+          platformTheme.name = "qtct";
+          qt5ctSettings.Appearance = {
+            custom_palette = true;
+            color_scheme_path = "${config.xdg.configHome}/qt5ct/colors/noctalia.conf";
+            style = "Fusion";
+          };
+          qt6ctSettings.Appearance = {
+            custom_palette = true;
+            color_scheme_path = "${config.xdg.configHome}/qt6ct/colors/noctalia.conf";
+            style = "Fusion";
+          };
+        };
+
         programs.noctalia = {
           enable = cfg.noctalia.enable;
           package = pkgs.noctalia;
@@ -532,8 +557,12 @@ in
               wallpaper_scheme = "m3-tonal-spot";
               pure_black_dark = false;
               templates = {
-                enable_builtin_templates = false;
-                builtin_ids = [ ];
+                enable_builtin_templates = true;
+                builtin_ids = [
+                  "gtk3"
+                  "gtk4"
+                  "qt"
+                ];
                 enable_community_templates = false;
                 community_ids = [ ];
               };
