@@ -102,8 +102,63 @@ in
             moonshotai-cn = lib.mkIf mif.pi.providers.moonshot-cn.enable {
               apiKey = cat_ mif.pi.providers.moonshot-cn.apiKey;
             };
-            zai-coding-cn = lib.mkIf mif.pi.providers.zai-cn.enable {
+            zai-api-cn = lib.mkIf mif.pi.providers.zai-cn.enable {
+              api = "openai-completions";
+              baseUrl = "https://open.bigmodel.cn/api/paas/v4";
               apiKey = cat_ mif.pi.providers.zai-cn.apiKey;
+              compat = {
+                thinkingFormat = "zai";
+                supportsReasoningEffort = true;
+              };
+              models =
+                builtins.map
+                  (
+                    x_:
+                    x_
+                    // {
+                      thinkingLevelMap = {
+                        off = null;
+                        minimal = null;
+                        low = "low";
+                        medium = null;
+                        high = "high";
+                        xhigh = null;
+                        max = "max";
+                      };
+                    }
+                  )
+                  [
+                    {
+                      id = "glm-5.3";
+                      name = "GLM-5.3";
+                      reasoning = true;
+                      input = [ "text" ];
+                      contextWindow = 1000000;
+                      maxTokens = 131072;
+                    }
+                    {
+                      id = "glm-5.3-flash";
+                      name = "GLM-5.3 Flash";
+                      reasoning = true;
+                      input = [
+                        "text"
+                        "image"
+                      ];
+                      contextWindow = 1000000;
+                      maxTokens = 131072;
+                    }
+                    {
+                      id = "glm-5.3-flashx";
+                      name = "GLM-5.3 FlashX";
+                      reasoning = true;
+                      input = [
+                        "text"
+                        "image"
+                      ];
+                      contextWindow = 1000000;
+                      maxTokens = 131072;
+                    }
+                  ];
             };
           };
         };
