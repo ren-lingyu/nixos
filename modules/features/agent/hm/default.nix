@@ -101,6 +101,9 @@ in
               baseUrl = "https://api.deepseek.com";
               apiKey = cat_ mif.pi.providers.deepseek.apiKey;
             };
+            moonshotai-cn = lib.mkIf mif.pi.providers.moonshot-cn.enable {
+              apiKey = cat_ mif.pi.providers.moonshot-cn.apiKey;
+            };
           };
         };
 
