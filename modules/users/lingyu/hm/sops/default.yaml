@@ -18,6 +18,10 @@ moonshot:
   cn:
     apiKey:
       pi: ENC[AES256_GCM,data:4x3ZiPzoCTSNjSP1zbj7zxWzQybXVVSYvZjEWQZa8oiCmPDkO4RGFcq1r8omCQIlycSvAsW0AWR3B4OxxZM=,iv:+1bE0OeDe2Lv2u2k3LLQAf3+uvWNl8UQhnS/DVJJ/14=,tag:TS0QpM4l9FUn6dG0Py+f1w==,type:str]
+zai:
+  cn:
+    apiKey:
+      pi: ENC[AES256_GCM,data:dvXnjsOtUYJ5t4jv9LsQSvBI+nGFGjtNxE+0iFyNDsZbwHvNo8xQ/z6E9KH/XYl+YA==,iv:kXm6IFiYCQVZkWtj4BL4hXh9lhX4qCpLuN2DtXjlWog=,tag:2sXDOuTKj4ID8lPtHNkjQg==,type:str]
 alibabacloud:
   oss:
     access_key_id: ENC[AES256_GCM,data:WZ9hze7CDeCbkpcPWgG4RKngjOTPGWbu,iv:4XFq5WQd9c98NUdtdEzmBPXzXmf4QjsRfdUXApgyBkQ=,tag:nQfl+BVVwtganOn3QkHeHQ==,type:str]
@@ -33,7 +37,7 @@ sops:
         a3eIK0PIBhWWHu3cMN9L1m93fJnfAjt9/98lLrANauMrFL3qeGVH1w==
         -----END AGE ENCRYPTED FILE-----
       recipient: age1kgwar87m34mfg5zhtywg42umlax77y28tvucu0wkdwrq870wdf9s782jqe
-  lastmodified: "2026-11-23T10:08:38Z"
-  mac: ENC[AES256_GCM,data:obYy6X7NCj6+yf6p3wjoz2aq+vnKfP1U5IDeJF/QcDS0wFtC/aiHWCWpD4HZvVZ3dqpbqbF4hlMEwd4am79rOoPJxr4Qteux9o4YQvdmbr2AUH9WB0sMLRrhCsjJqoLhWvKmquDGyc328wtTTZ49vd5+VZ2GuIv5hl0onU1GZ3w=,iv:e4T6hQsM29aWUV3Hk8v2tccBpoTkh9AQ4O1rPa6QWxU=,tag:NM0RZEb/I75CILRudH6Tpg==,type:str]
+  lastmodified: "2026-11-23T10:39:09Z"
+  mac: ENC[AES256_GCM,data:BS7kqAx43gFYKtPO7CzIryf88+/UEjWvrPNG3bao2d4TXC9wTVYS6euNh/+Rz+xN3QGGAIPSIGg8fw9OMHft1lWKmqljUVwf/s6OP/Elci4AnJvKJtcXtbfk6p+eEGDhXGB/cK0nriDmQt+Y1NRjZodY5zKNVOwqCHlbHhFgGZI=,iv:n2pGl2gBGZFDhnm3w6jthiK6ITwenPYFn5Qm94Tr8n0=,tag:xABcqSK73jq6X9E07Wdwig==,type:str]
   unencrypted_suffix: _unencrypted
   version: 3.13.3
