@@ -54,6 +54,11 @@
                     "apiKey" = [ "pi" ];
                   };
                 };
+                "zai" = {
+                  "cn" = {
+                    "apiKey" = [ "pi" ];
+                  };
+                };
               };
             }
           ];
@@ -68,6 +73,10 @@
               moonshot-cn = {
                 enable = true;
                 apiKey = config.sops.secrets."moonshot.cn.apiKey.pi".path;
+              };
+              zai-cn = {
+                enable = true;
+                apiKey = config.sops.secrets."zai.cn.apiKey.pi".path;
               };
             };
           };
