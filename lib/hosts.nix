@@ -27,6 +27,7 @@
       registry,
       privateKeyFile,
       wgIpRule,
+      wgSubnetRule,
       wgNameRule,
     }:
     let
@@ -36,6 +37,8 @@
       privateKeyFile_ = privateKeyFile;
 
       wgIpRule_ = wgIpRule;
+
+      wgSubnetRule_ = wgSubnetRule;
 
       wgNameRule_ = wgNameRule;
 
@@ -52,6 +55,7 @@
         lib.mapAttrs (_: endpointHost_: {
           number = endpointHost_.number;
           name = wgNameRule_ endpointHost_.number;
+          subnet = wgSubnetRule_ endpointHost_.number;
           nodes = (
             lib.mapAttrs (_: host_: {
               number = host_.number;
@@ -69,6 +73,7 @@
       topology = (
         lib.mapAttrs (unused_networkNumber_: network_: {
           name = network_.name;
+          subnet = network_.subnet;
           nodes = (lib.mapAttrs (unused_hostNumber_: node_: node_.ip) network_.nodes);
         }) networks_
       );
@@ -77,8 +82,16 @@
         lib.optionalAttrs (enabledHost_.wireguard != null) (
           let
 
+            interfaceNames_ = lib.mapAttrsToList (_: network_: network_.name) networks_;
+
+            hubInterfaceNames_ = lib.mapAttrsToList (_: network_: network_.name) (
+              lib.filterAttrs (_: network_: network_.number == enabledHost_.number) networks_
+            );
+
+            nftInterfaceSet_ = lib.concatMapStringsSep ", " (name_: ''"${name_}"'') interfaceNames_;
+
             wgConfigRule_ = self_: peers_: {
-              ips = [ "${self_.ip}/24" ];
+              ips = [ "${self_.ip}/${self_.prefixLength}" ];
 
               listenPort = self_.listenPort;
 
@@ -86,7 +99,7 @@
                 builtins.map (peer_: {
                   publicKey = peer_.publicKey;
 
-                  allowedIPs = [ "${peer_.ip}/32" ];
+                  allowedIPs = peer_.allowedIPs;
 
                   endpoint = (
                     if peer_.endpoint == null then
@@ -125,15 +138,16 @@
 
                 self_ = {
                   ip = selfNode_.ip;
+                  prefixLength = lib.last (lib.splitString "/" network_.subnet);
 
                   listenPort = (if isHub_ then selfNode_.listenPort else null);
                 };
 
                 peers_ = (
                   lib.mapAttrsToList (_: peerNode_: {
-                    ip = peerNode_.ip;
-
                     publicKey = peerNode_.publicKey;
+
+                    allowedIPs = if isHub_ then [ "${peerNode_.ip}/32" ] else [ network_.subnet ];
 
                     endpoint = (if peerNode_.number == network_.number then peerNode_.endpoint else null);
                   }) peerNodes_
@@ -145,6 +159,7 @@
                   type = "wireguard";
                   privateKeyFile = privateKeyFile_;
                   generatePrivateKeyFile = false;
+                  allowedIPsAsRoutes = isHub_;
                 })
 
                 (wgConfigRule_ self_ peers_)
@@ -168,6 +183,26 @@
                 (enabledHost_.wireguard.listenPort != null)
               ]) { allowedUDPPorts = [ enabledHost_.wireguard.listenPort ]; }
             );
+
+            nftables.tables = lib.optionalAttrs (interfaceNames_ != [ ]) {
+              "wireguard-isolation" = {
+                family = "inet";
+                content = ''
+                  chain forward {
+                    type filter hook forward priority -10; policy accept;
+
+                    # Only this host's Hub interfaces may forward within themselves.
+                    ${lib.concatMapStringsSep "\n" (
+                      name_: ''iifname "${name_}" oifname "${name_}" meta nfproto ipv4 accept''
+                    ) hubInterfaceNames_}
+
+                    # Reject every other forwarded packet involving a managed WG interface.
+                    iifname { ${nftInterfaceSet_} } drop
+                    oifname { ${nftInterfaceSet_} } drop
+                  }
+                '';
+              };
+            };
           }
         )
       );

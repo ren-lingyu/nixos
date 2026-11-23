@@ -22,6 +22,7 @@ in
         lib.types.submodule {
           options = {
             name = lib.mkOption { type = lib.types.str; };
+            subnet = lib.mkOption { type = lib.types.str; };
             nodes = lib.mkOption { type = lib.types.attrsOf lib.types.str; };
           };
         }
@@ -32,6 +33,17 @@ in
   };
 
   config = {
+    assertions = [
+      {
+        assertion = enabledHost_.wireguard == null || config.networking.nftables.enable;
+        message = "WireGuard routing isolation requires networking.nftables.enable.";
+      }
+    ];
+
+    boot.kernel.sysctl."net.ipv4.ip_forward" = lib.mkIf (
+      enabledHost_.wireguard != null && enabledHost_.wireguard.endpoint != null
+    ) 1;
+
     age.secrets = lib.mkIf (enabledHost_.wireguard != null) {
       wireguard = {
         rekeyFile = enabledHost_.wireguard.privateKey;
@@ -48,6 +60,7 @@ in
             registry = cfg;
             privateKeyFile = config.age.secrets.wireguard.path;
             wgIpRule = (x_: y_: "10.100.${builtins.toString x_}.${builtins.toString y_}");
+            wgSubnetRule = (x_: "10.100.${builtins.toString x_}.0/24");
             wgNameRule = (x_: "wg${builtins.toString x_}");
           }
         );

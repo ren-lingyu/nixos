@@ -1,4 +1,8 @@
-{ runCommand, hosts }:
+{
+  lib,
+  runCommand,
+  hosts,
+}:
 let
 
   hosts_ = {
@@ -72,6 +76,7 @@ let
       registry = builtins.mapAttrs (name: host: host // { enable = name == enabledHostName; }) registry;
       privateKeyFile = "/run/wireguard-key";
       wgIpRule = hub: node: "10.100.${builtins.toString hub}.${builtins.toString node}";
+      wgSubnetRule = hub: "10.100.${builtins.toString hub}.0/24";
       wgNameRule = number: "wg${builtins.toString number}";
     };
 
@@ -80,6 +85,13 @@ let
   thinkbook_ = (mkNetworks_ wireguardHosts_ "thinkbook").config;
   aliyun_ = (mkNetworks_ wireguardHosts_ "aliyun").config;
   backup_ = (mkNetworks_ wireguardHosts_ "backup").config;
+  matebook_ = (mkNetworks_ wireguardHosts_ "matebook").config;
+  noHub_ = mkNetworks_ (builtins.removeAttrs wireguardHosts_ [
+    "aliyun"
+    "backup"
+  ]) "thinkbook";
+
+  isolationRules_ = config: config.nftables.tables."wireguard-isolation".content;
 
   peersByKey_ =
     peers:
@@ -124,6 +136,7 @@ let
       topology_ == {
         aliyun = {
           name = "wg3";
+          subnet = "10.100.3.0/24";
           nodes = {
             aliyun = "10.100.3.3";
             backup = "10.100.3.5";
@@ -133,6 +146,7 @@ let
         };
         backup = {
           name = "wg5";
+          subnet = "10.100.5.0/24";
           nodes = {
             aliyun = "10.100.5.3";
             backup = "10.100.5.5";
@@ -144,6 +158,8 @@ let
     )
     (builtins.attrNames singleHub_.topology == [ "aliyun" ])
     (builtins.attrNames singleHub_.config.wireguard.interfaces == [ "wg3" ])
+    (noHub_.topology == { })
+    (noHub_.config.nftables.tables == { })
     (
       builtins.attrNames thinkbook_.wireguard.interfaces == [
         "wg3"
@@ -163,7 +179,7 @@ let
       thinkbook_.wireguard.interfaces.wg3.peers == [
         {
           publicKey = "key-aliyun";
-          allowedIPs = [ "10.100.3.3/32" ];
+          allowedIPs = [ "10.100.3.0/24" ];
           endpoint = "203.0.113.3:51820";
           persistentKeepalive = 25;
         }
@@ -173,34 +189,53 @@ let
       thinkbook_.wireguard.interfaces.wg5.peers == [
         {
           publicKey = "key-backup";
-          allowedIPs = [ "10.100.5.5/32" ];
+          allowedIPs = [ "10.100.5.0/24" ];
           endpoint = "[2001:db8::5]:51821";
           persistentKeepalive = 25;
         }
       ]
     )
+    (!thinkbook_.wireguard.interfaces.wg3.allowedIPsAsRoutes)
+    (!thinkbook_.wireguard.interfaces.wg5.allowedIPsAsRoutes)
+    (!matebook_.wireguard.interfaces.wg3.allowedIPsAsRoutes)
     (thinkbook_.wireguard.interfaces.wg3.privateKeyFile == "/run/wireguard-key")
     (thinkbook_.wireguard.interfaces.wg3.generatePrivateKeyFile == false)
 
     (aliyun_.wireguard.interfaces.wg3.ips == [ "10.100.3.3/24" ])
     (aliyun_.wireguard.interfaces.wg3.listenPort == 51820)
+    (aliyun_.wireguard.interfaces.wg3.allowedIPsAsRoutes)
     (peersByKey_ aliyun_.wireguard.interfaces.wg3.peers == expectedHubPeers_)
     (aliyun_.wireguard.interfaces.wg5.listenPort == null)
+    (!aliyun_.wireguard.interfaces.wg5.allowedIPsAsRoutes)
     (
       aliyun_.wireguard.interfaces.wg5.peers == [
         {
           publicKey = "key-backup";
-          allowedIPs = [ "10.100.5.5/32" ];
+          allowedIPs = [ "10.100.5.0/24" ];
           endpoint = "[2001:db8::5]:51821";
           persistentKeepalive = 25;
         }
       ]
     )
     (backup_.wireguard.interfaces.wg5.listenPort == 51821)
+    (backup_.wireguard.interfaces.wg5.allowedIPsAsRoutes)
+    (!backup_.wireguard.interfaces.wg3.allowedIPsAsRoutes)
     (builtins.length backup_.wireguard.interfaces.wg5.peers == 3)
+    (
+      (peersByKey_ backup_.wireguard.interfaces.wg5.peers)."key-aliyun".allowedIPs == [ "10.100.5.3/32" ]
+    )
     (aliyun_.firewall.allowedUDPPorts == [ 51820 ])
     (backup_.firewall.allowedUDPPorts == [ 51821 ])
     (!(thinkbook_.firewall ? allowedUDPPorts))
+
+    (lib.hasInfix ''iifname "wg3" oifname "wg3" meta nfproto ipv4 accept'' (isolationRules_ aliyun_))
+    (!lib.hasInfix ''iifname "wg5" oifname "wg5" meta nfproto ipv4 accept'' (isolationRules_ aliyun_))
+    (lib.hasInfix ''iifname "wg5" oifname "wg5" meta nfproto ipv4 accept'' (isolationRules_ backup_))
+    (!lib.hasInfix ''iifname "wg3" oifname "wg3" meta nfproto ipv4 accept'' (isolationRules_ backup_))
+    (!lib.hasInfix "meta nfproto ipv4 accept" (isolationRules_ thinkbook_))
+    (lib.hasInfix ''iifname { "wg3", "wg5" } drop'' (isolationRules_ aliyun_))
+    (lib.hasInfix ''oifname { "wg3", "wg5" } drop'' (isolationRules_ thinkbook_))
+    (lib.hasInfix "priority -10; policy accept;" (isolationRules_ matebook_))
   ];
 
 in
