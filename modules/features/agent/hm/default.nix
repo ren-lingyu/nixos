@@ -104,6 +104,9 @@ in
             moonshotai-cn = lib.mkIf mif.pi.providers.moonshot-cn.enable {
               apiKey = cat_ mif.pi.providers.moonshot-cn.apiKey;
             };
+            zai-coding-cn = lib.mkIf mif.pi.providers.zai-cn.enable {
+              apiKey = cat_ mif.pi.providers.zai-cn.apiKey;
+            };
           };
         };
 

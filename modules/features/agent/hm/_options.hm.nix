@@ -32,6 +32,7 @@ feature_:
         pi = {
           deepseek = { };
           moonshot-cn = { };
+          zai-cn = { };
         };
       }
     )
