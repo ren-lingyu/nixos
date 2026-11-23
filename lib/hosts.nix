@@ -1,5 +1,5 @@
 { lib }: rec {
-  getUniqueEnabledHost =
+  getUniqueEnabledHostEntry =
     hosts_:
     let
       enabledHostEntries_ = (
@@ -13,12 +13,14 @@
     in
     (
       if (builtins.length enabledHostEntries_) == 1 then
-        (builtins.head enabledHostEntries_).value
+        builtins.head enabledHostEntries_
       else
-        builtins.throw "getUniqueEnabledHost requires exactly one enabled host. Enabled hosts: ${
+        builtins.throw "Exactly one enabled host is required. Enabled hosts: ${
           builtins.concatStringsSep ", " (builtins.map (hostEntry_: hostEntry_.name) enabledHostEntries_)
         }."
     );
+
+  getUniqueEnabledHost = hosts_: (getUniqueEnabledHostEntry hosts_).value;
 
   mkWireGuardNetworks =
     {
@@ -40,28 +42,26 @@
     in
     let
 
-      enabledHost_ = getUniqueEnabledHost hosts_;
+      enabledHostEntry_ = getUniqueEnabledHostEntry hosts_;
+
+      enabledHost_ = enabledHostEntry_.value;
 
       wireguardHosts_ = (lib.filterAttrs (unused_name_: host_: host_.wireguard != null) hosts_);
 
       networks_ = (
-        lib.mapAttrs' (unused_name_: endpointHost_: {
-          name = builtins.toString endpointHost_.number;
-          value = {
-            name = wgNameRule_ endpointHost_.number;
-            nodes = (
-              lib.mapAttrs' (unused_name_: host_: {
-                name = builtins.toString host_.number;
-                value = {
-                  ip = wgIpRule_ endpointHost_.number host_.number;
-                  publicKey = host_.wireguard.publicKey;
-                  listenPort = host_.wireguard.listenPort;
-                  endpoint = host_.wireguard.endpoint;
-                };
-              }) wireguardHosts_
-            );
-          };
-        }) (lib.filterAttrs (unused_name_: host_: host_.wireguard.endpoint != null) wireguardHosts_)
+        lib.mapAttrs (_: endpointHost_: {
+          number = endpointHost_.number;
+          name = wgNameRule_ endpointHost_.number;
+          nodes = (
+            lib.mapAttrs (_: host_: {
+              number = host_.number;
+              ip = wgIpRule_ endpointHost_.number host_.number;
+              publicKey = host_.wireguard.publicKey;
+              listenPort = host_.wireguard.listenPort;
+              endpoint = host_.wireguard.endpoint;
+            }) wireguardHosts_
+          );
+        }) (lib.filterAttrs (_: host_: host_.wireguard.endpoint != null) wireguardHosts_)
       );
 
     in
@@ -76,8 +76,6 @@
       config = (
         lib.optionalAttrs (enabledHost_.wireguard != null) (
           let
-
-            enabledHostNumber_ = builtins.toString enabledHost_.number;
 
             wgConfigRule_ = self_: peers_: {
               ips = [ "${self_.ip}/24" ];
@@ -111,31 +109,33 @@
             };
 
             interfaceOf_ =
-              networkNumber_: network_:
+              networkName_: network_:
               let
 
-                selfNode_ = builtins.getAttr enabledHostNumber_ network_.nodes;
+                selfNode_ = builtins.getAttr enabledHostEntry_.name network_.nodes;
+
+                isHub_ = enabledHost_.number == network_.number;
 
                 peerNodes_ = (
-                  if enabledHostNumber_ == networkNumber_ then
-                    (lib.filterAttrs (hostNumber_: unused_node_: hostNumber_ != enabledHostNumber_) network_.nodes)
+                  if isHub_ then
+                    (lib.filterAttrs (_: node_: node_.number != enabledHost_.number) network_.nodes)
                   else
-                    { ${networkNumber_} = builtins.getAttr networkNumber_ network_.nodes; }
+                    { ${networkName_} = builtins.getAttr networkName_ network_.nodes; }
                 );
 
                 self_ = {
                   ip = selfNode_.ip;
 
-                  listenPort = (if enabledHostNumber_ == networkNumber_ then selfNode_.listenPort else null);
+                  listenPort = (if isHub_ then selfNode_.listenPort else null);
                 };
 
                 peers_ = (
-                  lib.mapAttrsToList (peerNumber_: peerNode_: {
+                  lib.mapAttrsToList (_: peerNode_: {
                     ip = peerNode_.ip;
 
                     publicKey = peerNode_.publicKey;
 
-                    endpoint = (if peerNumber_ == networkNumber_ then peerNode_.endpoint else null);
+                    endpoint = (if peerNode_.number == network_.number then peerNode_.endpoint else null);
                   }) peerNodes_
                 );
 
@@ -155,9 +155,9 @@
             wireguard = {
               enable = true;
               interfaces = (
-                lib.mapAttrs' (networkNumber_: network_: {
+                lib.mapAttrs' (networkName_: network_: {
                   name = network_.name;
-                  value = interfaceOf_ networkNumber_ network_;
+                  value = interfaceOf_ networkName_ network_;
                 }) networks_
               );
             };

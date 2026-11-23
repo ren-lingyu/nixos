@@ -246,10 +246,10 @@
                   };
                   workloads.wbo = {
                     enable = true;
-                    ip = { config, ... }: config.networking.wireguard.topology."3".nodes."2";
+                    ip = { config, ... }: config.networking.wireguard.topology.aliyun.nodes.thinkbook;
                     port = _: 18000;
-                    networkInterface = { config, ... }: config.networking.wireguard.topology."3".name;
-                    allowedSourceIp = { config, ... }: config.networking.wireguard.topology."3".nodes."3";
+                    networkInterface = { config, ... }: config.networking.wireguard.topology.aliyun.name;
+                    allowedSourceIp = { config, ... }: config.networking.wireguard.topology.aliyun.nodes.aliyun;
                   };
                   users = {
                     lingyu = {
@@ -341,9 +341,9 @@
                   };
                   workloads.caddy = {
                     enable = true;
-                    ip = { config, ... }: config.networking.wireguard.topology."3".nodes."2";
+                    ip = { config, ... }: config.networking.wireguard.topology.aliyun.nodes.thinkbook;
                     port = _: 18000;
-                    networkInterface = { config, ... }: config.networking.wireguard.topology."3".name;
+                    networkInterface = { config, ... }: config.networking.wireguard.topology.aliyun.name;
                   };
                   users = {
                     lingyu-minimal = {
