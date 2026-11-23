@@ -14,6 +14,10 @@ onedrive:
 deepseek:
   apiKey:
     pi: ENC[AES256_GCM,data:HVI/zBaG6mfpEd08uwd290LIDt7SHQuTZ5H2FLuB4aQwchY=,iv:h+LPijJoe5h9JbGXObtdz/TyQ2Lm89Zp+ycM0xGa5wE=,tag:SYSFkQG0PC4Wdw9d/E+eEw==,type:str]
+moonshot:
+  cn:
+    apiKey:
+      pi: ENC[AES256_GCM,data:4x3ZiPzoCTSNjSP1zbj7zxWzQybXVVSYvZjEWQZa8oiCmPDkO4RGFcq1r8omCQIlycSvAsW0AWR3B4OxxZM=,iv:+1bE0OeDe2Lv2u2k3LLQAf3+uvWNl8UQhnS/DVJJ/14=,tag:TS0QpM4l9FUn6dG0Py+f1w==,type:str]
 alibabacloud:
   oss:
     access_key_id: ENC[AES256_GCM,data:WZ9hze7CDeCbkpcPWgG4RKngjOTPGWbu,iv:4XFq5WQd9c98NUdtdEzmBPXzXmf4QjsRfdUXApgyBkQ=,tag:nQfl+BVVwtganOn3QkHeHQ==,type:str]
@@ -29,7 +33,7 @@ sops:
         a3eIK0PIBhWWHu3cMN9L1m93fJnfAjt9/98lLrANauMrFL3qeGVH1w==
         -----END AGE ENCRYPTED FILE-----
       recipient: age1kgwar87m34mfg5zhtywg42umlax77y28tvucu0wkdwrq870wdf9s782jqe
-  lastmodified: "2026-10-24T12:37:46Z"
-  mac: ENC[AES256_GCM,data:rLt0+psBHw50OpE8HsfyX+SCZz+3cRCU9KlwvQ7SthijAVAHZjLUWazaxvWPt9qAijzbriDL/mYGajo/nr8inTPZ8LQNrYN4k9BpYdAFpGgAqiPbKtWq5euKXFX5sZsA5aGAsUcR8CJRliOv+m2Fa0zjXxmlqDmIMf3YnhAYp0s=,iv:nRqTjlfYap4o3Y9EqHcFt1RYQm1LxEV6fkHi0uNctNM=,tag:PhOzieLSVDgVJNQc5r45NA==,type:str]
+  lastmodified: "2026-11-23T10:08:38Z"
+  mac: ENC[AES256_GCM,data:obYy6X7NCj6+yf6p3wjoz2aq+vnKfP1U5IDeJF/QcDS0wFtC/aiHWCWpD4HZvVZ3dqpbqbF4hlMEwd4am79rOoPJxr4Qteux9o4YQvdmbr2AUH9WB0sMLRrhCsjJqoLhWvKmquDGyc328wtTTZ49vd5+VZ2GuIv5hl0onU1GZ3w=,iv:e4T6hQsM29aWUV3Hk8v2tccBpoTkh9AQ4O1rPa6QWxU=,tag:NM0RZEb/I75CILRudH6Tpg==,type:str]
   unencrypted_suffix: _unencrypted
   version: 3.13.3
