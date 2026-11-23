@@ -33,7 +33,10 @@ in
   ];
 
   config = lib.mkIf cfg.enable {
-    home.packages = with pkgs; [ adwaita-icon-theme ];
+    home.packages = with pkgs; [
+      adwaita-icon-theme
+      wl-clipboard
+    ];
 
     xdg.portal = {
       enable = true;
