@@ -49,6 +49,11 @@
                 "deepseek" = {
                   "apiKey" = [ "pi" ];
                 };
+                "moonshot" = {
+                  "cn" = {
+                    "apiKey" = [ "pi" ];
+                  };
+                };
               };
             }
           ];
@@ -59,6 +64,10 @@
               deepseek = {
                 enable = true;
                 apiKey = config.sops.secrets."deepseek.apiKey.pi".path;
+              };
+              moonshot-cn = {
+                enable = true;
+                apiKey = config.sops.secrets."moonshot.cn.apiKey.pi".path;
               };
             };
           };
