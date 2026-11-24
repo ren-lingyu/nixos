@@ -24,6 +24,8 @@ The Configuration type nixosConfigurations explicitly accepts modules, llib and 
 
 ## Native Feature implementations
 
+The committed native contract exposes a default-off `features.<name>.enable` in each actual OS/HM implementation. Module imports make options available. Native enablement controls contributions independently in each scope. The current root Registry sets enable explicitly as part of delivery until the root construction model is revisited. The SOPS bridge ciphertext belongs to the native SOPS feature, while Agenix and Agenix-rekey remain root Share infrastructure. See [current.md](current.md#committed-phase-one-native-interfaces-and-sops-ownership) for the implementation and validation state.
+
 The child flake discovers and exports Feature entries as native `nixosModules.<name>` and `homeModules.<name>` modules. The path convention is `pkgs/modules/<name>/{os,hm}/default.nix`. The child composes its upstream Nixvim input with the local Editor implementation under `homeModules.editor`. The root Registry retains control of external integration, overlays, FP-to-native configuration mapping and UID allocation. Root Feature entry markers preserve discovery and availability. Agent and SOPS retain root HM compatibility declarations for User profile inputs. Native Feature modules declare their own required `features.<name>` options and accept actual package values. Shared Monitor, SOPS secret input and default-editor value types live in `pkgs/lib/` and enter the root type namespace through the root flake. Defaults and definition-presence semantics remain local to each option declaration.
 
 ## Users and interfaces
