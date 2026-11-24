@@ -4,13 +4,8 @@
   lib,
   ...
 }:
-let
-
-  cfg = config.modules.hosts.thinkbook;
-
-in
 {
-  config = lib.mkIf cfg.enable {
+  config = {
     environment.systemPackages = with pkgs; [ fbset ];
 
     systemd.services.fbset-xedrmfb = {

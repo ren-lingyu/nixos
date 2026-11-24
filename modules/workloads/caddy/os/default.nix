@@ -6,10 +6,17 @@
 }:
 let
 
-  cfg = config.modules.workloads.caddy;
+  cfg = config.workloads.caddy;
 
 in
 {
+  options.workloads.caddy = {
+    enable = lib.mkEnableOption "caddy workload";
+    ip = lib.mkOption { type = lib.types.nonEmptyStr; };
+    port = lib.mkOption { type = lib.types.port; };
+    networkInterface = lib.mkOption { type = lib.types.nonEmptyStr; };
+  };
+
   config = lib.mkIf cfg.enable {
     networking = {
       nftables = {

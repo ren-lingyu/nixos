@@ -1,21 +1,19 @@
 {
   config,
+  host,
   pkgs,
   lib,
   ...
 }:
-let
-
-  cfg = config.modules.hosts.aliyun;
-
-in
 {
   imports = [
     ./hardware-configuration.nix
     ./disk-config.nix
   ];
 
-  config = lib.mkIf cfg.enable {
+  config = {
+    nixpkgs.hostPlatform = "x86_64-linux";
+
     nix.settings = {
       trusted-users = [
         "@wheel"
@@ -60,8 +58,8 @@ in
             "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAILCnfaTNuw0Wxh4CfReEKqqU2rT8HqPG/M1HmiDwr0Ry Ren_Lingyu@outlook.com"
           ];
         };
-        "${builtins.toString cfg.users."1000"}" = {
-          uid = cfg.users."1000";
+        "${builtins.toString host.users."1000"}" = {
+          uid = host.users."1000";
           isNormalUser = true;
           extraGroups = [ "wheel" ];
           openssh.authorizedKeys.keys = config.users.users.root.openssh.authorizedKeys.keys;

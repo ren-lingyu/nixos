@@ -96,498 +96,276 @@
           ...
         }:
         {
-          imports = [ inputs.agenix-rekey.flakeModule ];
+          imports = [
+            inputs.agenix-rekey.flakeModule
+            ./modules
+          ];
 
-          options =
-            let
-              args_ = {
-                inherit llib;
-                modules = ./modules;
-              };
-            in
-            {
-              nixosBuilder = lib.mkOption {
-                type = llib.flakeParts.types.nixosBuilder;
-                readOnly = true;
-              };
-              moduleRegistry = lib.mkOption {
-                apply = (llib.flakeParts.mkValidatorApplications args_).moduleRegistry;
-                type = llib.flakeParts.types.moduleRegistry args_;
-                readOnly = true;
-              };
-              nixosConfigurations = lib.mkOption {
-                apply = (llib.flakeParts.mkValidatorApplications args_).nixosConfigurations config.moduleRegistry;
-                type = llib.flakeParts.types.nixosConfigurations {
-                  inherit (args_) modules llib;
-                  registry = config.moduleRegistry;
-                };
-                readOnly = true;
-              };
-            };
+          options = llib.flakeParts.mkOptions config;
 
           config = {
             debug = true;
 
             systems = [ "x86_64-linux" ];
 
-            nixosBuilder = {
+            nixosBuilderArgs = {
               nixosSystem = inputs.nixpkgs.lib.nixosSystem;
               homeManager = inputs.home-manager.nixosModules.home-manager;
               specialArgs = { inherit llib rootPath; };
-            };
-
-            moduleRegistry = {
-              share = {
-                nixosModules = [
+              baseModule = {
+                imports = [
                   inputs.agenix.nixosModules.default
                   inputs.agenix-rekey.nixosModules.default
                   inputs.local-nixpkgs.nixosModules.share
                 ];
-                nixpkgsOverlays = [ inputs.local-nixpkgs.overlays.share ];
-                homeModules = [ inputs.local-nixpkgs.homeModules.share ];
+                nixpkgs.overlays = [ inputs.local-nixpkgs.overlays.share ];
+                home-manager.sharedModules = [ inputs.local-nixpkgs.homeModules.share ];
               };
 
-              hosts = {
-                wsl = {
-                  nixosModules = [ inputs.nixos-wsl.nixosModules.default ];
-                };
-                thinkbook = {
-                  nixosModules = [
-                    inputs.nix-flatpak.nixosModules.nix-flatpak
-                    inputs.nixvirt.nixosModules.default
-                  ];
-                };
-                aliyun = {
-                  nixosModules = [ inputs.disko.nixosModules.disko ];
-                };
+              hostRegistry = {
+                thinkbook.module.imports = [
+                  inputs.nix-flatpak.nixosModules.nix-flatpak
+                  inputs.nixvirt.nixosModules.default
+                ];
+                aliyun.module.imports = [ inputs.disko.nixosModules.disko ];
+                wsl.module.imports = [ inputs.nixos-wsl.nixosModules.default ];
               };
 
-              features = {
-                agent = {
-                  nixosModules = [
-                    inputs.local-nixpkgs.nixosModules.agent
-                    { features.agent.enable = true; }
-                  ];
-                  homeModules = [
-                    inputs.local-nixpkgs.homeModules.agent
-                    ({ config, options, ... }: {
-                      features.agent.enable = true;
-                      features.agent.pi.providers = lib.mapAttrs (
-                        name: provider:
-                        let
-                          source = options.moduleInterfaces.features.agent.pi.providers.${name};
-                        in
-                        lib.optionalAttrs source.enable.isDefined { inherit (provider) enable; }
-                        // lib.optionalAttrs source.apiKey.isDefined { apiKeyFile = provider.apiKey; }
-                      ) config.moduleInterfaces.features.agent.pi.providers;
-                    })
-                  ];
-                };
-                diagnostics.homeModules = [
-                  inputs.local-nixpkgs.homeModules.diagnostics
-                  { features.diagnostics.enable = true; }
-                ];
-                editor = {
-                  nixosModules = [
-                    inputs.local-nixpkgs.nixosModules.editor
-                    { features.editor.enable = true; }
-                  ];
-                  homeModules = [
-                    inputs.local-nixpkgs.homeModules.editor
-                    ({ osConfig, ... }: {
-                      features.editor = {
-                        enable = true;
-                        inherit (osConfig.modules.features.editor)
-                          defaultEditor
-                          vim
-                          neovim
-                          emacs
-                          lem
-                          ;
-                      };
-                    })
-                  ];
-                };
-                file-manager = {
-                  nixosModules = [
-                    inputs.local-nixpkgs.nixosModules.file-manager
-                    ({ config, ... }: {
-                      features.file-manager.enable = true;
-                      features.file-manager.fileChooser = config.modules.features.file-manager.fileChooser;
-                    })
-                  ];
-                  homeModules = [
-                    inputs.local-nixpkgs.homeModules.file-manager
-                    ({ osConfig, ... }: {
-                      features.file-manager = {
-                        enable = true;
-                        inherit (osConfig.modules.features.file-manager) fileChooser;
-                        wayfile.enable = osConfig.modules.features.niri.enable;
-                      };
-                    })
-                  ];
-                };
-                font = {
-                  nixosModules = [
-                    inputs.local-nixpkgs.nixosModules.font
-                    { features.font.enable = true; }
-                  ];
-                  homeModules = [
-                    inputs.local-nixpkgs.homeModules.font
-                    { features.font.enable = true; }
-                  ];
-                };
-                greeter.nixosModules = [
-                  inputs.local-nixpkgs.nixosModules.greeter
-                  (
-                    { config, ... }:
-                    let
-                      host = llib.hosts.getUniqueEnabledHost config.modules.hosts;
-                      defaults = lib.filter (monitor: monitor.role == "default") (lib.attrValues host.monitors);
-                    in
-                    {
-                      features.greeter = {
-                        enable = true;
-                        monitorName = (builtins.head defaults).name;
-                        sessionPackages = lib.mkMerge [
-                          (lib.mkIf (config.features.niri.enable or false) (
-                            lib.mkBefore [ config.features.niri.sessionPackage ]
-                          ))
-                          (lib.mkIf (config.features.x11-session.enable or false) [
-                            config.features.x11-session.sessionPackage
-                          ])
-                        ];
-                      };
-                    }
-                  )
-                ];
-                media = {
-                  nixosModules = [
-                    inputs.local-nixpkgs.nixosModules.media
-                    { features.media.enable = true; }
-                  ];
-                  homeModules = [
-                    inputs.local-nixpkgs.homeModules.media
-                    { features.media.enable = true; }
-                  ];
-                };
-                niri = {
-                  nixosModules = [
-                    inputs.local-nixpkgs.nixosModules.niri
-                    ({ config, ... }: {
-                      features.niri = {
-                        enable = true;
-                        inherit (config.modules.features.niri) noctalia;
-                      };
-                    })
-                  ];
-                  homeModules = [
-                    inputs.local-nixpkgs.homeModules.niri
-                    ({ osConfig, ... }: {
-                      features.niri = {
-                        enable = true;
-                        inherit (osConfig.modules.features.niri) noctalia waybar;
-                        inherit (llib.hosts.getUniqueEnabledHost osConfig.modules.hosts) monitors;
-                      };
-                    })
-                  ];
-                };
-                office.homeModules = [
-                  inputs.local-nixpkgs.homeModules.office
-                  { features.office.enable = true; }
-                ];
-                proxy.nixosModules = [
-                  inputs.local-nixpkgs.nixosModules.proxy
-                  ({ config, ... }: {
-                    features.proxy = {
-                      enable = true;
-                      inherit (config.modules.features.proxy)
-                        clash-verge
-                        throne
-                        mihomo
-                        v2raya
-                        ;
-                    };
-                  })
-                ];
-                shell = {
-                  nixosModules = [
-                    inputs.local-nixpkgs.nixosModules.shell
-                    { features.shell.enable = true; }
-                  ];
-                  homeModules = [
-                    inputs.local-nixpkgs.homeModules.shell
-                    { features.shell.enable = true; }
-                  ];
-                };
-                sops = {
-                  nixosModules = [
-                    inputs.local-nixpkgs.nixosModules.sops
-                    ({ config, ... }: {
-                      features.sops = {
-                        enable = true;
-                        authorizedUids = config.modules.features.sops.allowUidList;
-                      };
-                    })
-                  ];
-                  homeModules = [
-                    inputs.local-nixpkgs.homeModules.sops
-                    (
-                      {
-                        config,
-                        options,
-                        osConfig,
-                        ...
-                      }:
-                      let
-                        source = options.moduleInterfaces.features.sops;
-                        values = config.moduleInterfaces.features.sops;
-                      in
-                      {
-                        features.sops = {
-                          enable = true;
-                          ageKeyPath = osConfig.age.secrets."sops.hm".path;
-                        }
-                        // lib.optionalAttrs source.secretsInput.isDefined { inherit (values) secretsInput; }
-                        // lib.optionalAttrs source.defaultSopsFormat.isDefined { inherit (values) defaultSopsFormat; }
-                        // lib.optionalAttrs source.defaultSopsFile.isDefined { inherit (values) defaultSopsFile; };
-                      }
-                    )
-                  ];
-                };
-                terminal.homeModules = [
-                  inputs.local-nixpkgs.homeModules.terminal
-                  { features.terminal.enable = true; }
-                ];
-                texlive.nixosModules = [
-                  inputs.local-nixpkgs.nixosModules.texlive
-                  { features.texlive.enable = true; }
-                ];
-                x11-session = {
-                  nixosModules = [
-                    inputs.local-nixpkgs.nixosModules.x11-session
-                    { features.x11-session.enable = true; }
-                  ];
-                  homeModules = [
-                    inputs.local-nixpkgs.homeModules.x11-session
-                    { features.x11-session.enable = true; }
-                  ];
-                };
+              featureRegistry = {
+                os = removeAttrs inputs.local-nixpkgs.nixosModules [ "share" ];
+                hm = removeAttrs inputs.local-nixpkgs.homeModules [ "share" ];
               };
             };
 
             nixosConfigurations = {
               nixos = {
-                system = "x86_64-linux";
-                modules = {
-                  share = {
+                host = config.nixosBuilderArgs.hostRegistry.thinkbook;
+
+                features = {
+                  agent.enable = true;
+                  editor.enable = true;
+                  file-manager = {
                     enable = true;
-                    allowUnfreePredicateList = [
-                      "github-copilot-cli"
-                      "microsoft-edge"
-                      "feishu"
-                      "zoom"
-                      "rar"
-                      "unrar"
-                    ];
-                    createXdgUserDirectories = true;
+                    module = {
+                      features.file-manager.fileChooser.enable = true;
+                    };
                   };
+                  font.enable = true;
+                  greeter.enable = true;
+                  media.enable = true;
+                  niri = {
+                    enable = true;
+                    module = {
+                      features.niri.noctalia.enable = true;
+                    };
+                  };
+                  proxy = {
+                    enable = true;
+                    module = {
+                      features.proxy = {
+                        clash-verge.enable = true;
+                        throne.enable = true;
+                      };
+                    };
+                  };
+                  shell.enable = true;
+                  sops.enable = true;
+                  texlive.enable = true;
+                  x11-session.enable = true;
+                };
+
+                workloads.wbo = {
+                  enable = true;
+                  module.workloads.wbo = {
+                    ip = config.nixosBuilderArgs.hostTopology.aliyun.nodes.thinkbook;
+                    port = 18000;
+                    networkInterface = config.nixosBuilderArgs.hostTopology.aliyun.name;
+                    allowedSourceIp = config.nixosBuilderArgs.hostTopology.aliyun.nodes.aliyun;
+                  };
+                };
+
+                users."1000" = {
+                  username = "lingyu";
+                  profile = config.nixosBuilderArgs.userRegistry.lingyu;
+
                   features = {
                     agent.enable = true;
                     diagnostics.enable = true;
                     editor = {
                       enable = true;
-                      defaultEditor = "neovim";
-                      vim.enable = false;
-                      neovim.enable = true;
-                      emacs = {
-                        enable = true;
-                        programs.package = { pkgs, ... }: pkgs.emacs-pgtk;
-                        services.package = { pkgs, ... }: pkgs.emarccs-pgtk;
-                      };
-                      lem = {
-                        enable = true;
-                        package = { pkgs, ... }: pkgs.lem-webview;
+                      module = { pkgs, ... }: {
+                        features.editor = {
+                          defaultEditor = "neovim";
+                          neovim.enable = true;
+                          emacs.enable = true;
+                          emacs.programs.package = pkgs.emacs-pgtk;
+                          emacs.services.package = pkgs.emarccs-pgtk;
+                          lem = {
+                            enable = true;
+                            package = pkgs.lem-webview;
+                          };
+                        };
                       };
                     };
                     file-manager.enable = true;
                     font.enable = true;
-                    greeter.enable = true;
                     media.enable = true;
                     niri = {
                       enable = true;
-                      noctalia.enable = true;
-                      waybar.enable = false;
+                      module = {
+                        features.niri.waybar.enable = false;
+                      };
                     };
                     office.enable = true;
-                    proxy = {
-                      enable = true;
-                      clash-verge.enable = true;
-                      throne.enable = true;
-                    };
-                    sops.enable = true;
                     shell.enable = true;
+                    sops.enable = true;
                     terminal.enable = true;
-                    texlive.enable = true;
                     x11-session.enable = true;
-                  };
-                  hosts = {
-                    thinkbook = {
-                      enable = true;
-                      flatpak.enable = true;
-                    };
-                  };
-                  workloads.wbo = {
-                    enable = true;
-                    ip = { config, ... }: config.networking.wireguard.topology.aliyun.nodes.thinkbook;
-                    port = _: 18000;
-                    networkInterface = { config, ... }: config.networking.wireguard.topology.aliyun.name;
-                    allowedSourceIp = { config, ... }: config.networking.wireguard.topology.aliyun.nodes.aliyun;
-                  };
-                  users = {
-                    lingyu = {
-                      enable = true;
-                      username = "lingyu";
-                      homeDirectory = "/home/lingyu";
-                      uid = config.moduleRegistry.hosts.thinkbook.metadata.users."1000";
-                    };
                   };
                 };
               };
 
               nixos-matebook = {
-                system = "x86_64-linux";
-                modules = {
-                  share = {
+                host = config.nixosBuilderArgs.hostRegistry.matebook;
+
+                features = {
+                  agent.enable = true;
+                  editor.enable = true;
+                  file-manager = {
                     enable = true;
-                    allowUnfreePredicateList = [ "github-copilot-cli" ];
-                    createXdgUserDirectories = true;
+                    module = {
+                      features.file-manager.fileChooser.enable = true;
+                    };
                   };
+                  font.enable = true;
+                  greeter.enable = true;
+                  media.enable = true;
+                  niri = {
+                    enable = true;
+                    module = {
+                      features.niri.noctalia.enable = true;
+                    };
+                  };
+                  proxy = {
+                    enable = true;
+                    module = {
+                      features.proxy = {
+                        clash-verge.enable = true;
+                      };
+                    };
+                  };
+                  shell.enable = true;
+                  sops.enable = true;
+                  texlive.enable = true;
+                };
+
+                users."1000" = {
+                  username = "lingyu";
+                  profile = config.nixosBuilderArgs.userRegistry.lingyu;
+
                   features = {
                     agent.enable = true;
                     diagnostics.enable = true;
                     editor = {
                       enable = true;
-                      defaultEditor = "neovim";
-                      vim.enable = false;
-                      neovim.enable = true;
-                      emacs = {
-                        enable = true;
-                        programs.package = { pkgs, ... }: pkgs.emacs-pgtk;
-                        services.package = { pkgs, ... }: pkgs.emarccs-pgtk;
-                      };
-                      lem = {
-                        enable = true;
-                        package = { pkgs, ... }: pkgs.lem-webview;
+                      module = { pkgs, ... }: {
+                        features.editor = {
+                          defaultEditor = "neovim";
+                          neovim.enable = true;
+                          emacs.enable = true;
+                          emacs.programs.package = pkgs.emacs-pgtk;
+                          emacs.services.package = pkgs.emarccs-pgtk;
+                          lem = {
+                            enable = true;
+                            package = pkgs.lem-webview;
+                          };
+                        };
                       };
                     };
                     file-manager.enable = true;
                     font.enable = true;
-                    greeter.enable = true;
                     media.enable = true;
                     niri = {
                       enable = true;
-                      noctalia.enable = true;
-                      waybar.enable = false;
+                      module = {
+                        features.niri.waybar.enable = false;
+                      };
                     };
-                    proxy = {
-                      enable = true;
-                      clash-verge.enable = true;
-                      throne.enable = false;
-                    };
-                    sops.enable = true;
                     shell.enable = true;
+                    sops.enable = true;
                     terminal.enable = true;
-                    texlive.enable = true;
-                  };
-                  hosts = {
-                    matebook = {
-                      enable = true;
-                    };
-                  };
-                  users = {
-                    lingyu = {
-                      enable = true;
-                      username = "lingyu";
-                      homeDirectory = "/home/lingyu";
-                      uid = config.moduleRegistry.hosts.matebook.metadata.users."1000";
-                    };
                   };
                 };
               };
 
               nixos-server = {
-                system = "x86_64-linux";
-                modules = {
-                  share = {
-                    enable = true;
-                    createXdgUserDirectories = false;
+                host = config.nixosBuilderArgs.hostRegistry.aliyun;
+
+                features = {
+                  shell.enable = true;
+                  sops.enable = true;
+                };
+
+                workloads.caddy = {
+                  enable = true;
+                  module.workloads.caddy = {
+                    ip = config.nixosBuilderArgs.hostTopology.aliyun.nodes.thinkbook;
+                    port = 18000;
+                    networkInterface = config.nixosBuilderArgs.hostTopology.aliyun.name;
                   };
+                };
+
+                users."1000" = {
+                  username = "lingyu";
+                  profile = config.nixosBuilderArgs.userRegistry.lingyu-minimal;
+
                   features = {
                     shell.enable = true;
                     sops.enable = true;
-                  };
-                  hosts = {
-                    aliyun = {
-                      enable = true;
-                    };
-                  };
-                  workloads.caddy = {
-                    enable = true;
-                    ip = { config, ... }: config.networking.wireguard.topology.aliyun.nodes.thinkbook;
-                    port = _: 18000;
-                    networkInterface = { config, ... }: config.networking.wireguard.topology.aliyun.name;
-                  };
-                  users = {
-                    lingyu-minimal = {
-                      enable = true;
-                      username = "lingyu";
-                      homeDirectory = "/home/lingyu";
-                      uid = config.moduleRegistry.hosts.aliyun.metadata.users."1000";
-                    };
                   };
                 };
               };
 
               nixos-wsl = {
-                system = "x86_64-linux";
-                modules = {
-                  share = {
+                host = config.nixosBuilderArgs.hostRegistry.wsl;
+
+                features = {
+                  agent.enable = true;
+                  editor.enable = true;
+                  file-manager = {
                     enable = true;
-                    allowUnfreePredicateList = [ "github-copilot-cli" ];
-                    createXdgUserDirectories = false;
+                    module = {
+                      features.file-manager.fileChooser.enable = true;
+                    };
                   };
+                  font.enable = true;
+                  shell.enable = true;
+                  sops.enable = true;
+                  texlive.enable = true;
+                };
+
+                users."1000" = {
+                  username = "lingyu";
+                  profile = config.nixosBuilderArgs.userRegistry.lingyu;
+
                   features = {
                     agent.enable = true;
                     diagnostics.enable = true;
                     editor = {
                       enable = true;
-                      defaultEditor = "neovim";
-                      vim.enable = false;
-                      neovim.enable = true;
-                      emacs.enable = true;
+                      module = { pkgs, ... }: {
+                        features.editor = {
+                          defaultEditor = "neovim";
+                          neovim.enable = true;
+                          emacs.enable = true;
+                        };
+                      };
                     };
                     file-manager.enable = true;
                     font.enable = true;
-                    media.enable = false;
-                    office.enable = false;
-                    sops.enable = true;
                     shell.enable = true;
+                    sops.enable = true;
                     terminal.enable = true;
-                    texlive.enable = true;
-                  };
-                  hosts = {
-                    wsl = {
-                      enable = true;
-                    };
-                  };
-                  users = {
-                    lingyu = {
-                      enable = true;
-                      username = "lingyu";
-                      homeDirectory = "/home/lingyu";
-                      uid = config.moduleRegistry.hosts.wsl.metadata.users."1000";
-                    };
                   };
                 };
               };
@@ -595,9 +373,7 @@
 
             flake = {
               nixosConfigurations = llib.flakeParts.mkNixosConfigurations {
-                modules = ./modules;
-                builder = config.nixosBuilder;
-                registry = config.moduleRegistry;
+                builderArgs = config.nixosBuilderArgs;
                 configurations = config.nixosConfigurations;
               };
             };

@@ -6,8 +6,6 @@
 }:
 let
 
-  cfg = config.modules.hosts.thinkbook;
-
   vm = rec {
     media = {
       directory = "/var/lib/libvirt/boot";
@@ -79,7 +77,7 @@ let
 
 in
 {
-  config = lib.mkIf cfg.enable {
+  config = {
     environment.systemPackages = with pkgs; [
       freerdp
       virt-viewer

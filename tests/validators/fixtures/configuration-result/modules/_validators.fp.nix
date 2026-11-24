@@ -1,1 +1,0 @@
-{ path }: { configuration = _: "wrong"; }

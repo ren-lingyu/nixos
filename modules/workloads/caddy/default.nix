@@ -1,0 +1,1 @@
+{ nixosBuilderArgs.workloadRegistry.caddy = ./os; }

@@ -1,1 +1,0 @@
-{ path }: { typo = _: true; }

@@ -3,15 +3,11 @@
 # https://search.nixos.org/options and in the NixOS manual (`nixos-help`).
 {
   config,
+  host,
   pkgs,
   lib,
   ...
 }:
-let
-
-  cfg = config.modules.hosts.thinkbook;
-
-in
 {
   imports = [
     ./hardware-configuration.nix
@@ -21,7 +17,9 @@ in
     ./vm
   ];
 
-  config = lib.mkIf cfg.enable {
+  config = {
+    nixpkgs.hostPlatform = "x86_64-linux";
+
     nix.settings = {
       trusted-users = [
         "@wheel"
@@ -108,8 +106,8 @@ in
           name = "root";
           hashedPassword = "$y$j9T$I75rvRCS.FR8zj/o3ivGb1$lteEgidoSR8AbjTXhxfemLeiXFIQsxUuUmSl1f0Ni10";
         };
-        "${builtins.toString cfg.users."1000"}" = {
-          uid = cfg.users."1000";
+        "${builtins.toString host.users."1000"}" = {
+          uid = host.users."1000";
           isNormalUser = true;
           hashedPassword = "$y$j9T$HZvnP.0ZR5uBiDAviT9xA.$MSExGgePZwjIDZq2n3fOUGGguWKEgvjuIKImW4uf7p4";
           linger = true;
@@ -144,7 +142,7 @@ in
     };
 
     home-manager.users = {
-      "${builtins.toString cfg.users."1000"}" = {
+      "${builtins.toString host.users."1000"}" = {
         xdg.configFile = {
           "freerdp/sdl-freerdp.json" = {
             enable = config.virtualisation.libvirtd.enable;

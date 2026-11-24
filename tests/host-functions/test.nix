@@ -6,26 +6,6 @@
 }:
 let
 
-  hosts_ = {
-    disabled = {
-      enable = false;
-      value = "disabled";
-    };
-    enabled = {
-      enable = true;
-      value = "enabled";
-    };
-  };
-
-  noEnabledHosts_ = {
-    disabled.enable = false;
-  };
-
-  multipleEnabledHosts_ = {
-    first.enable = true;
-    second.enable = true;
-  };
-
   wireguardHosts_ = {
     aliyun = {
       number = 3;
@@ -83,7 +63,8 @@ let
   mkNetworks_ =
     registry: enabledHostName:
     hosts.mkWireGuardNetworks {
-      registry = builtins.mapAttrs (name: host: host // { enable = name == enabledHostName; }) registry;
+      inherit registry;
+      hostName = enabledHostName;
       privateKeyFile = "/run/wireguard-key";
       wgIpRule = hub: node: "10.100.${builtins.toString hub}.${builtins.toString node}";
       wgSubnetRule = hub: "10.100.${builtins.toString hub}.0/24";
@@ -118,12 +99,15 @@ let
   evalSshModule_ =
     enabledHostName_:
     (lib.evalModules {
-      specialArgs.llib.hosts = hosts;
+      specialArgs = {
+        llib.hosts = hosts;
+        host = sshRegistry_.${enabledHostName_};
+        hostRegistry = sshRegistry_;
+      };
       modules = [
-        (modules + "/hosts/ssh-targets.nix")
+        (modules + "/base/os/ssh-targets.nix")
         {
           options = {
-            modules.hosts = lib.mkOption { type = lib.types.attrsOf lib.types.anything; };
             networking.wireguard.topology = lib.mkOption { type = lib.types.attrsOf lib.types.anything; };
             programs.ssh.hosts = lib.mkOption {
               type = lib.types.attrsOf lib.types.anything;
@@ -135,9 +119,6 @@ let
             };
           };
           config = {
-            modules.hosts = lib.mapAttrs (
-              name_: host_: host_ // { enable = name_ == enabledHostName_; }
-            ) sshRegistry_;
             networking.wireguard.topology = topology_;
           };
         }
@@ -177,13 +158,8 @@ let
   };
 
   checks_ = [
-    ((hosts.getUniqueEnabledHostEntry hosts_).name == "enabled")
-    ((hosts.getUniqueEnabledHostEntry hosts_).value.value == "enabled")
-    ((hosts.getUniqueEnabledHost hosts_).value == "enabled")
-    (!(builtins.tryEval (hosts.getUniqueEnabledHost noEnabledHosts_)).success)
-    (!(builtins.tryEval (hosts.getUniqueEnabledHost multipleEnabledHosts_)).success)
-    (!(builtins.tryEval (hosts.getUniqueEnabledHostEntry noEnabledHosts_)).success)
-    (!(builtins.tryEval (hosts.getUniqueEnabledHostEntry multipleEnabledHosts_)).success)
+    (hosts.mkWireGuardTopology { registry = wireguardHosts_; } == topology_)
+    ((mkNetworks_ wireguardHosts_ "excluded").config == { })
 
     (
       topology_ == {

@@ -4,13 +4,8 @@
   lib,
   ...
 }:
-let
-
-  cfg = config.modules.hosts.aliyun;
-
-in
 {
-  config = lib.mkIf cfg.enable {
+  config = {
     disko.devices.disk = {
       system = {
         type = "disk";

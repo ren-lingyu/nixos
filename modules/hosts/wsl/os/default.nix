@@ -7,22 +7,20 @@
 
 {
   config,
+  host,
   pkgs,
   lib,
   ...
 }:
-let
-
-  cfg = config.modules.hosts.wsl;
-
-in
 {
   # imports = [
   #   # include NixOS-WSL modules
   #   <nixos-wsl/modules>
   # ];
 
-  config = lib.mkIf cfg.enable {
+  config = {
+    nixpkgs.hostPlatform = "x86_64-linux";
+
     nix.settings = {
       trusted-users = [
         "@wheel"
@@ -48,7 +46,7 @@ in
 
     wsl = {
       enable = true;
-      defaultUser = "${builtins.toString cfg.users."1000"}";
+      defaultUser = "${builtins.toString host.users."1000"}";
       interop = {
         includePath = false;
         register = true;
@@ -67,8 +65,8 @@ in
     users = {
       groups.docker = { };
       users = {
-        "${builtins.toString cfg.users."1000"}" = {
-          uid = cfg.users."1000";
+        "${builtins.toString host.users."1000"}" = {
+          uid = host.users."1000";
           isNormalUser = true;
           linger = true;
           extraGroups = [
@@ -237,7 +235,7 @@ in
         "L+ %t/wayland-0 - - - - ${config.wsl.wslConf.automount.root}/wslg/runtime-dir/wayland-0"
         "L+ %t/wayland-0.lock - - - - ${config.wsl.wslConf.automount.root}/wslg/runtime-dir/wayland-0.lock"
         "L+ ${
-          config.users.users."${builtins.toString cfg.users."1000"}".home
+          config.users.users."${builtins.toString host.users."1000"}".home
         }/ren - - - - ${config.wsl.wslConf.automount.root}/c/Users/Lingyu/Ren"
       ];
     };

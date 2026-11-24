@@ -8,15 +8,10 @@
   modulesPath,
   ...
 }:
-let
-
-  cfg = config.modules.hosts.aliyun;
-
-in
 {
   imports = [ (modulesPath + "/profiles/qemu-guest.nix") ];
 
-  config = lib.mkIf cfg.enable {
+  config = {
     boot.initrd.availableKernelModules = [
       "ata_piix"
       "uhci_hcd"

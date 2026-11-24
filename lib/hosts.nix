@@ -1,27 +1,4 @@
 { lib }: rec {
-  getUniqueEnabledHostEntry =
-    hosts_:
-    let
-      enabledHostEntries_ = (
-        builtins.filter (hostEntry_: (hostEntry_.value.enable or false) == true) (
-          lib.mapAttrsToList (name_: value_: {
-            name = name_;
-            value = value_;
-          }) hosts_
-        )
-      );
-    in
-    (
-      if (builtins.length enabledHostEntries_) == 1 then
-        builtins.head enabledHostEntries_
-      else
-        builtins.throw "Exactly one enabled host is required. Enabled hosts: ${
-          builtins.concatStringsSep ", " (builtins.map (hostEntry_: hostEntry_.name) enabledHostEntries_)
-        }."
-    );
-
-  getUniqueEnabledHost = hosts_: (getUniqueEnabledHostEntry hosts_).value;
-
   mkWireGuardSshTargets =
     {
       registry,
@@ -76,44 +53,31 @@
       );
     };
 
-  mkWireGuardNetworks =
+  wireguardRules = {
+    wgIpRule = hub: node: "10.100.${toString hub}.${toString node}";
+    wgSubnetRule = hub: "10.100.${toString hub}.0/24";
+    wgNameRule = hub: "wg${toString hub}";
+  };
+
+  mkWireGuardNetworkData =
     {
       registry,
-      privateKeyFile,
-      wgIpRule,
-      wgSubnetRule,
-      wgNameRule,
+      wgIpRule ? wireguardRules.wgIpRule,
+      wgSubnetRule ? wireguardRules.wgSubnetRule,
+      wgNameRule ? wireguardRules.wgNameRule,
     }:
     let
-
-      hosts_ = registry;
-
-      privateKeyFile_ = privateKeyFile;
-
-      wgIpRule_ = wgIpRule;
-
-      wgSubnetRule_ = wgSubnetRule;
-
-      wgNameRule_ = wgNameRule;
-
-    in
-    let
-
-      enabledHostEntry_ = getUniqueEnabledHostEntry hosts_;
-
-      enabledHost_ = enabledHostEntry_.value;
-
-      wireguardHosts_ = (lib.filterAttrs (unused_name_: host_: host_.wireguard != null) hosts_);
+      wireguardHosts_ = (lib.filterAttrs (unused_name_: host_: host_.wireguard != null) registry);
 
       networks_ = (
         lib.mapAttrs (_: endpointHost_: {
           number = endpointHost_.number;
-          name = wgNameRule_ endpointHost_.number;
-          subnet = wgSubnetRule_ endpointHost_.number;
+          name = wgNameRule endpointHost_.number;
+          subnet = wgSubnetRule endpointHost_.number;
           nodes = (
             lib.mapAttrs (_: host_: {
               number = host_.number;
-              ip = wgIpRule_ endpointHost_.number host_.number;
+              ip = wgIpRule endpointHost_.number host_.number;
               publicKey = host_.wireguard.publicKey;
               listenPort = host_.wireguard.listenPort;
               endpoint = host_.wireguard.endpoint;
@@ -123,14 +87,38 @@
       );
 
     in
+    networks_;
+
+  mkWireGuardTopology =
+    args:
+    lib.mapAttrs (_: network: {
+      inherit (network) name subnet;
+      nodes = lib.mapAttrs (_: node: node.ip) network.nodes;
+    }) (mkWireGuardNetworkData args);
+
+  mkWireGuardNetworks =
     {
-      topology = (
-        lib.mapAttrs (unused_networkNumber_: network_: {
-          name = network_.name;
-          subnet = network_.subnet;
-          nodes = (lib.mapAttrs (unused_hostNumber_: node_: node_.ip) network_.nodes);
-        }) networks_
-      );
+      registry,
+      hostName,
+      privateKeyFile,
+      wgIpRule ? wireguardRules.wgIpRule,
+      wgSubnetRule ? wireguardRules.wgSubnetRule,
+      wgNameRule ? wireguardRules.wgNameRule,
+    }:
+    let
+      enabledHost_ = registry.${hostName};
+      networkArgs = {
+        inherit
+          registry
+          wgIpRule
+          wgSubnetRule
+          wgNameRule
+          ;
+      };
+      networks_ = mkWireGuardNetworkData networkArgs;
+    in
+    {
+      topology = mkWireGuardTopology networkArgs;
 
       config = (
         lib.optionalAttrs (enabledHost_.wireguard != null) (
@@ -179,7 +167,7 @@
               networkName_: network_:
               let
 
-                selfNode_ = builtins.getAttr enabledHostEntry_.name network_.nodes;
+                selfNode_ = builtins.getAttr hostName network_.nodes;
 
                 isHub_ = enabledHost_.number == network_.number;
 
@@ -211,7 +199,7 @@
               (lib.mergeAttrsList [
                 ({
                   type = "wireguard";
-                  privateKeyFile = privateKeyFile_;
+                  privateKeyFile = privateKeyFile;
                   generatePrivateKeyFile = false;
                   allowedIPsAsRoutes = isHub_;
                 })

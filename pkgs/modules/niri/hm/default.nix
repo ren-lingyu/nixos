@@ -47,6 +47,10 @@ in
   config = lib.mkIf cfg.enable (
     lib.mkMerge [
       {
+        features.niri.noctalia.enable = lib.mkDefault (
+          (osConfig.features.niri.enable or false) && (osConfig.features.niri.noctalia.enable or false)
+        );
+
         assertions = [
           {
             assertion = systemPackage != null;

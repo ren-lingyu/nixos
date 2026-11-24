@@ -3,10 +3,11 @@
   pkgs,
   lib,
   ...
-}:
+}@args:
 let
 
   cfg = config.features.file-manager;
+  osConfig = args.osConfig or { };
 
 in
 {
@@ -17,6 +18,14 @@ in
   };
 
   config = lib.mkIf config.features.file-manager.enable {
+    features.file-manager = {
+      fileChooser.enable = lib.mkDefault (
+        (osConfig.features.file-manager.enable or false)
+        && (osConfig.features.file-manager.fileChooser.enable or false)
+      );
+      wayfile.enable = lib.mkDefault (config.features.niri.enable or false);
+    };
+
     assertions = [
       {
         assertion = (

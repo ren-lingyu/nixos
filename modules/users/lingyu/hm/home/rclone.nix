@@ -1,6 +1,5 @@
 {
   config,
-  osConfig,
   pkgs,
   lib,
   ...
@@ -10,7 +9,7 @@
     programs.rclone = {
       enable = true;
       package = pkgs.rclone;
-      remotes = lib.mkIf osConfig.modules.features.sops.enable {
+      remotes = lib.mkIf (config.features.sops.enable or false) {
         "Nutstore" = {
           config = {
             type = "webdav";

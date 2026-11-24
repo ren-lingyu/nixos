@@ -8,18 +8,13 @@
   modulesPath,
   ...
 }:
-let
-
-  cfg = config.modules.hosts.thinkbook;
-
-in
 {
   imports = [
     (modulesPath + "/hardware/cpu/intel-npu.nix")
     (modulesPath + "/installer/scan/not-detected.nix")
   ];
 
-  config = lib.mkIf cfg.enable {
+  config = {
     boot.initrd.availableKernelModules = [
       "xhci_pci"
       "thunderbolt"

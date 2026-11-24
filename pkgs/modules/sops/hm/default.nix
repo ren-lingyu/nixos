@@ -1,7 +1,8 @@
-{ config, lib, ... }:
+{ config, lib, ... }@args:
 let
 
   cfg = config.features.sops;
+  osConfig = args.osConfig or { };
   secrets = import ./secrets.nix { inherit config; };
   hasDefaults = cfg.defaultSopsFormat != null && cfg.defaultSopsFile != null;
 
@@ -32,6 +33,10 @@ in
   };
 
   config = lib.mkIf config.features.sops.enable {
+    features.sops.ageKeyPath = lib.mkIf (osConfig.features.sops.enable or false) (
+      lib.mkDefault osConfig.age.secrets."sops.hm".path
+    );
+
     home.sessionVariables = {
       SOPS_AGE_KEY_FILE = cfg.ageKeyPath;
     };

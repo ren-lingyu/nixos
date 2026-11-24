@@ -5,92 +5,77 @@
 这是一个基于 Flake 的 NixOS 配置仓库.
 
 * 架构约定
-=flake.nix= 是最终组装层, 通过 =personal-nixpkgs.lib.mkFlake= 组织 flake-parts 配置, 声明每台系统, 管理系统级 flake inputs, 导出本地软件包, 并接入项目级 NixOS/Home Manager modules 和 overlays. =pkgs/= 是独立的 package 子项目, 管理应用及 Feature 专用 inputs, 包定义和集成输出, 根 =flake.lock= 记录系统消费的依赖版本. 具体配置由四类平级 profile 提供:
+=flake.nix= 是最终组装层, 通过 =personal-nixpkgs.lib.mkFlake= 组织统一的 flake-parts (FP) option space, 声明每台系统的选择, 接入外部 flake inputs. 本地 FP modules 由 =modules/default.nix= 逐层显式组合并登记对象. =pkgs/= 是独立的 package 子项目, 管理应用及 Feature 专用 inputs, 包定义和原生模块输出. 根 =flake.lock= 记录系统消费的依赖版本.
 
-- =modules/hosts/= 描述主机身份, 硬件和主机拥有的资源. host 只通过 UID registry 声明可管理的用户, 不声明用户名或 user profile.
-- =modules/users/= 描述 user profile 和个人 Home Manager 配置. user 不决定自己属于哪台 host.
-- =modules/features/= 描述可复用的功能实现, 可同时提供 OS 和 HM 模块.
-- =modules/workloads/= 描述按 host 需要启用的服务型 workload.
-
-=modules/share/= 提供公共系统与用户配置, 与其他模块一样由最终配置显式启用. profile 选择, UID 绑定与外部依赖注入由 =flake.nix= 负责; 模块检查自己的依赖是否满足, 不替最终配置启用其他 profile. =lib/= 提供公共类型, 模块发现, 配置适配和系统构造函数, 在模块参数中名为 =llib=.
+- =modules/hosts/<name>/default.nix= 和 =modules/users/<name>/default.nix= 是顶层 FP modules, 分别贡献 Host/User Registry 中的领域数据及 =module= option. =os/= 和 =hm/= 则是对应原生 module system 的入口. Host 管理主机资源和 UID registry, User profile 描述个人环境, Account 在具体 System configuration 中绑定 UID 与登录身份.
+- Feature implementations 由 =pkgs/flake.nix= 显式导出. OS 和 HM 各自选择, 不再通过 OS Feature 的全局用户列表分配. Workload 暂时保留在 =modules/workloads/=, 由具体系统选择并配置.
+- =baseModule= 提供始终导入的原生基础配置, 包括 =modules/base/= 中的本地基础模块和主机公共接线. Home Manager 是明确的构造参数, 其公共 HM modules 通过 =home-manager.sharedModules= 接入.
 
 * Option 和组装协议
-** Configuration 与 metadata
-=modules/= 下包含 =os/default.nix= 或 =hm/default.nix= 的目录会被识别为模块. 两侧实现是统一目录约定, 模块之间不允许嵌套. 模块根目录的 =default.nix= 是可选的 NixOS 配置补充, 不再承担模块发现入口的职责.
-
-从 =modules/_options.fp.nix= 到模块目录沿途的 =_options.fp.nix= 共同定义 schema, 分为 =configuration= 和 =metadata= 两部分. =configuration= 用于 flake-parts 层的 =nixosConfigurations.<system>.modules=; =metadata= 用于 =moduleRegistry.<kind>.<name>.metadata=. 模块的 =_metadata.fp.nix= 提供静态 metadata 值. =.fp.nix= 标识解释文件的配置层; metadata 文件仍返回普通 Nix 属性集, 不要求成为 flake-parts module. =_validators.fp.nix= 提供检查已求值 FP 数据的谓词函数, 由两个 FP option 的 =apply= 执行.
-
-仓库使用 =_options.<system>.nix= 标识按约定发现的 option declaration 文件: =fp= 对应 flake-parts, =os= 对应 NixOS, =hm= 对应 Home Manager. 这些文件由仓库加载器发现, 文件名标识解释环境, 不限定声明的 option namespace. 三者保留各自接口: FP 返回 configuration/metadata 声明分支, OS 返回原生 NixOS module, HM 返回以模块名和求值上下文为参数的声明片段. 统一命名不要求统一返回值结构或函数签名.
-
-share 没有 profile 名这一层, 对应 =nixosConfigurations.<system>.modules.share= 和 =moduleRegistry.share.metadata=.
-
-=moduleRegistry= 同时登记模块需要的外部 =nixosModules=, =homeModules= 和 =nixpkgsOverlays=. =nixosBuilder= 提供 =nixosSystem= 构造函数, Home Manager 集成模块和公共 =specialArgs=. =llib.flakeParts.mkNixosConfigurations= 将配置集合转换为最终 =flake.nixosConfigurations=.
-
-** FP validator 协议
-=_validators.fp.nix= 是返回属性集的普通 Nix 函数, 不属于 Nix module. =metadata= 和 =configuration= 两个分支均可省略; 已声明的分支必须是返回布尔值的函数. =true= 表示通过, =false= 表示失败; 可以通过 =assert lib.assertMsg= 或 =throw= 提供具体诊断. 非布尔返回值, 未知分支或无效文件结构都会被拒绝.
+** FP 项目配置
+FP options 全局可访问, 不将整个 FP configuration 复制到原生 NixOS/HM option space. Host 和 User 各有 typed FP submodule schema, 不再使用统一 descriptor 或 metadata namespace. =module= 是普通的 =deferredModule= option, 与其他领域数据平级. 通过 =modules/default.nix= 及各级目录入口逐层显式引入各对象定义与 schema 扩展; 不按目录发现模块、声明或 validators.
 
 #+begin_src nix
-{ path }:
-{
-  metadata = { lib, llib, registry, ... }: true;
-  configuration = { lib, llib, name, configuration, registry, ... }: true;
-}
+nixosBuilderArgs = {
+  nixosSystem = ...;
+  homeManager = ...;
+  baseModule = ...;
+  specialArgs = ...;
+  hostRegistry.thinkbook = {
+    number = 2;
+    # ... Host data ...
+    module = ...;
+  };
+  userRegistry.lingyu = {
+    sops = { ... };
+    module = ...;
+  };
+  featureRegistry = {
+    os = { ... };
+    hm = { ... };
+  };
+  workloadRegistry = { ... };
+};
 #+end_src
 
-导入声明时仅传入文件所属目录的 =path=, 例如 =[ "modules" "features" "niri" ]=. 不隐式提供 FP =config/options= 或 OS/HM =config=. 执行分支时显式传入 =lib=, =llib= 和合并后的 Registry 或单个系统的 FP configuration; 文件位置表示约束的归属, 不限制其只能检查同目录的数据.
-
-=llib.modules.discoverValidatorFiles= 基于现有 =discoverModules= descriptors 收集路径前缀中的文件, 包括 =modules/= 根级, 类别级及模块级. 不搜索 =os/= 或 =hm/=; 中间层文件可缺省. 文件按目录深度及同层路径顺序排列, 去重后每个文件在一次验证边界中至多执行一次. 各文件的约束按逻辑与组合, 不通过属性集覆盖合并函数.
-
-=llib.flakeParts.mkValidatorApplications= 接收 =modules= 目录和调用时的 =llib= 验证上下文, 生成与测试共用的两个 =apply= 函数. =moduleRegistry.apply= 用其参数中的 Registry 执行 =metadata= 验证并原样返回值, 不读取 =nixosConfigurations=. =nixosConfigurations.apply= 为各系统保留惰性验证: 消费该系统时执行 =configuration= 分支并返回原值, 不强制其他系统. 诊断包含文件, 分支以及配置分支的系统名称; =--show-trace= 保留谓词的具体错误上下文.
-
-验证器只检查相关字段, 不修改数据, 不通过顶层已经处理过的同名 option 重新取得输入, 不对完整 Registry 或 configuration 使用 =deepSeq=. 外部 module, overlay 和 =functionTo= 值应保持惰性, 不应为了检查其存在而调用函数. 仅依赖 FP configuration 与 Registry metadata 的静态约束由所属目录的 validators 执行; 依赖最终 NixOS/Home Manager 状态的检查继续留在对应原生 module system 中.
-
-静态约束按职责归属组织: =hosts/_validators.fp.nix= 检查所有 Host 的 number, monitor, UID registry 和 WireGuard endpoint/listenPort 关系, 并检查每个系统恰好启用一个 Host; =users/_validators.fp.nix= 检查 UID, username, home directory 和选中 Host 的 UID 注册关系; =features/_validators.fp.nix= 只对启用且具有 HM 实现的 Feature 检查 =allowUidList=. 非空 User UID 的下界对禁用 User 同样适用, Host 可以登记未分配给启用 User 的 UID, 禁用 Feature 可以保留非空默认接收列表.
-
-Niri, Greeter, Proxy 和 ThinkBook 在各自目录维护静态约束. Niri 的子功能父级依赖与互斥, Proxy 四个子功能的父级依赖及仅 clash-verge/mihomo 的互斥, ThinkBook Flatpak 的父级依赖会在父模块禁用时仍被检查. Niri 和 Greeter 启用时要求选中 Host 恰有一个默认 monitor. Noctalia 对实际系统服务的要求, Greeter 会话包的 =meta.mainProgram= 与 provider 非空检查, 以及 HM 的 SOPS/provider/terminal-exec 检查仍保留为原生 assertions.
-
-** =enable= 与 =existModule=
-=nixosConfigurations.<system>.modules.<kind>.<name>.enable= 表示在当前最终配置中启用该 profile, 默认关闭. =existModule.{os,hm}= 由模块发现 descriptor 自动派生, 是内部只读布尔值: =true= 表示对应实现存在, =false= 表示不存在, 不再使用 =null= 或手动 metadata 声明.
-
-模块发现要求至少存在 =os/default.nix= 或 =hm/default.nix= 之一; 两侧都不存在的目录不会作为模块进入 Registry. =moduleRegistry.<kind>.<name>.metadata.existModule= 与 NixOS 的 =config.modules.<kind>.<name>.existModule= 保持原有访问路径.
-
-=existModule= 与 profile 的 =enable= 无关, 也不表示 Home Manager 本身是否存在. 构建函数根据目录发现结果加载已启用模块的实现; 派生 metadata 也参与 feature 的默认 HM 用户选择.
-
-NixOS 的 =config.modules= 是外层 configuration 经适配后与 metadata 合并的只读视图; Home Manager 通过 =osConfig.modules= 读取它. 禁用父模块时, 其实现和外部集成不加载, 子选项不会单独启用实现.
-
-** User 与 UID
-=modules.users= 以 profile 名为 key, =username= 是可与 profile 名不同的登录名. host 的 =moduleRegistry.hosts.<host>.metadata.users= 登记可用 UID; =flake.nix= 在最终组装时完成绑定:
+=nixosBuilderArgs.hostTopology= 是由 Host Registry 派生的只读 FP option, 保留既有 WireGuard topology 的结构与地址分配规则. Registry entry 的只读 =name= 由其 key 派生, 供直接选择时标识 Registry 对象. =host= 和 =profile= 选择单个已登记对象, 不合并不同对象.
 
 #+begin_src nix
-nixosConfigurations.nixos.modules.users.lingyu.uid =
-  config.moduleRegistry.hosts.thinkbook.metadata.users."1000";
+nixosConfigurations.nixos = {
+  system = "x86_64-linux";
+  host = config.nixosBuilderArgs.hostRegistry.thinkbook;
+  features.shell.enable = true;
+  users."1000" = {
+    username = "lingyu";
+    profile = config.nixosBuilderArgs.userRegistry.lingyu;
+    features.shell.enable = true;
+    features.editor = {
+      enable = true;
+      module = { pkgs, ... }: {
+        features.editor.emacs.programs.package = pkgs.emacs-pgtk;
+      };
+    };
+  };
+  workloads.wbo = {
+    enable = true;
+    module.workloads.wbo.port = 18000;
+  };
+};
 #+end_src
 
-FP User validator 保证启用的 user 已绑定 UID, 启用用户的用户名和 UID 各自唯一, 且 UID 已在启用 host 中登记. host registry 可以包含尚未绑定给当前 user profile 的 UID. NixOS 与 Home Manager 实现读取适配后的 =modules.hosts.<host>.users= 和 =modules.users.<profile>=.
+Account entry 的存在即表示构造该账户, 不再提供 Account enable. UID key 必须是 canonical decimal, 不小于 1000, 且已由 Host 注册; 用户名在每个系统内唯一, homeDirectory 默认 =/home/${username}= 且必须为绝对路径. Host 仍可注册未被 Account 使用的 UID.
 
-** Feature 的 HM 送达
-=modules.features.<name>.allowUidList= 指定应向哪些 Home Manager 用户导入该 feature 的 =hm/default.nix= 及 registry 中的 =homeModules=. 当 feature 存在 HM 模块时, 它默认包含所有已启用且已绑定 UID 的 user; 否则默认为空. 启用且声明 HM 实现的 feature 会校验列表不能包含重复 UID, 也不能引用未分配给启用 user 的 UID.
+** 原生模块组合
+=llib.flakeParts.mkNixosConfigurations= 接收 =builderArgs= 和 =configurations=, 生成最终 =flake.nixosConfigurations=. 构造器导入 Home Manager、baseModule 和选中的 Host module, 再按 System configuration 导入 OS Features、Workloads 与每个 Account 的 HM profile 和 Features. Account 同时贡献 NixOS 与 HM 的身份字段, 两侧以 UID 字符串为 key. Home Manager 继续使用全局 package set (=useGlobalPkgs = true=).
 
-user profile 的 HM 实现导入到自身绑定的 UID. 其他类别的已启用模块, 包括 share 和 host, 将 HM 实现及外部 HM 集成加入 =home-manager.sharedModules=.
+每个已登记 Feature/Workload 具有默认 =false= 的 FP =enable= 及 =module= option. 启用时依次导入 Registry implementation、合并后的 consumer module 和显式原生 enable contribution; 禁用时两类 deferredModules 都不加载, 不贡献原生 enable. OS/HM implementations 各自声明原生 =features.<name>=, Workloads 声明原生 =workloads.<name>=. Feature 不启用、导入或配置其他 Feature, 可读取其他 Feature 的已定义值并通过原生 assertions 检查实际依赖. 外部 flake inputs 仅在所属 flake.nix 中引用. 选中对象的 native imports 在 FP 层决定, 不依赖同一原生求值的 =config= 计算 imports.
 
-** 原生 Feature 接口与过渡声明
-客制化功能使用 =features.<name>= 原生 options. 每个实际存在的 NixOS/HM 模块各自声明默认 =false= 的 =features.<name>.enable=. 导入模块使 options 可用, 显式启用后才提供功能配置. OS 与 HM 独立启用, Shell 的系统 shell 状态与包、Niri 的系统包等依赖仍通过原生接口表达.
+** 接线与验证
+构造器仅传递所需项目数据: NixOS 获得 =host=、不含 deferredModule 的 =hostRegistry= 及 =hostTopology=, OS/HM 均获得公共 =specialArgs=. NixOS 仍通过 =networking.wireguard.topology= 暴露拓扑. 不再使用旧 configuration adapter 或镜像 option space. 特定 Feature 的接线不属于构造器.
 
-当前 root registry 负责按 FP 配置选择系统和 UID, 并在收到模块的作用域显式启用、映射配置. 这些映射、现有 discovery markers 和 HM 分配协议属于第一阶段的过渡接线.
+FP modules 可以扩展 Registry 与 System/Account 的 submodule schema. =modules/hosts/features.nix= 将选中 Host 的显示器数据接入 Greeter/Niri, =modules/users/options.nix= 声明个人 secrets/provider 数据并将其接入对应 Account 的 deferredModule, 同时从实际 HM SOPS 选择派生 OS SOPS 的授权 UID. Agent 在自身 HM scope 消费已启用 SOPS 的 secret path. 原生接线读取实际 OS/HM config, 例如 Greeter 消费 Niri/X11 session packages (Niri 优先), File-manager 消费 OS file chooser 和当前 HM Niri 选择, Niri HM 默认读取 OS Noctalia 状态, SOPS HM 默认读取系统共享 age key 路径.
 
-=mkNixosSystem= 仍统一加载原有声明, 独立于 =share.enable=. SOPS 和 Agent 的 =hm/_options.hm.nix= 暂时保留 =moduleInterfaces=, 供现有 user profile 描述账户 secrets、provider 和 API key 路径. 由 root 接线映射已定义字段. Niri 和 X11 分别输出实际 session package, root 将已启用 provider 的包送给 Greeter, 使用 =mkBefore= 保持 Niri 优先.
-
-** 导入与配置适配
-最终模块列表直接由已求值的 flake-parts configuration 生成. =mkNixosSystem= 导入类别公共模块, 已启用 profile 的 OS 实现和可选根 =default.nix=, 并收集 registry 中的外部模块与 overlays. 这避免了在 NixOS 同一求值层根据 =config= 决定 =imports= 的循环依赖.
-
-依赖最终 NixOS =config= 或 =pkgs= 的配置值通过 =functionTo= 类型延迟解析, 例如:
-
-#+begin_src nix
-nixosConfigurations.nixos.modules.features.editor.emacs.programs.package =
-  { pkgs, ... }: pkgs.emacs31-pgtk;
-#+end_src
-
-适配器按 option schema 解析 =functionTo= 值和 submodule, 保留其他值中的函数. 公共与每台系统的 =specialArgs= 合并后分别传入 NixOS 和 Home Manager.
+Host 数据不变量由 =modules/hosts/options.nix= 的 option types 与 =apply= 表达: Registry 保证 number 全局唯一, monitors 保证名称唯一、默认 monitor 至多一个且具有 mode, users 保证 UID registry key 与值一致, wireguard 保证 endpoint 非空时 listenPort 非空. =apply= 在对应 option 被消费时执行; =checks.host-registry= 强制求值所有 Host 的这些领域数据, 包括未被选中的 Host, 而不求值 deferredModules. Registry 的 number 检查不应依赖再次读取同一 Registry 的最终值; 局部字段可以读取其他已登记对象. Greeter 接线自行要求唯一默认 monitor, HM Niri 使用原生 assertion, OS Niri 不需要显示器数据. 构造时验证所有 System configurations 的选择及 Account 绑定, 不强制未选中的 deferredModules. 仅依赖最终原生状态的约束由相应原生 assertions 检查 (例如 Proxy 互斥、Noctalia 服务依赖、HM SOPS 与 API keys).
 
 * 结构
 ** [[file:./][/]]
@@ -114,8 +99,8 @@ nixosConfigurations.nixos.modules.features.editor.emacs.programs.package =
 根 flake inputs 按使用位置集中传递:
 - =nixpkgs=: 提供最终系统与 =perSystem= 的 package set, 也是多个 inputs 的 =follows= 目标.
 - =personal-nixpkgs=: 提供 =mkFlake= 组装入口与 =llib.tests= 测试组织接口, 其 =nixpkgs= 跟随根输入; 与 package 子项目中的同名输入在根 lock graph 中分别记录版本. =flake-parts= 和 =treefmt-nix= 由该输入管理, 不再直接声明为根输入.
-- =local-nixpkgs=: 通过 =path:./pkgs= 引用 package 子项目, 将其 Share overlays/modules 和 Feature module exports 注入对应 Registry 条目; =legacy= overlay 用于构造根 =perSystem= 的 package set 和 =legacyPackages= 输出.
-- =home-manager=: 通过 =nixosBuilder.homeManager= 导入每台系统.
+- =local-nixpkgs=: 通过 =path:./pkgs= 引用 package 子项目, 将其公共 overlays/modules 接入 baseModule, 将 Feature exports 登记到 featureRegistry; =legacy= overlay 用于构造根 =perSystem= 的 package set 和 =legacyPackages= 输出.
+- =home-manager=: 通过 =nixosBuilderArgs.homeManager= 导入每台系统.
 - =agenix= 和 =agenix-rekey=: 提供 age secret 与 rekey module; =agenix-rekey.agePackage= 使用本仓库的 =rage-armored=, =agenix-rekey= 的 =treefmt-nix= 跟随 =personal-nixpkgs/treefmt-nix=.
 - =nix-flatpak=: 注入 thinkbook host 的 Flatpak module.
 - =nixvirt=: 注入 thinkbook host 的 NixVirt module.
@@ -126,28 +111,11 @@ nixosConfigurations.nixos.modules.features.editor.emacs.programs.package =
 #+begin_example
 /lib/
 ├── default.nix
-├── flakeParts.configurations.nix
-├── flakeParts.types.nix
-├── flakeParts.validators.nix
-├── hosts.nix
-└── modules.nix
+├── flakeParts.nix
+└── hosts.nix
 #+end_example
 
-[[file:./lib/default.nix][lib/default.nix]] 导出 =llib= 的公共命名空间:
-- =types=: 由根 flake 从 =pkgs/lib/= 引入的共享值类型, 包括显示器、SOPS secret 输入和默认编辑器.
-- =modules=: 模块与 validator 文件发现, option tree/schema 组织及框架结构检查.
-- =hosts=: host 选择与 WireGuard 拓扑生成.
-- =flakeParts=: 配置适配, 系统构造与 =mkValidatorApplications= 验证组合/执行; =flakeParts.types= 声明 registry, builder 和系统配置类型.
-
-根 flake 将本地库与 =personal-nixpkgs.lib.tests= 合并为运行时 =llib=, 不引入外部库的其他命名空间.
-
-[[file:./lib/flakeParts.configurations.nix][flakeParts.configurations.nix]] 私有封装内部与接口 options 的生成, 并在系统构造时统一加载.
-
-=lib/default.nix= 按实际依赖逐项构造各 flakeParts 子库, 不注入递归的整库 =llib=. =moduleRegistry= 类型函数在调用时通过 =modules= 和 =llib= 接收模块目录及 metadata 声明上下文. =nixosConfigurations= 类型函数显式接收 =modules=, =llib= 和 =registry=, 在声明上下文中保留 =moduleRegistry= 名称. validator 在 =mkValidatorApplications= 调用时接收验证上下文. 这些调用参数与库的构造依赖分开.
-
-模块发现, 声明加载, validator 加载, FP 类型构造及 NixOS 构建统一接收 =modules= 目录. =discoverModules modules= 生成的逻辑路径始终以 =[ "modules" ]= 开头, 不从仓库根路径或目录实际名称推导; 声明与 validator 文件从传入目录定位. =builder.specialArgs= 中的运行时参数与该目录接口独立.
-
-通用库中的 =assert= / =throw= 检查框架结构与函数前置条件, 例如发现目录本身不能作为模块, 禁止嵌套模块及 configuration/metadata 顶层字段不相交. 这些检查保留在通用库, 模块业务静态约束由所属 =_validators.fp.nix= 维护, 最终 NixOS/HM 状态相关检查使用原生 assertions.
+[[file:./lib/default.nix][lib/default.nix]] 导出 =llib.hosts= 与 =llib.flakeParts=. =hosts.nix= 提供 WireGuard network data、拓扑、接口/firewall 及 SSH targets 的派生; =flakeParts.nix= 声明通用 FP schema 并构造原生系统和 Account modules. 根 flake 同时从 =pkgs/lib/= 引入共享值类型, 从 personal-nixpkgs 引入 tests. Host domain schema 和项目特有接线由显式 FP modules 扩展, 不在构造器内硬编码 Feature 业务逻辑.
 
 *** [[file:./pkgs/][/pkgs]]
 #+begin_example
@@ -221,7 +189,7 @@ nixosConfigurations.nixos.modules.features.editor.emacs.programs.package =
 
 根 flake 通过 =perSystem.nixpkgs.overlays= 接入 =inputs.local-nixpkgs.overlays.legacy=, 使用 =mkFlake= 提供的 =pkgs= 并导出 =legacyPackages = pkgs.legacyPackages;=. checks, devShells 和 rekey 工具共同使用该 =pkgs=; =agenix-rekey.agePackage= 直接取 =pkgs.rage-armored=.
 
-根 flake 通过 =moduleRegistry.share= 接入公共 overlays/modules, 通过 =moduleRegistry.features= 选择 Feature module exports 并提供过渡配置映射. Feature 专用 overlays 由相应 OS export 在启用时提供.
+根 flake 通过 =baseModule= 接入公共 overlays/modules, 通过 =featureRegistry.{os,hm}= 登记 Feature exports. Feature 专用 overlays 由相应 OS export 在启用时提供.
 
 本地 package 包括:
 - =codex=: 为 Codex wrapper 补充 Python/PyYAML 运行环境.
@@ -236,108 +204,78 @@ nixosConfigurations.nixos.modules.features.editor.emacs.programs.package =
 *** [[file:./modules/][/modules]]
 #+begin_example
 /modules/
-├── _options.fp.nix
-├── features/
+├── default.nix
+├── base/
 ├── hosts/
-├── share/
 ├── users/
 └── workloads/
 #+end_example
 
-=modules/_options.fp.nix= 定义所有模块共享的 configuration schema, 并保留 metadata 声明分支. 模块发现和系统组装由 =llib.modules= 与 =llib.flakeParts= 完成; 类别的可选 =default.nix= 保留公共配置, 静态约束由 =_validators.fp.nix= 自动发现, =share/= 提供公共 OS/HM 配置.
+各级 =default.nix= 显式聚合直接下属的 FP modules; =os/= 与 =hm/= 的入口属于原生 module system. 外部 inputs 的配置贡献保留在 =flake.nix=.
 
-**** [[file:./modules/share/][/modules/share]]
+**** [[file:./modules/base/][/modules/base]]
 #+begin_example
-/modules/share/
-├── _options.fp.nix
+/modules/base/
+├── default.nix
 ├── hm/
 │   └── default.nix
 └── os/
-    └── default.nix
+    ├── boot-manager.nix
+    ├── default.nix
+    ├── identity.nix
+    ├── shared.nix
+    ├── ssh-targets.nix
+    └── wireguard.nix
 #+end_example
 
-=_options.fp.nix= 声明允许的 unfree 包名和 XDG 用户目录开关. =os/default.nix= 提供 Nix, 防火墙, 基础工具, age 与 Home Manager 公共配置; =hm/default.nix= 提供 Fastfetch, XDG 路径和 home state version. 内部状态与 HM 接口声明由构建库独立加载.
+=default.nix= 是 FP 入口, 向 =nixosBuilderArgs.baseModule= 贡献本地 OS/HM modules; =os/default.nix= 组合其余公共原生 OS modules.
 
-**** [[file:./modules/features/][/modules/features]]
-#+begin_example
-/modules/features/
-├── _options.fp.nix
-├── _validators.fp.nix
-├── agent/
-├── diagnostics/
-├── editor/
-├── file-manager/
-├── font/
-├── greeter/
-├── media/
-├── niri/
-├── office/
-├── proxy/
-├── shell/
-├── sops/
-├── terminal/
-├── texlive/
-└── x11-session/
-#+end_example
+=os/default.nix= 提供 Nix, 防火墙, 基础工具, age 与 Home Manager 公共配置, 并声明原生 =xdg.createUserDirectories= (默认 false); =hm/default.nix= 提供 Fastfetch, XDG 路径和 home state version. Host module 直接使用 =nixpkgs.config.allowUnfreePackages= 与 =xdg.createUserDirectories= 声明本机策略. 两侧基础模块由 =baseModule= 接入, 没有额外的启用开关或 Feature 接口声明.
 
-[[file:./modules/features/_validators.fp.nix][modules/features/_validators.fp.nix]] 在 FP 层校验 feature 的 HM 用户选择. =_options.fp.nix= 定义公共 =allowUidList= schema; 发现, option tree 生成与 HM 送达由构建库统一处理.
+[[file:./modules/base/os/boot-manager.nix][modules/base/os/boot-manager.nix]], [[file:./modules/base/os/identity.nix][modules/base/os/identity.nix]], [[file:./modules/base/os/shared.nix][modules/base/os/shared.nix]] 和 [[file:./modules/base/os/wireguard.nix][modules/base/os/wireguard.nix]] 分别消费选中的 Host 数据, 生成 boot manager, identity, shared capability 和 WireGuard interface/secret 的配置; topology 由 FP 层派生并投影到原生 option.
 
-原有 =os/default.nix= 与 =hm/default.nix= 入口保留 discovery 和 =existModule= 语义. 实现从 [[file:./pkgs/modules/][pkgs/modules/]] 导出, 通过 root =moduleRegistry.features= 导入. Root 保留 FP schema、validators、显示器等 Host 数据以及用户配置. 实际配置和资源按功能组织:
+[[file:./modules/base/os/ssh-targets.nix][modules/base/os/ssh-targets.nix]] 从 =networking.wireguard.topology= 与 Host Registry 生成系统级 SSH 客户端别名 =<hub>.<node>=, 使用拓扑中的 IPv4 地址作为 =HostName=. 同一节点经不同 Hub 访问时共用 =HostKeyAlias= 与 Registry 中的 SSH host public key, 并由 =programs.ssh.knownHosts= 声明式验证服务器身份. =programs.ssh.hosts= 的 =order= 从 1000 开始, 依据 =(hub.number, node.number)= 排序分配. 当选中 Host 没有 WireGuard 配置时不生成这些条目; 参与生成的节点缺少 SSH host public key 时显式报错. 该集成不依赖 =modules/users/=, 不指定 SSH 登录用户、认证凭据或认证方法, 也不启用或修改 SSH 服务端. 别名只描述网络路径与服务器身份, 不保证 SSH 登录权限.
 
-- Diagnostics、Terminal、Office、TeXLive、Font、Media 和 Shell 保留现有系统或账户配置. Shell HM 按实际系统 Zsh 状态选择 Bash/Zsh 与 Starship integration.
-- Proxy 保留现有子功能开关和互斥规则. File-manager 保留两侧 file chooser 配置、terminal-exec 依赖及按系统 Niri 选择 Wayfile 的策略.
-- Editor OS 提供系统 package set 中的 Emarccs 和 Lem overlays, HM 在各 scope 使用原生 package values. Root adapter 继续求值旧 FP package selectors, 并将 Emacs programs 和 services 的包分别传入.
-- Niri 保留 OS 服务依赖, 由 root 向已分配的 HM scope 提供显示器及 Noctalia/Waybar 选择. Greeter 消费实际 session packages, 不负责启用 providers.
-- SOPS OS 按 UID 查找实际系统账户并授权 =sops-decrypt=. SOPS 模块持有自己的接线密文 =pkgs/modules/sops/os/sops.hm.age=. Agenix 和 Agenix-rekey 继续由 root 的 Share integration 提供. SOPS HM 接收每账户 secrets 描述和实际 age key 路径. Agent HM 接收 provider 开关与 API key 文件路径.
+=identity.nix= 将当前 host 的非空 SSH 私钥备份引用登记为 =age.secrets.ssh-identity=, 设置 =intermediary = true;=, 使其参与 =agenix edit=, =agenix view= 和 =agenix update-masterkeys=. host rekey 跳过该备份, 上游 agenix module 安装 dummy secret, SSH host 私钥的安装与恢复需单独处理. 备份登记独立于 =identity.rootAccess=; 后者只控制 YubiKey 工具和 =pcscd= 的启用.
 
 **** [[file:./modules/workloads/][/modules/workloads]]
 #+begin_example
 /modules/workloads/
+├── default.nix
 ├── caddy/
-│   ├── _options.fp.nix
+│   ├── default.nix
 │   └── os/
 │       └── default.nix
 └── wbo/
-    ├── _options.fp.nix
+    ├── default.nix
     └── os/
         └── default.nix
 #+end_example
 
-Workload 的 OS/HM 可用性由模块发现结果派生, 无需类别级一致性断言. 各 workload 的 =_options.fp.nix= 定义 configuration schema, 依赖 NixOS 网络配置的值通过函数延迟解析.
+各 Workload 的 FP 入口显式登记 OS deferredModule, 各实现直接声明原生 =workloads.<name>= options. 根 FP 配置从 =hostTopology= 取得 IP 与接口名称, 通过 consumer module 传递给已选中的 Workload.
 
 =caddy= workload 配置 Caddy container, 通过指定 network interface, upstream IP 和 port 反向代理服务, 并用 nftables 限制出站路径. =wbo= workload 配置 whitebophir container, 通过指定 listen IP, port, network interface 和 allowed source IP 暴露白板服务.
 
 **** [[file:./modules/hosts/][/modules/hosts]]
 #+begin_example
 /modules/hosts/
-├── _options.fp.nix
-├── _validators.fp.nix
 ├── aliyun/
-├── boot-manager.nix
 ├── default.nix
-├── identity.nix
+├── features.nix
 ├── matebook/
-├── shared.nix
-├── ssh-targets.nix
+├── options.nix
 ├── thinkbook/
-├── wireguard.nix
 └── wsl/
 #+end_example
 
-[[file:./modules/hosts/default.nix][modules/hosts/default.nix]] 导入 boot-manager, identity, shared, SSH targets 和 WireGuard 相关通用模块. =_validators.fp.nix= 在 metadata 分支校验全部 Host 的静态属性, 在 configuration 分支确保恰好启用一个 host. =_options.fp.nix= 定义 host metadata schema.
+[[file:./modules/hosts/default.nix][modules/hosts/default.nix]] 聚合各 Host FP modules、schema 与接线, 并提供全 Registry 的求值检查. =options.nix= 扩展 Host schema、声明数据不变量并派生全局 topology; =features.nix= 将选中 Host 的显示器数据接入相应 Feature.
 
-[[file:./modules/hosts/boot-manager.nix][modules/hosts/boot-manager.nix]], [[file:./modules/hosts/identity.nix][modules/hosts/identity.nix]], [[file:./modules/hosts/shared.nix][modules/hosts/shared.nix]] 和 [[file:./modules/hosts/wireguard.nix][modules/hosts/wireguard.nix]] 分别消费 host metadata, 生成 boot manager, identity, shared capability 和 WireGuard topology/secret 的配置.
-
-[[file:./modules/hosts/ssh-targets.nix][modules/hosts/ssh-targets.nix]] 从 =networking.wireguard.topology= 与 Host Registry 生成系统级 SSH 客户端别名 =<hub>.<node>=, 使用拓扑中的 IPv4 地址作为 =HostName=. 同一节点经不同 Hub 访问时共用 =HostKeyAlias= 与 Registry 中的 SSH host public key, 并由 =programs.ssh.knownHosts= 声明式验证服务器身份. =programs.ssh.hosts= 的 =order= 从 1000 开始, 依据 =(hub.number, node.number)= 排序分配. 当选中 Host 没有 WireGuard 配置时不生成这些条目; 参与生成的节点缺少 SSH host public key 时显式报错. 该集成不依赖 =modules/users/=, 不指定 SSH 登录用户、认证凭据或认证方法, 也不启用或修改 SSH 服务端. 别名只描述网络路径与服务器身份, 不保证 SSH 登录权限.
-
-各 host 的 =_metadata.fp.nix= 由 registry 的 metadata 子模块加载, 用于声明 UID registry, monitor, public IP, WireGuard 和 identity metadata. =ssh.private.age= 与 =wireguard.private.age= 分别保存该 host 的加密 SSH host private key 与 WireGuard private key, 并由 =_metadata.fp.nix= 引用.
-
-=identity.nix= 将当前 host 的非空 SSH 私钥备份引用登记为 =age.secrets.ssh-identity=, 设置 =intermediary = true;=, 使其参与 =agenix edit=, =agenix view= 和 =agenix update-masterkeys=. host rekey 跳过该备份, 上游 agenix module 安装 dummy secret, SSH host 私钥的安装与恢复需单独处理. 备份登记独立于 =identity.rootAccess=; 后者只控制 YubiKey 工具和 =pcscd= 的启用.
+各 Host 的 =default.nix= 是顶层 FP module, 声明 UID registry, monitor, public IP, WireGuard 和 identity 数据以及原生 module. =ssh.private.age= 与 =wireguard.private.age= 分别保存该 Host 的加密 SSH host private key 与 WireGuard private key, 由同目录的 FP module 引用.
 
 ***** [[file:./modules/hosts/aliyun/][/modules/hosts/aliyun]]
 #+begin_example
 /modules/hosts/aliyun/
-├── _metadata.fp.nix
+├── default.nix
 ├── os/
 │   ├── default.nix
 │   ├── disk-config.nix
@@ -351,7 +289,7 @@ Workload 的 OS/HM 可用性由模块发现结果派生, 无需类别级一致�
 ***** [[file:./modules/hosts/matebook/][/modules/hosts/matebook]]
 #+begin_example
 /modules/hosts/matebook/
-├── _metadata.fp.nix
+├── default.nix
 ├── os/
 │   ├── default.nix
 │   └── hardware-configuration.nix
@@ -364,9 +302,7 @@ MateBook bare metal NixOS host, hostname =nixos-matebook=, 配置本机硬件, �
 ***** [[file:./modules/hosts/thinkbook/][/modules/hosts/thinkbook]]
 #+begin_example
 /modules/hosts/thinkbook/
-├── _metadata.fp.nix
-├── _options.fp.nix
-├── _validators.fp.nix
+├── default.nix
 ├── os/
 │   ├── default.nix
 │   ├── flatpak.nix
@@ -395,7 +331,7 @@ ThinkBook bare metal NixOS host, hostname =nixos=, 配置本机硬件, 启动, F
 ***** [[file:./modules/hosts/wsl/][/modules/hosts/wsl]]
 #+begin_example
 /modules/hosts/wsl/
-├── _metadata.fp.nix
+├── default.nix
 ├── os/
 │   └── default.nix
 ├── ssh.private.age
@@ -407,39 +343,40 @@ NixOS-WSL host, hostname =nixos-wsl=.
 **** [[file:./modules/users/][/modules/users]]
 #+begin_example
 /modules/users/
-├── _options.fp.nix
-├── _validators.fp.nix
 ├── default.nix
 ├── lingyu/
-└── lingyu-minimal/
+├── lingyu-minimal/
+└── options.nix
 #+end_example
 
-[[file:./modules/users/default.nix][modules/users/default.nix]] 创建 NixOS user, 并向 UID-keyed 的 =home-manager.users= 提供 UID, username 和 home directory. =_options.fp.nix= 定义 user configuration schema, =_validators.fp.nix= 负责静态绑定约束, HM 实现由构建函数送达.
+[[file:./modules/users/default.nix][modules/users/default.nix]] 聚合 User FP modules; =options.nix= 声明个人 SOPS 输入、Agent provider secret name 及 Account 接线. Account 的身份和 HM module 由通用构造函数送达. 每个 User profile 的 =default.nix= 贡献 Registry entry, =hm/default.nix= 是原生 HM 入口.
 
 ***** [[file:./modules/users/lingyu/][/modules/users/lingyu]]
 #+begin_example
 /modules/users/lingyu/
-└── hm/
-    ├── default.nix
-    ├── home/
-    │   ├── .local/
-    │   │   └── bin/
-    │   │       ├── org.sh
-    │   │       ├── rc.sh
-    │   │       └── ssha.sh
-    │   ├── cloud-server.nix
-    │   ├── default.nix
-    │   ├── email.nix
-    │   ├── git.nix
-    │   ├── keyring.nix
-    │   ├── langs.nix
-    │   └── rclone.nix
-    └── sops/
-        ├── .sops.yaml
-        └── default.yaml
+├── default.nix
+├── hm/
+│   ├── default.nix
+│   └── home/
+│       ├── .local/
+│       │   └── bin/
+│       │       ├── git-push-loop.sh
+│       │       ├── org.sh
+│       │       ├── rc.sh
+│       │       └── ssha.sh
+│       ├── cloud-server.nix
+│       ├── default.nix
+│       ├── email.nix
+│       ├── git.nix
+│       ├── keyring.nix
+│       ├── langs.nix
+│       └── rclone.nix
+└── sops/
+    ├── .sops.yaml
+    └── default.yaml
 #+end_example
 
-配置 lingyu 用户的个人 home-manager 模块, 包含 cloud-server, email, git, keyring, langs, rclone 等用户级配置.
+配置 lingyu 用户的个人 home-manager 模块, 包含 cloud-server, email, git, keyring, langs, rclone 等用户级配置. SOPS 密文和编辑配置移到 User FP module 同级目录, 由其直接引用; rclone remotes 只在当前 Account 的 HM SOPS 启用时配置.
 
 =modules/users/lingyu/hm/home/.local/bin/= 放置个人脚本:
 - =org=: 进入 =~/org= 目录并准备使用 =~/org/config/Makefile= 的 make 函数.
@@ -449,6 +386,7 @@ NixOS-WSL host, hostname =nixos-wsl=.
 ***** [[file:./modules/users/lingyu-minimal/][/modules/users/lingyu-minimal]]
 #+begin_example
 /modules/users/lingyu-minimal/
+├── default.nix
 └── hm/
     └── default.nix
 #+end_example
@@ -456,15 +394,15 @@ NixOS-WSL host, hostname =nixos-wsl=.
 最小用户 profile, 提供空的 =hm/default.nix= 实现, 可以接收最终配置启用的公共 HM features.
 
 * 测试
-[[file:./tests/default.nix][tests/default.nix]] 调用 =llib.tests.mkChecks=, 按 =test-overlay.nix= 发现各组测试入口, 在独立测试 scope 中组合定义并收集检查派生物. 嵌套 check 名称以 =-= 连接. 测试覆盖 FP validator 发现/组合/惰性边界, 自定义类型, Registry 的 =existModule= 派生与只读约束, host 相关函数与配置适配器. 子 flake 持有原生 Feature enable 契约和 SOPS helper 检查, 根 flake 使用同一锁图转发这两项. Host 函数测试还覆盖 WireGuard SSH targets 的多 Hub 别名、排序、主机身份去重、缺失公钥以及不依赖用户模块的系统级集成.
+[[file:./tests/default.nix][tests/default.nix]] 调用 =llib.tests.mkChecks=, 按 =test-overlay.nix= 发现各组测试入口, 在独立测试 scope 中组合定义并收集检查派生物. 嵌套 check 名称以 =-= 连接. 测试覆盖 FP schema 扩展与合并、禁用模块不导入、Account 的独立 HM 选择与静态绑定约束、自定义类型及 Host 相关函数. 子 flake 持有原生 Feature enable 契约和 SOPS helper 检查, 根 flake 使用同一锁图转发这两项. Host 函数测试还覆盖 WireGuard SSH targets 的多 Hub 别名、排序、主机身份去重、缺失公钥以及不依赖用户模块的系统级集成.
 
 各组测试的 =test-overlay.nix= 使用与包相同的外层构造协议, 通过 =final.callPackage ./test.nix= 调用测试体. =test.nix= 保存断言和检查派生物, fixtures 保留在所属组内; 专用入口文件名避免将 fixtures 误识别为测试组.
 
-根 flake 向测试总入口传入 =lib=, =pkgs=, =llib= 和 =modules = ./modules;=. 总入口通过 =mkChecks.args= 注入 =lib=, =modules=, 从 =pkgs= 提取的 =runCommand= 及选定库命名空间, 不向各组测试传递整套 =pkgs= 或 =llib=. 库依赖展平为 =llibFlakeParts=, =llibModules= 等小驼峰名称, 含 =-= 的名称也按词转换, 各组 overlay 再显式映射为 =flakeParts=, =moduleLib= 等普通参数名, 保留测试体中的 =namespace.member= 调用形式. =mkChecks.args= 用于测试 scope 和 =callPackage= 注入, 不属于 overlay 外层构造参数.
+根 flake 向测试总入口传入 =lib=, =pkgs=, =llib= 和 =modules = ./modules;=. 总入口通过 =mkChecks.args= 注入 =lib=, =modules=, 从 =pkgs= 提取的 =runCommand= 及选定库命名空间, 不向各组测试传递整套 =pkgs= 或 =llib=. 库依赖展平为 =llibFlakeParts=, =llibHosts= 等小驼峰名称, 含 =-= 的名称也按词转换, 各组 overlay 再显式映射为 =flakeParts=, =hosts= 等普通参数名, 保留测试体中的 =namespace.member= 调用形式. =mkChecks.args= 用于测试 scope 和 =callPackage= 注入, 不属于 overlay 外层构造参数.
 
 测试对所在目录之外的依赖通过函数参数传入, 禁止使用 =../*= 或 =../../*= 等父目录相对路径直接取得依赖. 需要真实模块树的测试通过 =modules= 参数接收该目录, 不依赖仓库根路径.
 
-检查集合通过根 =perSystem.checks= 导出. 根 flake 使用 =treefmt.flakeCheck = true;= 接入格式检查, 本地不再逐项声明 formatter 程序. 本地 =treefmt.settings.excludes= 排除 =*.patch=, =.gitignore=, =LICENSE=, =README.org=, =flake.lock= 和 =*.age=.
+检查集合通过根 =perSystem.checks= 导出. Host FP module 另外贡献 =host-registry=, 强制全部已登记 Host 的受约束数据, 不导入未选中实现. 根 flake 使用 =treefmt.flakeCheck = true;= 接入格式检查, 本地不再逐项声明 formatter 程序. 本地 =treefmt.settings.excludes= 排除 =*.patch=, =.gitignore=, =LICENSE=, =README.org=, =flake.lock= 和 =*.age=.
 
 #+begin_src sh
 nix flake check

@@ -24,6 +24,12 @@ in
   };
 
   config = lib.mkIf cfg.enable {
+    features.greeter.sessionPackages = lib.mkDefault (
+      lib.optional (config.features.niri.enable or false) config.features.niri.sessionPackage
+      ++ lib.optional (config.features.x11-session.enable or false
+      ) config.features.x11-session.sessionPackage
+    );
+
     assertions = [
       {
         assertion = cfg.sessionPackages != [ ];

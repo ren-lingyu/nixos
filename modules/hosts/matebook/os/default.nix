@@ -3,19 +3,17 @@
 # and in the NixOS manual (accessible by running ‘nixos-help’).
 {
   config,
+  host,
   pkgs,
   lib,
   ...
 }:
-let
-
-  cfg = config.modules.hosts.matebook;
-
-in
 {
   imports = [ ./hardware-configuration.nix ];
 
-  config = lib.mkIf cfg.enable {
+  config = {
+    nixpkgs.hostPlatform = "x86_64-linux";
+
     nix.settings = {
       trusted-users = [
         "@wheel"
@@ -78,8 +76,8 @@ in
           name = "root";
           hashedPassword = "$y$j9T$3zzZQHdL7iI.V/dVUa.ti0$eiiWaYqAixyLkt5nCft3X.o5OkxpIXpz3p.hrzL0Hf1";
         };
-        "${builtins.toString cfg.users."1000"}" = {
-          uid = cfg.users."1000";
+        "${builtins.toString host.users."1000"}" = {
+          uid = host.users."1000";
           isNormalUser = true;
           hashedPassword = "$y$j9T$ckTNGDz1gOk0jJWnABn0U0$8GnjsLLNYSeVRIwoFS9VusrMGKfNBQXNcyoQlGEJYMB";
           linger = true;

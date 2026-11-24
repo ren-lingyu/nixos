@@ -1,13 +1,12 @@
 {
   config,
+  host,
   pkgs,
   lib,
   utils,
   ...
 }:
 let
-
-  cfg = config.modules.hosts.thinkbook;
 
   bindfsUserMountOptions = builtins.concatStringsSep "," [
     "force-user=${nixosUserName}"
@@ -26,9 +25,9 @@ let
     "allow_other"
   ];
 
-  nixosUserName = config.users.users."${builtins.toString cfg.users."1000"}".name;
+  nixosUserName = config.users.users."${builtins.toString host.users."1000"}".name;
 
-  nixosUserHome = config.users.users."${builtins.toString cfg.users."1000"}".home;
+  nixosUserHome = config.users.users."${builtins.toString host.users."1000"}".home;
 
   nixosRootName = config.users.users.root.name;
 
@@ -36,7 +35,7 @@ let
 
 in
 {
-  config = lib.mkIf cfg.enable {
+  config = {
     environment.systemPackages = with pkgs; [ bindfs ];
 
     programs.fuse = {
