@@ -4,9 +4,9 @@ Pending work and adopted target constraints. Current progress and verification b
 
 ## Module system architecture refactor
 
-The owner split implementation into two phases. Phase one moves Feature implementations and their reusable resources to `pkgs/modules/<name>/{os,hm}`, with native options and exports plus explicit root Registry bridges. This preserves the current FP schema, allocation and validation behavior. Phase two revisits system construction, Hosts, User profiles and Accounts, static FP data, deferred native contributions and project-wide validity. The separation allows the native Feature boundary to stabilize while those construction decisions remain open.
+The owner split implementation into two phases. Phase one is committed. Feature implementations and their reusable resources now live in `pkgs/modules/<name>/{os,hm}`, with native options and exports plus explicit root Registry bridges. This preserves the current FP schema, allocation and validation behavior. Phase two revisits system construction, Hosts, User profiles and Accounts, static FP data, deferred native contributions and project-wide validity. The separation allows the native Feature boundary to stabilize while those construction decisions remain open.
 
-This is the next primary research effort. The uniform construction protocol obscures differences between categories and leaves some structural invariants to validation after construction. The FP/NixOS split also carries historical responsibilities forward. Some global static data and relationships are derived inside individual NixOS configurations, adding adaptation and deferred evaluation. The design principles are in [architecture.md](architecture.md#construction-semantics-and-layer-boundaries).
+Phase two is the next architecture research effort. The uniform construction protocol obscures differences between categories and leaves some structural invariants to validation after construction. The FP/NixOS split also carries historical responsibilities forward. Some global static data and relationships are derived inside individual NixOS configurations, adding adaptation and deferred evaluation. The design principles are in [architecture.md](architecture.md#construction-semantics-and-layer-boundaries).
 
 ### Research sequence
 
