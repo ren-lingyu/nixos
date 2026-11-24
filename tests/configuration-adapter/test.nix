@@ -135,7 +135,7 @@ let
     )
     (
       registry_.features.editor.metadata.existModule == {
-        os = false;
+        os = true;
         hm = true;
       }
     )

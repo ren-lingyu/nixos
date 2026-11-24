@@ -50,14 +50,6 @@
       url = "git+https://github.com/oddlama/agenix-rekey.git?ref=refs/heads/main&shallow=1";
       inputs.nixpkgs.follows = "nixpkgs";
     };
-    sops-nix = {
-      url = "git+https://github.com/Mic92/sops-nix.git?ref=refs/heads/master&shallow=1";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
-    niri-flake = {
-      url = "git+https://github.com/sodiboo/niri-flake.git?ref=refs/heads/main&shallow=1";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
     nix-flatpak = {
       url = "git+https://github.com/gmodena/nix-flatpak.git?ref=refs/tags/latest&shallow=1";
     };
@@ -196,7 +188,10 @@
                   { features.diagnostics.enable = true; }
                 ];
                 editor = {
-                  nixpkgsOverlays = [ inputs.local-nixpkgs.overlays.editor ];
+                  nixosModules = [
+                    inputs.local-nixpkgs.nixosModules.editor
+                    { features.editor.enable = true; }
+                  ];
                   homeModules = [
                     inputs.local-nixpkgs.homeModules.editor
                     ({ osConfig, ... }: {
@@ -277,7 +272,6 @@
                   ];
                 };
                 niri = {
-                  nixpkgsOverlays = [ inputs.niri-flake.overlays.niri ];
                   nixosModules = [
                     inputs.local-nixpkgs.nixosModules.niri
                     ({ config, ... }: {
@@ -288,7 +282,6 @@
                     })
                   ];
                   homeModules = [
-                    inputs.niri-flake.homeModules.niri
                     inputs.local-nixpkgs.homeModules.niri
                     ({ osConfig, ... }: {
                       features.niri = {
@@ -329,7 +322,6 @@
                 };
                 sops = {
                   nixosModules = [
-                    inputs.sops-nix.nixosModules.sops
                     inputs.local-nixpkgs.nixosModules.sops
                     ({ config, ... }: {
                       features.sops = {
@@ -339,7 +331,6 @@
                     })
                   ];
                   homeModules = [
-                    inputs.sops-nix.homeManagerModules.sops
                     inputs.local-nixpkgs.homeModules.sops
                     (
                       {
@@ -632,11 +623,7 @@
                     modules = ./modules;
                   }
                   // {
-                    inherit (inputs.local-nixpkgs.checks.${system})
-                      feature-discovery
-                      native-feature-enables
-                      sops-functions
-                      ;
+                    inherit (inputs.local-nixpkgs.checks.${system}) native-feature-enables sops-functions;
                   };
 
                 devShells = {

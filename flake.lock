@@ -411,6 +411,7 @@
         "lean4-nix": "lean4-nix",
         "lem": "lem",
         "luadraw": "luadraw",
+        "niri-flake": "niri-flake",
         "nixpkgs": [
           "nixpkgs"
         ],
@@ -422,6 +423,7 @@
         "pi-mono-extensions": "pi-mono-extensions",
         "pi-workspace-history": "pi-workspace-history",
         "semver-org": "semver-org",
+        "sops-nix": "sops-nix",
         "wayfile": "wayfile",
         "zotero-fix-nixpkgs": "zotero-fix-nixpkgs"
       },
@@ -458,6 +460,7 @@
         "niri-stable": "niri-stable",
         "niri-unstable": "niri-unstable",
         "nixpkgs": [
+          "local-nixpkgs",
           "nixpkgs"
         ],
         "nixpkgs-stable": "nixpkgs-stable",
@@ -1174,14 +1177,12 @@
         ],
         "home-manager": "home-manager",
         "local-nixpkgs": "local-nixpkgs",
-        "niri-flake": "niri-flake",
         "nix-flatpak": "nix-flatpak",
         "nixos-anywhere": "nixos-anywhere",
         "nixos-wsl": "nixos-wsl",
         "nixpkgs": "nixpkgs_2",
         "nixvirt": "nixvirt",
-        "personal-nixpkgs": "personal-nixpkgs_7",
-        "sops-nix": "sops-nix"
+        "personal-nixpkgs": "personal-nixpkgs_7"
       }
     },
     "semver-org": {
@@ -1205,6 +1206,7 @@
     "sops-nix": {
       "inputs": {
         "nixpkgs": [
+          "local-nixpkgs",
           "nixpkgs"
         ]
       },

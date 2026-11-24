@@ -7,6 +7,14 @@
       url = "git+https://github.com/ren-lingyu/nixpkgs.git?ref=refs/heads/main&shallow=1";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+    sops-nix = {
+      url = "git+https://github.com/Mic92/sops-nix.git?ref=refs/heads/master&shallow=1";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+    niri-flake = {
+      url = "git+https://github.com/sodiboo/niri-flake.git?ref=refs/heads/main&shallow=1";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
     emarccs = {
       url = "git+https://github.com/ren-lingyu/emarccs.git?ref=refs/heads/main&shallow=1";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -112,31 +120,59 @@
             systems = [ "x86_64-linux" ];
 
             flake = {
-              nixosModules = inputs.personal-nixpkgs.lib.mergeAttrsRecursive { allowOverrides = false; } [
-                { share = lpkgs.nixosModule; }
-                (llib.discoverModules {
-                  root = ./modules;
-                  modulePath = "os/default.nix";
-                })
-              ];
+              nixosModules = {
+                agent = ./modules/agent/os;
+                editor = { config, lib, ... }: {
+                  imports = [ ./modules/editor/os ];
 
-              homeModules =
-                let
-                  discovered = llib.discoverModules {
-                    root = ./modules;
-                    modulePath = "hm/default.nix";
+                  config = lib.mkIf config.features.editor.enable { nixpkgs.overlays = [ lpkgs.overlays.editor ]; };
+                };
+                file-manager = ./modules/file-manager/os;
+                font = ./modules/font/os;
+                greeter = ./modules/greeter/os;
+                media = ./modules/media/os;
+                niri = { config, lib, ... }: {
+                  imports = [ ./modules/niri/os ];
+
+                  config = lib.mkIf config.features.niri.enable {
+                    nixpkgs.overlays = [ inputs.niri-flake.overlays.niri ];
                   };
-                in
-                inputs.personal-nixpkgs.lib.mergeAttrsRecursive { allowOverrides = false; } [
-                  (builtins.removeAttrs discovered [ "editor" ])
-                  {
-                    editor.imports = [
-                      inputs.nixvim.homeModules.nixvim
-                      discovered.editor
-                    ];
-                    share = lpkgs.homeModule;
-                  }
+                };
+                proxy = ./modules/proxy/os;
+                share = lpkgs.nixosModule;
+                shell = ./modules/shell/os;
+                sops.imports = [
+                  inputs.sops-nix.nixosModules.sops
+                  ./modules/sops/os
                 ];
+                texlive = ./modules/texlive/os;
+                x11-session = ./modules/x11-session/os;
+              };
+
+              homeModules = {
+                agent = ./modules/agent/hm;
+                diagnostics = ./modules/diagnostics/hm;
+                editor.imports = [
+                  inputs.nixvim.homeModules.nixvim
+                  ./modules/editor/hm
+                ];
+                file-manager = ./modules/file-manager/hm;
+                font = ./modules/font/hm;
+                media = ./modules/media/hm;
+                niri.imports = [
+                  inputs.niri-flake.homeModules.niri
+                  ./modules/niri/hm
+                ];
+                office = ./modules/office/hm;
+                share = lpkgs.homeModule;
+                shell = ./modules/shell/hm;
+                sops.imports = [
+                  inputs.sops-nix.homeManagerModules.sops
+                  ./modules/sops/hm
+                ];
+                terminal = ./modules/terminal/hm;
+                x11-session = ./modules/x11-session/hm;
+              };
 
               overlays = {
                 editor = lpkgs.overlays.editor;
@@ -149,26 +185,21 @@
               checks = {
                 native-feature-enables = import ./tests/native-feature-enables.nix {
                   inherit lib pkgs;
-                  nixosModules = llib.discoverModules {
-                    root = ./modules;
-                    modulePath = "os/default.nix";
+                  # The fixture supplies native declarations instead of upstream modules.
+                  nixosModules = builtins.removeAttrs config.flake.nixosModules [ "share" ] // {
+                    sops = ./modules/sops/os;
                   };
-                  homeModules = llib.discoverModules {
-                    root = ./modules;
-                    modulePath = "hm/default.nix";
+                  homeModules = builtins.removeAttrs config.flake.homeModules [ "share" ] // {
+                    editor = ./modules/editor/hm;
+                    niri = ./modules/niri/hm;
+                    sops = ./modules/sops/hm;
                   };
-                };
-                feature-discovery = import ./tests/discovery.nix {
-                  inherit lib;
-                  inherit (pkgs) runCommand;
-                  inherit (llib) discoverModules;
-                  inherit (inputs.personal-nixpkgs.lib) mergeAttrsRecursive;
                 };
                 sops-functions = import ./tests/sops-functions.nix {
                   inherit lib;
                   inherit (pkgs) runCommand;
                   secrets = import ./modules/sops/hm/secrets.nix;
-                  inherit (config.flake.nixosModules) sops;
+                  sops = ./modules/sops/os;
                 };
               };
             };

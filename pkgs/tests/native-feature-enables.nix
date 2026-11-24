@@ -24,6 +24,7 @@ let
       "fonts"
       "gtk"
       "home"
+      "nixpkgs"
       "qt"
       "services"
       "sops"
@@ -94,6 +95,10 @@ let
     lib.assertMsg (
       config.features.${name}.enable == false && contributions config == empty
     ) "Imported Feature ${name} must default to false and contribute no configuration.";
+  editorSystem = evaluate [
+    nixosModules.editor
+    { features.editor.enable = true; }
+  ] unusedSystem unusedPackages;
   existingDesktop = {
     programs.niri.enable = true;
     programs.noctalia.enable = true;
@@ -137,6 +142,7 @@ let
 in
 assert builtins.all (value: value) (lib.mapAttrsToList disabled nixosModules);
 assert builtins.all (value: value) (lib.mapAttrsToList disabled homeModules);
+assert builtins.length editorSystem.nixpkgs.overlays == 1;
 assert
   contributions disabledDesktop
   == contributions (evaluate [ existingDesktop ] unusedSystem unusedPackages);
