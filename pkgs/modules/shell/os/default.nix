@@ -6,6 +6,7 @@
 }:
 {
   options.features.shell = {
+    enable = lib.mkEnableOption "system shell configuration";
     bashPackage = lib.mkOption {
       type = lib.types.package;
       readOnly = true;
@@ -20,7 +21,7 @@
     };
   };
 
-  config = {
+  config = lib.mkIf config.features.shell.enable {
     users = {
       defaultUserShell = (
         if (config.programs.zsh.enable == true) then

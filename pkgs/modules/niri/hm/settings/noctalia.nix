@@ -8,6 +8,7 @@ let
 
   noctaliaNiriSettingsEnable = (
     builtins.all (x_: x_) [
+      config.features.niri.enable
       config.programs.niri.enable
       config.programs.noctalia.enable
     ]

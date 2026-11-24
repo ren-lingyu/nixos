@@ -1,5 +1,13 @@
-{ pkgs, ... }: {
-  config = {
+{
+  pkgs,
+  config,
+  lib,
+  ...
+}:
+{
+  options.features.office.enable = lib.mkEnableOption "Home Manager office applications";
+
+  config = lib.mkIf config.features.office.enable {
     programs.libreoffice = {
       enable = true;
       package = pkgs.libreoffice-qt-stable.override {

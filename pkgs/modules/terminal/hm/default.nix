@@ -1,5 +1,13 @@
-{ pkgs, ... }: {
-  config = {
+{
+  pkgs,
+  config,
+  lib,
+  ...
+}:
+{
+  options.features.terminal.enable = lib.mkEnableOption "Home Manager terminal configuration";
+
+  config = lib.mkIf config.features.terminal.enable {
     programs.alacritty = {
       enable = false;
       settings = {

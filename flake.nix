@@ -172,10 +172,14 @@
 
               features = {
                 agent = {
-                  nixosModules = [ inputs.local-nixpkgs.nixosModules.agent ];
+                  nixosModules = [
+                    inputs.local-nixpkgs.nixosModules.agent
+                    { features.agent.enable = true; }
+                  ];
                   homeModules = [
                     inputs.local-nixpkgs.homeModules.agent
                     ({ config, options, ... }: {
+                      features.agent.enable = true;
                       features.agent.pi.providers = lib.mapAttrs (
                         name: provider:
                         let
@@ -187,13 +191,17 @@
                     })
                   ];
                 };
-                diagnostics.homeModules = [ inputs.local-nixpkgs.homeModules.diagnostics ];
+                diagnostics.homeModules = [
+                  inputs.local-nixpkgs.homeModules.diagnostics
+                  { features.diagnostics.enable = true; }
+                ];
                 editor = {
                   nixpkgsOverlays = [ inputs.local-nixpkgs.overlays.editor ];
                   homeModules = [
                     inputs.local-nixpkgs.homeModules.editor
                     ({ osConfig, ... }: {
                       features.editor = {
+                        enable = true;
                         inherit (osConfig.modules.features.editor)
                           defaultEditor
                           vim
@@ -209,6 +217,7 @@
                   nixosModules = [
                     inputs.local-nixpkgs.nixosModules.file-manager
                     ({ config, ... }: {
+                      features.file-manager.enable = true;
                       features.file-manager.fileChooser = config.modules.features.file-manager.fileChooser;
                     })
                   ];
@@ -216,6 +225,7 @@
                     inputs.local-nixpkgs.homeModules.file-manager
                     ({ osConfig, ... }: {
                       features.file-manager = {
+                        enable = true;
                         inherit (osConfig.modules.features.file-manager) fileChooser;
                         wayfile.enable = osConfig.modules.features.niri.enable;
                       };
@@ -223,8 +233,14 @@
                   ];
                 };
                 font = {
-                  nixosModules = [ inputs.local-nixpkgs.nixosModules.font ];
-                  homeModules = [ inputs.local-nixpkgs.homeModules.font ];
+                  nixosModules = [
+                    inputs.local-nixpkgs.nixosModules.font
+                    { features.font.enable = true; }
+                  ];
+                  homeModules = [
+                    inputs.local-nixpkgs.homeModules.font
+                    { features.font.enable = true; }
+                  ];
                 };
                 greeter.nixosModules = [
                   inputs.local-nixpkgs.nixosModules.greeter
@@ -239,43 +255,60 @@
                         enable = true;
                         monitorName = (builtins.head defaults).name;
                         sessionPackages = lib.mkMerge [
-                          (lib.mkIf config.modules.features.niri.enable (
+                          (lib.mkIf (config.features.niri.enable or false) (
                             lib.mkBefore [ config.features.niri.sessionPackage ]
                           ))
-                          (lib.mkIf config.modules.features.x11-session.enable [ config.features.x11-session.sessionPackage ])
+                          (lib.mkIf (config.features.x11-session.enable or false) [
+                            config.features.x11-session.sessionPackage
+                          ])
                         ];
                       };
                     }
                   )
                 ];
                 media = {
-                  nixosModules = [ inputs.local-nixpkgs.nixosModules.media ];
-                  homeModules = [ inputs.local-nixpkgs.homeModules.media ];
+                  nixosModules = [
+                    inputs.local-nixpkgs.nixosModules.media
+                    { features.media.enable = true; }
+                  ];
+                  homeModules = [
+                    inputs.local-nixpkgs.homeModules.media
+                    { features.media.enable = true; }
+                  ];
                 };
                 niri = {
                   nixpkgsOverlays = [ inputs.niri-flake.overlays.niri ];
                   nixosModules = [
                     inputs.local-nixpkgs.nixosModules.niri
-                    ({ config, ... }: { features.niri = { inherit (config.modules.features.niri) enable noctalia; }; })
+                    ({ config, ... }: {
+                      features.niri = {
+                        enable = true;
+                        inherit (config.modules.features.niri) noctalia;
+                      };
+                    })
                   ];
                   homeModules = [
                     inputs.niri-flake.homeModules.niri
                     inputs.local-nixpkgs.homeModules.niri
                     ({ osConfig, ... }: {
                       features.niri = {
-                        inherit (osConfig.modules.features.niri) enable noctalia waybar;
+                        enable = true;
+                        inherit (osConfig.modules.features.niri) noctalia waybar;
                         inherit (llib.hosts.getUniqueEnabledHost osConfig.modules.hosts) monitors;
                       };
                     })
                   ];
                 };
-                office.homeModules = [ inputs.local-nixpkgs.homeModules.office ];
+                office.homeModules = [
+                  inputs.local-nixpkgs.homeModules.office
+                  { features.office.enable = true; }
+                ];
                 proxy.nixosModules = [
                   inputs.local-nixpkgs.nixosModules.proxy
                   ({ config, ... }: {
                     features.proxy = {
+                      enable = true;
                       inherit (config.modules.features.proxy)
-                        enable
                         clash-verge
                         throne
                         mihomo
@@ -285,8 +318,14 @@
                   })
                 ];
                 shell = {
-                  nixosModules = [ inputs.local-nixpkgs.nixosModules.shell ];
-                  homeModules = [ inputs.local-nixpkgs.homeModules.shell ];
+                  nixosModules = [
+                    inputs.local-nixpkgs.nixosModules.shell
+                    { features.shell.enable = true; }
+                  ];
+                  homeModules = [
+                    inputs.local-nixpkgs.homeModules.shell
+                    { features.shell.enable = true; }
+                  ];
                 };
                 sops = {
                   nixosModules = [
@@ -294,8 +333,8 @@
                     inputs.local-nixpkgs.nixosModules.sops
                     ({ config, ... }: {
                       features.sops = {
+                        enable = true;
                         authorizedUids = config.modules.features.sops.allowUidList;
-                        ageKeySource = ./modules/features/sops/os/sops.hm.age;
                       };
                     })
                   ];
@@ -315,6 +354,7 @@
                       in
                       {
                         features.sops = {
+                          enable = true;
                           ageKeyPath = osConfig.age.secrets."sops.hm".path;
                         }
                         // lib.optionalAttrs source.secretsInput.isDefined { inherit (values) secretsInput; }
@@ -324,11 +364,23 @@
                     )
                   ];
                 };
-                terminal.homeModules = [ inputs.local-nixpkgs.homeModules.terminal ];
-                texlive.nixosModules = [ inputs.local-nixpkgs.nixosModules.texlive ];
+                terminal.homeModules = [
+                  inputs.local-nixpkgs.homeModules.terminal
+                  { features.terminal.enable = true; }
+                ];
+                texlive.nixosModules = [
+                  inputs.local-nixpkgs.nixosModules.texlive
+                  { features.texlive.enable = true; }
+                ];
                 x11-session = {
-                  nixosModules = [ inputs.local-nixpkgs.nixosModules.x11-session ];
-                  homeModules = [ inputs.local-nixpkgs.homeModules.x11-session ];
+                  nixosModules = [
+                    inputs.local-nixpkgs.nixosModules.x11-session
+                    { features.x11-session.enable = true; }
+                  ];
+                  homeModules = [
+                    inputs.local-nixpkgs.homeModules.x11-session
+                    { features.x11-session.enable = true; }
+                  ];
                 };
               };
             };
@@ -580,7 +632,11 @@
                     modules = ./modules;
                   }
                   // {
-                    inherit (inputs.local-nixpkgs.checks.${system}) feature-discovery sops-functions;
+                    inherit (inputs.local-nixpkgs.checks.${system})
+                      feature-discovery
+                      native-feature-enables
+                      sops-functions
+                      ;
                   };
 
                 devShells = {

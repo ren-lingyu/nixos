@@ -1,5 +1,13 @@
-{ pkgs, ... }: {
-  config = {
+{
+  pkgs,
+  config,
+  lib,
+  ...
+}:
+{
+  options.features.media.enable = lib.mkEnableOption "system media configuration";
+
+  config = lib.mkIf config.features.media.enable {
     # boot = {
     #   extraModulePackages = with config.boot.kernelPackages; [
     #     v4l2loopback

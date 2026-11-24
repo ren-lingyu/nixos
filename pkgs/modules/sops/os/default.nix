@@ -13,18 +13,15 @@ let
 in
 {
   options.features.sops = {
+    enable = lib.mkEnableOption "system SOPS integration";
     authorizedUids = lib.mkOption {
       type = lib.types.listOf lib.types.ints.unsigned;
       default = [ ];
       description = "UIDs authorized to read the shared SOPS age key.";
     };
-    ageKeySource = lib.mkOption {
-      type = lib.types.path;
-      description = "Repository ciphertext for the shared SOPS age key.";
-    };
   };
 
-  config = {
+  config = lib.mkIf config.features.sops.enable {
     users.groups.${sopsGroup} = {
       name = sopsGroup;
       members = builtins.map (
@@ -48,7 +45,7 @@ in
 
     age.secrets = {
       "sops.hm" = {
-        rekeyFile = cfg.ageKeySource;
+        rekeyFile = ./sops.hm.age;
         owner = "root";
         group = sopsGroup;
         mode = "0440";

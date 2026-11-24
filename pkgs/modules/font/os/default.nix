@@ -1,5 +1,13 @@
-{ pkgs, ... }: {
-  config = {
+{
+  pkgs,
+  config,
+  lib,
+  ...
+}:
+{
+  options.features.font.enable = lib.mkEnableOption "system font configuration";
+
+  config = lib.mkIf config.features.font.enable {
     fonts = {
       packages = with pkgs; [
         lxgw-wenkai

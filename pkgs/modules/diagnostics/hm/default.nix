@@ -1,5 +1,13 @@
-{ pkgs, ... }: {
-  config = {
+{
+  pkgs,
+  config,
+  lib,
+  ...
+}:
+{
+  options.features.diagnostics.enable = lib.mkEnableOption "Home Manager diagnostic tools";
+
+  config = lib.mkIf config.features.diagnostics.enable {
     home.packages = with pkgs; [
       dnsutils
       mtr

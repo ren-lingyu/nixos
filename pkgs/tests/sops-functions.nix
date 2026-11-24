@@ -75,8 +75,8 @@ let
     } secrets_."database.password")
     (assertEqual "user template path" "/run/user/1000/secrets/cloud.token" secrets_."cloud.token".path)
   ];
-  membersFor =
-    accounts:
+  configFor =
+    enabled: accounts:
     (lib.evalModules {
       specialArgs.pkgs = { };
       modules = [
@@ -84,24 +84,34 @@ let
         {
           options = {
             users.users = lib.mkOption { type = lib.types.raw; };
-            users.groups = lib.mkOption { type = lib.types.raw; };
+            users.groups = lib.mkOption {
+              type = lib.types.raw;
+              default = { };
+            };
             environment.systemPackages = lib.mkOption { type = lib.types.raw; };
-            age.secrets = lib.mkOption { type = lib.types.raw; };
+            age.secrets = lib.mkOption {
+              type = lib.types.raw;
+              default = { };
+            };
           };
           config = {
             users.users = accounts;
             features.sops = {
-              ageKeySource = ./sops-functions.nix;
+              enable = enabled;
               authorizedUids = [ 1000 ];
             };
           };
         }
       ];
-    }).config.users.groups.sops-decrypt.members;
+    }).config;
+  membersFor = accounts: (configFor true accounts).users.groups.sops-decrypt.members;
+  disabled = configFor false (throw "Disabled SOPS must not resolve authorized accounts");
   fails = value: !(builtins.tryEval (builtins.deepSeq value true)).success;
 
 in
 assert builtins.deepSeq tests_ true;
+assert disabled.users.groups == { };
+assert disabled.age.secrets == { };
 assert
   membersFor {
     different-key = {

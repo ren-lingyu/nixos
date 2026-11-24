@@ -8,6 +8,7 @@ let
 in
 {
   options.features.sops = {
+    enable = lib.mkEnableOption "Home Manager SOPS integration";
     secretsInput = lib.mkOption {
       type = (import ../../../lib/types.nix { inherit lib; }).sopsSecretsInput;
       default = [ ];
@@ -30,7 +31,7 @@ in
     };
   };
 
-  config = {
+  config = lib.mkIf config.features.sops.enable {
     home.sessionVariables = {
       SOPS_AGE_KEY_FILE = cfg.ageKeyPath;
     };

@@ -1,4 +1,9 @@
-{ pkgs, lib, ... }:
+{
+  pkgs,
+  lib,
+  config,
+  ...
+}:
 let
 
   sessionWrapper =
@@ -42,6 +47,7 @@ let
 in
 {
   options.features.x11-session = {
+    enable = lib.mkEnableOption "system X11 session integration";
     sessionPackage = lib.mkOption {
       type = lib.types.package;
       readOnly = true;
@@ -50,7 +56,7 @@ in
     };
   };
 
-  config = {
+  config = lib.mkIf config.features.x11-session.enable {
     services.xserver = {
       enable = true;
 

@@ -21,6 +21,7 @@
 
 !/pkgs/modules/
 !/pkgs/modules/**/
+!/pkgs/modules/**/*.age
 !/pkgs/modules/**/*.css
 !/pkgs/modules/**/*.md
 !/pkgs/modules/**/*.nix

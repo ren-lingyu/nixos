@@ -74,7 +74,9 @@ FP User validator 保证启用的 user 已绑定 UID, 启用用户的用户名�
 user profile 的 HM 实现导入到自身绑定的 UID. 其他类别的已启用模块, 包括 share 和 host, 将 HM 实现及外部 HM 集成加入 =home-manager.sharedModules=.
 
 ** 原生 Feature 接口与过渡声明
-迁移后的模块使用各自 NixOS 或 Home Manager evaluation scope 的 =features.<name>= options. 两侧分别声明所需输入, HM 只通过 =osConfig= 读取实际系统依赖. Root registry 将旧 FP 配置映射到原生 options, 并将 HM implementation 与映射模块一起送达选中的 UID.
+客制化功能使用 =features.<name>= 原生 options. 每个实际存在的 NixOS/HM 模块各自声明默认 =false= 的 =features.<name>.enable=. 导入模块使 options 可用, 显式启用后才提供功能配置. OS 与 HM 独立启用, Shell 的系统 shell 状态与包、Niri 的系统包等依赖仍通过原生接口表达.
+
+当前 root registry 负责按 FP 配置选择系统和 UID, 并在收到模块的作用域显式启用、映射配置. 这些映射、现有 discovery markers 和 HM 分配协议属于第一阶段的过渡接线.
 
 =mkNixosSystem= 仍统一加载原有声明, 独立于 =share.enable=. SOPS 和 Agent 的 =hm/_options.hm.nix= 暂时保留 =moduleInterfaces=, 供现有 user profile 描述账户 secrets、provider 和 API key 路径. 由 root 接线映射已定义字段. Niri 和 X11 分别输出实际 session package, root 将已启用 provider 的包送给 Greeter, 使用 =mkBefore= 保持 Niri 优先.
 
@@ -285,7 +287,7 @@ nixosConfigurations.nixos.modules.features.editor.emacs.programs.package =
 - Proxy 保留现有子功能开关和互斥规则. File-manager 保留两侧 file chooser 配置、terminal-exec 依赖及按系统 Niri 选择 Wayfile 的策略.
 - Editor 在每个 HM scope 使用原生 package values. Root adapter 继续求值旧 FP package selectors, 并将 Emacs programs 和 services 的包分别传入.
 - Niri 保留 OS 服务依赖, 由 root 向已分配的 HM scope 提供显示器及 Noctalia/Waybar 选择. Greeter 消费实际 session packages, 不负责启用 providers.
-- SOPS OS 按 UID 查找实际系统账户并授权 =sops-decrypt=. 密文 =sops.hm.age= 保留在 root. SOPS HM 接收每账户 secrets 描述和实际 age key 路径. Agent HM 接收 provider 开关与 API key 文件路径.
+- SOPS OS 按 UID 查找实际系统账户并授权 =sops-decrypt=. SOPS 模块持有自己的接线密文 =pkgs/modules/sops/os/sops.hm.age=. Agenix 和 Agenix-rekey 继续由 root 的 Share integration 提供. SOPS HM 接收每账户 secrets 描述和实际 age key 路径. Agent HM 接收 provider 开关与 API key 文件路径.
 
 **** [[file:./modules/workloads/][/modules/workloads]]
 #+begin_example

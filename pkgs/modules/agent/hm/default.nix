@@ -42,7 +42,9 @@ in
         };
       });
 
-  config = {
+  options.features.agent.enable = lib.mkEnableOption "Home Manager agent tools";
+
+  config = lib.mkIf config.features.agent.enable {
     home = {
       packages = builtins.concatLists [ packagesWithSkills_ ];
       file = {

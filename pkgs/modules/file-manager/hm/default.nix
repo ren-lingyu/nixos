@@ -11,11 +11,12 @@ let
 in
 {
   options.features.file-manager = {
+    enable = lib.mkEnableOption "Home Manager file manager integration";
     fileChooser.enable = lib.mkEnableOption "Yazi file chooser";
     wayfile.enable = lib.mkEnableOption "Wayfile directory handler";
   };
 
-  config = {
+  config = lib.mkIf config.features.file-manager.enable {
     assertions = [
       {
         assertion = (

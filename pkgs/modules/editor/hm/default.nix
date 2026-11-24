@@ -11,6 +11,7 @@ let
 in
 {
   options.features.editor = {
+    enable = lib.mkEnableOption "Home Manager editor configuration";
     defaultEditor = lib.mkOption {
       type = (import ../../../lib/types.nix { inherit lib; }).defaultEditor;
       default = null;
@@ -29,7 +30,7 @@ in
     };
   };
 
-  config = {
+  config = lib.mkIf config.features.editor.enable {
     home.packages = lib.optionals cfg.lem.enable [ cfg.lem.package ];
 
     programs.nixvim = {

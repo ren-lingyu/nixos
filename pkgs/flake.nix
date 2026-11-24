@@ -147,6 +147,17 @@
 
             perSystem = { pkgs, ... }: {
               checks = {
+                native-feature-enables = import ./tests/native-feature-enables.nix {
+                  inherit lib pkgs;
+                  nixosModules = llib.discoverModules {
+                    root = ./modules;
+                    modulePath = "os/default.nix";
+                  };
+                  homeModules = llib.discoverModules {
+                    root = ./modules;
+                    modulePath = "hm/default.nix";
+                  };
+                };
                 feature-discovery = import ./tests/discovery.nix {
                   inherit lib;
                   inherit (pkgs) runCommand;
