@@ -2,9 +2,17 @@
 
 ## Purpose and composition
 
-The committed project defines nixos (ThinkBook), nixos-matebook, nixos-server (Aliyun) and nixos-wsl. Its goal is selectable shared user capabilities over distinct platform/hardware environments, with finer ownership than one monolithic HM profile. Root flake-parts options own final enablement, UID binding and external input/module/overlay adaptation. Hosts, users, features and workloads have peer responsibilities; explicitly enabled share supplies common OS/HM behavior. Modules check dependencies instead of silently enabling peers.
+The committed project defines nixos (ThinkBook), nixos-matebook, nixos-server (Aliyun) and nixos-wsl. Its goal is selectable shared user capabilities over distinct platform/hardware environments, with finer ownership than one monolithic HM profile. Root flake-parts options own final enablement, UID binding and external input/module/overlay adaptation. The current framework organizes Hosts, Users, Features and Workloads through a largely uniform category and assembly protocol. Explicitly enabled Share supplies common OS/HM behavior. Modules check dependencies without silently enabling peers. The owner sees value in sharing these mechanisms and has retired category parity in system construction as a long-term design principle.
 
 Module descriptors are discovered from OS/HM implementation entry points and reject nested modules. Optional root default.nix holds cross-implementation coordination. moduleRegistry separates static metadata and external integrations; nixosBuilder and llib.flakeParts.mkNixosConfigurations construct the output collection. The typed adapter resolves only declared functionTo/submodule values. Configuration/metadata fields must be disjoint. OS config.modules is the merged internal readOnly view; HM consumes osConfig.modules.
+
+## Construction semantics and layer boundaries
+
+Hosts provide infrastructure required by every system closure, with exactly one selected Host per system. Features describe composable capabilities. Users describe people or accounts deployed on a system and their environments. Workloads describe deployable, movable and cooperating services or tools. Share's existence and construction semantics need review. These differences in responsibility, presence, cardinality and dependencies can warrant category-specific construction protocols while reusing discovery, option construction, metadata management and implementation assembly.
+
+Prefer expressing fundamental structure and responsibilities in the construction protocol so invalid shapes are harder to represent. Keep validation for global consistency, cross-object relations, library preconditions and constraints on final NixOS state. Judge changes by the constraints they express and where the relevant inputs are available. The current Host protocol permits independent `enable` values, validates that exactly one Host is enabled and uses a getter to recover it. Direct construction with a single selected Host is a research direction with its API still open.
+
+The current split reflects the incremental introduction of the flake-parts module system onto an existing module structure. The review should distinguish the global static infrastructure model, per-system construction and local plans, and implementation requiring final NixOS evaluation. WireGuard topology is a candidate for derivation in flake-parts. NixOS remains the natural place for service configuration, actual UIDs, resolved secret paths, interface configuration and nftables rules. Assess static computations and `functionTo` uses individually based on their real dependencies and responsibilities. The research and open interface decisions are in [backlog.md](backlog.md#module-system-architecture-refactor).
 
 ## Module directory interface
 
@@ -44,7 +52,7 @@ Tests and treefmt are registered in flake checks. The committed test organizatio
 
 ## Network ownership
 
-Hosts own encrypted WireGuard material and stable numbers. lib/hosts.nix derives per-network endpoint/spoke configuration, interface maps and a shared topology view. Roles are per network, addresses are stable-number-derived and a host without WireGuard does not need a key path. Workloads consume explicit topology/interface/address/port relationships instead of coupling to the retired interconnect Feature. Configuration topology is not live peer health, and no current handshake/routing/HTTP result is established here.
+Hosts own encrypted WireGuard material and stable numbers. `lib/hosts.nix` derives one network per endpoint Host and keys the topology by Hub and node Host names. The read-only NixOS topology exposes each Hub interface name, subnet and node IPv4 addresses. Roles are per network, addresses use stable Host numbers, and a Host without WireGuard needs no WireGuard key path. Each Hub configures spoke peers with individual `/32` `AllowedIPs`. Each spoke uses that network's subnet as the Hub peer's `AllowedIPs`. IPv4 forwarding is enabled on endpoint Hosts. The `wireguard-isolation` nftables FORWARD chain allows IPv4 forwarding within a local Hub's own WireGuard interface and drops other forwarded traffic involving managed WireGuard interfaces. It is independent of local OUTPUT policy. SSH targets consume the same topology for system-wide aliases and trusted Host identities. See [current.md](current.md#wireguard-ssh-targets-and-aliyun-reachability) for verification and the Aliyun OUTPUT diagnosis.
 
 ## Definition ownership
 
@@ -52,7 +60,9 @@ Internal marks producer ownership rather than confidentiality. ReadOnly constrai
 
 ## Workload responsibilities
 
-Workloads are the peer category for host-selected services. Caddy reverse-proxy and WBO whiteboard containers receive explicit addresses, ports, interfaces and permitted-source inputs. Their FP options use declared functionTo values for delayed access to resolved system networking; the adapter resolves those values before OS consumers use them. WBO's port resolves to null by default; 18000 is an example, so final composition must supply its intended value. Firewall policy stays explicit, and wiring does not establish deployed HTTP reachability. Earlier containers drafts and the retired interconnect namespace are historical designs rather than the current API.
+Workloads describe services and tools selected by deployment configuration. The current deployment wires Caddy on Aliyun to WBO on ThinkBook in `flake.nix`. Each consumes explicit network settings, including WBO's permitted source. Declared `functionTo` values defer access to resolved system networking until the adapter resolves the inputs for OS consumers. WBO's port defaults to null and this deployment explicitly supplies 18000. The current Caddy module also installs the interface-wide OUTPUT rule described in [current.md](current.md#wireguard-ssh-targets-and-aliyun-reachability). The wiring establishes the configured endpoints. Deployed HTTP reachability requires runtime evidence.
+
+Preserve Workload portability by letting deployment configuration wire explicit endpoints. A Workload can consume Host networking, declare required access and its own deployment and security constraints, and depend on other Workloads. A Workload's enablement should leave the Host in control of its default egress policy. Hosts are mandatory infrastructure, so bidirectional data flow between Hosts and Workloads alone does not justify a top-level Networking category. Check whether the concrete evaluation dependencies form a cycle. Future flake-parts composition could express deployment relationships and service connections directly. Workload instances, an explicit dependency protocol and configuration schema remain open.
 
 ## Virtualization and host resources
 
