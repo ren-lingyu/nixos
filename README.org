@@ -496,14 +496,17 @@ Workload 的 OS/HM 可用性由模块发现结果派生, 无需类别级一致�
 ├── identity.nix
 ├── matebook/
 ├── shared.nix
+├── ssh-targets.nix
 ├── thinkbook/
 ├── wireguard.nix
 └── wsl/
 #+end_example
 
-[[file:./modules/hosts/default.nix][modules/hosts/default.nix]] 导入 boot-manager, identity, shared 和 WireGuard 相关通用模块. =_validators.fp.nix= 在 metadata 分支校验全部 Host 的静态属性, 在 configuration 分支确保恰好启用一个 host. =_options.fp.nix= 定义 host metadata schema.
+[[file:./modules/hosts/default.nix][modules/hosts/default.nix]] 导入 boot-manager, identity, shared, SSH targets 和 WireGuard 相关通用模块. =_validators.fp.nix= 在 metadata 分支校验全部 Host 的静态属性, 在 configuration 分支确保恰好启用一个 host. =_options.fp.nix= 定义 host metadata schema.
 
 [[file:./modules/hosts/boot-manager.nix][modules/hosts/boot-manager.nix]], [[file:./modules/hosts/identity.nix][modules/hosts/identity.nix]], [[file:./modules/hosts/shared.nix][modules/hosts/shared.nix]] 和 [[file:./modules/hosts/wireguard.nix][modules/hosts/wireguard.nix]] 分别消费 host metadata, 生成 boot manager, identity, shared capability 和 WireGuard topology/secret 的配置.
+
+[[file:./modules/hosts/ssh-targets.nix][modules/hosts/ssh-targets.nix]] 从 =networking.wireguard.topology= 与 Host Registry 生成系统级 SSH 客户端别名 =<hub>.<node>=, 使用拓扑中的 IPv4 地址作为 =HostName=. 同一节点经不同 Hub 访问时共用 =HostKeyAlias= 与 Registry 中的 SSH host public key, 并由 =programs.ssh.knownHosts= 声明式验证服务器身份. =programs.ssh.hosts= 的 =order= 从 1000 开始, 依据 =(hub.number, node.number)= 排序分配. 当选中 Host 没有 WireGuard 配置时不生成这些条目; 参与生成的节点缺少 SSH host public key 时显式报错. 该集成不依赖 =modules/users/=, 不指定 SSH 登录用户、认证凭据或认证方法, 也不启用或修改 SSH 服务端. 别名只描述网络路径与服务器身份, 不保证 SSH 登录权限.
 
 各 host 的 =_metadata.fp.nix= 由 registry 的 metadata 子模块加载, 用于声明 UID registry, monitor, public IP, WireGuard 和 identity metadata. =ssh.private.age= 与 =wireguard.private.age= 分别保存该 host 的加密 SSH host private key 与 WireGuard private key, 并由 =_metadata.fp.nix= 引用.
 
@@ -631,7 +634,7 @@ NixOS-WSL host, hostname =nixos-wsl=.
 最小用户 profile, 提供空的 =hm/default.nix= 实现, 可以接收最终配置启用的公共 HM features.
 
 * 测试
-[[file:./tests/default.nix][tests/default.nix]] 调用 =llib.tests.mkChecks=, 按 =test-overlay.nix= 发现各组测试入口, 在独立测试 scope 中组合定义并收集检查派生物. 嵌套 check 名称以 =-= 连接. 测试覆盖 FP validator 发现/组合/惰性边界, 自定义类型, Registry 的 =existModule= 派生与只读约束, host 与 SOPS 相关函数, 配置适配器.
+[[file:./tests/default.nix][tests/default.nix]] 调用 =llib.tests.mkChecks=, 按 =test-overlay.nix= 发现各组测试入口, 在独立测试 scope 中组合定义并收集检查派生物. 嵌套 check 名称以 =-= 连接. 测试覆盖 FP validator 发现/组合/惰性边界, 自定义类型, Registry 的 =existModule= 派生与只读约束, host 与 SOPS 相关函数, 配置适配器. Host 函数测试还覆盖 WireGuard SSH targets 的多 Hub 别名、排序、主机身份去重、缺失公钥以及不依赖用户模块的系统级集成.
 
 各组测试的 =test-overlay.nix= 使用与包相同的外层构造协议, 通过 =final.callPackage ./test.nix= 调用测试体. =test.nix= 保存断言和检查派生物, fixtures 保留在所属组内; 专用入口文件名避免将 fixtures 误识别为测试组.
 

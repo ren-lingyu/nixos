@@ -2,6 +2,7 @@
   lib,
   runCommand,
   hosts,
+  modules,
 }:
 let
 
@@ -70,6 +71,15 @@ let
     };
   };
 
+  sshRegistry_ = lib.mapAttrs (
+    name_: host_:
+    host_
+    // {
+      identity.keys.ssh.public.key =
+        if name_ == "excluded" then null else "ssh-ed25519 ${name_}-host-key";
+    }
+  ) wireguardHosts_;
+
   mkNetworks_ =
     registry: enabledHostName:
     hosts.mkWireGuardNetworks {
@@ -90,6 +100,49 @@ let
     "aliyun"
     "backup"
   ]) "thinkbook";
+
+  sshTargets_ = hosts.mkWireGuardSshTargets {
+    registry = sshRegistry_;
+    topology = topology_;
+  };
+
+  missingKeySshTargets_ = hosts.mkWireGuardSshTargets {
+    registry = sshRegistry_ // {
+      matebook = sshRegistry_.matebook // {
+        identity.keys.ssh.public.key = null;
+      };
+    };
+    topology = topology_;
+  };
+
+  evalSshModule_ =
+    enabledHostName_:
+    (lib.evalModules {
+      specialArgs.llib.hosts = hosts;
+      modules = [
+        (modules + "/hosts/ssh-targets.nix")
+        {
+          options = {
+            modules.hosts = lib.mkOption { type = lib.types.attrsOf lib.types.anything; };
+            networking.wireguard.topology = lib.mkOption { type = lib.types.attrsOf lib.types.anything; };
+            programs.ssh.hosts = lib.mkOption {
+              type = lib.types.attrsOf lib.types.anything;
+              default = { };
+            };
+            programs.ssh.knownHosts = lib.mkOption {
+              type = lib.types.attrsOf lib.types.anything;
+              default = { };
+            };
+          };
+          config = {
+            modules.hosts = lib.mapAttrs (
+              name_: host_: host_ // { enable = name_ == enabledHostName_; }
+            ) sshRegistry_;
+            networking.wireguard.topology = topology_;
+          };
+        }
+      ];
+    }).config.programs.ssh;
 
   isolationRules_ = config: config.nftables.tables."wireguard-isolation".content;
 
@@ -236,6 +289,67 @@ let
     (lib.hasInfix ''iifname { "wg3", "wg5" } drop'' (isolationRules_ aliyun_))
     (lib.hasInfix ''oifname { "wg3", "wg5" } drop'' (isolationRules_ thinkbook_))
     (lib.hasInfix "priority -10; policy accept;" (isolationRules_ matebook_))
+
+    (builtins.length (builtins.attrNames sshTargets_.hosts) == 8)
+    (builtins.length (builtins.attrNames sshTargets_.knownHosts) == 4)
+    (
+      sshTargets_.hosts."aliyun.thinkbook" == {
+        order = 1000;
+        HostName = "10.100.3.2";
+        HostKeyAlias = "wg-host-thinkbook";
+      }
+    )
+    (sshTargets_.hosts."aliyun.aliyun".order == 1001)
+    (sshTargets_.hosts."aliyun.matebook".order == 1002)
+    (sshTargets_.hosts."aliyun.backup".order == 1003)
+    (sshTargets_.hosts."backup.thinkbook".order == 1004)
+    (sshTargets_.hosts."backup.matebook".order == 1006)
+    (sshTargets_.hosts."backup.matebook".HostName == "10.100.5.4")
+    (
+      sshTargets_.hosts."backup.matebook".HostKeyAlias == sshTargets_.hosts."aliyun.matebook".HostKeyAlias
+    )
+    (sshTargets_.knownHosts."wg-host-matebook".publicKey == "ssh-ed25519 matebook-host-key")
+    (
+      builtins.attrNames sshTargets_.knownHosts == [
+        "wg-host-aliyun"
+        "wg-host-backup"
+        "wg-host-matebook"
+        "wg-host-thinkbook"
+      ]
+    )
+    (builtins.all (
+      settings_:
+      builtins.attrNames settings_ == [
+        "HostKeyAlias"
+        "HostName"
+        "order"
+      ]
+    ) (builtins.attrValues sshTargets_.hosts))
+    (
+      hosts.mkWireGuardSshTargets {
+        registry = sshRegistry_;
+        topology = { };
+      } == {
+        hosts = { };
+        knownHosts = { };
+      }
+    )
+    (
+      (hosts.mkWireGuardSshTargets {
+        registry = sshRegistry_;
+        topology = singleHub_.topology;
+        baseOrder = 1200;
+      }).hosts."aliyun.thinkbook".order == 1200
+    )
+    (!(builtins.tryEval (builtins.deepSeq missingKeySshTargets_.knownHosts true)).success)
+    ((evalSshModule_ "thinkbook").hosts == sshTargets_.hosts)
+    ((evalSshModule_ "thinkbook").knownHosts == sshTargets_.knownHosts)
+    (
+      (evalSshModule_ "excluded") == {
+        hosts = { };
+        knownHosts = { };
+      }
+    )
   ];
 
 in
