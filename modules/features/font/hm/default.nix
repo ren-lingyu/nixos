@@ -1,20 +1,2 @@
-{
-  config,
-  osConfig,
-  pkgs,
-  lib,
-  ...
-}:
-let
-
-  cfg = osConfig.modules.features.font;
-
-in
-{
-  config = lib.mkIf cfg.enable {
-    fonts.fontconfig = {
-      enable = true;
-      defaultFonts = osConfig.fonts.fontconfig.defaultFonts;
-    };
-  };
-}
+# Retain this entry for root Feature discovery and availability.
+{ }

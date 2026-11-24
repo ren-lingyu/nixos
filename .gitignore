@@ -19,6 +19,13 @@
 !/pkgs/lib/**/
 !/pkgs/lib/**/*.nix
 
+!/pkgs/modules/
+!/pkgs/modules/**/
+!/pkgs/modules/**/*.css
+!/pkgs/modules/**/*.md
+!/pkgs/modules/**/*.nix
+!/pkgs/modules/**/*.xml
+
 !/pkgs/pkgs/
 !/pkgs/pkgs/**/
 !/pkgs/pkgs/**/*.md
@@ -31,6 +38,10 @@
 !/pkgs/pkgs/**/*.hs
 !/pkgs/pkgs/**/*.el
 !/pkgs/pkgs/**/cabal.project
+
+!/pkgs/tests/
+!/pkgs/tests/**/
+!/pkgs/tests/**/*.nix
 
 !/modules/
 !/modules/**/

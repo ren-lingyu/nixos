@@ -1,15 +1,7 @@
 { lib }: rec {
-  types = rec {
-    monitor = import ./types.monitor.nix { inherit lib; };
-
-    monitors = lib.types.attrsOf monitor;
-  };
-
   modules = import ./modules.nix { inherit lib; };
 
   hosts = import ./hosts.nix { inherit lib; };
-
-  features.sops = import ./features.sops.nix;
 
   flakeParts = lib.mergeAttrsList [
     (import ./flakeParts.configurations.nix {

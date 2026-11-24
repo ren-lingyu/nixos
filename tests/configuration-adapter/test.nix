@@ -49,7 +49,8 @@ let
       ++ definitions;
     }).config.registry;
   registry_ = evalRegistry_ [ ];
-  configuration_ =
+  evalConfiguration_ =
+    registry: overrides:
     (lib.evalModules {
       modules = [
         {
@@ -57,7 +58,7 @@ let
             type = flakeParts.types.nixosConfigurations {
               inherit modules;
               llib = declarationLib_;
-              registry = registry_;
+              inherit registry;
             };
           };
           config.systems.test = {
@@ -68,8 +69,10 @@ let
             };
           };
         }
-      ];
+      ]
+      ++ overrides;
     }).config.systems.test;
+  configuration_ = evalConfiguration_ registry_ [ ];
   # Inspect the real builder's generated bridge without evaluating OS services.
   bridge_ = flakeParts.mkNixosSystem {
     inherit modules;
@@ -88,6 +91,41 @@ let
     };
   };
   evaluationFails_ = value: !(builtins.tryEval (builtins.deepSeq value true)).success;
+  allocationRegistry_ = evalRegistry_ [
+    {
+      registry.features.editor.homeModules = [
+        { options.sampleUpstream = lib.mkEnableOption "upstream fixture"; }
+        { options.sampleImplementation = lib.mkEnableOption "implementation fixture"; }
+        {
+          sampleUpstream = true;
+          sampleImplementation = true;
+        }
+      ];
+    }
+  ];
+  allocationConfiguration_ = evalConfiguration_ allocationRegistry_ [
+    {
+      config.systems.test.modules = {
+        users.lingyu-minimal = {
+          enable = true;
+          uid = 1001;
+        };
+        features.editor = {
+          enable = true;
+          allowUidList = [ 1001 ];
+        };
+      };
+    }
+  ];
+  allocated_ =
+    flakeParts.homeUserModules
+      (flakeParts.enabledModules (moduleLib.discoverModules modules) allocationConfiguration_)
+      allocationConfiguration_
+      allocationRegistry_;
+  allocationOptions_ =
+    (lib.evalModules {
+      modules = builtins.filter (module: !builtins.isPath module) allocated_."1001".imports;
+    }).config;
   availabilityTests_ = [
     (
       registry_.features.proxy.metadata.existModule == {
@@ -130,6 +168,10 @@ let
     (configuration_.modules.features.niri.allowUidList == [ 1000 ])
     (configuration_.modules.features.proxy.allowUidList == [ ])
     (!configuration_.modules.features.editor.enable)
+    (builtins.length allocated_."1000".imports == 1)
+    (builtins.length allocated_."1001".imports == 5)
+    allocationOptions_.sampleUpstream
+    allocationOptions_.sampleImplementation
     (
       !(builtins.elem (
         modules + "/features/editor/hm/default.nix"

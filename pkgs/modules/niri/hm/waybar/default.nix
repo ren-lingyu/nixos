@@ -1,0 +1,34 @@
+{
+  config,
+  pkgs,
+  lib,
+  ...
+}:
+let
+
+  cfg = config.features.niri;
+
+in
+{
+  imports = [ ./settings.nix ];
+
+  config =
+    lib.mkIf
+      (builtins.all (x_: x_) [
+        cfg.enable
+        cfg.waybar.enable
+      ])
+      {
+        programs.waybar = {
+          enable = cfg.waybar.enable;
+          package = pkgs.waybar;
+          systemd = {
+            enable = true;
+            targets = [ config.wayland.systemd.target ];
+            enableDebug = false;
+            enableInspect = false;
+          };
+          style = builtins.readFile ./style.css;
+        };
+      };
+}

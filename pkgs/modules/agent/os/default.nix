@@ -1,0 +1,1 @@
+{ environment.pathsToLink = [ "/share/skills" ]; }

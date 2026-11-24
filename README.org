@@ -73,12 +73,10 @@ FP User validator 保证启用的 user 已绑定 UID, 启用用户的用户名�
 
 user profile 的 HM 实现导入到自身绑定的 UID. 其他类别的已启用模块, 包括 share 和 host, 将 HM 实现及外部 HM 集成加入 =home-manager.sharedModules=.
 
-** =moduleInternals= 与 =moduleInterfaces=
-=moduleInternals= 保存 NixOS 求值阶段产生的内部状态, 例如启用 host 的显示器信息和 shell 包. 声明位于各模块的 =os/_options.os.nix=; HM 实现通过 =osConfig.moduleInternals= 读取这些状态.
+** 原生 Feature 接口与过渡声明
+迁移后的模块使用各自 NixOS 或 Home Manager evaluation scope 的 =features.<name>= options. 两侧分别声明所需输入, HM 只通过 =osConfig= 读取实际系统依赖. Root registry 将旧 FP 配置映射到原生 options, 并将 HM implementation 与映射模块一起送达选中的 UID.
 
-=moduleInterfaces= 是 Home Manager 模块之间的内部通信命名空间. 声明位于各模块的 =hm/_options.hm.nix=, 注册到每个 Home Manager 用户自己的 option 合并范围中. user profile 可以通过 =moduleInterfaces.<kind>.<name>.*= 向 feature 提供 per-user 内部数据; 当前 sops feature 用它接收 per-user SOPS 输入, agent feature 用它接收 provider 配置和 API key 文件路径.
-
-=mkNixosSystem= 通过构建库的私有生成函数统一加载这两类声明, 不依赖 =share.enable=. 声明加载不表示对应功能已启用. niri 与 x11-session 直接向 =moduleInternals.features.greeter.sessionPackages= 贡献会话包, niri 使用 =mkBefore= 保持优先顺序; greeter 校验包的 =meta.mainProgram= 并消费列表.
+=mkNixosSystem= 仍统一加载原有声明, 独立于 =share.enable=. SOPS 和 Agent 的 =hm/_options.hm.nix= 暂时保留 =moduleInterfaces=, 供现有 user profile 描述账户 secrets、provider 和 API key 路径. 由 root 接线映射已定义字段. Niri 和 X11 分别输出实际 session package, root 将已启用 provider 的包送给 Greeter, 使用 =mkBefore= 保持 Niri 优先.
 
 ** 导入与配置适配
 最终模块列表直接由已求值的 flake-parts configuration 生成. =mkNixosSystem= 导入类别公共模块, 已启用 profile 的 OS 实现和可选根 =default.nix=, 并收集 registry 中的外部模块与 overlays. 这避免了在 NixOS 同一求值层根据 =config= 决定 =imports= 的循环依赖.
@@ -128,20 +126,17 @@ nixosConfigurations.nixos.modules.features.editor.emacs.programs.package =
 #+begin_example
 /lib/
 ├── default.nix
-├── features.sops.nix
 ├── flakeParts.configurations.nix
 ├── flakeParts.types.nix
 ├── flakeParts.validators.nix
 ├── hosts.nix
-├── modules.nix
-└── types.monitor.nix
+└── modules.nix
 #+end_example
 
 [[file:./lib/default.nix][lib/default.nix]] 导出 =llib= 的公共命名空间:
-- =types=: 显示器及显示器集合类型.
+- =types=: 由根 flake 从 =pkgs/lib/= 引入的共享值类型, 包括显示器、SOPS secret 输入和默认编辑器.
 - =modules=: 模块与 validator 文件发现, option tree/schema 组织及框架结构检查.
 - =hosts=: host 选择与 WireGuard 拓扑生成.
-- =features.sops=: per-user SOPS 输入处理.
 - =flakeParts=: 配置适配, 系统构造与 =mkValidatorApplications= 验证组合/执行; =flakeParts.types= 声明 registry, builder 和系统配置类型.
 
 根 flake 将本地库与 =personal-nixpkgs.lib.tests= 合并为运行时 =llib=, 不引入外部库的其他命名空间.
@@ -159,7 +154,13 @@ nixosConfigurations.nixos.modules.features.editor.emacs.programs.package =
 /pkgs/
 ├── flake.nix
 ├── lib/
-│   └── default.nix
+│   ├── default.nix
+│   ├── discover-modules.nix
+│   ├── monitor-type.nix
+│   └── types.nix
+├── modules/
+│   └── <name>/{os,hm}/
+├── tests/
 └── pkgs/
     ├── default.nix
     ├── codex/
@@ -181,7 +182,7 @@ nixosConfigurations.nixos.modules.features.editor.emacs.programs.package =
         └── package.nix
 #+end_example
 
-[[file:./pkgs/flake.nix][pkgs/flake.nix]] 使用独立的 inputs 声明应用依赖, =nixpkgs= 使用 =nixpkgs-unstable=, 不跟随根系统的 =nixpkgs=. 根 flake 消费子项目时通过根 [[file:./flake.lock][flake.lock]] 记录其依赖版本, 仓库不跟踪 =pkgs/flake.lock=. 应用依赖可相对独立地维护和更新; 根 flake 仍决定模块启用, overlay 接入和最终系统构建. 更新子项目 inputs 后应同步根 lock graph. 单独使用子 flake 时, 本地 lockfile 不纳入版本控制; 没有本地 lockfile 时, 子 flake 不提供独立的已提交锁定基线.
+[[file:./pkgs/flake.nix][pkgs/flake.nix]] 独立使用时由自身 inputs 声明应用依赖, =nixpkgs= 指向 =nixpkgs-unstable=. 根 flake 将 =local-nixpkgs= 的 =nixpkgs= 与 =personal-nixpkgs= 分别指向根输入, 并通过根 [[file:./flake.lock][flake.lock]] 记录其依赖版本, 仓库不跟踪 =pkgs/flake.lock=. 应用依赖可相对独立地维护和更新; 根 flake 仍决定模块启用, overlay 接入和最终系统构建. 更新子项目 inputs 后应同步根 lock graph. 单独使用子 flake 时, 本地 lockfile 不纳入版本控制; 没有本地 lockfile 时, 子 flake 不提供独立的已提交锁定基线.
 
 子项目 inputs 包括:
 - =personal-nixpkgs=: 提供 =mkFlake= 和通用 package library, 其 =nixpkgs= 跟随子项目输入; =flake-parts= 和 =treefmt-nix= 由该输入管理, 不再直接声明为子项目输入.
@@ -193,7 +194,7 @@ nixosConfigurations.nixos.modules.features.editor.emacs.programs.package =
 
 =emarccs= 的 =flake-parts= 和 =treefmt-nix= 分别跟随子项目 =personal-nixpkgs= 的对应输入; =lem=, =nixvim=, =git-agent-workflow= 和 =lean4-nix= 的 =flake-parts= 也跟随 =personal-nixpkgs/flake-parts=.
 
-=pkgs/flake.nix= 仅选取 =personal-nixpkgs.lib.packages=, 与 [[file:./pkgs/lib/default.nix][pkgs/lib/default.nix]] 的本地扩展通过 =mergeAttrsRecursive { allowOverrides = false; }= 合并为子项目的 =llib=, 禁止覆盖同名定义. 通用 =llib.packages= 由外部库提供; 本地扩展入口当前为空, 子项目 =llib= 与根 =llib= 分开. [[file:./pkgs/pkgs/default.nix][pkgs/pkgs/default.nix]] 使用它生成 overlays 和 OS/HM 模块入口. =package.nix= 定义独立包, =overlay.nix= 注入包或命名空间; 对已有包的纯定制直接写在 =overlay.nix= 中; =os/default.nix= 和 =hm/default.nix= 提供包附带的模块. =mkOverlays= 通过 =groups= 生成本地 overlay 分组: =legacy= 包含全部本地扩展并通过 =export = true;= 提供扩展后 package set 的 =pkgs.legacyPackages=, =share= 排除 =rage-armored=. 各组通过 =exclude= 选择扩展, 可共享同一包定义.
+=pkgs/flake.nix= 仅选取 =personal-nixpkgs.lib.packages=, 与 [[file:./pkgs/lib/default.nix][pkgs/lib/default.nix]] 的本地扩展通过 =mergeAttrsRecursive { allowOverrides = false; }= 合并为子项目的 =llib=, 禁止覆盖同名定义. 通用 =llib.packages= 由外部库提供; 本地扩展提供 Feature export discovery, 子项目 =llib= 与根 =llib= 分开. [[file:./pkgs/pkgs/default.nix][pkgs/pkgs/default.nix]] 使用它生成 overlays 和 OS/HM 模块入口. =package.nix= 定义独立包, =overlay.nix= 注入包或命名空间; 对已有包的纯定制直接写在 =overlay.nix= 中; =os/default.nix= 和 =hm/default.nix= 提供包附带的模块. =mkOverlays= 通过 =groups= 生成本地 overlay 分组: =legacy= 包含全部本地扩展并通过 =export = true;= 提供扩展后 package set 的 =pkgs.legacyPackages=, =share= 排除 =rage-armored=. 各组通过 =exclude= 选择扩展, 可共享同一包定义.
 
 包与测试的 overlay 源文件使用带参数的构造函数, 返回标准的双参数 overlay. 无构造参数时写作:
 
@@ -210,7 +211,10 @@ nixosConfigurations.nixos.modules.features.editor.emacs.programs.package =
 - =overlays.share=: 本地包扩展中排除 =rage-armored=, 并加入 GAW, Lean 和 Zotero 的集成.
 - =overlays.editor=: 组合 emarccs 和 Lem 的 overlays, 并为 Lem 补充依赖及桌面入口.
 - =nixosModules.share= 和 =homeModules.share=: 汇集包附带的 OS/HM 模块.
-- =homeModules.editor=: 提供 Nixvim Home Manager module.
+- =nixosModules.<name>= 和 =homeModules.<name>=: 提供 Feature 原生模块. Discovery 按直接子目录名生成 key, 只返回已有入口的路径, 不导入或求值文件. 显式导出与发现结果重名时会报错.
+- =homeModules.editor=: 在子 flake 中组合上游 Nixvim 与本地 Editor HM 模块. Root 的 Editor registry 导入该组合, 并提供配置映射与 Editor overlay.
+
+=pkgs/pkgs/= 组织软件包和随包提供的 integrations. =pkgs/modules/= 组织独立功能, 采用 =modules/<name>/{fp,os,hm}= 的功能优先布局. 本阶段提供 =os/= 和 =hm/=, 由消费方按需组合上游原生模块.
 
 根 flake 通过 =perSystem.nixpkgs.overlays= 接入 =inputs.local-nixpkgs.overlays.legacy=, 使用 =mkFlake= 提供的 =pkgs= 并导出 =legacyPackages = pkgs.legacyPackages;=. checks, devShells 和 rekey 工具共同使用该 =pkgs=; =agenix-rekey.agePackage= 直接取 =pkgs.rage-armored=.
 
@@ -275,198 +279,13 @@ nixosConfigurations.nixos.modules.features.editor.emacs.programs.package =
 
 [[file:./modules/features/_validators.fp.nix][modules/features/_validators.fp.nix]] 在 FP 层校验 feature 的 HM 用户选择. =_options.fp.nix= 定义公共 =allowUidList= schema; 发现, option tree 生成与 HM 送达由构建库统一处理.
 
-每个 feature 的实现可用性由目录发现结果派生, 通过可选的 =_options.fp.nix= 定义配置 schema, 按需提供 =os/= 和 =hm/= 实现. 可选根 =default.nix= 保存跨实现的内部状态, 会话包贡献或断言.
+原有 =os/default.nix= 与 =hm/default.nix= 入口保留 discovery 和 =existModule= 语义. 实现从 [[file:./pkgs/modules/][pkgs/modules/]] 导出, 通过 root =moduleRegistry.features= 导入. Root 保留 FP schema、validators、显示器等 Host 数据以及用户配置. 实际配置和资源按功能组织:
 
-***** [[file:./modules/features/agent/][/modules/features/agent]]
-#+begin_example
-/modules/features/agent/
-├── hm/
-│   ├── context/
-│   │   ├── default.nix
-│   │   ├── gaw.md
-│   │   ├── policy.md
-│   │   ├── preamble.md
-│   │   └── runtime.md
-│   ├── default.nix
-│   └── _options.hm.nix
-└── os/
-    └── default.nix
-#+end_example
-
-=hm/default.nix= 配置用户级 AI/agent 工具, 包括 =pi-coding-agent=, =codex= 和 =github-copilot-cli= 及其 provider 配置. =hm/context/default.nix= 组装 agent 上下文, skills 由 =git-maintenance= 和 =git-agent-workflow= 等包提供. =os/default.nix= 将包的 =/share/skills= 链接到系统环境.
-
-***** [[file:./modules/features/diagnostics/][/modules/features/diagnostics]]
-#+begin_example
-/modules/features/diagnostics/
-└── hm/
-    └── default.nix
-#+end_example
-
-声明 diagnostics feature 的 HM 模块入口, 配置用户级诊断与性能分析工具.
-
-***** [[file:./modules/features/editor/][/modules/features/editor]]
-#+begin_example
-/modules/features/editor/
-├── _options.fp.nix
-└── hm/
-    └── default.nix
-#+end_example
-
-=_options.fp.nix= 定义默认编辑器, Vim, Neovim, Emacs 和 Lem 相关 option. =hm/default.nix= 配置 nixvim, vim, Emacs program 和 Emacs service. 根 flake 为两台桌面系统指定 =pkgs.emacs-pgtk= 作为 Emacs program 包, =pkgs.emarccs-pgtk= 作为 Emacs service 包.
-
-***** [[file:./modules/features/file-manager/][/modules/features/file-manager]]
-#+begin_example
-/modules/features/file-manager/
-├── _options.fp.nix
-├── hm/
-│   └── default.nix
-└── os/
-    └── default.nix
-#+end_example
-
-声明 file-manager feature 的 OS 与 HM 模块入口. feature 启用时始终提供 Yazi; 当 Niri feature 同时启用时额外提供 Wayfile 并将它注册为默认目录处理器, 其他环境则使用 Yazi. =os/default.nix= 在启用 file chooser 时向系统 link 应用入口和 XDG portal 目录.
-
-***** [[file:./modules/features/font/][/modules/features/font]]
-#+begin_example
-/modules/features/font/
-├── hm/
-│   └── default.nix
-└── os/
-    └── default.nix
-#+end_example
-
-声明 font feature 同时包含 OS 与 HM 模块. =hm/default.nix= 启用用户级 fontconfig 并继承系统默认字体族; =os/default.nix= 配置系统字体包, fontconfig 默认字体族和本地字体目录.
-
-***** [[file:./modules/features/greeter/][/modules/features/greeter]]
-#+begin_example
-/modules/features/greeter/
-├── _validators.fp.nix
-├── default.nix
-└── os/
-    ├── default.nix
-    └── _options.os.nix
-#+end_example
-
-=_validators.fp.nix= 检查启用时 Host 的默认 monitor; =default.nix= 推导内部显示器状态, 并保留会话包和 provider 检查. =os/_options.os.nix= 声明 greeter 的内部显示器与会话包接口. =os/default.nix= 配置系统级 greeter 相关服务和 session 列表.
-
-***** [[file:./modules/features/media/][/modules/features/media]]
-#+begin_example
-/modules/features/media/
-└── os/
-    └── default.nix
-#+end_example
-
-声明 media feature 的 OS 模块入口. =os/default.nix= 配置系统级媒体能力, 包括 PipeWire, OBS Studio, ffmpeg 和 VA-API 工具.
-
-***** [[file:./modules/features/niri/][/modules/features/niri]]
-#+begin_example
-/modules/features/niri/
-├── _options.fp.nix
-├── _validators.fp.nix
-├── default.nix
-├── hm/
-│   ├── default.nix
-│   ├── noctalia/
-│   │   └── default.nix
-│   ├── settings/
-│   │   ├── animations.nix
-│   │   ├── binds.nix
-│   │   ├── default.nix
-│   │   ├── input.nix
-│   │   ├── layout.nix
-│   │   ├── noctalia.nix
-│   │   ├── outputs.nix
-│   │   ├── top-level.nix
-│   │   └── window-rules.nix
-│   └── waybar/
-│       ├── default.nix
-│       ├── power-menu.xml
-│       ├── settings.nix
-│       └── style.css
-└── os/
-    ├── default.nix
-    └── _options.os.nix
-#+end_example
-
-通过 registry 中的 =niri-flake= 集成窗口管理器. =_validators.fp.nix= 检查子功能依赖, 互斥及默认 monitor; =default.nix= 保留 Noctalia 的实际系统服务检查, 从 host 读取显示器信息, 保存到 =moduleInternals.features.niri.monitors=, 并向 greeter 贡献 Niri session wrapper. =hm/default.nix= 导入用户级 Niri 配置; =hm/settings/default.nix= 汇总输入, 布局, 输出, 绑定, 动画和窗口规则; =hm/noctalia/default.nix= 配置 Noctalia shell/bar; =hm/waybar/default.nix= 配置 Waybar; =os/default.nix= 配置系统级 Niri 支持.
-
-***** [[file:./modules/features/office/][/modules/features/office]]
-#+begin_example
-/modules/features/office/
-└── hm/
-    └── default.nix
-#+end_example
-
-声明 office feature 的 HM 模块入口. =hm/default.nix= 配置用户级办公软件, 包括 LibreOffice 和预留的 OnlyOffice 配置.
-
-***** [[file:./modules/features/proxy/][/modules/features/proxy]]
-#+begin_example
-/modules/features/proxy/
-├── _options.fp.nix
-├── _validators.fp.nix
-└── os/
-    └── default.nix
-#+end_example
-
-=_options.fp.nix= 定义 clash-verge, throne, mihomo 和 v2raya 等开关. =_validators.fp.nix= 检查子功能的父级依赖及 clash-verge/mihomo 互斥; =os/default.nix= 配置系统级代理组件的 package 与运行模式.
-
-***** [[file:./modules/features/shell/][/modules/features/shell]]
-#+begin_example
-/modules/features/shell/
-├── default.nix
-├── hm/
-│   └── default.nix
-└── os/
-    ├── default.nix
-    └── _options.os.nix
-#+end_example
-
-=default.nix= 提供 OS 与 HM 共享的 shell 包内部状态. =hm/default.nix= 配置 zsh, starship 和 shell 行为; =os/default.nix= 配置系统级 shell 支持.
-
-***** [[file:./modules/features/sops/][/modules/features/sops]]
-#+begin_example
-/modules/features/sops/
-├── default.nix
-├── hm/
-│   ├── default.nix
-│   └── _options.hm.nix
-└── os/
-    ├── default.nix
-    ├── _options.os.nix
-    └── sops.hm.age
-#+end_example
-
-声明 sops feature 的 OS 与 HM 模块入口. =default.nix= 根据 =allowUidList= 推导允许读取密钥的用户名列表, 并提供 HM age key 文件路径; =os/default.nix= 创建 =sops-decrypt= group, 安装 SOPS 相关工具, 并通过 =age.secrets= 暴露 HM 使用的 age key file. =hm/_options.hm.nix= 定义 per-user SOPS 输入.
-
-***** [[file:./modules/features/terminal/][/modules/features/terminal]]
-#+begin_example
-/modules/features/terminal/
-└── hm/
-    └── default.nix
-#+end_example
-
-声明 terminal feature 的 HM 模块入口. =hm/default.nix= 配置用户级 terminal 程序, 当前启用 Kitty 并通过 =xdg-terminal-exec= 将其设为默认 terminal.
-
-***** [[file:./modules/features/texlive/][/modules/features/texlive]]
-#+begin_example
-/modules/features/texlive/
-└── os/
-    └── default.nix
-#+end_example
-
-声明 texlive feature 的 OS 模块入口. =os/default.nix= 配置系统级 TeX Live 环境.
-
-***** [[file:./modules/features/x11-session/][/modules/features/x11-session]]
-#+begin_example
-/modules/features/x11-session/
-├── default.nix
-├── hm/
-│   └── default.nix
-└── os/
-    └── default.nix
-#+end_example
-
-=default.nix= 生成 IceWM/X11 session wrapper 并贡献到 greeter 的 =sessionPackages=. =hm/default.nix= 配置用户级 Rofi; =os/default.nix= 配置系统级 X11 session 支持.
+- Diagnostics、Terminal、Office、TeXLive、Font、Media 和 Shell 保留现有系统或账户配置. Shell HM 按实际系统 Zsh 状态选择 Bash/Zsh 与 Starship integration.
+- Proxy 保留现有子功能开关和互斥规则. File-manager 保留两侧 file chooser 配置、terminal-exec 依赖及按系统 Niri 选择 Wayfile 的策略.
+- Editor 在每个 HM scope 使用原生 package values. Root adapter 继续求值旧 FP package selectors, 并将 Emacs programs 和 services 的包分别传入.
+- Niri 保留 OS 服务依赖, 由 root 向已分配的 HM scope 提供显示器及 Noctalia/Waybar 选择. Greeter 消费实际 session packages, 不负责启用 providers.
+- SOPS OS 按 UID 查找实际系统账户并授权 =sops-decrypt=. 密文 =sops.hm.age= 保留在 root. SOPS HM 接收每账户 secrets 描述和实际 age key 路径. Agent HM 接收 provider 开关与 API key 文件路径.
 
 **** [[file:./modules/workloads/][/modules/workloads]]
 #+begin_example
@@ -634,7 +453,7 @@ NixOS-WSL host, hostname =nixos-wsl=.
 最小用户 profile, 提供空的 =hm/default.nix= 实现, 可以接收最终配置启用的公共 HM features.
 
 * 测试
-[[file:./tests/default.nix][tests/default.nix]] 调用 =llib.tests.mkChecks=, 按 =test-overlay.nix= 发现各组测试入口, 在独立测试 scope 中组合定义并收集检查派生物. 嵌套 check 名称以 =-= 连接. 测试覆盖 FP validator 发现/组合/惰性边界, 自定义类型, Registry 的 =existModule= 派生与只读约束, host 与 SOPS 相关函数, 配置适配器. Host 函数测试还覆盖 WireGuard SSH targets 的多 Hub 别名、排序、主机身份去重、缺失公钥以及不依赖用户模块的系统级集成.
+[[file:./tests/default.nix][tests/default.nix]] 调用 =llib.tests.mkChecks=, 按 =test-overlay.nix= 发现各组测试入口, 在独立测试 scope 中组合定义并收集检查派生物. 嵌套 check 名称以 =-= 连接. 测试覆盖 FP validator 发现/组合/惰性边界, 自定义类型, Registry 的 =existModule= 派生与只读约束, host 相关函数与配置适配器. 子 flake 持有 Feature discovery 和 SOPS helper 检查, 根 flake 使用同一锁图转发这两项. Host 函数测试还覆盖 WireGuard SSH targets 的多 Hub 别名、排序、主机身份去重、缺失公钥以及不依赖用户模块的系统级集成.
 
 各组测试的 =test-overlay.nix= 使用与包相同的外层构造协议, 通过 =final.callPackage ./test.nix= 调用测试体. =test.nix= 保存断言和检查派生物, fixtures 保留在所属组内; 专用入口文件名避免将 fixtures 误识别为测试组.
 

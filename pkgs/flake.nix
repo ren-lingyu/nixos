@@ -112,19 +112,53 @@
             systems = [ "x86_64-linux" ];
 
             flake = {
-              nixosModules = {
-                share = lpkgs.nixosModule;
-              };
+              nixosModules = inputs.personal-nixpkgs.lib.mergeAttrsRecursive { allowOverrides = false; } [
+                { share = lpkgs.nixosModule; }
+                (llib.discoverModules {
+                  root = ./modules;
+                  modulePath = "os/default.nix";
+                })
+              ];
 
-              homeModules = {
-                editor = inputs.nixvim.homeModules.nixvim;
-                share = lpkgs.homeModule;
-              };
+              homeModules =
+                let
+                  discovered = llib.discoverModules {
+                    root = ./modules;
+                    modulePath = "hm/default.nix";
+                  };
+                in
+                inputs.personal-nixpkgs.lib.mergeAttrsRecursive { allowOverrides = false; } [
+                  (builtins.removeAttrs discovered [ "editor" ])
+                  {
+                    editor.imports = [
+                      inputs.nixvim.homeModules.nixvim
+                      discovered.editor
+                    ];
+                    share = lpkgs.homeModule;
+                  }
+                ];
 
               overlays = {
                 editor = lpkgs.overlays.editor;
                 legacy = lpkgs.overlays.legacy;
                 share = lpkgs.overlays.share;
+              };
+            };
+
+            perSystem = { pkgs, ... }: {
+              checks = {
+                feature-discovery = import ./tests/discovery.nix {
+                  inherit lib;
+                  inherit (pkgs) runCommand;
+                  inherit (llib) discoverModules;
+                  inherit (inputs.personal-nixpkgs.lib) mergeAttrsRecursive;
+                };
+                sops-functions = import ./tests/sops-functions.nix {
+                  inherit lib;
+                  inherit (pkgs) runCommand;
+                  secrets = import ./modules/sops/hm/secrets.nix;
+                  inherit (config.flake.nixosModules) sops;
+                };
               };
             };
           };

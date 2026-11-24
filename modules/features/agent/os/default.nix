@@ -1,14 +1,2 @@
-{
-  config,
-  pkgs,
-  lib,
-  ...
-}:
-let
-
-  cfg = config.modules.features.agent;
-
-in
-{
-  config = lib.mkIf cfg.enable { environment.pathsToLink = [ "/share/skills" ]; };
-}
+# Retain this entry for root Feature discovery and availability.
+{ }

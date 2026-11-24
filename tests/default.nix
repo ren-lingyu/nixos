@@ -11,7 +11,6 @@ llib.tests.mkChecks {
   args = {
     inherit lib modules;
     inherit (pkgs) runCommand;
-    llibFeatures = llib.features;
     llibFlakeParts = llib.flakeParts;
     llibHosts = llib.hosts;
     llibModules = llib.modules;
