@@ -47,19 +47,13 @@
       };
     };
 
-    networking =
-      let
-        wireguardNetworks_ = (
-          llib.hosts.mkWireGuardNetworks {
-            registry = hostRegistry;
-            hostName = host.name;
-            privateKeyFile = config.age.secrets.wireguard.path;
-          }
-        );
-      in
-      (lib.mkMerge [
-        wireguardNetworks_.config
-        { wireguard.topology = hostTopology; }
-      ]);
+    networking = lib.mkMerge [
+      (llib.hosts.mkWireGuardNetworks {
+        registry = hostRegistry;
+        hostName = host.name;
+        privateKeyFile = config.age.secrets.wireguard.path;
+      })
+      { wireguard.topology = hostTopology; }
+    ];
   };
 }

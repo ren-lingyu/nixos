@@ -71,16 +71,22 @@ let
       wgNameRule = number: "wg${builtins.toString number}";
     };
 
-  topology_ = (mkNetworks_ wireguardHosts_ "thinkbook").topology;
-  singleHub_ = mkNetworks_ (builtins.removeAttrs wireguardHosts_ [ "backup" ]) "thinkbook";
-  thinkbook_ = (mkNetworks_ wireguardHosts_ "thinkbook").config;
-  aliyun_ = (mkNetworks_ wireguardHosts_ "aliyun").config;
-  backup_ = (mkNetworks_ wireguardHosts_ "backup").config;
-  matebook_ = (mkNetworks_ wireguardHosts_ "matebook").config;
-  noHub_ = mkNetworks_ (builtins.removeAttrs wireguardHosts_ [
+  singleHubRegistry_ = builtins.removeAttrs wireguardHosts_ [ "backup" ];
+  noHubRegistry_ = builtins.removeAttrs wireguardHosts_ [
     "aliyun"
     "backup"
-  ]) "thinkbook";
+  ];
+
+  topology_ = hosts.mkWireGuardTopology { registry = wireguardHosts_; };
+  singleHubTopology_ = hosts.mkWireGuardTopology { registry = singleHubRegistry_; };
+  noHubTopology_ = hosts.mkWireGuardTopology { registry = noHubRegistry_; };
+
+  singleHub_ = mkNetworks_ singleHubRegistry_ "thinkbook";
+  thinkbook_ = mkNetworks_ wireguardHosts_ "thinkbook";
+  aliyun_ = mkNetworks_ wireguardHosts_ "aliyun";
+  backup_ = mkNetworks_ wireguardHosts_ "backup";
+  matebook_ = mkNetworks_ wireguardHosts_ "matebook";
+  noHub_ = mkNetworks_ noHubRegistry_ "thinkbook";
 
   sshTargets_ = hosts.mkWireGuardSshTargets {
     registry = sshRegistry_;
@@ -158,8 +164,7 @@ let
   };
 
   checks_ = [
-    (hosts.mkWireGuardTopology { registry = wireguardHosts_; } == topology_)
-    ((mkNetworks_ wireguardHosts_ "excluded").config == { })
+    (mkNetworks_ wireguardHosts_ "excluded" == { })
 
     (
       topology_ == {
@@ -185,10 +190,10 @@ let
         };
       }
     )
-    (builtins.attrNames singleHub_.topology == [ "aliyun" ])
-    (builtins.attrNames singleHub_.config.wireguard.interfaces == [ "wg3" ])
-    (noHub_.topology == { })
-    (noHub_.config.nftables.tables == { })
+    (builtins.attrNames singleHubTopology_ == [ "aliyun" ])
+    (builtins.attrNames singleHub_.wireguard.interfaces == [ "wg3" ])
+    (noHubTopology_ == { })
+    (noHub_.nftables.tables == { })
     (
       builtins.attrNames thinkbook_.wireguard.interfaces == [
         "wg3"
@@ -313,7 +318,7 @@ let
     (
       (hosts.mkWireGuardSshTargets {
         registry = sshRegistry_;
-        topology = singleHub_.topology;
+        topology = singleHubTopology_;
         baseOrder = 1200;
       }).hosts."aliyun.thinkbook".order == 1200
     )

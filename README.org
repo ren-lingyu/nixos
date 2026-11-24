@@ -38,13 +38,13 @@ nixosBuilderArgs = {
 };
 #+end_src
 
-=nixosBuilderArgs.hostTopology= 是由 Host Registry 派生的只读 FP option, 保留既有 WireGuard topology 的结构与地址分配规则. Registry entry 的只读 =name= 由其 key 派生, 供直接选择时标识 Registry 对象. =host= 和 =profile= 选择单个已登记对象, 不合并不同对象.
+=nixosBuilderArgs.hostTopology= 是由 Host Registry 派生的只读 FP option, 保留既有 WireGuard topology 的结构与地址分配规则. Registry entry 的只读 =name= 由其 key 派生, 供直接选择时标识 Registry 对象. =host= 和 =profile= 以输入值的 =name= 在对应 Registry 中重新解析最终对象, 不合并不同选择. 通常直接引用相应 Registry entry; 输入中的其他字段不会覆盖 Registry 数据.
 
 #+begin_src nix
 nixosConfigurations.nixos = {
-  system = "x86_64-linux";
   host = config.nixosBuilderArgs.hostRegistry.thinkbook;
   features.shell.enable = true;
+  features.editor.enable = true;
   users."1000" = {
     username = "lingyu";
     profile = config.nixosBuilderArgs.userRegistry.lingyu;
@@ -52,13 +52,21 @@ nixosConfigurations.nixos = {
     features.editor = {
       enable = true;
       module = { pkgs, ... }: {
-        features.editor.emacs.programs.package = pkgs.emacs-pgtk;
+        features.editor.emacs = {
+          enable = true;
+          programs.package = pkgs.emacs-pgtk;
+        };
       };
     };
   };
   workloads.wbo = {
     enable = true;
-    module.workloads.wbo.port = 18000;
+    module.workloads.wbo = {
+      ip = config.nixosBuilderArgs.hostTopology.aliyun.nodes.thinkbook;
+      port = 18000;
+      networkInterface = config.nixosBuilderArgs.hostTopology.aliyun.name;
+      allowedSourceIp = config.nixosBuilderArgs.hostTopology.aliyun.nodes.aliyun;
+    };
   };
 };
 #+end_src
@@ -66,6 +74,8 @@ nixosConfigurations.nixos = {
 Account entry 的存在即表示构造该账户, 不再提供 Account enable. UID key 必须是 canonical decimal, 不小于 1000, 且已由 Host 注册; 用户名在每个系统内唯一, homeDirectory 默认 =/home/${username}= 且必须为绝对路径. Host 仍可注册未被 Account 使用的 UID.
 
 ** 原生模块组合
+系统平台由选中的 Host module 通过原生 =nixpkgs.hostPlatform= 声明. 构造器以 =system = null;= 调用 =nixosSystem=, FP System configuration 不重复声明平台.
+
 =llib.flakeParts.mkNixosConfigurations= 接收 =builderArgs= 和 =configurations=, 生成最终 =flake.nixosConfigurations=. 构造器导入 Home Manager、baseModule 和选中的 Host module, 再按 System configuration 导入 OS Features、Workloads 与每个 Account 的 HM profile 和 Features. Account 同时贡献 NixOS 与 HM 的身份字段, 两侧以 UID 字符串为 key. Home Manager 继续使用全局 package set (=useGlobalPkgs = true=).
 
 每个已登记 Feature/Workload 具有默认 =false= 的 FP =enable= 及 =module= option. 启用时依次导入 Registry implementation、合并后的 consumer module 和显式原生 enable contribution; 禁用时两类 deferredModules 都不加载, 不贡献原生 enable. OS/HM implementations 各自声明原生 =features.<name>=, Workloads 声明原生 =workloads.<name>=. Feature 不启用、导入或配置其他 Feature, 可读取其他 Feature 的已定义值并通过原生 assertions 检查实际依赖. 外部 flake inputs 仅在所属 flake.nix 中引用. 选中对象的 native imports 在 FP 层决定, 不依赖同一原生求值的 =config= 计算 imports.
@@ -115,7 +125,7 @@ Host 数据不变量由 =modules/hosts/options.nix= 的 option types 与 =apply=
 └── hosts.nix
 #+end_example
 
-[[file:./lib/default.nix][lib/default.nix]] 导出 =llib.hosts= 与 =llib.flakeParts=. =hosts.nix= 提供 WireGuard network data、拓扑、接口/firewall 及 SSH targets 的派生; =flakeParts.nix= 声明通用 FP schema 并构造原生系统和 Account modules. 根 flake 同时从 =pkgs/lib/= 引入共享值类型, 从 personal-nixpkgs 引入 tests. Host domain schema 和项目特有接线由显式 FP modules 扩展, 不在构造器内硬编码 Feature 业务逻辑.
+[[file:./lib/default.nix][lib/default.nix]] 导出 =llib.hosts= 与 =llib.flakeParts=. =hosts.nix= 提供 WireGuard network data、拓扑、接口/firewall 及 SSH targets 的派生; =mkWireGuardTopology= 返回全局 topology, =mkWireGuardNetworks= 直接返回指定 Host 的原生 networking 配置; =flakeParts.nix= 声明通用 FP schema 并构造原生系统和 Account modules. 根 flake 同时从 =pkgs/lib/= 引入共享值类型, 从 personal-nixpkgs 引入 tests. Host domain schema 和项目特有接线由显式 FP modules 扩展, 不在构造器内硬编码 Feature 业务逻辑.
 
 *** [[file:./pkgs/][/pkgs]]
 #+begin_example

@@ -140,8 +140,6 @@ let
     };
 in
 {
-  inherit validateAccounts;
-
   mkOptions = fpConfig: {
     nixosBuilderArgs = {
       nixosSystem = mkOption { type = types.raw; };
