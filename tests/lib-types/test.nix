@@ -36,6 +36,18 @@ let
       };
     })."eDP-1";
 
+  evalFragment =
+    definitions:
+    (lib.evalModules {
+      modules = [
+        { options.value = lib.mkOption { type = types.deferredModuleFragment; }; }
+      ]
+      ++ definitions;
+    }).config.value;
+
+  fragmentFunction = { input, ... }: { value = input; };
+  callableFragment = lib.setFunctionArgs (args: { value = args.input; }) { input = false; };
+
   tests_ = [
     (assertEqual "monitor name default" "eDP-1" monitor_.name)
     (assertEqual "monitor role default" null monitor_.role)
@@ -54,6 +66,42 @@ let
           };
         }).broken.mode.width
       )
+    ))
+    (assertEqual "fragment attrset normalization" { value = 42; } (
+      (evalFragment [
+        {
+          value = {
+            value = 42;
+          };
+        }
+      ])
+        { }
+    ))
+    (assertEqual "fragment function arguments" (lib.functionArgs fragmentFunction) (
+      lib.functionArgs (evalFragment [ { value = fragmentFunction; } ])
+    ))
+    (assertEqual "fragment callable arguments" (lib.functionArgs callableFragment) (
+      lib.functionArgs (evalFragment [ { value = callableFragment; } ])
+    ))
+    (assertEqual "fragment callable result" { value = 42; } (
+      (evalFragment [ { value = callableFragment; } ]) { input = 42; }
+    ))
+    (assertTrue "fragment rejects non-module input" (
+      evaluationFails (evalFragment [ { value = 42; } ])
+    ))
+    (assertTrue "fragment rejects multiple definitions" (
+      evaluationFails (evalFragment [
+        {
+          value = {
+            value = 1;
+          };
+        }
+        {
+          value = {
+            value = 2;
+          };
+        }
+      ])
     ))
   ];
 

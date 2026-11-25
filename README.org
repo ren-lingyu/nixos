@@ -85,7 +85,7 @@ Account entry 的存在即表示构造该账户, 不再提供 Account enable. UI
 
 FP modules 可以扩展 Registry 与 System/Account 的 submodule schema. Greeter 和 Niri 的 FP 入口各自将选中 Host 的完整默认 Monitor 和 monitors 数据接入相应 native Feature; SOPS 的 FP 入口从 Account 的 HM SOPS 选择派生 OS SOPS 的授权 UID. 接线结果均进入对应 System 或 Account 的 =features.<name>.module=, 不由构造器处理业务逻辑.
 
-User Registry 的 =features.<name>.module= 是稀疏的只读 =llib.types.featureModule= option, 与通用 =module= (完整 HM deferredModule) 区分. 它接受 attrset 或函数, 不负责选择或启用 Feature. 通用 FP schema 将该值封装成原生 module 并合并到引用此 User 的 Account 对应 Feature 的 deferredModule. 使用 =lib.setFunctionArgs= 保留函数的参数需求, 仅在 Account 选择对应 Feature 后于其 HM scope 求值. 返回值直接定义 =features.<name>= 下的配置, 不声明新的原生 options 或 imports, 也不在 FP 层重复声明业务数据类型.
+User Registry 的 =features.<name>.module= 是稀疏的只读 =llib.types.deferredModuleFragment= option, 与通用 =module= (完整 HM deferredModule) 区分. 它接受 attrset 或函数, 不负责选择或启用 Feature. 通用 FP schema 通过 =mkFeatureModule= 将该值封装成原生 module 并合并到引用此 User 的 Account 对应 Feature 的 deferredModule. 该函数使用 =llib.modules.mapModule= 保留函数的参数需求并映射其返回值, 仅在 Account 选择对应 Feature 后于其 HM scope 求值. 返回值直接定义 =features.<name>= 下的配置, 不声明新的原生 options 或 imports, 也不在 FP 层重复声明业务数据类型.
 
 #+begin_src nix
 nixosBuilderArgs.userRegistry.lingyu.features = {
@@ -145,11 +145,12 @@ Host 数据不变量由 =modules/hosts/options.nix= 的 option types 与 =apply=
 ├── default.nix
 ├── flakeParts.nix
 ├── hosts.nix
+├── modules.nix
 ├── monitor-type.nix
 └── types.nix
 #+end_example
 
-[[file:./lib/default.nix][lib/default.nix]] 导出 =llib.hosts=, =llib.flakeParts= 与 =llib.types=. =hosts.nix= 提供 WireGuard network data、拓扑、接口/firewall 及 SSH targets 的派生; =mkWireGuardTopology= 返回全局 topology, =mkWireGuardNetworks= 直接返回指定 Host 的原生 networking 配置; =flakeParts.nix= 声明通用 FP schema 并构造原生系统和 Account modules. 共享值类型由 =types.nix= 与 =monitor-type.nix= 定义, FP 与原生模块通过 =llib.types= 使用同一组类型. 根 flake 从 personal-nixpkgs 引入 tests. Host domain schema 和项目特有接线由显式 FP modules 扩展, 不在构造器内硬编码 Feature 业务逻辑.
+[[file:./lib/default.nix][lib/default.nix]] 导出 =llib.hosts=, =llib.flakeParts=, =llib.modules= 与 =llib.types=. =hosts.nix= 提供 WireGuard network data、拓扑、接口/firewall 及 SSH targets 的派生; =mkWireGuardTopology= 返回全局 topology, =mkWireGuardNetworks= 直接返回指定 Host 的原生 networking 配置; =flakeParts.nix= 声明通用 FP schema 并构造原生系统和 Account modules. =modules.nix= 提供 =mapModule=, 在保留 callable value 的原生参数声明的同时变换其返回值, 不预设 module 的结构或目标 namespace. =types.nix= 中的 =deferredModuleFragment= 接受 attrset 或 callable value, 在合并时将普通 attrset 规范化为常值函数; 它不负责完整 module 的组合或 namespace 限制. 共享值类型由 =types.nix= 与 =monitor-type.nix= 定义, FP 与原生模块通过 =llib.types= 使用同一组类型. 根 flake 从 personal-nixpkgs 引入 tests. Host domain schema 和项目特有接线由显式 FP modules 扩展, 不在构造器内硬编码 Feature 业务逻辑.
 
 *** [[file:./pkgs/][/pkgs]]
 #+begin_example

@@ -2,9 +2,9 @@
   monitor = import ./monitor-type.nix { inherit lib; };
   monitors = lib.types.attrsOf monitor;
 
-  featureModule = lib.types.mkOptionType {
-    name = "featureModule";
-    description = "Feature-local configuration module function.";
+  deferredModuleFragment = lib.types.mkOptionType {
+    name = "deferredModuleFragment";
+    description = "Deferred function producing a module fragment.";
     check = value: lib.isFunction value || builtins.isAttrs value;
     merge =
       loc: defs:

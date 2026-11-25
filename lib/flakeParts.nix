@@ -1,4 +1,8 @@
-{ lib, featureModule }:
+{
+  lib,
+  deferredModuleFragment,
+  mapModule,
+}:
 let
   inherit (lib) mkOption types;
 
@@ -19,9 +23,7 @@ let
     };
   };
 
-  mkFeatureModule =
-    name: module:
-    lib.setFunctionArgs (args: { config.features.${name} = module args; }) (lib.functionArgs module);
+  mkFeatureModule = name: module: mapModule (value: { config.features.${name} = value; }) module;
 
   selection =
     registry:
@@ -164,7 +166,7 @@ in
                 type = types.attrsOf (
                   types.submodule {
                     options.module = mkOption {
-                      type = featureModule;
+                      type = deferredModuleFragment;
                       readOnly = true;
                       description = "User-supplied native configuration definitions under this Feature's namespace.";
                     };
