@@ -77,10 +77,7 @@
         inherit inputs;
         moduleLocation = __curPos.file;
         llib = inputs.personal-nixpkgs.lib.mergeAttrsRecursive { allowOverrides = false; } [
-          {
-            inherit (inputs.personal-nixpkgs.lib) tests;
-            inherit (import ./pkgs/lib { inherit lib; }) types;
-          }
+          { inherit (inputs.personal-nixpkgs.lib) tests; }
           (import ./lib { inherit lib; })
         ];
         specialArgs = {
@@ -94,7 +91,7 @@
           config,
           lib,
           ...
-        }:
+        }@fpArgs:
         {
           imports = [
             inputs.agenix-rekey.flakeModule
@@ -132,8 +129,24 @@
               };
 
               featureRegistry = {
-                os = removeAttrs inputs.local-nixpkgs.nixosModules [ "share" ];
-                hm = removeAttrs inputs.local-nixpkgs.homeModules [ "share" ];
+                os = {
+                  editor = { config, lib, ... }: {
+                    config = lib.mkIf config.features.editor.enable {
+                      nixpkgs.overlays = [ inputs.local-nixpkgs.overlays.editor ];
+                    };
+                  };
+                  niri = { config, lib, ... }: {
+                    config = lib.mkIf config.features.niri.enable {
+                      nixpkgs.overlays = [ inputs.local-nixpkgs.overlays.niri ];
+                    };
+                  };
+                  sops = lib.mkBefore inputs.local-nixpkgs.nixosModules.sops;
+                };
+                hm = {
+                  editor = lib.mkBefore inputs.local-nixpkgs.homeModules.nixvim;
+                  niri = lib.mkBefore inputs.local-nixpkgs.homeModules.niri;
+                  sops = lib.mkBefore inputs.local-nixpkgs.homeModules.sops;
+                };
               };
             };
 
@@ -381,11 +394,9 @@
             perSystem =
               {
                 inputs',
-                system,
                 config,
                 pkgs,
                 lib,
-                final,
                 ...
               }:
               {
@@ -393,14 +404,11 @@
 
                 legacyPackages = pkgs.legacyPackages;
 
-                checks =
-                  import ./tests {
-                    inherit lib pkgs llib;
-                    modules = ./modules;
-                  }
-                  // {
-                    inherit (inputs.local-nixpkgs.checks.${system}) native-feature-enables sops-functions;
-                  };
+                checks = import ./tests {
+                  inherit lib pkgs llib;
+                  modules = ./modules;
+                  featureRegistry = fpArgs.config.nixosBuilderArgs.featureRegistry;
+                };
 
                 devShells = {
                   deploy = pkgs.mkShell { nativeBuildInputs = [ inputs'.nixos-anywhere.packages.default ]; };

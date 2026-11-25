@@ -75,10 +75,7 @@
       ({ lib }: rec {
         inherit inputs;
         moduleLocation = __curPos.file;
-        llib = inputs.personal-nixpkgs.lib.mergeAttrsRecursive { allowOverrides = false; } [
-          { inherit (inputs.personal-nixpkgs.lib) packages; }
-          (import ./lib { inherit lib; })
-        ];
+        llib = { inherit (inputs.personal-nixpkgs.lib) packages; };
         lpkgs = import ./pkgs {
           inherit lib llib;
           sources = {
@@ -106,14 +103,7 @@
         };
       })
       (
-        {
-          llib,
-          lpkgs,
-          config,
-          lib,
-          ...
-        }:
-        {
+        { lpkgs, ... }: {
           config = {
             debug = true;
 
@@ -121,86 +111,22 @@
 
             flake = {
               nixosModules = {
-                agent = ./modules/agent/os;
-                editor = { config, lib, ... }: {
-                  imports = [ ./modules/editor/os ];
-
-                  config = lib.mkIf config.features.editor.enable { nixpkgs.overlays = [ lpkgs.overlays.editor ]; };
-                };
-                file-manager = ./modules/file-manager/os;
-                font = ./modules/font/os;
-                greeter = ./modules/greeter/os;
-                media = ./modules/media/os;
-                niri = { config, lib, ... }: {
-                  imports = [ ./modules/niri/os ];
-
-                  config = lib.mkIf config.features.niri.enable {
-                    nixpkgs.overlays = [ inputs.niri-flake.overlays.niri ];
-                  };
-                };
-                proxy = ./modules/proxy/os;
                 share = lpkgs.nixosModule;
-                shell = ./modules/shell/os;
-                sops.imports = [
-                  inputs.sops-nix.nixosModules.sops
-                  ./modules/sops/os
-                ];
-                texlive = ./modules/texlive/os;
-                x11-session = ./modules/x11-session/os;
+                sops = inputs.sops-nix.nixosModules.sops;
               };
 
               homeModules = {
-                agent = ./modules/agent/hm;
-                diagnostics = ./modules/diagnostics/hm;
-                editor.imports = [
-                  inputs.nixvim.homeModules.nixvim
-                  ./modules/editor/hm
-                ];
-                file-manager = ./modules/file-manager/hm;
-                font = ./modules/font/hm;
-                media = ./modules/media/hm;
-                niri.imports = [
-                  inputs.niri-flake.homeModules.niri
-                  ./modules/niri/hm
-                ];
-                office = ./modules/office/hm;
+                niri = inputs.niri-flake.homeModules.niri;
+                nixvim = inputs.nixvim.homeModules.nixvim;
                 share = lpkgs.homeModule;
-                shell = ./modules/shell/hm;
-                sops.imports = [
-                  inputs.sops-nix.homeManagerModules.sops
-                  ./modules/sops/hm
-                ];
-                terminal = ./modules/terminal/hm;
-                x11-session = ./modules/x11-session/hm;
+                sops = inputs.sops-nix.homeManagerModules.sops;
               };
 
               overlays = {
                 editor = lpkgs.overlays.editor;
                 legacy = lpkgs.overlays.legacy;
+                niri = inputs.niri-flake.overlays.niri;
                 share = lpkgs.overlays.share;
-              };
-            };
-
-            perSystem = { pkgs, ... }: {
-              checks = {
-                native-feature-enables = import ./tests/native-feature-enables.nix {
-                  inherit lib pkgs;
-                  # The fixture supplies native declarations instead of upstream modules.
-                  nixosModules = builtins.removeAttrs config.flake.nixosModules [ "share" ] // {
-                    sops = ./modules/sops/os;
-                  };
-                  homeModules = builtins.removeAttrs config.flake.homeModules [ "share" ] // {
-                    editor = ./modules/editor/hm;
-                    niri = ./modules/niri/hm;
-                    sops = ./modules/sops/hm;
-                  };
-                };
-                sops-functions = import ./tests/sops-functions.nix {
-                  inherit lib;
-                  inherit (pkgs) runCommand;
-                  secrets = import ./modules/sops/hm/secrets.nix;
-                  sops = ./modules/sops/os;
-                };
               };
             };
           };

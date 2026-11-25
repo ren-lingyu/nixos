@@ -1,0 +1,255 @@
+{
+  config,
+  osConfig,
+  pkgs,
+  lib,
+  llib,
+  ...
+}:
+let
+  cfg = config.features.niri;
+  systemPackage = osConfig.programs.niri.package or null;
+
+  noctaliaSettings = config.programs.noctalia.settings;
+
+  noctaliaIdleBehaviors = (
+    if builtins.isAttrs noctaliaSettings then (noctaliaSettings.idle.behavior or { }) else { }
+  );
+
+  noctaliaIdleEnabled = (
+    builtins.all (x_: x_) [
+      config.programs.noctalia.enable
+      (builtins.any (
+        behavior_: (if builtins.isAttrs behavior_ then (behavior_.enabled or false) else false)
+      ) (builtins.attrValues noctaliaIdleBehaviors))
+    ]
+  );
+in
+{
+  imports = [
+    ./settings
+    ./waybar
+    ./noctalia
+  ];
+
+  options.features.niri = {
+    enable = lib.mkEnableOption "Niri desktop configuration";
+    noctalia.enable = lib.mkEnableOption "Noctalia";
+    waybar.enable = lib.mkEnableOption "Waybar";
+    monitors = lib.mkOption {
+      type = llib.types.monitors;
+      default = { };
+      description = "Displays configured for this Niri session.";
+    };
+  };
+
+  config = lib.mkIf cfg.enable (
+    lib.mkMerge [
+      {
+        features.niri.noctalia.enable = lib.mkDefault (
+          (osConfig.features.niri.enable or false) && (osConfig.features.niri.noctalia.enable or false)
+        );
+
+        assertions = [
+          {
+            assertion = systemPackage != null;
+            message = "Home Manager Niri requires a package from the system programs.niri.package option.";
+          }
+          {
+            assertion = !(cfg.noctalia.enable && cfg.waybar.enable);
+            message = "Noctalia and Waybar cannot both be enabled.";
+          }
+          {
+            assertion = lib.count (monitor: monitor.role == "default") (lib.attrValues cfg.monitors) == 1;
+            message = "Niri needs exactly one default monitor.";
+          }
+        ];
+      }
+      (lib.mkIf (systemPackage != null) {
+        home.packages = with pkgs; [
+          adwaita-icon-theme
+          wl-clipboard
+        ];
+
+        xdg.portal = {
+          enable = true;
+          xdgOpenUsePortal = true;
+          extraPortals = [ pkgs.xdg-desktop-portal-gtk ];
+        };
+
+        programs.niri = {
+          enable = cfg.enable;
+          package = systemPackage;
+        };
+
+        programs.fuzzel = lib.mkIf (!config.programs.noctalia.enable) {
+          enable = true;
+          package = pkgs.fuzzel;
+          settings = {
+            main = {
+              terminal = lib.mkIf config.xdg.terminal-exec.enable (lib.getExe config.xdg.terminal-exec.package);
+              icon-theme = "Adwaita";
+              layer = "overlay";
+            };
+          };
+        };
+
+        programs.swaylock = {
+          enable = true;
+          package = pkgs.swaylock-effects;
+          settings = {
+            clock = true;
+            daemonize = true;
+            ignore-empty-password = false;
+            show-failed-attempts = true;
+            show-keyboard-layout = true;
+            hide-keyboard-layout = false;
+
+            indicator = true;
+            indicator-caps-lock = true;
+            indicator-idle-visible = true;
+            indicator-radius = 250;
+            indicator-thickness = 15;
+
+            scaling = "fill";
+            timestr = "%H:%M:%S";
+            datestr = "%Y-%m-%d %a";
+            # font-size = 128;
+
+            screenshots = true;
+            effect-blur = "10x5";
+            effect-vignette = "0.5:0.5";
+            grace = 0;
+            fade-in = 0;
+
+            text-color = "ffffff";
+            inside-color = "00000049";
+            ring-color = "ffffff";
+            line-color = "00000000";
+
+            text-caps-lock-color = "ff00ff";
+            inside-caps-lock-color = "00000049";
+            ring-caps-lock-color = "ffffff";
+            line-caps-lock-color = "00000000";
+
+            separator-color = "ffd700";
+            bs-hl-color = "ff0000";
+            key-hl-color = "0000ff";
+            caps-lock-bs-hl-color = "ff4900";
+            caps-lock-key-hl-color = "0049ff";
+
+            text-ver-color = "004900";
+            inside-ver-color = "00ff00";
+            ring-ver-color = "008100";
+            line-ver-color = "00000000";
+
+            text-wrong-color = "490000";
+            inside-wrong-color = "ff0000";
+            ring-wrong-color = "810000";
+            line-wrong-color = "00000000";
+
+            text-clear-color = "494900";
+            inside-clear-color = "ffff00";
+            ring-clear-color = "818100";
+            line-clear-color = "00000000";
+
+            layout-bg-color = "00000000";
+            layout-border-color = "00000000";
+            layout-text-color = "ffffff";
+          };
+        };
+
+        services.mako = lib.mkIf (!config.programs.noctalia.enable) {
+          enable = true; # notification daemon
+          package = pkgs.mako;
+          settings = {
+            anchor = "top-left";
+            default-timeout = 10000;
+            width = 200;
+            height = 30;
+            margin = 0;
+            padding = 0;
+            border-radius = 0;
+            border-size = 1;
+            icons = true;
+            markup = true;
+            actions = true;
+            group-by = "app-name";
+          };
+        };
+
+        services.swayidle = lib.mkIf (!noctaliaIdleEnabled) {
+          enable = true; # idle management daemon
+          package = pkgs.swayidle;
+          systemdTargets = [ config.wayland.systemd.target ];
+          extraArgs = [ "-w" ];
+          events = {
+            after-resume = "${lib.getExe config.programs.niri.package} msg action power-on-monitors";
+            before-sleep = builtins.concatStringsSep "&&" [
+              "${lib.getExe config.programs.swaylock.package} -fF"
+              "${lib.getExe config.programs.niri.package} msg action power-off-monitors"
+            ];
+            lock = "${lib.getExe config.programs.swaylock.package} -fF";
+            unlock = "${lib.getExe config.programs.niri.package} msg action power-on-monitors";
+          };
+          timeouts = [
+            {
+              timeout = 300;
+              command = "${lib.getExe config.programs.swaylock.package} -f";
+            }
+            {
+              timeout = 600;
+              command = "${lib.getExe config.programs.niri.package} msg action power-off-monitors";
+              resumeCommand = "${lib.getExe config.programs.niri.package} msg action power-on-monitors";
+            }
+            {
+              timeout = 1200;
+              command = "${pkgs.systemd}/bin/systemctl suspend";
+            }
+          ];
+        };
+
+        services.polkit-gnome = {
+          enable = false;
+          package = pkgs.polkit_gnome;
+        };
+
+        services.gnome-keyring.enable = false;
+
+        services.cliphist = {
+          enable = true;
+          package = pkgs.cliphist;
+          clipboardPackage = pkgs.wl-clipboard;
+          systemdTargets = "${config.wayland.systemd.target}";
+          allowImages = true;
+          extraOptions = [
+            "-max-dedupe-search"
+            "10"
+            "-max-items"
+            "100"
+          ];
+        };
+
+        services.clipse = {
+          enable = false;
+          package = pkgs.clipse;
+          systemdTarget = "${config.wayland.systemd.target}";
+          settings = {
+            allowDuplicates = true;
+            maxHistory = 100;
+            imageDisplay = {
+              type = "kitty";
+              heightCut = 2;
+              scaleX = 9;
+              scaleY = 9;
+            };
+            keyBindings = { };
+          };
+          theme = {
+            useCustomTheme = false;
+          };
+        };
+      })
+    ]
+  );
+}

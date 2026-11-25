@@ -1,0 +1,19 @@
+{
+  imports = [
+    ./agent
+    ./diagnostics
+    ./editor
+    ./file-manager
+    ./font
+    ./greeter
+    ./media
+    ./niri
+    ./office
+    ./proxy
+    ./shell
+    ./sops
+    ./terminal
+    ./texlive
+    ./x11-session
+  ];
+}
