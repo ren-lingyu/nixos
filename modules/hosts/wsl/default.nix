@@ -42,6 +42,7 @@
         bootManager.enable = false;
         networkmanager.enable = false;
         power.enable = false;
+        wireguard.firewall.restrictOutput = false;
       };
 
       nixpkgs.config.allowUnfreePackages = [ "github-copilot-cli" ];

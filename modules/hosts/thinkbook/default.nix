@@ -59,6 +59,7 @@
         bootManager.enable = true;
         networkmanager.enable = true;
         power.enable = true;
+        wireguard.firewall.restrictOutput = false;
       };
 
       nixpkgs.config = {

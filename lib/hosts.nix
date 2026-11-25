@@ -1,4 +1,10 @@
 { lib }: rec {
+  getManagedWireGuardInterfaces =
+    { topology, hostName }:
+    lib.mapAttrsToList (_: network: network.name) (
+      lib.filterAttrs (_: network: builtins.hasAttr hostName network.nodes) topology
+    );
+
   mkWireGuardSshTargets =
     {
       registry,

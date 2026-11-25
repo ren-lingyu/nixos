@@ -1,12 +1,24 @@
 {
   config,
+  host,
+  hostTopology,
   pkgs,
   lib,
+  llib,
   ...
 }:
 let
 
   cfg = config.workloads.caddy;
+
+  interfaceNames_ = llib.hosts.getManagedWireGuardInterfaces {
+    topology = hostTopology;
+    hostName = host.name;
+  };
+
+  principal_ = "meta skuid ${builtins.toString config.ids.uids.caddy}";
+
+  upstream_ = ''oifname "${cfg.networkInterface}" ip daddr ${cfg.ip} tcp dport ${builtins.toString cfg.port}'';
 
 in
 {
@@ -18,21 +30,28 @@ in
   };
 
   config = lib.mkIf cfg.enable {
-    networking = {
-      nftables = {
-        tables = {
-          workload-caddy-egress = {
-            family = "inet";
-            content = "chain output {${
-              (builtins.concatStringsSep "\n" [
-                "type filter hook output priority filter; policy accept;"
-                "oifname \"${cfg.networkInterface}\" ip daddr ${cfg.ip} tcp dport ${builtins.toString cfg.port} meta skuid ${builtins.toString config.ids.uids.caddy} accept;"
-                "oifname \"${cfg.networkInterface}\" reject;"
-              ])
-            }}";
-          };
-        };
-      };
+    base.wireguard.firewall.extraOutputAllowRules = "${principal_} ${upstream_} accept";
+
+    networking.nftables.tables.workload-caddy-egress = lib.mkIf (interfaceNames_ != [ ]) {
+      family = "inet";
+      content = ''
+        chain output {
+          type filter hook output priority filter; policy accept;
+
+          ${principal_} oifname { ${
+            lib.concatMapStringsSep ", " (name: ''"${name}"'') interfaceNames_
+          } } jump restricted-output
+        }
+
+        chain restricted-output {
+          ct direction reply ct state established accept
+          ct direction reply ct state related meta l4proto { icmp, ipv6-icmp } accept
+
+          ${upstream_} accept
+
+          reject
+        }
+      '';
     };
 
     containers.caddy = rec {

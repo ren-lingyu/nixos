@@ -263,6 +263,8 @@ Host 数据不变量由 =modules/hosts/options.nix= 的 option types 与 =apply=
 
 =bluetooth.nix=, =boot-manager.nix=, =networkmanager.nix= 与 =power.nix= 分别声明并消费对应的 =base.*.enable=, 保留各自的原生配置贡献; boot manager 仍消费 Host monitor 数据派生分辨率. =identity.nix= 与 =wireguard.nix= 消费选中的 Host 领域数据, 生成 identity 与 WireGuard interface/secret 的配置; topology 由 FP 层派生并投影到原生 option.
 
+各 Host 必须显式定义只读原生 option =base.wireguard.firewall.restrictOutput=. Aliyun 启用受管理 WireGuard 接口的本机 OUTPUT 默认拒绝策略, 其他 Host 禁用. =base.wireguard.firewall.extraOutputAllowRules= 为可合并的 =lib.types.lines= option, 由 Host 或 Workload 等可信原生模块贡献 nftables 授权规则; Base 将其置于返回流量例外之后、最终拒绝之前. 未启用限制或无受管理接口时不生成 Host OUTPUT table. =llib.hosts.getManagedWireGuardInterfaces= 根据 topology 中的 Host 成员关系确定接口集合, 不包含独立配置的其他 VPN. 返回流量例外匹配 conntrack reply 方向的 established 报文及相关 ICMP/ICMPv6 报文, 不无条件放行本机主动建立的连接. 此策略与既有 FORWARD 隔离及非受管理接口无关.
+
 [[file:./modules/base/os/ssh-targets.nix][modules/base/os/ssh-targets.nix]] 从 =networking.wireguard.topology= 与 Host Registry 生成系统级 SSH 客户端别名 =<hub>.<node>=, 使用拓扑中的 IPv4 地址作为 =HostName=. 同一节点经不同 Hub 访问时共用 =HostKeyAlias= 与 Registry 中的 SSH host public key, 并由 =programs.ssh.knownHosts= 声明式验证服务器身份. =programs.ssh.hosts= 的 =order= 从 1000 开始, 依据 =(hub.number, node.number)= 排序分配. 当选中 Host 没有 WireGuard 配置时不生成这些条目; 参与生成的节点缺少 SSH host public key 时显式报错. 该集成不依赖 =modules/users/=, 不指定 SSH 登录用户、认证凭据或认证方法, 也不启用或修改 SSH 服务端. 别名只描述网络路径与服务器身份, 不保证 SSH 登录权限.
 
 =identity.nix= 将当前 host 的非空 SSH 私钥备份引用登记为 =age.secrets.ssh-identity=, 设置 =intermediary = true;=, 使其参与 =agenix edit=, =agenix view= 和 =agenix update-masterkeys=. host rekey 跳过该备份, 上游 agenix module 安装 dummy secret, SSH host 私钥的安装与恢复需单独处理. 备份登记独立于 =identity.rootAccess=; 后者只控制 YubiKey 工具和 =pcscd= 的启用.
@@ -306,7 +308,7 @@ Host 数据不变量由 =modules/hosts/options.nix= 的 option types 与 =apply=
 
 各 Workload 的 FP 入口显式登记 OS deferredModule, 各实现直接声明原生 =workloads.<name>= options. 根 FP 配置从 =hostTopology= 取得 IP 与接口名称, 通过 consumer module 传递给已选中的 Workload.
 
-=caddy= workload 配置 Caddy container, 通过指定 network interface, upstream IP 和 port 反向代理服务, 并用 nftables 限制出站路径. =wbo= workload 配置 whitebophir container, 通过指定 listen IP, port, network interface 和 allowed source IP 暴露白板服务.
+=caddy= workload 配置 Caddy container, 通过指定 network interface, upstream IP 和 port 反向代理服务, 并向 Base 贡献仅允许 Caddy socket UID 访问指定 upstream 的授权. Caddy 自身的独立 OUTPUT table 对其 socket UID 在全部受管理 WireGuard 接口上的主动访问施加相同的 upstream 限制, 不取决于 Host 是否启用默认拒绝, 也不限制其他 UID. 两套策略同时存在时分别生效; UID 匹配并非完整的容器安全边界. =wbo= workload 配置 whitebophir container, 通过指定 listen IP, port, network interface 和 allowed source IP 暴露白板服务.
 
 **** [[file:./modules/hosts/][/modules/hosts]]
 #+begin_example

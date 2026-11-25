@@ -45,6 +45,7 @@
         bootManager.enable = false;
         networkmanager.enable = false;
         power.enable = false;
+        wireguard.firewall.restrictOutput = true;
       };
     };
   };

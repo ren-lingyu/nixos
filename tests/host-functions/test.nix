@@ -88,6 +88,90 @@ let
   matebook_ = mkNetworks_ wireguardHosts_ "matebook";
   noHub_ = mkNetworks_ noHubRegistry_ "thinkbook";
 
+  evalFirewall_ =
+    {
+      registry ? wireguardHosts_,
+      hostName ? "aliyun",
+      restrictOutput ? true,
+      caddy ? true,
+      extraRules ? [ ],
+    }:
+    (lib.evalModules {
+      specialArgs = {
+        llib.hosts = hosts;
+        host = registry.${hostName} // {
+          name = hostName;
+          wireguard =
+            if registry.${hostName}.wireguard == null then
+              null
+            else
+              registry.${hostName}.wireguard // { privateKey = "/fixture/wireguard-key"; };
+        };
+        hostRegistry = registry;
+        hostTopology = hosts.mkWireGuardTopology { inherit registry; };
+        pkgs = { };
+      };
+      modules = [
+        (modules + "/base/os/wireguard.nix")
+        (modules + "/workloads/caddy/os/default.nix")
+        {
+          options = {
+            assertions = lib.mkOption { type = lib.types.listOf lib.types.anything; };
+            boot.kernel.sysctl = lib.mkOption { type = lib.types.attrsOf lib.types.anything; };
+            age.secrets = lib.mkOption { type = lib.types.attrsOf lib.types.anything; };
+            networking = {
+              wireguard.enable = lib.mkEnableOption "fixture WireGuard";
+              wireguard.interfaces = lib.mkOption { type = lib.types.attrsOf lib.types.anything; };
+              firewall.allowedUDPPorts = lib.mkOption { type = lib.types.listOf lib.types.port; };
+              nftables.enable = lib.mkEnableOption "fixture nftables";
+              nftables.tables = lib.mkOption {
+                type = lib.types.attrsOf (
+                  lib.types.submodule {
+                    options = {
+                      family = lib.mkOption { type = lib.types.str; };
+                      content = lib.mkOption { type = lib.types.lines; };
+                    };
+                  }
+                );
+                default = { };
+              };
+            };
+            ids.uids.caddy = lib.mkOption { type = lib.types.int; };
+            containers = lib.mkOption { type = lib.types.attrsOf lib.types.anything; };
+          };
+          config = {
+            base.wireguard.firewall.restrictOutput = restrictOutput;
+            networking.nftables.enable = true;
+            age.secrets.wireguard.path = "/run/wireguard-key";
+            ids.uids.caddy = 239;
+            workloads.caddy = lib.mkMerge [
+              { enable = caddy; }
+              (lib.mkIf caddy {
+                ip = "10.100.3.2";
+                port = 18000;
+                networkInterface = "wg3";
+              })
+            ];
+          };
+        }
+      ]
+      ++ builtins.map (rule: { base.wireguard.firewall.extraOutputAllowRules = rule; }) extraRules;
+    }).config;
+
+  firewall_ = evalFirewall_ { extraRules = [ extraAllow_ ]; };
+  unrestricted_ = evalFirewall_ { restrictOutput = false; };
+  withoutCaddy_ = evalFirewall_ { caddy = false; };
+  excludedFirewall_ = evalFirewall_ { hostName = "excluded"; };
+  noHubFirewall_ = evalFirewall_ {
+    registry = noHubRegistry_;
+    hostName = "thinkbook";
+  };
+
+  hostOutput_ = firewall_.networking.nftables.tables.wireguard-egress.content;
+  caddyOutput_ = firewall_.networking.nftables.tables.workload-caddy-egress.content;
+  caddyAllow_ = ''meta skuid 239 oifname "wg3" ip daddr 10.100.3.2 tcp dport 18000 accept'';
+  extraAllow_ = ''oifname "wg5" ip daddr 10.100.5.4 tcp dport 1234 accept'';
+
   sshTargets_ = hosts.mkWireGuardSshTargets {
     registry = sshRegistry_;
     topology = topology_;
@@ -165,6 +249,63 @@ let
 
   checks_ = [
     (mkNetworks_ wireguardHosts_ "excluded" == { })
+
+    (
+      hosts.getManagedWireGuardInterfaces {
+        topology = topology_;
+        hostName = "aliyun";
+      } == [
+        "wg3"
+        "wg5"
+      ]
+    )
+    (
+      hosts.getManagedWireGuardInterfaces {
+        topology = singleHubTopology_;
+        hostName = "thinkbook";
+      } == [ "wg3" ]
+    )
+    (
+      hosts.getManagedWireGuardInterfaces {
+        topology = topology_;
+        hostName = "excluded";
+      } == [ ]
+    )
+    (
+      hosts.getManagedWireGuardInterfaces {
+        topology = noHubTopology_;
+        hostName = "thinkbook";
+      } == [ ]
+    )
+    (lib.hasInfix ''oifname { "wg3", "wg5" } jump restricted-output'' hostOutput_)
+    (lib.hasInfix ''meta skuid 239 oifname { "wg3", "wg5" } jump restricted-output'' caddyOutput_)
+    (lib.hasInfix caddyAllow_ hostOutput_)
+    (lib.hasInfix extraAllow_ hostOutput_)
+    (!lib.hasInfix extraAllow_ caddyOutput_)
+    (lib.hasInfix ''oifname "wg3" ip daddr 10.100.3.2 tcp dport 18000 accept'' caddyOutput_)
+    (builtins.all (content: lib.hasInfix "ct direction reply ct state established accept" content) [
+      hostOutput_
+      caddyOutput_
+    ])
+    (builtins.all
+      (
+        content:
+        lib.hasInfix "ct direction reply ct state related meta l4proto { icmp, ipv6-icmp } accept" content
+      )
+      [
+        hostOutput_
+        caddyOutput_
+      ]
+    )
+    (lib.hasInfix "${firewall_.base.wireguard.firewall.extraOutputAllowRules}\n\n  reject" hostOutput_)
+    (!(unrestricted_.networking.nftables.tables ? wireguard-egress))
+    (unrestricted_.networking.nftables.tables.workload-caddy-egress.content == caddyOutput_)
+    (withoutCaddy_.base.wireguard.firewall.extraOutputAllowRules == "")
+    (withoutCaddy_.networking.nftables.tables ? wireguard-egress)
+    (!(withoutCaddy_.networking.nftables.tables ? workload-caddy-egress))
+    (excludedFirewall_.networking.nftables.tables == { })
+    (noHubFirewall_.networking.nftables.tables == { })
+    (firewall_.networking.nftables.tables.wireguard-isolation.content == isolationRules_ aliyun_)
 
     (
       topology_ == {
