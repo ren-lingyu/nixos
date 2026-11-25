@@ -6,6 +6,16 @@ This repository provides composable NixOS and Home Manager configurations for Th
 
 ## Latest continuation state
 
+### Root Feature implementations and wiring preparation
+
+The committed project returned native Feature implementation ownership to root `modules/features/`. Root FP entries register the implementations and root `flake.nix` combines them with upstream integrations from the child flake. The child continues to provide upstream modules, overlays, packages and shared modules. Shared business types and native-enable/SOPS-helper tests now live in root; the native SOPS bridge moved with its OS implementation. These facts come from static inspection of the committed project snapshot. Prior reports below apply to their original source states.
+
+The owner adopted the [pending Feature wiring and native option constraints](backlog.md#feature-wiring-and-native-option-interfaces). The next step is isolated module-system evaluation after this checkpoint. The production implementation and verification remain pending.
+
+## Historical continuation records
+
+The following reports describe their original source and verification horizons.
+
 ### Committed explicit FP composition and closeout
 
 The owner committed the explicit FP composition refactor (`9b54105`) and its interface closeout (`afe88dc`). System construction selects one Host and declares UID-keyed Accounts with independent HM Features. Explicit FP registries and deferred contributions replace descriptor discovery, UID delivery and the native configuration mirror. The profile connections now guard Agent and rclone SOPS use in the current account's HM scope. The native Feature boundary remains in the child flake. See [architecture.md](architecture.md) for the adopted model.
