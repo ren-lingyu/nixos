@@ -6,11 +6,19 @@ This repository provides composable NixOS and Home Manager configurations for Th
 
 ## Latest continuation state
 
+### Feature wiring evaluation completed
+
+The isolated evaluation against the [archived rev-pinned inputs and replay evidence](../archive/2026-11-25T10-30-30Z--e2115b6/MANIFEST.md) completed 77 independent cases. Fifty-one serialized successfully and 26 emitted expected negative diagnostics. The experiment used locked Nixpkgs, the committed FP constructor with mocked native scopes and the real SOPS expansion helper with fabricated input. It did not evaluate complete systems, run flake checks, build, deploy or access secrets.
+
+Normalize the proposed feature module at single-definition merge, checking callable values before attrsets. The argument-preserving wrapper passed merged deferred modules and preserved native definition properties. Map the sparse profile contributions into Account selections from `config.profile.features`. The existing Account selection schema rejected unknown names for referenced profiles, and selecting a Feature remained independent of profile data. The same profile supplied independent native UID and SOPS state to two Accounts.
+
+Read-only counts definitions before override/condition filtering, so declare one producer and avoid explicit replacement defaults. Locked nullable/list types already yield empty values for the optional SOPS fields. Agent's strict boolean needs `isDefined` before reading it; an enabled provider still needs the nullable credential to hold a path. The simulated SOPS HM enable dependency and OS path passed separate enabled, disabled and missing-OS scopes. Shell, Niri, Font and File-manager retain dependencies on the interfaces or state they actually consume. The native implementation and production verification remain pending; the archive includes exact candidates and limitations.
+
 ### Root Feature implementations and wiring preparation
 
 The committed project returned native Feature implementation ownership to root `modules/features/`. Root FP entries register the implementations and root `flake.nix` combines them with upstream integrations from the child flake. The child continues to provide upstream modules, overlays, packages and shared modules. Shared business types and native-enable/SOPS-helper tests now live in root; the native SOPS bridge moved with its OS implementation. These facts come from static inspection of the committed project snapshot. Prior reports below apply to their original source states.
 
-The owner adopted the [pending Feature wiring and native option constraints](backlog.md#feature-wiring-and-native-option-interfaces). The next step is isolated module-system evaluation after this checkpoint. The production implementation and verification remain pending.
+The owner adopted the [pending Feature wiring and native option constraints](backlog.md#feature-wiring-and-native-option-interfaces). The isolated evaluation was the next step at that checkpoint; the results are recorded above. The production implementation and verification remain pending.
 
 ## Historical continuation records
 

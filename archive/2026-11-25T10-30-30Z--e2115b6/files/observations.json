@@ -1,0 +1,642 @@
+{
+  "A_attrs": {
+    "code": 0,
+    "result": {
+      "arguments": {},
+      "callable": true,
+      "result": {
+        "value": 42
+      }
+    },
+    "error": ""
+  },
+  "A_fun": {
+    "code": 0,
+    "result": {
+      "arguments": {
+        "config": false,
+        "customArg": false,
+        "lib": false
+      },
+      "callable": true,
+      "result": {
+        "value": 42
+      }
+    },
+    "error": ""
+  },
+  "A_callable": {
+    "code": 0,
+    "result": {
+      "arguments": {
+        "customArg": false
+      },
+      "callable": true,
+      "result": {
+        "value": 42
+      }
+    },
+    "error": ""
+  },
+  "A_coercedCallable": {
+    "code": 0,
+    "result": {
+      "arguments": {},
+      "resultArguments": {
+        "customArg": false
+      },
+      "returnedCallable": true
+    },
+    "error": ""
+  },
+  "A_coercedAttrs": {
+    "code": 0,
+    "result": {
+      "arguments": {},
+      "callable": true,
+      "result": {
+        "value": 42
+      }
+    },
+    "error": ""
+  },
+  "A_coercedFun": {
+    "code": 0,
+    "result": {
+      "arguments": {
+        "config": false,
+        "customArg": false,
+        "lib": false
+      },
+      "callable": true,
+      "result": {
+        "value": 42
+      }
+    },
+    "error": ""
+  },
+  "A_badInt": {
+    "code": 1,
+    "result": null,
+    "error": "error: A definition for option `local' is not of type `Feature-local configuration module function.'. Definition values:\n       - In `<unknown-file>': 42"
+  },
+  "A_badString": {
+    "code": 1,
+    "result": null,
+    "error": "error: A definition for option `local' is not of type `Feature-local configuration module function.'. Definition values:\n       - In `<unknown-file>': \"example\""
+  },
+  "A_badList": {
+    "code": 1,
+    "result": null,
+    "error": "error: A definition for option `local' is not of type `Feature-local configuration module function.'. Definition values:\n       - In `<unknown-file>': [ ]"
+  },
+  "A_badPath": {
+    "code": 1,
+    "result": null,
+    "error": "error: A definition for option `local' is not of type `Feature-local configuration module function.'. Definition values:\n       - In `<unknown-file>': <scratch>"
+  },
+  "A_functionTo": {
+    "code": 0,
+    "result": {},
+    "error": ""
+  },
+  "A_functionToMerge": {
+    "code": 0,
+    "result": {
+      "first": 1,
+      "second": 2
+    },
+    "error": ""
+  },
+  "A_directProperty": {
+    "code": 0,
+    "result": {
+      "_type": "if",
+      "condition": false,
+      "content": {
+        "value": 42
+      }
+    },
+    "error": ""
+  },
+  "B_native": {
+    "code": 0,
+    "result": 42,
+    "error": ""
+  },
+  "B_signature": {
+    "code": 0,
+    "result": {
+      "config": false,
+      "customArg": false,
+      "lib": false,
+      "options": false,
+      "osConfig": false
+    },
+    "error": ""
+  },
+  "B_ellipsis": {
+    "code": 0,
+    "result": 0,
+    "error": ""
+  },
+  "B_default": {
+    "code": 1,
+    "result": null,
+    "error": "error: attribute 'customArg' missing\n       at <locked-nixpkgs>/lib/modules.nix:824:13:\n          823|             \"noting that argument `${name}` is not externally provided, so querying `_module.args` instead, requiring `config`\"\n          824|             config._module.args.${name}\n             |             ^\n          825|           )"
+  },
+  "C_providerOn": {
+    "code": 0,
+    "result": {
+      "test": {
+        "apiKeyFile": "/mock/token",
+        "enable": true
+      }
+    },
+    "error": ""
+  },
+  "C_providerOff": {
+    "code": 0,
+    "result": {},
+    "error": ""
+  },
+  "C_providerOffThrow": {
+    "code": 0,
+    "result": {},
+    "error": ""
+  },
+  "C_fpLazy": {
+    "code": 0,
+    "result": true,
+    "error": ""
+  },
+  "C_if": {
+    "code": 0,
+    "result": 42,
+    "error": ""
+  },
+  "C_ifOff": {
+    "code": 0,
+    "result": 0,
+    "error": ""
+  },
+  "C_merge": {
+    "code": 0,
+    "result": {
+      "first": 1,
+      "items": [],
+      "programs": {
+        "git": {
+          "enable": false
+        }
+      },
+      "second": 2,
+      "value": 0
+    },
+    "error": ""
+  },
+  "C_attrProps": {
+    "code": 0,
+    "result": {
+      "first": 0,
+      "items": [
+        "a",
+        "b"
+      ],
+      "programs": {
+        "git": {
+          "enable": false
+        }
+      },
+      "second": 0,
+      "value": 42
+    },
+    "error": ""
+  },
+  "C_attrTopIf": {
+    "code": 0,
+    "result": false,
+    "error": ""
+  },
+  "C_attrTopMerge": {
+    "code": 1,
+    "result": null,
+    "error": "error: The option `local' is defined multiple times while it's expected to be unique.\n\n       Definition values:\n       - In `<unknown-file>':\n           {\n             first = 1;\n           }\n       - In `<unknown-file>':\n           {\n             second = 2;\n           }\n       Use `lib.mkForce value` or `lib.mkDefault value` to change the priority on any of these definitions."
+  },
+  "C_default": {
+    "code": 0,
+    "result": 2,
+    "error": ""
+  },
+  "C_force": {
+    "code": 0,
+    "result": 1,
+    "error": ""
+  },
+  "C_order": {
+    "code": 0,
+    "result": [
+      "first",
+      "middle",
+      "last"
+    ],
+    "error": ""
+  },
+  "C_namespace": {
+    "code": 0,
+    "result": {
+      "global": false,
+      "local": true
+    },
+    "error": ""
+  },
+  "C_imports": {
+    "code": 1,
+    "result": null,
+    "error": "error: The option `features.example.imports' does not exist. Definition values:\n       - In `<unknown-file>'\n\n       Did you mean `features.example.items', `features.example.first' or `features.example.programs'?"
+  },
+  "C_options": {
+    "code": 1,
+    "result": null,
+    "error": "error: The option `features.example.options' does not exist. Definition values:\n       - In `<unknown-file>':\n           {\n             escape = {\n               _type = \"option\";\n               type = {\n                 _type = \"option-type\";\n           ...\n\n       Did you mean `features.example.items', `features.example.second' or `features.example.first'?"
+  },
+  "D_empty": {
+    "code": 0,
+    "result": {},
+    "error": ""
+  },
+  "D_multi": {
+    "code": 0,
+    "result": [
+      42,
+      3,
+      42
+    ],
+    "error": ""
+  },
+  "D_duplicate": {
+    "code": 1,
+    "result": null,
+    "error": "error: The option `users.alice.features.example.module' is read-only, but it's set multiple times. Definition values:\n       - In `<unknown-file>': <function>\n       - In `<unknown-file>': <function>"
+  },
+  "D_force": {
+    "code": 1,
+    "result": null,
+    "error": "error: The option `users.alice.features.example.module' is read-only, but it's set multiple times. Definition values:\n       - In `<unknown-file>': <function>\n       - In `<unknown-file>': <function>"
+  },
+  "D_false": {
+    "code": 1,
+    "result": null,
+    "error": "error: The option `users.alice.features.example.module' is read-only, but it's set multiple times. Definition values:\n       - In `<unknown-file>'\n       - In `<unknown-file>': <function>"
+  },
+  "D_mergeOne": {
+    "code": 0,
+    "result": {
+      "value": 2
+    },
+    "error": ""
+  },
+  "E_accounts": {
+    "code": 0,
+    "result": {
+      "accounts": {
+        "1000": {
+          "agent": {
+            "account": 1000,
+            "enable": true,
+            "layers": [
+              "profile",
+              "account",
+              "another-FP"
+            ],
+            "pi": {
+              "providers": {
+                "test": {
+                  "apiKeyFile": "/mock/1000",
+                  "enable": true
+                }
+              }
+            }
+          },
+          "hasUnused": false
+        },
+        "1001": {
+          "agent": {
+            "account": 1001,
+            "enable": true,
+            "layers": [
+              "profile"
+            ],
+            "pi": {
+              "providers": {
+                "test": {
+                  "apiKeyFile": null,
+                  "enable": false
+                }
+              }
+            }
+          },
+          "hasUnused": false
+        },
+        "1002": {
+          "agent": {
+            "account": 0,
+            "enable": true,
+            "layers": [],
+            "pi": {
+              "providers": {
+                "test": {
+                  "apiKeyFile": null,
+                  "enable": false
+                }
+              }
+            }
+          },
+          "hasUnused": false
+        }
+      },
+      "profile": "alice"
+    },
+    "error": ""
+  },
+  "E_unknown": {
+    "code": 1,
+    "result": null,
+    "error": "error: The option `nixosConfigurations.demo.users.\"1000\".features.typo' does not exist. Definition values:\n       - In `<unknown-file>':\n           {\n             module = <function>;\n           }\n\n       Did you mean `nixosConfigurations.demo.users.\"1000\".features.sops', `nixosConfigurations.demo.users.\"1000\".features.agent' or `nixosConfigurations.demo.users.\"1000\".features.unused'?"
+  },
+  "E_unknownUnreferenced": {
+    "code": 0,
+    "result": {
+      "accounts": {
+        "1000": {
+          "agent": {
+            "account": 1000,
+            "enable": true,
+            "layers": [
+              "profile",
+              "account",
+              "another-FP"
+            ],
+            "pi": {
+              "providers": {
+                "test": {
+                  "apiKeyFile": "/mock/1000",
+                  "enable": true
+                }
+              }
+            }
+          },
+          "hasUnused": false
+        },
+        "1001": {
+          "agent": {
+            "account": 1001,
+            "enable": true,
+            "layers": [
+              "profile"
+            ],
+            "pi": {
+              "providers": {
+                "test": {
+                  "apiKeyFile": null,
+                  "enable": false
+                }
+              }
+            }
+          },
+          "hasUnused": false
+        },
+        "1002": {
+          "agent": {
+            "account": 0,
+            "enable": true,
+            "layers": [],
+            "pi": {
+              "providers": {
+                "test": {
+                  "apiKeyFile": null,
+                  "enable": false
+                }
+              }
+            }
+          },
+          "hasUnused": false
+        }
+      },
+      "profile": "alice"
+    },
+    "error": ""
+  },
+  "F_missingStrict": {
+    "code": 1,
+    "result": null,
+    "error": "error: The option `value' was accessed but has no value defined. Try setting the option."
+  },
+  "F_orStrict": {
+    "code": 1,
+    "result": null,
+    "error": "error: The option `value' was accessed but has no value defined. Try setting the option."
+  },
+  "F_missingFile": {
+    "code": 0,
+    "result": null,
+    "error": ""
+  },
+  "F_missingInputs": {
+    "code": 0,
+    "result": [],
+    "error": ""
+  },
+  "F_missingEnable": {
+    "code": 1,
+    "result": null,
+    "error": "error: The option `value' was accessed but has no value defined. Try setting the option."
+  },
+  "F_missing": {
+    "code": 0,
+    "result": null,
+    "error": ""
+  },
+  "F_or": {
+    "code": 0,
+    "result": null,
+    "error": ""
+  },
+  "F_presence": {
+    "code": 0,
+    "result": {
+      "default": true,
+      "explicitNull": true,
+      "inactive": false,
+      "missing": false
+    },
+    "error": ""
+  },
+  "F_defined": {
+    "code": 0,
+    "result": "given",
+    "error": ""
+  },
+  "F_defaultOnly": {
+    "code": 0,
+    "result": null,
+    "error": ""
+  },
+  "F_defaultConflict": {
+    "code": 1,
+    "result": null,
+    "error": "error: The option `value' is read-only, but it's set multiple times. Definition values:\n       - In `<unknown-file>': null\n       - In `<unknown-file>': \"given\""
+  },
+  "F_sopsEmpty": {
+    "code": 0,
+    "result": {
+      "declarations": {},
+      "keyPath": "/mock/shared"
+    },
+    "error": ""
+  },
+  "F_sopsExplicitEmpty": {
+    "code": 0,
+    "result": {
+      "declarations": {},
+      "keyPath": "/mock/shared"
+    },
+    "error": ""
+  },
+  "F_sopsFull": {
+    "code": 0,
+    "result": {
+      "declarations": {
+        "account.example": {
+          "fileMatches": true,
+          "format": "yaml",
+          "key": "account/example",
+          "mode": "0400",
+          "path": "/run/user/1000/secrets/account.example"
+        }
+      },
+      "keyPath": "/mock/shared"
+    },
+    "error": ""
+  },
+  "F_sopsNoDefaults": {
+    "code": 1,
+    "result": null,
+    "error": "error: mock secrets require format and file"
+  },
+  "F_sopsNoFormat": {
+    "code": 1,
+    "result": null,
+    "error": "error: mock secrets require format and file"
+  },
+  "F_sopsNoFile": {
+    "code": 1,
+    "result": null,
+    "error": "error: mock secrets require format and file"
+  },
+  "F_sopsDisabled": {
+    "code": 0,
+    "result": {},
+    "error": ""
+  },
+  "F_sopsDuplicate": {
+    "code": 1,
+    "result": null,
+    "error": "error: The option `features.sops.secretsInput' is read-only, but it's set multiple times. Definition values:\n       - In `<unknown-file>': [ ]\n       - In `<unknown-file>': [ ]"
+  },
+  "F_agentEmpty": {
+    "code": 0,
+    "result": {
+      "other": null,
+      "test": null
+    },
+    "error": ""
+  },
+  "F_agentA": {
+    "code": 0,
+    "result": {
+      "other": null,
+      "test": "/mock/non-sops"
+    },
+    "error": ""
+  },
+  "F_agentAB": {
+    "code": 0,
+    "result": {
+      "other": null,
+      "test": "/mock/non-sops"
+    },
+    "error": ""
+  },
+  "F_agentGuard": {
+    "code": 0,
+    "result": {
+      "other": null,
+      "test": null
+    },
+    "error": ""
+  },
+  "F_agentPathOnly": {
+    "code": 0,
+    "result": {
+      "other": null,
+      "test": null
+    },
+    "error": ""
+  },
+  "F_agentNullKey": {
+    "code": 1,
+    "result": null,
+    "error": "error: enabled provider requires a credential"
+  },
+  "F_agentNoKey": {
+    "code": 1,
+    "result": null,
+    "error": "error: enabled provider requires a credential"
+  },
+  "F_agentDuplicate": {
+    "code": 1,
+    "result": null,
+    "error": "error: The option `features.agent.pi.providers.test.enable' is read-only, but it's set multiple times. Definition values:\n       - In `<unknown-file>': false\n       - In `<unknown-file>': true"
+  },
+  "G_peer": {
+    "code": 0,
+    "result": "/mock/shared",
+    "error": ""
+  },
+  "G_off": {
+    "code": 0,
+    "result": null,
+    "error": ""
+  },
+  "G_duplicate": {
+    "code": 1,
+    "result": null,
+    "error": "error: The option `service.path' is read-only, but it's set multiple times. Definition values:\n       - In `<unknown-file>': \"/mock/override\"\n       - In `<unknown-file>': \"/mock/shared\""
+  },
+  "G_hmOn": {
+    "code": 0,
+    "result": "/mock/shared",
+    "error": ""
+  },
+  "G_hmOff": {
+    "code": 0,
+    "result": null,
+    "error": ""
+  },
+  "G_hmNoOSOff": {
+    "code": 0,
+    "result": null,
+    "error": ""
+  },
+  "G_hmNoOSOn": {
+    "code": 1,
+    "result": null,
+    "error": "error: Home Manager SOPS requires system SOPS."
+  },
+  "G_hmOSOff": {
+    "code": 1,
+    "result": null,
+    "error": "error: Home Manager SOPS requires system SOPS."
+  }
+}
