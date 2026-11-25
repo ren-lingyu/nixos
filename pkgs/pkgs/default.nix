@@ -18,7 +18,6 @@
         exclude = [ "rage-armored" ];
         overlays = with overlays; [
           git-agent-workflow
-          zotero
           lean4
         ];
       };

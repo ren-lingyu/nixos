@@ -61,14 +61,19 @@
         power.enable = true;
       };
 
-      nixpkgs.config.allowUnfreePackages = [
-        "github-copilot-cli"
-        "microsoft-edge"
-        "feishu"
-        "zoom"
-        "rar"
-        "unrar"
-      ];
+      nixpkgs.config = {
+        allowUnfreePackages = [
+          "feishu"
+          "firefox-esr-140-bin-unwrapped"
+          "github-copilot-cli"
+          "microsoft-edge"
+          "rar"
+          "unrar"
+          "zoom"
+        ];
+        permittedInsecurePackages = [ "firefox-esr-140-bin-unwrapped-140.17.0esr" ];
+      };
+
       xdg.createUserDirectories = true;
       services.flatpak.enable = true;
     };

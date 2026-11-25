@@ -187,7 +187,6 @@ Host 数据不变量由 =modules/hosts/options.nix= 的 option types 与 =apply=
 - =sops-nix=: 提供 SOPS 的 NixOS 和 Home Manager modules.
 - =git-agent-workflow=: 通过 =share= overlay 提供持久记忆工具.
 - =lean4-nix=: 通过 =share= overlay 提供 =lean4= 二进制包.
-- =zotero-fix-nixpkgs=: 固定 nixpkgs revision, 通过 =share= overlay 提供对应 =zotero= 包.
 
 =emarccs= 的 =flake-parts= 和 =treefmt-nix= 分别跟随子项目 =personal-nixpkgs= 的对应输入; =lem=, =nixvim=, =git-agent-workflow= 和 =lean4-nix= 的 =flake-parts= 也跟随 =personal-nixpkgs/flake-parts=.
 
@@ -205,7 +204,7 @@ Host 数据不变量由 =modules/hosts/options.nix= 的 option types 与 =apply=
 
 子 flake 当前提供以下集成入口:
 - =overlays.legacy=: 包含全部本地包扩展, 并提供按 =overlayFile = "overlay.nix"= 发现的 =pkgs.legacyPackages= 命名空间.
-- =overlays.share=: 本地包扩展中排除 =rage-armored=, 并加入 GAW, Lean 和 Zotero 的集成.
+- =overlays.share=: 本地包扩展中排除 =rage-armored=, 并加入 GAW 和 Lean 的集成.
 - =overlays.editor=: 组合 emarccs 和 Lem 的 overlays, 并为 Lem 补充依赖及桌面入口.
 - =nixosModules.share= 和 =homeModules.share=: 汇集包附带的 OS/HM 模块.
 - =overlays.niri=: 转发 niri-flake 的 overlay.

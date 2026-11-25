@@ -36,9 +36,6 @@
       url = "git+https://github.com/ren-lingyu/git-agent-workflow.git?ref=refs/heads/main&shallow=1";
       inputs.nixpkgs.follows = "nixpkgs";
     };
-    zotero-fix-nixpkgs = {
-      url = "git+https://github.com/NixOS/nixpkgs.git?rev=363fdbe57ed052c76e816e6270206b0cb348e53a&shallow=1";
-    };
     keep-a-changelog = {
       url = "git+https://github.com/olivierlacan/keep-a-changelog.git?rev=5417981223f2e87fb2c94e9c57a6c0b011447306&shallow=1";
       flake = false;
@@ -96,9 +93,6 @@
               lean4 = inputs.lean4-nix.packages.${final_.stdenv.hostPlatform.system}.lean-bin;
             };
             lem = inputs.lem.overlays.default;
-            zotero = final_: prev_: {
-              zotero = inputs.zotero-fix-nixpkgs.legacyPackages.${final_.stdenv.hostPlatform.system}.zotero;
-            };
           };
         };
       })
