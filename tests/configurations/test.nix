@@ -86,12 +86,6 @@ let
     publicIpAddress = null;
     wireguard = null;
     identity = { };
-    bootManager.enable = false;
-    shared = {
-      networkmanager.enable = false;
-      bluetooth.enable = false;
-      power.enable = false;
-    };
   };
 
   evaluate =

@@ -6,9 +6,11 @@
 }:
 {
   imports = [
+    ./bluetooth.nix
     ./boot-manager.nix
     ./identity.nix
-    ./shared.nix
+    ./networkmanager.nix
+    ./power.nix
     ./ssh-targets.nix
     ./wireguard.nix
   ];

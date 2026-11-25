@@ -248,19 +248,21 @@ Host 数据不变量由 =modules/hosts/options.nix= 的 option types 与 =apply=
 ├── hm/
 │   └── default.nix
 └── os/
+    ├── bluetooth.nix
     ├── boot-manager.nix
     ├── default.nix
     ├── identity.nix
-    ├── shared.nix
+    ├── networkmanager.nix
+    ├── power.nix
     ├── ssh-targets.nix
     └── wireguard.nix
 #+end_example
 
 =default.nix= 是 FP 入口, 向 =nixosBuilderArgs.baseModule= 贡献本地 OS/HM modules; =os/default.nix= 组合其余公共原生 OS modules.
 
-=os/default.nix= 提供 Nix, 防火墙, 基础工具, age 与 Home Manager 公共配置, 并声明原生 =xdg.createUserDirectories= (默认 false); =hm/default.nix= 提供 Fastfetch, XDG 路径和 home state version. Host module 直接使用 =nixpkgs.config.allowUnfreePackages= 与 =xdg.createUserDirectories= 声明本机策略. 两侧基础模块由 =baseModule= 接入, 没有额外的启用开关或 Feature 接口声明.
+=os/default.nix= 提供 Nix, 防火墙, 基础工具, age 与 Home Manager 公共配置, 并声明原生 =xdg.createUserDirectories= (默认 false); =hm/default.nix= 提供 Fastfetch, XDG 路径和 home state version. Host module 直接使用 =nixpkgs.config.allowUnfreePackages= 与 =xdg.createUserDirectories= 声明本机策略. 两侧基础模块由 =baseModule= 无条件接入, 不参与 Feature selection. Host 通过其原生 =module= 显式定义 =base.{bluetooth,bootManager,networkmanager,power}.enable=; 这些只读 native options 不设默认值, 控制对应 Base 配置贡献是否参与合并, 禁用时不强制关闭上游服务. 它们不再属于 Host Registry 的结构化 FP 数据.
 
-[[file:./modules/base/os/boot-manager.nix][modules/base/os/boot-manager.nix]], [[file:./modules/base/os/identity.nix][modules/base/os/identity.nix]], [[file:./modules/base/os/shared.nix][modules/base/os/shared.nix]] 和 [[file:./modules/base/os/wireguard.nix][modules/base/os/wireguard.nix]] 分别消费选中的 Host 数据, 生成 boot manager, identity, shared capability 和 WireGuard interface/secret 的配置; topology 由 FP 层派生并投影到原生 option.
+=bluetooth.nix=, =boot-manager.nix=, =networkmanager.nix= 与 =power.nix= 分别声明并消费对应的 =base.*.enable=, 保留各自的原生配置贡献; boot manager 仍消费 Host monitor 数据派生分辨率. =identity.nix= 与 =wireguard.nix= 消费选中的 Host 领域数据, 生成 identity 与 WireGuard interface/secret 的配置; topology 由 FP 层派生并投影到原生 option.
 
 [[file:./modules/base/os/ssh-targets.nix][modules/base/os/ssh-targets.nix]] 从 =networking.wireguard.topology= 与 Host Registry 生成系统级 SSH 客户端别名 =<hub>.<node>=, 使用拓扑中的 IPv4 地址作为 =HostName=. 同一节点经不同 Hub 访问时共用 =HostKeyAlias= 与 Registry 中的 SSH host public key, 并由 =programs.ssh.knownHosts= 声明式验证服务器身份. =programs.ssh.hosts= 的 =order= 从 1000 开始, 依据 =(hub.number, node.number)= 排序分配. 当选中 Host 没有 WireGuard 配置时不生成这些条目; 参与生成的节点缺少 SSH host public key 时显式报错. 该集成不依赖 =modules/users/=, 不指定 SSH 登录用户、认证凭据或认证方法, 也不启用或修改 SSH 服务端. 别名只描述网络路径与服务器身份, 不保证 SSH 登录权限.
 
@@ -320,7 +322,7 @@ Host 数据不变量由 =modules/hosts/options.nix= 的 option types 与 =apply=
 
 [[file:./modules/hosts/default.nix][modules/hosts/default.nix]] 聚合各 Host FP modules 与 schema, 并提供全 Registry 的求值检查. =options.nix= 扩展 Host schema、声明数据不变量并派生全局 topology; 显示器数据的消费接线由相应 Feature 的 FP 入口负责.
 
-各 Host 的 =default.nix= 是顶层 FP module, 声明 UID registry, monitor, public IP, WireGuard 和 identity 数据以及原生 module. =ssh.private.age= 与 =wireguard.private.age= 分别保存该 Host 的加密 SSH host private key 与 WireGuard private key, 由同目录的 FP module 引用.
+各 Host 的 =default.nix= 是顶层 FP module, 声明 UID registry, monitor, public IP, WireGuard 和 identity 数据以及原生 module. 本机 Base 配置由 =module.base= 提供, 不在 FP schema 中重复声明. =ssh.private.age= 与 =wireguard.private.age= 分别保存该 Host 的加密 SSH host private key 与 WireGuard private key, 由同目录的 FP module 引用.
 
 ***** [[file:./modules/hosts/aliyun/][/modules/hosts/aliyun]]
 #+begin_example

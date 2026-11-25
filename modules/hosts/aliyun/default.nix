@@ -2,16 +2,6 @@
   nixosBuilderArgs.hostRegistry.aliyun = rec {
     number = 3;
 
-    bootManager = {
-      enable = false;
-    };
-
-    shared = {
-      networkmanager.enable = false;
-      bluetooth.enable = false;
-      power.enable = false;
-    };
-
     users = {
       "1000" = 1000;
     };
@@ -49,6 +39,13 @@
 
     module = {
       imports = [ ./os ];
+
+      base = {
+        bluetooth.enable = false;
+        bootManager.enable = false;
+        networkmanager.enable = false;
+        power.enable = false;
+      };
     };
   };
 }

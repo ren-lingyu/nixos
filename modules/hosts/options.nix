@@ -85,19 +85,6 @@
               description = "Public IP address assigned to this host.";
             };
 
-            bootManager = lib.mkOption {
-              type = lib.types.submodule {
-                options.enable = lib.mkOption {
-                  type = lib.types.bool;
-                  internal = true;
-                  readOnly = true;
-                  description = "Whether to apply the boot-manager template for this host.";
-                };
-              };
-              default = { };
-              description = "Boot-manager template configuration for the ${name} host.";
-            };
-
             identity = lib.mkOption {
               type = lib.types.submodule {
                 options = {
@@ -162,33 +149,6 @@
                 rootAccess = true;
               };
               description = "Identity configuration for this host.";
-            };
-
-            shared = lib.mkOption {
-              type = lib.types.submodule {
-                options = {
-                  networkmanager.enable = lib.mkOption {
-                    type = lib.types.bool;
-                    internal = true;
-                    readOnly = true;
-                    description = "Whether to enable NetworkManager for this host.";
-                  };
-                  bluetooth.enable = lib.mkOption {
-                    type = lib.types.bool;
-                    internal = true;
-                    readOnly = true;
-                    description = "Whether to enable Bluetooth and blueman for this host.";
-                  };
-                  power.enable = lib.mkOption {
-                    type = lib.types.bool;
-                    internal = true;
-                    readOnly = true;
-                    description = "Whether to enable power-profiles-daemon and UPower for this host.";
-                  };
-                };
-              };
-              default = { };
-              description = "Shared system services for the ${name} host.";
             };
 
             wireguard = lib.mkOption {

@@ -1,5 +1,4 @@
 {
-  options,
   config,
   host,
   pkgs,
@@ -26,7 +25,14 @@ let
 
 in
 {
-  config = lib.mkIf host.bootManager.enable {
+  options.base.bootManager.enable = lib.mkOption {
+    type = lib.types.bool;
+    internal = true;
+    readOnly = true;
+    description = "Whether to apply the Base boot-manager configuration.";
+  };
+
+  config = lib.mkIf config.base.bootManager.enable {
     environment.systemPackages = (
       lib.optionals (config.boot.loader.limine.enable) (
         with pkgs;

@@ -1,29 +1,24 @@
 {
-  options,
   config,
-  host,
   pkgs,
   lib,
   ...
 }:
 {
-  config = {
-    networking.networkmanager = lib.mkIf host.shared.networkmanager.enable { enable = true; };
+  options.base.power.enable = lib.mkOption {
+    type = lib.types.bool;
+    internal = true;
+    readOnly = true;
+    description = "Whether to apply the Base power management configuration.";
+  };
 
-    hardware.bluetooth = lib.mkIf host.shared.bluetooth.enable {
-      enable = host.shared.bluetooth.enable;
-      package = pkgs.bluez;
-      powerOnBoot = true;
-    };
-
-    services.blueman = lib.mkIf host.shared.bluetooth.enable { enable = true; };
-
-    services.power-profiles-daemon = lib.mkIf host.shared.power.enable {
+  config = lib.mkIf config.base.power.enable {
+    services.power-profiles-daemon = {
       enable = true;
       package = pkgs.power-profiles-daemon;
     };
 
-    services.upower = lib.mkIf host.shared.power.enable {
+    services.upower = {
       enable = true;
       package = pkgs.upower;
       usePercentageForPolicy = true;

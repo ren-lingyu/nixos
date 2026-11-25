@@ -2,16 +2,6 @@
   nixosBuilderArgs.hostRegistry.thinkbook = {
     number = 2;
 
-    bootManager = {
-      enable = true;
-    };
-
-    shared = {
-      networkmanager.enable = true;
-      bluetooth.enable = true;
-      power.enable = true;
-    };
-
     users = {
       "1000" = 1000;
     };
@@ -63,6 +53,14 @@
 
     module = {
       imports = [ ./os ];
+
+      base = {
+        bluetooth.enable = true;
+        bootManager.enable = true;
+        networkmanager.enable = true;
+        power.enable = true;
+      };
+
       nixpkgs.config.allowUnfreePackages = [
         "github-copilot-cli"
         "microsoft-edge"
