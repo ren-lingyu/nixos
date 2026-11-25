@@ -7,12 +7,14 @@
 }:
 let
   hasSystemShell =
-    osConfig ? features.shell.bashPackage
-    && osConfig ? features.shell.zshPackage
+    osConfig ? features.shell.bash.package
+    && osConfig ? features.shell.zsh.package
     && osConfig ? programs.zsh.enable;
 in
 {
-  options.features.shell.enable = lib.mkEnableOption "Home Manager shell configuration";
+  options = {
+    features.shell.enable = lib.mkEnableOption "Home Manager shell configuration";
+  };
 
   config = lib.mkIf config.features.shell.enable (
     lib.mkMerge [
@@ -27,14 +29,14 @@ in
       (lib.mkIf hasSystemShell {
         programs.bash = {
           enable = !osConfig.programs.zsh.enable;
-          package = osConfig.features.shell.bashPackage;
+          package = osConfig.features.shell.bash.package;
           enableCompletion = true;
           shellAliases = { };
         };
 
         programs.zsh = {
           enable = osConfig.programs.zsh.enable;
-          package = osConfig.features.shell.zshPackage;
+          package = osConfig.features.shell.zsh.package;
           defaultKeymap = "emacs";
           enableCompletion = true;
           autosuggestion = {

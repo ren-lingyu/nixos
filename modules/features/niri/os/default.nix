@@ -26,14 +26,18 @@ let
     );
 in
 {
-  options.features.niri = {
-    enable = lib.mkEnableOption "Niri system integration";
-    noctalia.enable = lib.mkEnableOption "Noctalia system integration";
-    sessionPackage = lib.mkOption {
-      type = lib.types.package;
-      readOnly = true;
-      default = sessionWrapper;
-      description = "Executable session wrapper for login managers.";
+  options = {
+    features.niri = {
+      enable = lib.mkEnableOption "Niri system integration";
+      noctalia.enable = lib.mkEnableOption "Noctalia system integration" // {
+        default = cfg.enable;
+      };
+      sessionPackage = lib.mkOption {
+        type = lib.types.package;
+        readOnly = true;
+        default = sessionWrapper;
+        description = "Executable session wrapper for login managers.";
+      };
     };
   };
 

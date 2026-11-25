@@ -2,7 +2,7 @@
   nixosBuilderArgs.userRegistry.lingyu = {
     module = ./hm;
 
-    sops = {
+    features.sops.module = {
       defaultSopsFormat = "yaml";
       defaultSopsFile = ./sops/default.yaml;
       secretsInput = [
@@ -54,10 +54,21 @@
         }
       ];
     };
-    agent.pi.apiKeySecrets = {
-      deepseek = "deepseek.apiKey.pi";
-      moonshot-cn = "moonshot.cn.apiKey.pi";
-      zai-cn = "zai.cn.apiKey.pi";
+    features.agent.module = { config, lib, ... }: {
+      pi.providers = lib.mkIf (config.features.sops.enable or false) {
+        deepseek = {
+          enable = true;
+          apiKeyFile = config.sops.secrets."deepseek.apiKey.pi".path;
+        };
+        moonshot-cn = {
+          enable = true;
+          apiKeyFile = config.sops.secrets."moonshot.cn.apiKey.pi".path;
+        };
+        zai-cn = {
+          enable = true;
+          apiKeyFile = config.sops.secrets."zai.cn.apiKey.pi".path;
+        };
+      };
     };
   };
 }

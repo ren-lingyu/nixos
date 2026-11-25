@@ -8,9 +8,13 @@ let
   cfg = config.features.file-manager;
 in
 {
-  options.features.file-manager = {
-    enable = lib.mkEnableOption "system file manager integration";
-    fileChooser.enable = lib.mkEnableOption "Yazi file chooser";
+  options = {
+    features.file-manager = {
+      enable = lib.mkEnableOption "system file manager integration";
+      fileChooser.enable = lib.mkEnableOption "Yazi file chooser" // {
+        default = cfg.enable;
+      };
+    };
   };
 
   config = lib.mkIf config.features.file-manager.enable {

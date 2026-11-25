@@ -1,4 +1,4 @@
-{ lib }:
+{ lib, featureModule }:
 let
   inherit (lib) mkOption types;
 
@@ -8,18 +8,20 @@ let
     description = "Native module to be imported in the selected evaluation scope.";
   };
 
-  registryEntry = types.submodule (
-    { name, ... }: {
-      options = {
-        name = mkOption {
-          type = types.nonEmptyStr;
-          readOnly = true;
-          default = name;
-        };
-        module = moduleOption;
+  registryEntry = { name, ... }: {
+    options = {
+      name = mkOption {
+        type = types.nonEmptyStr;
+        readOnly = true;
+        default = name;
       };
-    }
-  );
+      module = moduleOption;
+    };
+  };
+
+  mkFeatureModule =
+    name: module:
+    lib.setFunctionArgs (args: { config.features.${name} = module args; }) (lib.functionArgs module);
 
   selection =
     registry:
@@ -150,11 +152,29 @@ in
         default = { };
       };
       hostRegistry = mkOption {
-        type = types.attrsOf registryEntry;
+        type = types.attrsOf (types.submodule registryEntry);
         default = { };
       };
       userRegistry = mkOption {
-        type = types.attrsOf registryEntry;
+        type = types.attrsOf (
+          types.submodule [
+            registryEntry
+            {
+              options.features = mkOption {
+                type = types.attrsOf (
+                  types.submodule {
+                    options.module = mkOption {
+                      type = featureModule;
+                      readOnly = true;
+                      description = "User-supplied native configuration definitions under this Feature's namespace.";
+                    };
+                  }
+                );
+                default = { };
+              };
+            }
+          ]
+        );
         default = { };
       };
       hostTopology = mkOption {
@@ -202,6 +222,9 @@ in
                       profile = registryReference fpConfig.nixosBuilderArgs.userRegistry;
                       features = selection fpConfig.nixosBuilderArgs.featureRegistry.hm;
                     };
+                    config.features = lib.mapAttrs (name: entry: {
+                      module = mkFeatureModule name entry.module;
+                    }) config.profile.features;
                   }
                 )
               );

@@ -64,8 +64,16 @@ let
         username = mkOption { type = str; };
         homeDirectory = mkOption { type = str; };
       };
-      features.alpha.enable = lib.mkEnableOption "HM alpha";
+      features.alpha = {
+        enable = lib.mkEnableOption "HM alpha";
+        profileUid = mkOption { type = lib.types.int; };
+        inputs = mkOption {
+          type = listOf str;
+          default = [ ];
+        };
+      };
     };
+    config._module.args.customArg = "native-argument";
   };
 
   invalid = throw "An unselected deferred module must never be imported";
@@ -140,8 +148,26 @@ let
                   };
                 };
               };
-              userRegistry.profile.module = {
-                markers = [ "profile" ];
+              userRegistry.profile = {
+                module.markers = [ "profile" ];
+                features = {
+                  alpha.module =
+                    lib.setFunctionArgs
+                      (args: {
+                        profileUid = args.config.home.uid;
+                        inputs = args.lib.mkBefore [
+                          args.marker
+                          args.customArg
+                        ];
+                      })
+                      {
+                        config = false;
+                        lib = false;
+                        marker = false;
+                        customArg = false;
+                      };
+                  absent.module = _: invalid;
+                };
               };
               featureRegistry = {
                 os = {
@@ -178,7 +204,10 @@ let
                   username = "first";
                   profile = config.nixosBuilderArgs.userRegistry.profile;
                   features.alpha.enable = true;
-                  features.alpha.module.markers = [ "hm-consumer" ];
+                  features.alpha.module = {
+                    markers = [ "hm-consumer" ];
+                    features.alpha.inputs = [ "consumer" ];
+                  };
                 };
                 "1001" = {
                   username = "second";
@@ -204,16 +233,29 @@ let
     (construct (evaluate [ { nixosConfigurations.one.features.alpha.module.markers = [ "merged" ]; } ]))
     .one.config;
 
-  hm =
-    uid:
+  hmFor =
+    system: uid:
     (lib.evalModules {
       modules = [
         hmFixture
-        os.home-manager.users.${uid}
+        system.home-manager.users.${uid}
       ]
-      ++ os.home-manager.sharedModules;
-      specialArgs = os.home-manager.extraSpecialArgs;
+      ++ system.home-manager.sharedModules;
+      specialArgs = system.home-manager.extraSpecialArgs;
     }).config;
+
+  hm = hmFor os;
+
+  reusedProfile =
+    hmFor
+      (construct (evaluate [ { nixosConfigurations.one.users."1001".features.alpha.enable = true; } ]))
+      .one.config
+      "1001";
+
+  duplicateProfileModule =
+    (evaluate [
+      { nixosBuilderArgs.userRegistry.profile.features.alpha.module = lib.mkForce { profileUid = 1; }; }
+    ]).nixosBuilderArgs.userRegistry.profile.features.alpha.module;
 
   disabled =
     (construct (evaluate [
@@ -247,21 +289,12 @@ let
   # Exercise the real project FP schema extensions independently of the full NixOS/HM build.
   connected =
     (evaluate [
-      (modules + "/hosts/features.nix")
-      (modules + "/users/options.nix")
+      (modules + "/features/greeter/default.nix")
+      (modules + "/features/niri/default.nix")
+      (modules + "/features/sops/default.nix")
       {
         nixosBuilderArgs = {
-          featureRegistry = {
-            os = {
-              greeter = { };
-              sops = { };
-            };
-            hm = {
-              agent = { };
-              niri = { };
-              sops = { };
-            };
-          };
+          featureRegistry.hm.agent = { };
           hostRegistry.first.monitors."eDP-1" = {
             role = "default";
             mode = {
@@ -269,12 +302,19 @@ let
               height = 1080;
             };
           };
-          userRegistry.profile = {
-            sops = {
+          userRegistry.profile.features = {
+            sops.module = {
               defaultSopsFormat = "yaml";
               defaultSopsFile = ./test.nix;
             };
-            agent.pi.apiKeySecrets.deepseek = "key";
+            agent.module = { config, lib, ... }: {
+              pi.providers = lib.mkIf (config.features.sops.enable or false) {
+                deepseek = {
+                  enable = true;
+                  apiKeyFile = config.sops.secrets.key.path;
+                };
+              };
+            };
           };
         };
         nixosConfigurations.one = {
@@ -294,31 +334,36 @@ let
 
   missingGreeterMonitor =
     (evaluate [
-      (modules + "/hosts/features.nix")
-      {
-        nixosBuilderArgs.featureRegistry = {
-          os.greeter = { };
-          hm.niri = { };
-        };
-        nixosConfigurations.one.features.greeter.enable = true;
-      }
+      (modules + "/features/greeter/default.nix")
+      { nixosConfigurations.one.features.greeter.enable = true; }
     ]).nixosConfigurations.one.features.greeter.module;
 
-  missingGreeterMonitorName =
+  missingGreeterMonitorValue =
     (lib.evalModules {
       modules = [
-        { options.features.greeter.monitorName = mkOption { type = str; }; }
+        {
+          options.features.greeter.monitor = mkOption {
+            type = types.monitor;
+            readOnly = true;
+          };
+        }
         missingGreeterMonitor
       ];
-    }).config.features.greeter.monitorName;
+    }).config.features.greeter.monitor.name;
 
   connectedOS =
     (lib.evalModules {
       modules = [
         {
           options.features = {
-            greeter.monitorName = mkOption { type = str; };
-            sops.authorizedUids = mkOption { type = listOf lib.types.int; };
+            greeter.monitor = mkOption {
+              type = types.monitor;
+              readOnly = true;
+            };
+            sops.authorizedUids = mkOption {
+              type = listOf lib.types.ints.unsigned;
+              readOnly = true;
+            };
           };
         }
         connected.features.greeter.module
@@ -331,12 +376,24 @@ let
       modules = [
         {
           options.features = {
-            niri.monitors = mkOption { type = types.monitors; };
+            niri.monitors = mkOption {
+              type = types.monitors;
+              readOnly = true;
+            };
             sops = {
               enable = lib.mkEnableOption "SOPS fixture";
-              defaultSopsFormat = mkOption { type = lib.types.nullOr str; };
-              defaultSopsFile = mkOption { type = lib.types.nullOr lib.types.path; };
-              secretsInput = mkOption { type = types.sopsSecretsInput; };
+              defaultSopsFormat = mkOption {
+                type = lib.types.nullOr str;
+                readOnly = true;
+              };
+              defaultSopsFile = mkOption {
+                type = lib.types.nullOr lib.types.path;
+                readOnly = true;
+              };
+              secretsInput = mkOption {
+                type = types.sopsSecretsInput;
+                readOnly = true;
+              };
             };
             agent.pi.providers = mkOption { type = attrsOf lib.types.anything; };
           };
@@ -397,6 +454,16 @@ assert os.users.users."1001".home == "/home/second";
 assert (hm "1000").home.uid == 1000;
 assert (hm "1000").home.username == "first";
 assert (hm "1000").features.alpha.enable;
+assert (hm "1000").features.alpha.profileUid == 1000;
+assert
+  (hm "1000").features.alpha.inputs == [
+    "argument"
+    "native-argument"
+    "consumer"
+  ];
+assert reusedProfile.features.alpha.profileUid == 1001;
+assert !(builtins.tryEval (lib.isFunction duplicateProfileModule)).success;
+assert fails [ { nixosBuilderArgs.userRegistry.profile.features.unknown.module = { }; } ];
 assert expectedMarkers (hm "1000").markers [
   "profile"
   "shared"
@@ -433,7 +500,7 @@ assert failsHostOption "wireguard" [
   }
 ];
 assert crossHostMonitors.external.name == "external";
-assert !(builtins.tryEval missingGreeterMonitorName).success;
+assert !(builtins.tryEval missingGreeterMonitorValue).success;
 assert fails [ { nixosConfigurations.one.users."1001".username = lib.mkForce "first"; } ];
 assert fails [ { nixosConfigurations.one.users."1001".homeDirectory = "relative"; } ];
 assert fails [
@@ -465,7 +532,8 @@ assert fails [
     };
   })
 ];
-assert connectedOS.greeter.monitorName == "eDP-1";
+assert connectedOS.greeter.monitor == connectedHM.niri.monitors."eDP-1";
+assert connectedOS.greeter.monitor.name == "eDP-1";
 assert connectedOS.sops.authorizedUids == [ 1000 ];
 assert connectedHM.niri.monitors."eDP-1".mode.width == 1920;
 assert connectedHM.sops.defaultSopsFormat == "yaml";

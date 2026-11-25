@@ -1,11 +1,14 @@
 {
   config,
+  options,
   pkgs,
   lib,
   ...
 }:
 let
   providers = config.features.agent.pi.providers;
+  providerEnabled =
+    name: options.features.agent.pi.providers.${name}.enable.isDefined && providers.${name}.enable;
 
   context_ = import ./context {
     inherit pkgs lib;
@@ -29,16 +32,22 @@ let
   );
 in
 {
-  options.features.agent.pi.providers = lib.genAttrs (import ./providers.nix) (provider: {
-    enable = lib.mkEnableOption "${provider} provider";
-    apiKeyFile = lib.mkOption {
-      type = lib.types.nullOr lib.types.nonEmptyStr;
-      default = null;
-      description = "Runtime path to the ${provider} API key.";
-    };
-  });
+  options = {
+    features.agent.pi.providers = lib.genAttrs (import ./providers.nix) (provider: {
+      enable = lib.mkOption {
+        type = lib.types.bool;
+        readOnly = true;
+        description = "Whether to enable the ${provider} provider.";
+      };
+      apiKeyFile = lib.mkOption {
+        type = lib.types.nullOr lib.types.nonEmptyStr;
+        readOnly = true;
+        description = "Runtime path to the ${provider} API key.";
+      };
+    });
 
-  options.features.agent.enable = lib.mkEnableOption "Home Manager agent tools";
+    features.agent.enable = lib.mkEnableOption "Home Manager agent tools";
+  };
 
   config = lib.mkIf config.features.agent.enable {
     home = {
@@ -76,13 +85,13 @@ in
         in
         {
           providers = {
-            deepseek = lib.mkIf (providers.deepseek.enable && providers.deepseek.apiKeyFile != null) {
+            deepseek = lib.mkIf (providerEnabled "deepseek" && providers.deepseek.apiKeyFile != null) {
               apiKey = cat_ providers.deepseek.apiKeyFile;
             };
             moonshotai-cn = lib.mkIf (
-              providers.moonshot-cn.enable && providers.moonshot-cn.apiKeyFile != null
+              providerEnabled "moonshot-cn" && providers.moonshot-cn.apiKeyFile != null
             ) { apiKey = cat_ providers.moonshot-cn.apiKeyFile; };
-            zai-api-cn = lib.mkIf (providers.zai-cn.enable && providers.zai-cn.apiKeyFile != null) {
+            zai-api-cn = lib.mkIf (providerEnabled "zai-cn" && providers.zai-cn.apiKeyFile != null) {
               api = "openai-completions";
               baseUrl = "https://open.bigmodel.cn/api/paas/v4";
               apiKey = cat_ providers.zai-cn.apiKeyFile;
@@ -169,7 +178,7 @@ in
     };
 
     assertions = lib.mapAttrsToList (name: provider: {
-      assertion = !provider.enable || provider.apiKeyFile != null;
+      assertion = !providerEnabled name || provider.apiKeyFile != null;
       message = "Enabled Agent provider ${name} requires features.agent.pi.providers.${name}.apiKeyFile.";
     }) providers;
   };

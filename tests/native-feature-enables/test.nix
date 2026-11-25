@@ -148,9 +148,63 @@ let
     homeModules.niri
     {
       features.niri.enable = true;
+      features.niri.waybar.enable = false;
       programs.niri.enable = false;
     }
   ] { } unusedPackages;
+  niriSystemDefault = evaluate [
+    nixosModules.niri
+    { features.niri.enable = true; }
+  ] unusedSystem unusedPackages;
+  niriHomeDefault =
+    noctalia:
+    evaluate
+      [
+        homeModules.niri
+        { features.niri.enable = true; }
+      ]
+      {
+        features.niri = {
+          enable = true;
+          noctalia.enable = noctalia;
+        };
+      }
+      unusedPackages;
+  fileManagerDefault = evaluate [
+    nixosModules.file-manager
+    { features.file-manager.enable = true; }
+  ] unusedSystem unusedPackages;
+  sopsSystem = evaluate [
+    nixosModules.sops
+    ({ config, ... }: {
+      features.sops = {
+        enable = true;
+        authorizedUids = [ 1000 ];
+      };
+      users.users.account = {
+        uid = 1000;
+        name = "account";
+      };
+      age.secrets.${config.features.sops.ageKeys.hm.name}.path = "/mock/shared";
+    })
+  ] unusedSystem unusedPackages;
+  sopsHome = evaluate [
+    homeModules.sops
+    { features.sops.enable = true; }
+  ] sopsSystem unusedPackages;
+  missingSops = evaluate [
+    homeModules.sops
+    { features.sops.enable = true; }
+  ] { } unusedPackages;
+  agentAssertions =
+    extra:
+    (evaluate (
+      [
+        homeModules.agent
+        { features.agent.enable = true; }
+      ]
+      ++ extra
+    ) unusedSystem unusedPackages).assertions;
 in
 assert builtins.all (value: value) (lib.mapAttrsToList disabled nixosModules);
 assert builtins.all (value: value) (lib.mapAttrsToList disabled homeModules);
@@ -162,9 +216,34 @@ assert contributions disabledAgent == empty;
 assert contributions disabledFileManager == empty;
 assert !systemShell.features.shell.enable;
 assert homeShell.programs.zsh.enable;
-assert homeShell.programs.zsh.package == systemShell.features.shell.zshPackage;
+assert homeShell.programs.zsh.package == systemShell.features.shell.zsh.package;
 assert !(builtins.head missingShell.assertions).assertion;
 assert missingShell.programs == empty.programs;
 assert !(builtins.head missingNiri.assertions).assertion;
 assert missingNiri.programs == empty.programs;
+assert niriSystemDefault.features.niri.noctalia.enable;
+assert (niriHomeDefault true).features.niri.noctalia.enable;
+assert !(niriHomeDefault true).features.niri.waybar.enable;
+assert (niriHomeDefault false).features.niri.waybar.enable;
+assert fileManagerDefault.features.file-manager.fileChooser.enable;
+assert sopsSystem.features.sops.ageKeys.hm.path == "/mock/shared";
+assert sopsSystem.age.secrets.${sopsSystem.features.sops.ageKeys.hm.name}.group == "sops-decrypt";
+assert sopsSystem.users.groups.sops-decrypt.members == [ "account" ];
+assert sopsHome.home.sessionVariables.SOPS_AGE_KEY_FILE == "/mock/shared";
+assert sopsHome.sops.age.keyFile == "/mock/shared";
+assert sopsHome.sops.secrets == { };
+assert !(builtins.tryEval missingSops.features.sops.enable).success;
+assert builtins.all (entry: entry.assertion) (agentAssertions [ ]);
+assert builtins.all (entry: entry.assertion) (agentAssertions [
+  {
+    features.agent.pi.providers.deepseek = {
+      enable = true;
+      apiKeyFile = "/mock/non-sops";
+    };
+  }
+]);
+assert
+  !(builtins.all (entry: entry.assertion) (agentAssertions [
+    { features.agent.pi.providers.deepseek.enable = true; }
+  ]));
 runCommand "native-feature-enables" { } "touch $out"

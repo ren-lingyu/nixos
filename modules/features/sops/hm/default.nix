@@ -11,40 +11,41 @@ let
   hasDefaults = cfg.defaultSopsFormat != null && cfg.defaultSopsFile != null;
 in
 {
-  options.features.sops = {
-    enable = lib.mkEnableOption "Home Manager SOPS integration";
-    secretsInput = lib.mkOption {
-      type = llib.types.sopsSecretsInput;
-      default = [ ];
-      description = "Per-user inputs consumed by the SOPS feature to generate Home Manager sops-nix secrets.";
-    };
+  options = {
+    features.sops = {
+      enable = lib.mkEnableOption "Home Manager SOPS integration" // {
+        apply =
+          enable:
+          assert lib.assertMsg (
+            !enable || (osConfig.features.sops.enable or false)
+          ) "Home Manager SOPS requires system SOPS.";
+          enable;
+      };
+      secretsInput = lib.mkOption {
+        type = llib.types.sopsSecretsInput;
+        readOnly = true;
+        description = "Per-user inputs consumed by the SOPS feature to generate Home Manager sops-nix secrets.";
+      };
 
-    defaultSopsFormat = lib.mkOption {
-      type = lib.types.nullOr lib.types.str;
-      default = null;
-      description = "Default format for generated secrets.";
-    };
-    defaultSopsFile = lib.mkOption {
-      type = lib.types.nullOr lib.types.path;
-      default = null;
-      description = "Default encrypted file for generated secrets.";
-    };
-    ageKeyPath = lib.mkOption {
-      type = lib.types.str;
-      description = "Runtime path of the shared SOPS age key.";
+      defaultSopsFormat = lib.mkOption {
+        type = lib.types.nullOr lib.types.str;
+        readOnly = true;
+        description = "Default format for generated secrets.";
+      };
+      defaultSopsFile = lib.mkOption {
+        type = lib.types.nullOr lib.types.path;
+        readOnly = true;
+        description = "Default encrypted file for generated secrets.";
+      };
     };
   };
 
   config = lib.mkIf config.features.sops.enable {
-    features.sops.ageKeyPath = lib.mkIf (osConfig.features.sops.enable or false) (
-      lib.mkDefault osConfig.age.secrets."sops.hm".path
-    );
-
     home.sessionVariables = {
-      SOPS_AGE_KEY_FILE = cfg.ageKeyPath;
+      SOPS_AGE_KEY_FILE = osConfig.features.sops.ageKeys.hm.path;
     };
 
-    sops = lib.mergeAttrsList [
+    sops = lib.mkMerge [
       {
         defaultSopsKey = null;
         keepGenerations = 1;
@@ -58,15 +59,15 @@ in
 
         age = {
           generateKey = false;
-          keyFile = cfg.ageKeyPath;
+          keyFile = osConfig.features.sops.ageKeys.hm.path;
           plugins = [ ];
           sshKeyPaths = [ ];
         };
 
         secrets = if hasDefaults then secrets.mkSopsSecrets cfg.secretsInput else { };
       }
-      (lib.optionalAttrs (cfg.defaultSopsFormat != null) { defaultSopsFormat = cfg.defaultSopsFormat; })
-      (lib.optionalAttrs (cfg.defaultSopsFile != null) { defaultSopsFile = cfg.defaultSopsFile; })
+      (lib.mkIf (cfg.defaultSopsFormat != null) { defaultSopsFormat = cfg.defaultSopsFormat; })
+      (lib.mkIf (cfg.defaultSopsFile != null) { defaultSopsFile = cfg.defaultSopsFile; })
     ];
 
     assertions = [

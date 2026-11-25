@@ -32,14 +32,18 @@ in
     ./noctalia
   ];
 
-  options.features.niri = {
-    enable = lib.mkEnableOption "Niri desktop configuration";
-    noctalia.enable = lib.mkEnableOption "Noctalia";
-    waybar.enable = lib.mkEnableOption "Waybar";
-    monitors = lib.mkOption {
-      type = llib.types.monitors;
-      default = { };
-      description = "Displays configured for this Niri session.";
+  options = {
+    features.niri = {
+      enable = lib.mkEnableOption "Niri desktop configuration";
+      noctalia.enable = lib.mkEnableOption "Noctalia";
+      waybar.enable = lib.mkEnableOption "Waybar" // {
+        default = cfg.enable && !cfg.noctalia.enable;
+      };
+      monitors = lib.mkOption {
+        type = llib.types.monitors;
+        readOnly = true;
+        description = "Displays configured for this Niri session.";
+      };
     };
   };
 

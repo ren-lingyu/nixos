@@ -10,12 +10,28 @@ let
   sopsGroup = "sops-decrypt";
 in
 {
-  options.features.sops = {
-    enable = lib.mkEnableOption "system SOPS integration";
-    authorizedUids = lib.mkOption {
-      type = lib.types.listOf lib.types.ints.unsigned;
-      default = [ ];
-      description = "UIDs authorized to read the shared SOPS age key.";
+  options = {
+    features.sops = {
+      enable = lib.mkEnableOption "system SOPS integration";
+      authorizedUids = lib.mkOption {
+        type = lib.types.listOf lib.types.ints.unsigned;
+        readOnly = true;
+        description = "UIDs authorized to read the shared SOPS age key.";
+      };
+      ageKeys.hm = {
+        name = lib.mkOption {
+          type = lib.types.nonEmptyStr;
+          readOnly = true;
+          default = "sops.hm";
+          description = "System age secret containing the shared Home Manager SOPS age key.";
+        };
+        path = lib.mkOption {
+          type = lib.types.str;
+          readOnly = true;
+          default = config.age.secrets.${cfg.ageKeys.hm.name}.path;
+          description = "Runtime path of the shared Home Manager SOPS age key.";
+        };
+      };
     };
   };
 
@@ -42,7 +58,7 @@ in
     ];
 
     age.secrets = {
-      "sops.hm" = {
+      ${cfg.ageKeys.hm.name} = {
         rekeyFile = ./sops.hm.age;
         owner = "root";
         group = sopsGroup;

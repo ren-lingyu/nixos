@@ -1,7 +1,6 @@
 { config, lib, ... }: {
   imports = [
     ./options.nix
-    ./features.nix
     ./aliyun
     ./matebook
     ./thinkbook

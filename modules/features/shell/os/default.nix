@@ -5,19 +5,21 @@
   ...
 }:
 {
-  options.features.shell = {
-    enable = lib.mkEnableOption "system shell configuration";
-    bashPackage = lib.mkOption {
-      type = lib.types.package;
-      readOnly = true;
-      default = pkgs.bashInteractive;
-      description = "Bash package shared with Home Manager.";
-    };
-    zshPackage = lib.mkOption {
-      type = lib.types.package;
-      readOnly = true;
-      default = pkgs.zsh;
-      description = "Zsh package shared with Home Manager.";
+  options = {
+    features.shell = {
+      enable = lib.mkEnableOption "system shell configuration";
+      bash.package = lib.mkOption {
+        type = lib.types.package;
+        readOnly = true;
+        default = pkgs.bashInteractive;
+        description = "Bash package shared with Home Manager.";
+      };
+      zsh.package = lib.mkOption {
+        type = lib.types.package;
+        readOnly = true;
+        default = pkgs.zsh;
+        description = "Zsh package shared with Home Manager.";
+      };
     };
   };
 
@@ -25,9 +27,9 @@
     users = {
       defaultUserShell = (
         if (config.programs.zsh.enable == true) then
-          (config.features.shell.zshPackage)
+          (config.features.shell.zsh.package)
         else
-          (config.features.shell.bashPackage)
+          (config.features.shell.bash.package)
       );
     };
 

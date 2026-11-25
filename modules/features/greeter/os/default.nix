@@ -2,31 +2,34 @@
   config,
   pkgs,
   lib,
+  llib,
   ...
 }:
 let
   cfg = config.features.greeter;
 in
 {
-  options.features.greeter = {
-    enable = lib.mkEnableOption "greetd configuration";
-    monitorName = lib.mkOption {
-      type = lib.types.nonEmptyStr;
-      description = "Output focused by the greeter.";
-    };
-    sessionPackages = lib.mkOption {
-      type = lib.types.listOf lib.types.package;
-      default = [ ];
-      description = "Ordered executable session packages.";
+  options = {
+    features.greeter = {
+      enable = lib.mkEnableOption "greetd configuration";
+      monitor = lib.mkOption {
+        type = llib.types.monitor;
+        readOnly = true;
+        description = "Default Host monitor focused by the greeter.";
+      };
+      sessionPackages = lib.mkOption {
+        type = lib.types.listOf lib.types.package;
+        readOnly = true;
+        description = "Ordered executable session packages.";
+      };
     };
   };
 
   config = lib.mkIf cfg.enable {
-    features.greeter.sessionPackages = lib.mkDefault (
+    features.greeter.sessionPackages =
       lib.optional (config.features.niri.enable or false) config.features.niri.sessionPackage
       ++ lib.optional (config.features.x11-session.enable or false
-      ) config.features.x11-session.sessionPackage
-    );
+      ) config.features.x11-session.sessionPackage;
 
     assertions = [
       {
@@ -88,7 +91,7 @@ in
           let
             concatWords_ = builtins.concatStringsSep (builtins.fromJSON "\"\\u0020\"");
             concatLines_ = builtins.concatStringsSep "\n";
-            greeterOutput_ = cfg.monitorName;
+            greeterOutput_ = cfg.monitor.name;
             swayGreetConfig_ =
               let
                 swayGreetCommand_ = builtins.concatStringsSep ";" [

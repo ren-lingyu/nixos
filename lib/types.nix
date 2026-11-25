@@ -2,6 +2,18 @@
   monitor = import ./monitor-type.nix { inherit lib; };
   monitors = lib.types.attrsOf monitor;
 
+  featureModule = lib.types.mkOptionType {
+    name = "featureModule";
+    description = "Feature-local configuration module function.";
+    check = value: lib.isFunction value || builtins.isAttrs value;
+    merge =
+      loc: defs:
+      let
+        value = lib.options.mergeOneOption loc defs;
+      in
+      if lib.isFunction value then value else _: value;
+  };
+
   defaultEditor = lib.types.nullOr (
     lib.types.enum [
       "vim"
