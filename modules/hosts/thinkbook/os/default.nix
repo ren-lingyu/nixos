@@ -129,6 +129,7 @@
                 microsoft-edge
                 zoom-us
                 feishu
+                telegram-desktop
                 zotero
                 (calibre.override { speechSupport = false; })
                 xournalpp
