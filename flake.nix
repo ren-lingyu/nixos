@@ -24,8 +24,6 @@
     nixpkgs = {
       # url = "github:NixOS/nixpkgs/nixos-unstable";
       url = "git+https://github.com/NixOS/nixpkgs?ref=refs/heads/nixos-unstable&shallow=1";
-      # url = "git+https://github.com/NixOS/nixpkgs?ref=refs/heads/nixos-unstable&rev=025c852a89be820b3117f604c8ace42e9b4caa08&shallow=1";
-      # url = "git+https://mirrors.tuna.tsinghua.edu.cn/git/nixpkgs.git?ref=refs/heads/nixos-unstable&shallow=1";
     };
     personal-nixpkgs = {
       url = "git+https://github.com/ren-lingyu/nixpkgs?ref=refs/heads/main&shallow=1";
