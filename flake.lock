@@ -96,11 +96,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1792526520,
-        "narHash": "sha256-3hSJlv8mUVnZPMWK2+CM7a9O+nR6Z4mCh27NfLCmTPc=",
+        "lastModified": 1795168368,
+        "narHash": "sha256-D35n2Q2v1KrlF9LS/pFl8Z3EBMJW6qvPw5q4HMbXXLg=",
         "owner": "nix-community",
         "repo": "disko",
-        "rev": "cedd626e11b635470fa6f9fdb8ad79b0075dd7f9",
+        "rev": "44761d4f745b95e037458a0e57133c5700c8e320",
         "type": "github"
       },
       "original": {
@@ -126,10 +126,10 @@
         "personal-nixpkgs": "personal-nixpkgs_5"
       },
       "locked": {
-        "lastModified": 1795244113,
-        "narHash": "sha256-XeooOwADLuF4uTwgJDAzVAZGqdzXaSHQIEzquVQWK5A=",
+        "lastModified": 1795634034,
+        "narHash": "sha256-eP8vMYDuhLud5kO89SVLi15RfuNdl4rhT3cnfWjps30=",
         "ref": "refs/heads/main",
-        "rev": "1f44917a51e324a1e7b1503876ff8534b9cba607",
+        "rev": "92da73fd9e6b1a6d4b8d460eda716a9074cbf1d1",
         "shallow": true,
         "type": "git",
         "url": "https://github.com/ren-lingyu/emarccs.git"
@@ -319,10 +319,10 @@
         ]
       },
       "locked": {
-        "lastModified": 1794963576,
-        "narHash": "sha256-+CPrP74GDJ63f7bgEFC9Av4hbxc7K9WUNv1ZVRifRe8=",
+        "lastModified": 1795686323,
+        "narHash": "sha256-4iRcuQObXq+6JrmHkCUjevZ4L0Wy97MkUE8BeOaCgRs=",
         "ref": "refs/heads/master",
-        "rev": "2b13c9cb3aa20653e6f8ee0b7f8331a53ea9b0a9",
+        "rev": "567216631dfccee23b32288de037b1339918144c",
         "shallow": true,
         "type": "git",
         "url": "https://github.com/nix-community/home-manager.git"
@@ -365,10 +365,10 @@
         ]
       },
       "locked": {
-        "lastModified": 1795185276,
-        "narHash": "sha256-15P4rwflAKmzWeFtKSSmZLDsG3U62wcVQXxvvBqjpKM=",
+        "lastModified": 1795524823,
+        "narHash": "sha256-F6HQm1eZGChKa8pXqyf247YppINniF6nNUVG3CxZ4cA=",
         "ref": "refs/heads/main",
-        "rev": "60cb7c379b61d63666c21388261bb04037bd4be6",
+        "rev": "1c1719d1d3ba9537344dd0231f1ff0eba2368e36",
         "shallow": true,
         "type": "git",
         "url": "https://github.com/lem-project/lem.git"
@@ -488,10 +488,10 @@
         "treefmt-nix": "treefmt-nix_2"
       },
       "locked": {
-        "lastModified": 1793171667,
-        "narHash": "sha256-8h9MU32SjnFWIWRdtP9vYVNV5QrVbai8Oo1LW1rAmwc=",
+        "lastModified": 1795590784,
+        "narHash": "sha256-9ybOgyGkDDk0s5MQwzcnzM88n3qmxKehmVivl/PhuO8=",
         "ref": "refs/heads/main",
-        "rev": "58132e1d1f813b845382a2aeca4203b18d2ac807",
+        "rev": "2293f6d0dd315cf7b781314d51ef63c97aade80f",
         "shallow": true,
         "type": "git",
         "url": "https://github.com/nix-community/nixos-anywhere.git"
@@ -631,10 +631,10 @@
     },
     "nixpkgs_2": {
       "locked": {
-        "lastModified": 1795085501,
-        "narHash": "sha256-S5keGWzaKpuXo9MNoIC2FfTIuTyTnx8P4NhYJMEsTLI=",
+        "lastModified": 1795234589,
+        "narHash": "sha256-f/VVvxf5RsQgWVhUtefoca5ktVg0DA2bnkMOcmSnozo=",
         "ref": "refs/heads/nixos-unstable",
-        "rev": "0bb8272318b4ca41bf0edc6224df3e3e3046b70d",
+        "rev": "2786a2a72088ecf32aea5b3ec52099e6a7cff78f",
         "shallow": true,
         "type": "git",
         "url": "https://github.com/NixOS/nixpkgs"
@@ -692,10 +692,10 @@
     "org": {
       "flake": false,
       "locked": {
-        "lastModified": 1795116665,
-        "narHash": "sha256-wzO0akEK4xmIeSBAjXMR56VDnhutZ9aEbHswWVtIsZI=",
+        "lastModified": 1795462644,
+        "narHash": "sha256-F7+0QyYJAt3GnjlzFY7+5+eCinaWXpDzGt3skBW8ay8=",
         "ref": "refs/heads/main",
-        "rev": "e80b80e52287f78889705a2025f133034e0827db",
+        "rev": "4c976322ed609ea9169034750f02f4acafb7f150",
         "shallow": true,
         "type": "git",
         "url": "https://github.com/bzg/org-mode.git"
@@ -806,16 +806,16 @@
         "personal-nixpkgs": "personal-nixpkgs_4"
       },
       "locked": {
-        "lastModified": 1795090709,
-        "narHash": "sha256-7kzpsJ/uEfNPYxHeUjxwepJOzqtD6kojGe1C2/x/KT4=",
-        "ref": "refs/tags/v0.8.0",
-        "rev": "d0f521688dac15ca1cbdf64f54f114d7ca9fbca4",
+        "lastModified": 1795550306,
+        "narHash": "sha256-L+hhvq+Q/c1c1Dr+hjIX1lZm5QjzABYarpFXtqkK5s0=",
+        "ref": "refs/heads/main",
+        "rev": "f36e5c3d807e6ff9064bd5cc4d6f00bb901ec7a4",
         "shallow": true,
         "type": "git",
         "url": "https://github.com/ren-lingyu/org-texmacs.git"
       },
       "original": {
-        "ref": "refs/tags/v0.8.0",
+        "ref": "refs/heads/main",
         "shallow": true,
         "type": "git",
         "url": "https://github.com/ren-lingyu/org-texmacs.git"
