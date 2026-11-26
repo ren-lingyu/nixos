@@ -46,7 +46,6 @@
         foot.terminfo
         tmux.terminfo
         age
-        sops
         ssh-to-age
         ssh-to-pgp
       ];

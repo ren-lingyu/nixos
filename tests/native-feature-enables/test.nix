@@ -12,7 +12,6 @@ let
   homeModules = featureRegistry.hm // {
     editor = modules + "/features/editor/hm";
     niri = modules + "/features/niri/hm";
-    sops = modules + "/features/sops/hm";
   };
   attrsOption = lib.mkOption {
     type = lib.types.attrsOf lib.types.anything;
@@ -36,7 +35,6 @@ let
       "nixpkgs"
       "qt"
       "services"
-      "sops"
       "systemd"
       "users"
       "xdg"
@@ -172,19 +170,6 @@ let
     nixosModules.file-manager
     { features.file-manager.enable = true; }
   ] unusedSystem unusedPackages;
-  sopsHome = evaluate [
-    homeModules.sops
-    {
-      features.sops = {
-        enable = true;
-        ageKeyFile = "/mock/identity";
-      };
-    }
-  ] unusedSystem unusedPackages;
-  missingSops = evaluate [
-    homeModules.sops
-    { features.sops.enable = true; }
-  ] unusedSystem unusedPackages;
   agentAssertions =
     extra:
     (evaluate (
@@ -215,16 +200,12 @@ assert (niriHomeDefault true).features.niri.noctalia.enable;
 assert !(niriHomeDefault true).features.niri.waybar.enable;
 assert (niriHomeDefault false).features.niri.waybar.enable;
 assert fileManagerDefault.features.file-manager.fileChooser.enable;
-assert sopsHome.home.sessionVariables.SOPS_AGE_KEY_FILE == "/mock/identity";
-assert sopsHome.sops.age.keyFile == "/mock/identity";
-assert sopsHome.sops.secrets == { };
-assert !(builtins.tryEval missingSops.sops.age.keyFile).success;
 assert builtins.all (entry: entry.assertion) (agentAssertions [ ]);
 assert builtins.all (entry: entry.assertion) (agentAssertions [
   {
     features.agent.pi.providers.deepseek = {
       enable = true;
-      apiKeyFile = "/mock/non-sops";
+      apiKeyFile = "/mock/agent-key";
     };
   }
 ]);

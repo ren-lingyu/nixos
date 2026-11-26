@@ -318,7 +318,6 @@ let
     (evaluate [
       (modules + "/features/greeter/default.nix")
       (modules + "/features/niri/default.nix")
-      (modules + "/features/sops/default.nix")
       {
         nixosBuilderArgs = {
           featureRegistry.hm.agent = { };
@@ -330,16 +329,11 @@ let
             };
           };
           userRegistry.profile.features = {
-            sops.module = {
-              ageKeyFile = "/mock/identity";
-              defaultSopsFormat = "yaml";
-              defaultSopsFile = ./test.nix;
-            };
-            agent.module = { config, lib, ... }: {
-              pi.providers = lib.mkIf (config.features.sops.enable or false) {
+            agent.module = { config, ... }: {
+              pi.providers = {
                 deepseek = {
                   enable = true;
-                  apiKeyFile = config.sops.secrets.key.path;
+                  apiKeyFile = "/run/secrets/key";
                 };
               };
             };
@@ -350,7 +344,6 @@ let
           users."1000".features = {
             agent.enable = true;
             niri.enable = true;
-            sops.enable = true;
           };
           users."1001".features.agent.enable = true;
         };
@@ -400,40 +393,15 @@ let
               type = types.monitors;
               readOnly = true;
             };
-            sops = {
-              enable = lib.mkEnableOption "SOPS fixture";
-              ageKeyFile = mkOption {
-                type = lib.types.nonEmptyStr;
-                readOnly = true;
-              };
-              defaultSopsFormat = mkOption {
-                type = lib.types.nullOr str;
-                readOnly = true;
-              };
-              defaultSopsFile = mkOption {
-                type = lib.types.nullOr lib.types.path;
-                readOnly = true;
-              };
-              secretsInput = mkOption {
-                type = types.sopsSecretsInput;
-                readOnly = true;
-              };
-            };
             agent.pi.providers = mkOption { type = attrsOf lib.types.anything; };
-          };
-          options.sops.secrets.key.path = mkOption { type = str; };
-          config = {
-            features.sops.enable = true;
-            sops.secrets.key.path = "/run/secrets/key";
           };
         }
         connected.users."1000".features.niri.module
-        connected.users."1000".features.sops.module
         connected.users."1000".features.agent.module
       ];
     }).config.features;
 
-  agentWithoutSops =
+  agentIsolated =
     (lib.evalModules {
       modules = [
         {
@@ -581,12 +549,10 @@ assert fails [
 assert connectedOS.greeter.monitor == connectedHM.niri.monitors."eDP-1";
 assert connectedOS.greeter.monitor.name == "eDP-1";
 assert connectedHM.niri.monitors."eDP-1".mode.width == 1920;
-assert connectedHM.sops.ageKeyFile == "/mock/identity";
-assert connectedHM.sops.defaultSopsFormat == "yaml";
-assert connectedHM.sops.defaultSopsFile == ./test.nix;
 assert connectedHM.agent.pi.providers.deepseek.enable;
 assert connectedHM.agent.pi.providers.deepseek.apiKeyFile == "/run/secrets/key";
-assert agentWithoutSops == { };
+assert agentIsolated.deepseek.enable;
+assert agentIsolated.deepseek.apiKeyFile == "/run/secrets/key";
 assert
   builtins.attrNames crossReferences == [
     "one"

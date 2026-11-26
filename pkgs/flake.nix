@@ -7,10 +7,6 @@
       url = "git+https://github.com/ren-lingyu/nixpkgs.git?ref=refs/heads/main&shallow=1";
       inputs.nixpkgs.follows = "nixpkgs";
     };
-    sops-nix = {
-      url = "git+https://github.com/Mic92/sops-nix.git?ref=refs/heads/master&shallow=1";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
     niri-flake = {
       url = "git+https://github.com/sodiboo/niri-flake.git?ref=refs/heads/main&shallow=1";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -112,7 +108,6 @@
                 niri = inputs.niri-flake.homeModules.niri;
                 nixvim = inputs.nixvim.homeModules.nixvim;
                 share = lpkgs.homeModule;
-                sops = inputs.sops-nix.homeManagerModules.sops;
               };
 
               overlays = {

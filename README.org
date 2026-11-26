@@ -100,9 +100,9 @@ nixosBuilderArgs.userRegistry.lingyu.features = {
 };
 #+end_src
 
-内部数据接线与派生接口通常为 =readOnly=, 不通过多个生产者合并数据; 可选输入按其 native option 类型和消费契约处理. SOPS HM 可不声明 secrets, 但启用时要求 Profile 提供只读输入 =features.sops.ageKeyFile=, 不依赖 OS SOPS Feature; Agent 独立消费 provider 的 enable 和 =apiKeyFile=, 不依赖特定秘密管理机制. 当前 lingyu Profile 通过 Base HM =secrets= 提供 API key 路径. 原生接线读取实际 OS/HM config, 例如 Greeter 消费 Niri/X11 session packages (Niri 优先), HM Shell 消费 OS =features.shell.{bash,zsh}.package=, File-manager 消费 OS file chooser 和当前 HM Niri 选择. OS Noctalia、OS FileChooser 默认随所属 Feature 启用, HM Noctalia 默认读取 OS Niri/Noctalia 状态, HM Waybar 默认随 HM Niri 启用且 HM Noctalia 禁用.
+内部数据接线与派生接口通常为 =readOnly=, 不通过多个生产者合并数据; 可选输入按其 native option 类型和消费契约处理. Agent 独立消费 provider 的 enable 和 =apiKeyFile=, 不依赖特定秘密管理机制. 当前 lingyu Profile 通过 Base HM =secrets= 提供 API key 路径. 原生接线读取实际 OS/HM config, 例如 Greeter 消费 Niri/X11 session packages (Niri 优先), HM Shell 消费 OS =features.shell.{bash,zsh}.package=, File-manager 消费 OS file chooser 和当前 HM Niri 选择. OS Noctalia、OS FileChooser 默认随所属 Feature 启用, HM Noctalia 默认读取 OS Niri/Noctalia 状态, HM Waybar 默认随 HM Niri 启用且 HM Noctalia 禁用.
 
-Host 数据不变量由 =modules/hosts/options.nix= 的 option types 与 =apply= 表达: Registry 保证 number 全局唯一, monitors 保证名称唯一、默认 monitor 至多一个且具有 mode, users 保证 UID registry key 与值一致, wireguard 保证 endpoint 非空时 listenPort 非空. =apply= 在对应 option 被消费时执行; =checks.host-registry= 强制求值所有 Host 的这些领域数据, 包括未被选中的 Host, 而不求值 deferredModules. Registry 的 number 检查不应依赖再次读取同一 Registry 的最终值; 局部字段可以读取其他已登记对象. Greeter 接线自行要求唯一默认 monitor, HM Niri 使用原生 assertion, OS Niri 不需要显示器数据. 构造时验证所有 System configurations 的选择及 Account 绑定, 不强制未选中的 deferredModules. 仅依赖最终原生状态的约束由相应原生 assertions 检查 (例如 Proxy 互斥、Noctalia 服务依赖、HM SOPS 与 API keys).
+Host 数据不变量由 =modules/hosts/options.nix= 的 option types 与 =apply= 表达: Registry 保证 number 全局唯一, monitors 保证名称唯一、默认 monitor 至多一个且具有 mode, users 保证 UID registry key 与值一致, wireguard 保证 endpoint 非空时 listenPort 非空. =apply= 在对应 option 被消费时执行; =checks.host-registry= 强制求值所有 Host 的这些领域数据, 包括未被选中的 Host, 而不求值 deferredModules. Registry 的 number 检查不应依赖再次读取同一 Registry 的最终值; 局部字段可以读取其他已登记对象. Greeter 接线自行要求唯一默认 monitor, HM Niri 使用原生 assertion, OS Niri 不需要显示器数据. 构造时验证所有 System configurations 的选择及 Account 绑定, 不强制未选中的 deferredModules. 仅依赖最终原生状态的约束由相应原生 assertions 检查 (例如 Proxy 互斥、Noctalia 服务依赖、Agent provider 的 API key 路径要求).
 
 * 结构
 ** [[file:./][/]]
@@ -181,7 +181,6 @@ Host 数据不变量由 =modules/hosts/options.nix= 的 option types 与 =apply=
 - =emarccs=: 提供 editor 的 Emacs overlay, 固定 revision, 其内部 =personal-nixpkgs= 依赖由自身锁定.
 - =lem= 和 =nixvim=: 提供 editor 所需的 overlay 和 Home Manager module.
 - =niri-flake=: 提供 Niri 的 OS overlay 和 Home Manager module.
-- =sops-nix=: 提供 SOPS 的 Home Manager module.
 - =git-agent-workflow=: 通过 =share= overlay 提供持久记忆工具.
 - =lean4-nix=: 通过 =share= overlay 提供 =lean4= 二进制包.
 
@@ -206,9 +205,8 @@ Host 数据不变量由 =modules/hosts/options.nix= 的 option types 与 =apply=
 - =nixosModules.share= 和 =homeModules.share=: 汇集包附带的 OS/HM 模块.
 - =overlays.niri=: 转发 niri-flake 的 overlay.
 - =homeModules.nixvim= 和 =homeModules.niri=: 分别转发上游 Nixvim 与 Niri HM modules.
-- =homeModules.sops=: 转发 sops-nix 的 HM module. Agenix 和 Agenix-rekey 仍由 root 提供.
 
-=pkgs/pkgs/= 组织软件包和随包提供的 integrations. Nixvim、Niri 与 SOPS 的 inputs 暂时保留在子 flake, 其 exports 不再组合本地 Feature implementations.
+=pkgs/pkgs/= 组织软件包和随包提供的 integrations. 子 flake 持有 Nixvim 与 Niri 的 inputs, 并导出供根 flake 接线的上游模块.
 
 根 flake 通过 =perSystem.nixpkgs.overlays= 接入 =inputs.local-nixpkgs.overlays.legacy=, 使用 =mkFlake= 提供的 =pkgs= 并导出 =legacyPackages = pkgs.legacyPackages;=. checks, devShells 和 rekey 工具共同使用该 =pkgs=; =agenix-rekey.agePackage= 直接取 =pkgs.rage-armored=.
 
@@ -268,7 +266,7 @@ Host 数据不变量由 =modules/hosts/options.nix= 的 option types 与 =apply=
 
 =identity.nix= 将当前 host 的非空 SSH 私钥备份引用登记为 =age.secrets.ssh-identity=, 设置 =intermediary = true;=, 使其参与 =agenix edit=, =agenix view= 和 =agenix update-masterkeys=. host rekey 跳过该备份, 上游 agenix module 安装 dummy secret, SSH host 私钥的安装与恢复需单独处理. 备份登记独立于 =identity.rootAccess=; 后者只控制 YubiKey 工具和 =pcscd= 的启用.
 
-Host 与 User Registry 共用 =llib.types.identity=, 其中 =keys.age= 和 =keys.ssh= 各为可空 submodule; Host 额外声明 =rootAccess=. Base 按 Account 绑定交付 Profile 中非空的 age 私钥文件, 不检查 SOPS Feature 选择. =llib.identity.userAgeSecretName= 根据 UID 生成原生 =age.secrets= 名称, 由 OS agenix 解密并以 Account username 所有、=0400= 权限安装. 此接线要求私钥材料为文件 path; =private.path= 为空时使用 agenix 默认安装位置, 显式指定时须避免同一 System 内的路径冲突. Profile 可通过 =osConfig.age.secrets.<name>.path= 消费实际安装路径. User SSH identity 暂不接线.
+Host 与 User Registry 共用 =llib.types.identity=, 其中 =keys.age= 和 =keys.ssh= 各为可空 submodule; Host 额外声明 =rootAccess=. Base 按 Account 绑定交付 Profile 中非空的 age 私钥文件. =llib.identity.userAgeSecretName= 根据 UID 生成原生 =age.secrets= 名称, 由 OS agenix 解密并以 Account username 所有、=0400= 权限安装. 此接线要求私钥材料为文件 path; =private.path= 为空时使用 agenix 默认安装位置, 显式指定时须避免同一 System 内的路径冲突. Profile 可通过 =osConfig.age.secrets.<name>.path= 消费实际安装路径. User SSH identity 暂不接线.
 
 HM 的 =secrets= 是 Base 提供的递归资源声明, 默认空树, 不属于 Feature. 以 =rekeyFile= 字段识别叶节点, 其值为仓库密文 path; 叶节点的 =path= 是从 OS 原生 =age.secrets= 回读的只读输出. 各层名称分量只允许 ASCII 字母、数字、下划线及连字符, 且不得使用保留字 =rekeyFile=; 空分支不产生 secret, 叶节点不得兼作分支. 同一分支可由多个 HM modules 合并贡献.
 
@@ -283,7 +281,7 @@ HM 的 =secrets= 是 Base 提供的递归资源声明, 默认空树, 不属于 F
 }
 #+end_src
 
-OS 按当前 =accounts= 的 UID 收集 =config.home-manager.users.<uid>.secrets=, 仅遍历节点并消费 =rekeyFile=, 不读取 HM 派生的 =path=. 原生 secret 名为 =secrets.user.<uid>.<dot-separated-path>=, 由 OS agenix 以 Account username 所有、group =root=、mode =0400= 交付. User identity 不参与该解密过程, 不需要 HM agenix module 或额外的运行时服务. 此接口与 HM SOPS 相互独立; lingyu 已将所有 HM secrets 迁移至此, HM SOPS Feature 暂时保留, 但当前无 Account 选择.
+OS 按当前 =accounts= 的 UID 收集 =config.home-manager.users.<uid>.secrets=, 仅遍历节点并消费 =rekeyFile=, 不读取 HM 派生的 =path=. 原生 secret 名为 =secrets.user.<uid>.<dot-separated-path>=, 由 OS agenix 以 Account username 所有、group =root=、mode =0400= 交付. User identity 不参与该解密过程, 不需要 HM agenix module 或额外的运行时服务.
 
 **** [[file:./modules/features/][/modules/features]]
 #+begin_example
@@ -300,7 +298,6 @@ OS 按当前 =accounts= 的 UID 收集 =config.home-manager.users.<uid>.secrets=
 ├── office/
 ├── proxy/
 ├── shell/
-├── sops/
 ├── terminal/
 ├── texlive/
 └── x11-session/
@@ -425,32 +422,29 @@ NixOS-WSL host, hostname =nixos-wsl=.
 /modules/users/lingyu/
 ├── age.private.age
 ├── default.nix
-├── hm/
-│   ├── default.nix
-│   ├── home/
-│   │   ├── .local/
-│   │   │   └── bin/
-│   │   │       ├── git-push-loop.sh
-│   │   │       ├── org.sh
-│   │   │       ├── rc.sh
-│   │   │       └── ssha.sh
-│   │   ├── cloud-server.nix
-│   │   ├── default.nix
-│   │   ├── email.nix
-│   │   ├── git.nix
-│   │   ├── keyring.nix
-│   │   ├── langs.nix
-│   │   └── rclone.nix
-│   └── secrets/
-│       ├── default.nix
-│       └── <path>/
-│           └── <name>.age
-└── sops/
-    ├── .sops.yaml
-    └── default.yaml
+└── hm/
+    ├── default.nix
+    ├── home/
+    │   ├── .local/
+    │   │   └── bin/
+    │   │       ├── git-push-loop.sh
+    │   │       ├── org.sh
+    │   │       ├── rc.sh
+    │   │       └── ssha.sh
+    │   ├── cloud-server.nix
+    │   ├── default.nix
+    │   ├── email.nix
+    │   ├── git.nix
+    │   ├── keyring.nix
+    │   ├── langs.nix
+    │   └── rclone.nix
+    └── secrets/
+        ├── default.nix
+        └── <path>/
+            └── <name>.age
 #+end_example
 
-配置 lingyu 用户的个人 home-manager 模块, 包含 cloud-server, email, git, keyring, langs, rclone 等用户级配置. User age identity 密文位于 =age.private.age=. 各 secret 的 age 密文按 secrets tree 的层级组织于 =hm/secrets/=, 由 =hm/secrets/default.nix= 声明. 例如 =hm/secrets/foo/bar.age= 对应 =secrets.foo.bar.rekeyFile=, 消费者通过 =config.secrets.foo.bar.path= 获取实际交付路径. Rclone remotes 与 Agent providers 均采用此机制. =sops/= 暂时保留原有密文与编辑配置, 不再被 Profile 引用.
+配置 lingyu 用户的个人 home-manager 模块, 包含 cloud-server, email, git, keyring, langs, rclone 等用户级配置. User age identity 密文位于 =age.private.age=. 各 secret 的 age 密文按 secrets tree 的层级组织于 =hm/secrets/=, 由 =hm/secrets/default.nix= 声明. 例如 =hm/secrets/foo/bar.age= 对应 =secrets.foo.bar.rekeyFile=, 消费者通过 =config.secrets.foo.bar.path= 获取实际交付路径. Rclone remotes 与 Agent providers 均采用此机制.
 
 =modules/users/lingyu/hm/home/.local/bin/= 放置个人脚本:
 - =org=: 进入 =~/org= 目录并准备使用 =~/org/config/Makefile= 的 make 函数.
@@ -468,7 +462,7 @@ NixOS-WSL host, hostname =nixos-wsl=.
 最小用户 profile, 提供空的 =hm/default.nix= 实现, 可以接收最终配置启用的公共 HM features.
 
 * 测试
-[[file:./tests/default.nix][tests/default.nix]] 调用 =llib.tests.mkChecks=, 按 =test-overlay.nix= 发现各组测试入口, 在独立测试 scope 中组合定义并收集检查派生物. 嵌套 check 名称以 =-= 连接. 测试覆盖 FP schema 扩展与合并、禁用模块不导入、Account 的独立 HM 选择与静态绑定约束、自定义类型及 Host 相关函数. 原生 Feature enable 契约和 SOPS helper 检查分别位于 =tests/native-feature-enables/= 与 =tests/sops-functions/=, 通过根测试入口直接登记, 不再转发子 flake 的 checks. Host 函数测试还覆盖 WireGuard SSH targets 的多 Hub 别名、排序、主机身份去重、缺失公钥以及不依赖用户模块的系统级集成.
+[[file:./tests/default.nix][tests/default.nix]] 调用 =llib.tests.mkChecks=, 按 =test-overlay.nix= 发现各组测试入口, 在独立测试 scope 中组合定义并收集检查派生物. 嵌套 check 名称以 =-= 连接. 测试覆盖 FP schema 扩展与合并、禁用模块不导入、Account 的独立 HM 选择与静态绑定约束、自定义类型及 Host 相关函数. 原生 Feature enable 契约由 =tests/native-feature-enables/= 检查. =tests/configurations/= 使用模拟 =apiKeyFile= 验证 Agent provider 接线. Host 函数测试还覆盖 WireGuard SSH targets 的多 Hub 别名、排序、主机身份去重、缺失公钥以及不依赖用户模块的系统级集成.
 
 各组测试的 =test-overlay.nix= 使用与包相同的外层构造协议, 通过 =final.callPackage ./test.nix= 调用测试体. =test.nix= 保存断言和检查派生物, fixtures 保留在所属组内; 专用入口文件名避免将 fixtures 误识别为测试组.
 

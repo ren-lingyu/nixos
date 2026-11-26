@@ -144,7 +144,6 @@
                 hm = {
                   editor = lib.mkBefore inputs.local-nixpkgs.homeModules.nixvim;
                   niri = lib.mkBefore inputs.local-nixpkgs.homeModules.niri;
-                  sops = lib.mkBefore inputs.local-nixpkgs.homeModules.sops;
                 };
               };
             };
