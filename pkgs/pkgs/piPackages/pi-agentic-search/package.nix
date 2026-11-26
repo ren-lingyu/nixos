@@ -1,64 +1,60 @@
 {
   lib,
   buildNpmPackage,
+  importNpmLock,
   src,
-  nodejs_22,
+  nodejs,
+  makeWrapper,
+  git,
+  ripgrep,
 }:
-(buildNpmPackage (unused_finalAttrs_: {
-  inherit src;
+(buildNpmPackage (finalAttrs_: {
+  inherit src nodejs;
 
   pname = "pi-agentic-search";
-  version = (builtins.fromJSON (builtins.readFile "${src}/package.json")).version;
+  version = (lib.importJSON "${src}/package.json").version;
 
-  nodejs = nodejs_22;
+  npmDeps = importNpmLock { npmRoot = "${src}"; };
+  npmConfigHook = importNpmLock.npmConfigHook;
 
-  npmDepsHash = "sha256-adBodkfvix1/fpMTxZ10zmdjEAaR6UYvTAdctqRtfHY=";
+  npmInstallFlags = [ "--omit=peer" ];
 
-  npmInstallFlags = [
-    "--omit=dev"
-    "--omit=peer"
-  ];
-
-  dontNpmBuild = true;
+  nativeBuildInputs = [ makeWrapper ];
 
   installPhase = builtins.concatStringsSep "\n" [
-    (lib.escapeShellArgs [
-      "runHook"
-      "preInstall"
-    ])
+    "runHook preInstall"
     ""
-    (lib.escapeShellArgs [
-      "mkdir"
-      "-p"
-      (builtins.placeholder "out")
-    ])
+    # Pack the built project using its original upstream package manifest.
+    "npm pack --ignore-scripts --pack-destination \"$TMPDIR\""
+    "mkdir -p \"$out\""
+    "tar -xzf \"$TMPDIR/$pname-$version.tgz\" --strip-components=1 -C \"$out\""
     ""
-    (lib.escapeShellArgs [
-      "cp"
-      "-r"
-      "package.json"
-      "index.ts"
-      "src"
-      "README.md"
-      "CHANGELOG.md"
-      "LICENSE"
-      "SECURITY.md"
-      "docs"
-      (builtins.placeholder "out")
-    ])
+    # Use the local tarball references again while pruning offline.
+    "cp --no-preserve=mode ${finalAttrs_.npmDeps}/package.json package.json"
+    "cp --no-preserve=mode ${finalAttrs_.npmDeps}/package-lock.json package-lock.json"
+    "npm prune --offline --omit=dev --omit=peer --ignore-scripts --no-save"
+    "rm -f node_modules/.package-lock.json"
+    "cp -r node_modules \"$out\""
     ""
-    (lib.escapeShellArgs [
-      "cp"
-      "-r"
-      "node_modules"
-      (builtins.placeholder "out")
-    ])
+    "makeWrapper ${lib.getExe' nodejs "node"} \"$out/bin/agentic-search\" --add-flags \"$out/bin/agentic-search.mjs\" --prefix PATH : ${
+      lib.makeBinPath [
+        git
+        ripgrep
+      ]
+    }"
     ""
-    (lib.escapeShellArgs [
-      "runHook"
-      "postInstall"
-    ])
-    ""
+    "runHook postInstall"
+  ];
+
+  doInstallCheck = true;
+  installCheckPhase = builtins.concatStringsSep "\n" [
+    "runHook preInstallCheck"
+    "test -f \"$out/package.json\""
+    "test -f \"$out/index.ts\""
+    "test -f \"$out/skills/agentic-search/SKILL.md\""
+    "test ! -e \"$out/node_modules/@earendil-works/pi-coding-agent\""
+    "\"$out/bin/agentic-search\" --help > /dev/null"
+    "runHook postInstallCheck"
   ];
 
   meta = {
@@ -66,5 +62,6 @@
     homepage = "https://github.com/dantetekanem/pi-agentic-search";
     license = lib.licenses.mit;
     platforms = lib.platforms.unix;
+    mainProgram = "agentic-search";
   };
 }))

@@ -1,39 +1,39 @@
 {
   lib,
   buildNpmPackage,
+  importNpmLock,
   src,
-  fetchNpmDeps,
-  jq,
-  nodejs_22,
-  replaceVarsWith,
+  nodejs,
 }:
-let
-
-  postPatch_ = builtins.readFile (replaceVarsWith {
-    src = ./fetch-npm-deps-post-patch.sh;
-    replacements = {
-      jq = lib.getExe jq;
-    };
-  });
-
-in
-(buildNpmPackage (finalAttrs_: {
-  inherit src;
+(buildNpmPackage {
+  inherit src nodejs;
 
   pname = "pi-workspace-history";
-  version = (builtins.fromJSON (builtins.readFile "${src}/package.json")).version;
+  version = (lib.importJSON "${src}/package.json").version;
 
-  nodejs = nodejs_22;
-
-  postPatch = postPatch_;
-
-  npmDeps = fetchNpmDeps {
-    inherit (finalAttrs_) src;
-
-    hash = "sha256-5qkoYPFYYodiYe+V2IDKUFdSF0W8Fftmt1q1SeBgLzg=";
-
-    postPatch = postPatch_;
+  npmDeps = importNpmLock {
+    npmRoot = "${src}";
+    package = builtins.removeAttrs (lib.importJSON "${src}/package.json") [
+      "devDependencies"
+      "peerDependencies"
+      "peerDependenciesMeta"
+    ];
+    packageLock =
+      let
+        lock = lib.importJSON "${src}/package-lock.json";
+      in
+      lock
+      // {
+        packages = lib.filterAttrs (name: entry: name == "" || !(entry.dev or false)) lock.packages // {
+          "" = builtins.removeAttrs lock.packages."" [
+            "devDependencies"
+            "peerDependencies"
+            "peerDependenciesMeta"
+          ];
+        };
+      };
   };
+  npmConfigHook = importNpmLock.npmConfigHook;
 
   npmInstallFlags = [
     "--omit=dev"
@@ -43,44 +43,25 @@ in
   dontNpmBuild = true;
 
   installPhase = builtins.concatStringsSep "\n" [
-    (lib.escapeShellArgs [
-      "runHook"
-      "preInstall"
-    ])
+    "runHook preInstall"
     ""
-    (lib.escapeShellArgs [
-      "mkdir"
-      "-p"
-      "${builtins.placeholder "out"}/.pi"
-    ])
+    "npm pack --ignore-scripts --pack-destination \"$TMPDIR\""
+    "mkdir -p \"$out\""
+    "tar -xzf \"$TMPDIR/$pname-$version.tgz\" --strip-components=1 -C \"$out\""
+    "rm -f node_modules/.package-lock.json"
+    "cp -r node_modules \"$out\""
     ""
-    (lib.escapeShellArgs [
-      "cp"
-      "-r"
-      ".pi/extensions"
-      "${builtins.placeholder "out"}/.pi/"
-    ])
-    ""
-    (lib.escapeShellArgs [
-      "cp"
-      "package.json"
-      "README.md"
-      "README.zh-CN.md"
-      (builtins.placeholder "out")
-    ])
-    ""
-    (lib.escapeShellArgs [
-      "cp"
-      "-r"
-      "node_modules"
-      (builtins.placeholder "out")
-    ])
-    ""
-    (lib.escapeShellArgs [
-      "runHook"
-      "postInstall"
-    ])
-    ""
+    "runHook postInstall"
+  ];
+
+  doInstallCheck = true;
+  installCheckPhase = builtins.concatStringsSep "\n" [
+    "runHook preInstallCheck"
+    "test -f \"$out/package.json\""
+    "test -f \"$out/.pi/extensions/workspace-history.ts\""
+    "test -f \"$out/node_modules/ignore/package.json\""
+    "test ! -e \"$out/node_modules/@earendil-works/pi-coding-agent\""
+    "runHook postInstallCheck"
   ];
 
   meta = {
@@ -89,4 +70,4 @@ in
     license = lib.licenses.mit;
     platforms = lib.platforms.unix;
   };
-}))
+})

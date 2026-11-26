@@ -179,7 +179,7 @@ Host 数据不变量由 =modules/hosts/options.nix= 的 option types 与 =apply=
     └── flake.nix
 #+end_example
 
-[[file:./pkgs/srcs/flake.nix][pkgs/srcs/flake.nix]] 仅声明 =flake = false= 的外部源码 inputs, =outputs= 为空. [[file:./pkgs/srcs/flake.lock][pkgs/srcs/flake.lock]] 独立纳入版本控制. 根 flake 的锁图不包含这个源码 flake, 更新根 flake 时不会同时更新源码锁. 从仓库根目录可用 =nix flake update --flake ./pkgs/srcs= 单独维护源码锁. 源码 input 的 URL 使用显式 =rev= 固定提交, 升级某个源码时先修改该 input 的 =rev=, 再更新对应锁记录.
+[[file:./pkgs/srcs/flake.nix][pkgs/srcs/flake.nix]] 仅声明 =flake = false= 的外部源码 inputs, =outputs= 为空. [[file:./pkgs/srcs/flake.lock][pkgs/srcs/flake.lock]] 独立纳入版本控制. 根 flake 的锁图不包含这个源码 flake, 更新根 flake 时不会同时更新源码锁. 从仓库根目录可用 =nix flake update --flake ./pkgs/srcs= 单独维护源码锁. 源码 input 的 URL 显式指定跟踪分支, 具体提交由源码锁记录固定. 升级源码时更新对应的锁记录; npm 包可通过 =importNpmLock= 直接消费上游 =package-lock.json= 的依赖锁定信息.
 
 [[file:./pkgs/default.nix][pkgs/default.nix]] 接受 =lib=, 包含 =personal-nixpkgs.lib.packages= 的 =llib= 以及外部 =overlays=, 聚合本地 overlays 与 OS/HM 模块. 包和随包提供的模块位于 =pkgs/pkgs/=. =extraArgs.sources = (builtins.getFlake ./srcs).inputs;= 将独立锁定的源码提供给 overlay 构造函数. =package.nix= 定义独立包, =overlay.nix= 注入包或命名空间; 对已有包的纯定制直接写在 =overlay.nix= 中; =os/default.nix= 和 =hm/default.nix= 提供包附带的模块. =mkOverlays= 通过 =groups= 生成本地 overlay 分组: =legacy= 包含全部本地扩展并通过 =export = true;= 提供扩展后 package set 的 =pkgs.legacyPackages=, =share= 排除 =rage-armored=. 各组通过 =exclude= 选择扩展, 可共享同一包定义.
 
