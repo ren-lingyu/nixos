@@ -31,13 +31,6 @@
       url = "git+https://github.com/ren-lingyu/nixpkgs?ref=refs/heads/main&shallow=1";
       inputs.nixpkgs.follows = "nixpkgs";
     };
-    local-nixpkgs = {
-      url = "path:./pkgs";
-      inputs = {
-        nixpkgs.follows = "nixpkgs";
-        personal-nixpkgs.follows = "personal-nixpkgs";
-      };
-    };
     home-manager = {
       url = "git+https://github.com/nix-community/home-manager.git?ref=refs/heads/master&shallow=1";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -68,6 +61,31 @@
       # url = "git+https://github.com/nix-community/disko.git?ref=refs/heads/master&shallow=1";
       follows = "nixos-anywhere/disko";
     };
+    niri-flake = {
+      url = "git+https://github.com/sodiboo/niri-flake.git?ref=refs/heads/main&shallow=1";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+    emarccs = {
+      url = "git+https://github.com/ren-lingyu/emarccs.git?ref=refs/heads/main&shallow=1";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+    nixvim = {
+      # the main branch of nixvim must be use in nixpkgs-unstable
+      url = "git+https://github.com/nix-community/nixvim.git?ref=refs/heads/main&shallow=1";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+    lem = {
+      url = "git+https://github.com/lem-project/lem.git?ref=refs/heads/main&shallow=1";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+    lean4-nix = {
+      url = "git+https://github.com/lenianiva/lean4-nix.git?ref=refs/heads/main&shallow=1";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+    git-agent-workflow = {
+      url = "git+https://github.com/ren-lingyu/git-agent-workflow.git?ref=refs/heads/main&shallow=1";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
   outputs =
@@ -80,6 +98,18 @@
           { inherit (inputs.personal-nixpkgs.lib) tests; }
           (import ./lib { inherit lib; })
         ];
+        lpkgs = import ./pkgs {
+          inherit lib;
+          llib = { inherit (inputs.personal-nixpkgs.lib) packages; };
+          overlays = {
+            emarccs = inputs.emarccs.overlays.default;
+            git-agent-workflow = inputs.git-agent-workflow.overlays.default;
+            lean4 = final_: prev_: {
+              lean4 = inputs.lean4-nix.packages.${final_.stdenv.hostPlatform.system}.lean-bin;
+            };
+            lem = inputs.lem.overlays.default;
+          };
+        };
         specialArgs = {
           rootPath = ./.;
         };
@@ -88,6 +118,7 @@
         {
           rootPath,
           llib,
+          lpkgs,
           config,
           lib,
           ...
@@ -113,10 +144,10 @@
                 imports = [
                   inputs.agenix.nixosModules.default
                   inputs.agenix-rekey.nixosModules.default
-                  inputs.local-nixpkgs.nixosModules.share
+                  lpkgs.nixosModule
                 ];
-                nixpkgs.overlays = [ inputs.local-nixpkgs.overlays.share ];
-                home-manager.sharedModules = [ inputs.local-nixpkgs.homeModules.share ];
+                nixpkgs.overlays = [ lpkgs.overlays.share ];
+                home-manager.sharedModules = [ lpkgs.homeModule ];
               };
 
               hostRegistry = {
@@ -131,19 +162,17 @@
               featureRegistry = {
                 os = {
                   editor = { config, lib, ... }: {
-                    config = lib.mkIf config.features.editor.enable {
-                      nixpkgs.overlays = [ inputs.local-nixpkgs.overlays.editor ];
-                    };
+                    config = lib.mkIf config.features.editor.enable { nixpkgs.overlays = [ lpkgs.overlays.editor ]; };
                   };
                   niri = { config, lib, ... }: {
                     config = lib.mkIf config.features.niri.enable {
-                      nixpkgs.overlays = [ inputs.local-nixpkgs.overlays.niri ];
+                      nixpkgs.overlays = [ inputs.niri-flake.overlays.niri ];
                     };
                   };
                 };
                 hm = {
-                  editor = lib.mkBefore inputs.local-nixpkgs.homeModules.nixvim;
-                  niri = lib.mkBefore inputs.local-nixpkgs.homeModules.niri;
+                  editor = lib.mkBefore inputs.nixvim.homeModules.nixvim;
+                  niri = lib.mkBefore inputs.niri-flake.homeModules.niri;
                 };
               };
             };
@@ -390,7 +419,7 @@
                 ...
               }:
               {
-                nixpkgs.overlays = [ inputs.local-nixpkgs.overlays.legacy ];
+                nixpkgs.overlays = [ lpkgs.overlays.legacy ];
 
                 legacyPackages = pkgs.legacyPackages;
 
@@ -415,12 +444,13 @@
                 treefmt = {
                   flakeCheck = true;
                   settings.excludes = [
+                    "**/flake.lock"
+                    "*.age"
                     "*.patch"
                     ".gitignore"
                     "LICENSE"
                     "README.org"
                     "flake.lock"
-                    "*.age"
                   ];
                 };
               };

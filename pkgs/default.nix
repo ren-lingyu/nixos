@@ -2,11 +2,10 @@
   lib,
   llib,
   overlays,
-  sources,
 }:
 {
   overlays = llib.packages.mkOverlays {
-    root = ./.;
+    root = ./pkgs;
     overlayFile = "overlay.nix";
     groups = {
       legacy = {
@@ -30,16 +29,16 @@
         ];
       };
     };
-    extraArgs = { inherit sources; };
+    extraArgs.sources = (builtins.getFlake ./srcs).inputs;
   };
 
   nixosModule = llib.packages.mkNixosModule {
-    root = ./.;
+    root = ./pkgs;
     modulePath = "os/default.nix";
   };
 
   homeModule = llib.packages.mkHomeModule {
-    root = ./.;
+    root = ./pkgs;
     modulePath = "hm/default.nix";
   };
 }

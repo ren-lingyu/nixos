@@ -114,7 +114,6 @@
       "inputs": {
         "csl-locales": "csl-locales",
         "nixpkgs": [
-          "local-nixpkgs",
           "nixpkgs"
         ],
         "org": "org",
@@ -250,7 +249,6 @@
     "flake-parts_4": {
       "inputs": {
         "nixpkgs-lib": [
-          "local-nixpkgs",
           "nixvim",
           "nixpkgs"
         ]
@@ -272,7 +270,6 @@
     "git-agent-workflow": {
       "inputs": {
         "nixpkgs": [
-          "local-nixpkgs",
           "nixpkgs"
         ],
         "personal-nixpkgs": "personal-nixpkgs_6"
@@ -337,29 +334,10 @@
         "url": "https://github.com/nix-community/home-manager.git"
       }
     },
-    "keep-a-changelog": {
-      "flake": false,
-      "locked": {
-        "lastModified": 1788047714,
-        "narHash": "sha256-qES57L453dhTH4mwVO7o11tuMcUWq/SCF+Qakyqlf5c=",
-        "ref": "refs/heads/main",
-        "rev": "5417981223f2e87fb2c94e9c57a6c0b011447306",
-        "shallow": true,
-        "type": "git",
-        "url": "https://github.com/olivierlacan/keep-a-changelog.git"
-      },
-      "original": {
-        "rev": "5417981223f2e87fb2c94e9c57a6c0b011447306",
-        "shallow": true,
-        "type": "git",
-        "url": "https://github.com/olivierlacan/keep-a-changelog.git"
-      }
-    },
     "lean4-nix": {
       "inputs": {
         "flake-parts": "flake-parts_2",
         "nixpkgs": [
-          "local-nixpkgs",
           "nixpkgs"
         ]
       },
@@ -383,7 +361,6 @@
       "inputs": {
         "flake-parts": "flake-parts_3",
         "nixpkgs": [
-          "local-nixpkgs",
           "nixpkgs"
         ]
       },
@@ -403,62 +380,11 @@
         "url": "https://github.com/lem-project/lem.git"
       }
     },
-    "local-nixpkgs": {
-      "inputs": {
-        "emarccs": "emarccs",
-        "git-agent-workflow": "git-agent-workflow",
-        "keep-a-changelog": "keep-a-changelog",
-        "lean4-nix": "lean4-nix",
-        "lem": "lem",
-        "luadraw": "luadraw",
-        "niri-flake": "niri-flake",
-        "nixpkgs": [
-          "nixpkgs"
-        ],
-        "nixvim": "nixvim",
-        "personal-nixpkgs": [
-          "personal-nixpkgs"
-        ],
-        "pi-agentic-search": "pi-agentic-search",
-        "pi-mono-extensions": "pi-mono-extensions",
-        "pi-workspace-history": "pi-workspace-history",
-        "semver-org": "semver-org",
-        "wayfile": "wayfile"
-      },
-      "locked": {
-        "path": "./pkgs",
-        "type": "path"
-      },
-      "original": {
-        "path": "./pkgs",
-        "type": "path"
-      },
-      "parent": []
-    },
-    "luadraw": {
-      "flake": false,
-      "locked": {
-        "lastModified": 1788612556,
-        "narHash": "sha256-PH74e2QhrmzrDrRb/5hz+PUjccWP0q3sG+fj17VGy4w=",
-        "ref": "refs/heads/main",
-        "rev": "eba63b144ba788209191a611f461cd65a5e8935a",
-        "shallow": true,
-        "type": "git",
-        "url": "https://github.com/pfradin/luadraw.git"
-      },
-      "original": {
-        "rev": "eba63b144ba788209191a611f461cd65a5e8935a",
-        "shallow": true,
-        "type": "git",
-        "url": "https://github.com/pfradin/luadraw.git"
-      }
-    },
     "niri-flake": {
       "inputs": {
         "niri-stable": "niri-stable",
         "niri-unstable": "niri-unstable",
         "nixpkgs": [
-          "local-nixpkgs",
           "nixpkgs"
         ],
         "nixpkgs-stable": "nixpkgs-stable",
@@ -724,7 +650,6 @@
       "inputs": {
         "flake-parts": "flake-parts_4",
         "nixpkgs": [
-          "local-nixpkgs",
           "nixpkgs"
         ],
         "systems": "systems"
@@ -803,7 +728,6 @@
     "org-roam-blog": {
       "inputs": {
         "nixpkgs": [
-          "local-nixpkgs",
           "emarccs",
           "nixpkgs"
         ],
@@ -828,7 +752,6 @@
     "org-roam-include": {
       "inputs": {
         "nixpkgs": [
-          "local-nixpkgs",
           "emarccs",
           "nixpkgs"
         ],
@@ -853,7 +776,6 @@
     "org-roam-organize": {
       "inputs": {
         "nixpkgs": [
-          "local-nixpkgs",
           "emarccs",
           "nixpkgs"
         ],
@@ -878,7 +800,6 @@
     "org-texmacs": {
       "inputs": {
         "nixpkgs": [
-          "local-nixpkgs",
           "emarccs",
           "nixpkgs"
         ],
@@ -921,7 +842,6 @@
     "personal-nixpkgs": {
       "inputs": {
         "nixpkgs": [
-          "local-nixpkgs",
           "emarccs",
           "org-roam-blog",
           "nixpkgs"
@@ -946,7 +866,6 @@
     "personal-nixpkgs_2": {
       "inputs": {
         "nixpkgs": [
-          "local-nixpkgs",
           "emarccs",
           "org-roam-include",
           "nixpkgs"
@@ -971,7 +890,6 @@
     "personal-nixpkgs_3": {
       "inputs": {
         "nixpkgs": [
-          "local-nixpkgs",
           "emarccs",
           "org-roam-organize",
           "nixpkgs"
@@ -996,7 +914,6 @@
     "personal-nixpkgs_4": {
       "inputs": {
         "nixpkgs": [
-          "local-nixpkgs",
           "emarccs",
           "org-texmacs",
           "nixpkgs"
@@ -1021,7 +938,6 @@
     "personal-nixpkgs_5": {
       "inputs": {
         "nixpkgs": [
-          "local-nixpkgs",
           "emarccs",
           "nixpkgs"
         ]
@@ -1045,7 +961,6 @@
     "personal-nixpkgs_6": {
       "inputs": {
         "nixpkgs": [
-          "local-nixpkgs",
           "git-agent-workflow",
           "nixpkgs"
         ]
@@ -1088,60 +1003,6 @@
         "url": "https://github.com/ren-lingyu/nixpkgs"
       }
     },
-    "pi-agentic-search": {
-      "flake": false,
-      "locked": {
-        "lastModified": 1789578894,
-        "narHash": "sha256-KLRj9fOBl1tHqBnOzVV81+hFQixVHlaojUc5nWQXsMs=",
-        "ref": "refs/heads/main",
-        "rev": "fda2434bdfc9ffc810c145f66dc552c2464f1614",
-        "shallow": true,
-        "type": "git",
-        "url": "https://github.com/dantetekanem/pi-agentic-search.git"
-      },
-      "original": {
-        "rev": "fda2434bdfc9ffc810c145f66dc552c2464f1614",
-        "shallow": true,
-        "type": "git",
-        "url": "https://github.com/dantetekanem/pi-agentic-search.git"
-      }
-    },
-    "pi-mono-extensions": {
-      "flake": false,
-      "locked": {
-        "lastModified": 1787749160,
-        "narHash": "sha256-vPLPA3/tHmM+rcHyLeVsotjr8yD0B+a3S5ph05owjWo=",
-        "ref": "refs/heads/main",
-        "rev": "e4e047a5a203cac78f5e420c92a3115ccd2fe6bb",
-        "shallow": true,
-        "type": "git",
-        "url": "https://github.com/emanuelcasco/pi-mono-extensions.git"
-      },
-      "original": {
-        "rev": "e4e047a5a203cac78f5e420c92a3115ccd2fe6bb",
-        "shallow": true,
-        "type": "git",
-        "url": "https://github.com/emanuelcasco/pi-mono-extensions.git"
-      }
-    },
-    "pi-workspace-history": {
-      "flake": false,
-      "locked": {
-        "lastModified": 1791006484,
-        "narHash": "sha256-1sy/2t1aD6B3iTTNNUTrSzsxxfPuqTtQekXv/U5FECE=",
-        "ref": "refs/heads/main",
-        "rev": "4c51d3cad723bd8733c73fb36f4b971efb2eb53a",
-        "shallow": true,
-        "type": "git",
-        "url": "https://github.com/wcldyx/pi-workspace-history.git"
-      },
-      "original": {
-        "rev": "4c51d3cad723bd8733c73fb36f4b971efb2eb53a",
-        "shallow": true,
-        "type": "git",
-        "url": "https://github.com/wcldyx/pi-workspace-history.git"
-      }
-    },
     "pre-commit-hooks": {
       "inputs": {
         "flake-compat": "flake-compat_2",
@@ -1173,32 +1034,19 @@
           "nixos-anywhere",
           "disko"
         ],
+        "emarccs": "emarccs",
+        "git-agent-workflow": "git-agent-workflow",
         "home-manager": "home-manager",
-        "local-nixpkgs": "local-nixpkgs",
+        "lean4-nix": "lean4-nix",
+        "lem": "lem",
+        "niri-flake": "niri-flake",
         "nix-flatpak": "nix-flatpak",
         "nixos-anywhere": "nixos-anywhere",
         "nixos-wsl": "nixos-wsl",
         "nixpkgs": "nixpkgs_2",
+        "nixvim": "nixvim",
         "nixvirt": "nixvirt",
         "personal-nixpkgs": "personal-nixpkgs_7"
-      }
-    },
-    "semver-org": {
-      "flake": false,
-      "locked": {
-        "lastModified": 1683428709,
-        "narHash": "sha256-/X9vGVHF4ZduzgCF1A/F7nW7s9S6i6wsYLhsmeFZNBM=",
-        "ref": "refs/heads/gh-pages",
-        "rev": "839c747aeb15078beea00dbe93a84f2c0fd39878",
-        "shallow": true,
-        "type": "git",
-        "url": "https://github.com/semver/semver.org.git"
-      },
-      "original": {
-        "rev": "839c747aeb15078beea00dbe93a84f2c0fd39878",
-        "shallow": true,
-        "type": "git",
-        "url": "https://github.com/semver/semver.org.git"
       }
     },
     "systems": {
@@ -1258,26 +1106,6 @@
         "owner": "numtide",
         "repo": "treefmt-nix",
         "type": "github"
-      }
-    },
-    "wayfile": {
-      "flake": false,
-      "locked": {
-        "lastModified": 1781558933,
-        "narHash": "sha256-zwPvFQCNXyqCfscfDtpF88Aal9Ho+3WsIdDaOQ/kNzg=",
-        "ref": "refs/heads/main",
-        "rev": "e03db0c44d84aab3d3d67f6ae4b8fb6f9b3ae482",
-        "shallow": true,
-        "submodules": true,
-        "type": "git",
-        "url": "https://github.com/blackbartblues/Wayfile.git"
-      },
-      "original": {
-        "rev": "e03db0c44d84aab3d3d67f6ae4b8fb6f9b3ae482",
-        "shallow": true,
-        "submodules": true,
-        "type": "git",
-        "url": "https://github.com/blackbartblues/Wayfile.git"
       }
     },
     "xwayland-satellite-stable": {
