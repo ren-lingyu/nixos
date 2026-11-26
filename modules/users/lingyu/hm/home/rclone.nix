@@ -44,16 +44,6 @@
             endpoint = config.sops.secrets."cloudflare.endpoint".path;
           };
         };
-        "OneDrive" = {
-          config = {
-            type = "onedrive";
-            drive_type = "personal";
-          };
-          secrets = {
-            token = config.sops.secrets."onedrive.token".path;
-            drive_id = config.sops.secrets."onedrive.drive_id".path;
-          };
-        };
         "AliCloudOSS" = {
           config = {
             type = "s3";

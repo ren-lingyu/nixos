@@ -38,10 +38,6 @@
                 "secret_access_key"
                 "endpoint"
               ];
-              "onedrive" = [
-                "token"
-                "drive_id"
-              ];
               "alibabacloud" = {
                 "oss" = [
                   "access_key_id"
