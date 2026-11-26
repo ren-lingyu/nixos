@@ -11,6 +11,7 @@
     ./identity.nix
     ./networkmanager.nix
     ./power.nix
+    ./secrets.nix
     ./ssh-targets.nix
     ./wireguard.nix
   ];

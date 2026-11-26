@@ -149,10 +149,11 @@ Host 数据不变量由 =modules/hosts/options.nix= 的 option types 与 =apply=
 ├── identity.nix
 ├── modules.nix
 ├── monitor-type.nix
+├── secrets.nix
 └── types.nix
 #+end_example
 
-[[file:./lib/default.nix][lib/default.nix]] 导出 =llib.hosts=, =llib.flakeParts=, =llib.identity=, =llib.modules= 与 =llib.types=. =hosts.nix= 提供 WireGuard network data、拓扑、接口/firewall 及 SSH targets 的派生; =mkWireGuardTopology= 返回全局 topology, =mkWireGuardNetworks= 直接返回指定 Host 的原生 networking 配置; =flakeParts.nix= 声明通用 FP schema 并构造原生系统和 Account modules. =identity.nix= 提供基于 UID 的 User age secret 命名函数. =modules.nix= 提供 =mapModule=, 在保留 callable value 的原生参数声明的同时变换其返回值, 不预设 module 的结构或目标 namespace. =types.nix= 中的 =deferredModuleFragment= 接受 attrset 或 callable value, 在合并时将普通 attrset 规范化为常值函数; 它不负责完整 module 的组合或 namespace 限制. 共享值类型由 =types.nix= 与 =monitor-type.nix= 定义, FP 与原生模块通过 =llib.types= 使用同一组类型. 根 flake 从 personal-nixpkgs 引入 tests. Host 和 User domain schema 及项目特有接线由显式 FP modules 扩展, 不在构造器内硬编码 Feature 业务逻辑.
+[[file:./lib/default.nix][lib/default.nix]] 导出 =llib.hosts=, =llib.flakeParts=, =llib.identity=, =llib.modules=, =llib.secrets= 与 =llib.types=. =hosts.nix= 提供 WireGuard network data、拓扑、接口/firewall 及 SSH targets 的派生; =mkWireGuardTopology= 返回全局 topology, =mkWireGuardNetworks= 直接返回指定 Host 的原生 networking 配置; =flakeParts.nix= 声明通用 FP schema 并构造原生系统和 Account modules. =identity.nix= 提供基于 UID 的 User age secret 命名函数. =secrets.nix= 提供 HM 递归 secrets 类型、叶节点遍历与基于 UID 和完整名称路径的 User secret 命名函数. =modules.nix= 提供 =mapModule=, 在保留 callable value 的原生参数声明的同时变换其返回值, 不预设 module 的结构或目标 namespace. =types.nix= 中的 =deferredModuleFragment= 接受 attrset 或 callable value, 在合并时将普通 attrset 规范化为常值函数; 它不负责完整 module 的组合或 namespace 限制. 共享值类型由 =types.nix= 与 =monitor-type.nix= 定义, FP 与原生模块通过 =llib.types= 使用同一组类型. 根 flake 从 personal-nixpkgs 引入 tests. Host 和 User domain schema 及项目特有接线由显式 FP modules 扩展, 不在构造器内硬编码 Feature 业务逻辑.
 
 *** [[file:./pkgs/][/pkgs]]
 #+begin_example
@@ -247,7 +248,8 @@ Host 数据不变量由 =modules/hosts/options.nix= 的 option types 与 =apply=
 /modules/base/
 ├── default.nix
 ├── hm/
-│   └── default.nix
+│   ├── default.nix
+│   └── secrets.nix
 └── os/
     ├── bluetooth.nix
     ├── boot-manager.nix
@@ -255,6 +257,7 @@ Host 数据不变量由 =modules/hosts/options.nix= 的 option types 与 =apply=
     ├── identity.nix
     ├── networkmanager.nix
     ├── power.nix
+    ├── secrets.nix
     ├── ssh-targets.nix
     └── wireguard.nix
 #+end_example
@@ -272,6 +275,21 @@ Host 数据不变量由 =modules/hosts/options.nix= 的 option types 与 =apply=
 =identity.nix= 将当前 host 的非空 SSH 私钥备份引用登记为 =age.secrets.ssh-identity=, 设置 =intermediary = true;=, 使其参与 =agenix edit=, =agenix view= 和 =agenix update-masterkeys=. host rekey 跳过该备份, 上游 agenix module 安装 dummy secret, SSH host 私钥的安装与恢复需单独处理. 备份登记独立于 =identity.rootAccess=; 后者只控制 YubiKey 工具和 =pcscd= 的启用.
 
 Host 与 User Registry 共用 =llib.types.identity=, 其中 =keys.age= 和 =keys.ssh= 各为可空 submodule; Host 额外声明 =rootAccess=. Base 按 Account 绑定交付 Profile 中非空的 age 私钥文件, 不检查 SOPS Feature 选择. =llib.identity.userAgeSecretName= 根据 UID 生成原生 =age.secrets= 名称, 由 OS agenix 解密并以 Account username 所有、=0400= 权限安装. 此接线要求私钥材料为文件 path; =private.path= 为空时使用 agenix 默认安装位置, 显式指定时须避免同一 System 内的路径冲突. Profile 可通过 =osConfig.age.secrets.<name>.path= 消费实际安装路径. User SSH identity 暂不接线.
+
+HM 的 =secrets= 是 Base 提供的递归资源声明, 默认空树, 不属于 Feature. 以 =rekeyFile= 字段识别叶节点, 其值为仓库密文 path; 叶节点的 =path= 是从 OS 原生 =age.secrets= 回读的只读输出. 各层名称分量只允许 ASCII 字母、数字、下划线及连字符, 且不得使用保留字 =rekeyFile=; 空分支不产生 secret, 叶节点不得兼作分支. 同一分支可由多个 HM modules 合并贡献.
+
+#+begin_src nix
+{
+  config,
+  ...
+}:
+{
+  secrets.deepseek.apiKey.pi.rekeyFile = ./deepseek.apiKey.pi.age;
+  # A consumer reads config.secrets.deepseek.apiKey.pi.path.
+}
+#+end_src
+
+OS 按当前 =accounts= 的 UID 收集 =config.home-manager.users.<uid>.secrets=, 仅遍历节点并消费 =rekeyFile=, 不读取 HM 派生的 =path=. 原生 secret 名为 =secrets.user.<uid>.<dot-separated-path>=, 由 OS agenix 以 Account username 所有、group =root=、mode =0400= 交付. User identity 不参与该解密过程, 不需要 HM agenix module 或额外的运行时服务. 此接口与现有 HM SOPS 暂时独立共存; 既有消费者及 systemd ordering 不变.
 
 **** [[file:./modules/features/][/modules/features]]
 #+begin_example

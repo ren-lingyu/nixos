@@ -6,6 +6,8 @@
   ...
 }:
 {
+  imports = [ ./secrets.nix ];
+
   config = {
     programs.fastfetch = {
       enable = lib.mkDefault true;

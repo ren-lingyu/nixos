@@ -7,5 +7,6 @@
   };
   identity = import ./identity.nix;
   modules = import ./modules.nix { inherit lib; };
+  secrets = import ./secrets.nix { inherit lib; };
   types = import ./types.nix { inherit lib; };
 }

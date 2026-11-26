@@ -24,6 +24,7 @@ llib.tests.mkChecks {
     llibHosts = llib.hosts;
     llibIdentity = llib.identity;
     llibModules = llib.modules;
+    llibSecrets = llib.secrets;
     llibTypes = llib.types;
   };
 }
