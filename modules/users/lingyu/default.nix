@@ -10,75 +10,19 @@
       ssh = null;
     };
 
-    features.sops.module =
-      {
-        config,
-        osConfig,
-        llib,
-        ...
-      }:
-      {
-        ageKeyFile = osConfig.age.secrets.${llib.identity.userAgeSecretName config.home.uid}.path;
-        defaultSopsFormat = "yaml";
-        defaultSopsFile = ./sops/default.yaml;
-        secretsInput = [
-          {
-            template = "user";
-            structure = {
-              "nutstore" = [
-                "user"
-                "pass"
-              ];
-              "123cloud" = [
-                "user"
-                "pass"
-              ];
-              "cloudflare" = [
-                "access_key_id"
-                "secret_access_key"
-                "endpoint"
-              ];
-              "alibabacloud" = {
-                "oss" = [
-                  "access_key_id"
-                  "secret_access_key"
-                ];
-              };
-            };
-          }
-          {
-            template = "user";
-            structure = {
-              "deepseek" = {
-                "apiKey" = [ "pi" ];
-              };
-              "moonshot" = {
-                "cn" = {
-                  "apiKey" = [ "pi" ];
-                };
-              };
-              "zai" = {
-                "cn" = {
-                  "apiKey" = [ "pi" ];
-                };
-              };
-            };
-          }
-        ];
-      };
-    features.agent.module = { config, lib, ... }: {
-      pi.providers = lib.mkIf (config.features.sops.enable or false) {
+    features.agent.module = { config, ... }: {
+      pi.providers = {
         deepseek = {
           enable = true;
-          apiKeyFile = config.sops.secrets."deepseek.apiKey.pi".path;
+          apiKeyFile = config.secrets.deepseek.apiKey.pi.path;
         };
         moonshot-cn = {
           enable = true;
-          apiKeyFile = config.sops.secrets."moonshot.cn.apiKey.pi".path;
+          apiKeyFile = config.secrets.moonshot.cn.apiKey.pi.path;
         };
         zai-cn = {
           enable = true;
-          apiKeyFile = config.sops.secrets."zai.cn.apiKey.pi".path;
+          apiKeyFile = config.secrets.zai.cn.apiKey.pi.path;
         };
       };
     };

@@ -27,7 +27,7 @@ nixosBuilderArgs = {
     module = ...;
   };
   userRegistry.lingyu = {
-    features.sops.module = { ... };
+    features.agent.module = { ... };
     module = ...;
   };
   featureRegistry = {
@@ -89,24 +89,18 @@ User Registry 的 =features.<name>.module= 是稀疏的只读 =llib.types.deferr
 
 #+begin_src nix
 nixosBuilderArgs.userRegistry.lingyu.features = {
-  sops.module = { config, osConfig, llib, ... }: {
-    ageKeyFile = osConfig.age.secrets.${llib.identity.userAgeSecretName config.home.uid}.path;
-    defaultSopsFormat = "yaml";
-    defaultSopsFile = ./sops/default.yaml;
-    secretsInput = [ ... ];
-  };
-  agent.module = { config, lib, ... }: {
-    pi.providers = lib.mkIf (config.features.sops.enable or false) {
+  agent.module = { config, ... }: {
+    pi.providers = {
       deepseek = {
         enable = true;
-        apiKeyFile = config.sops.secrets."deepseek.apiKey.pi".path;
+        apiKeyFile = config.secrets.deepseek.apiKey.pi.path;
       };
     };
   };
 };
 #+end_src
 
-内部数据接线与派生接口通常为 =readOnly=, 不通过多个生产者合并数据; 可选输入按其 native option 类型和消费契约处理. SOPS HM 可不声明 secrets, 但启用时要求 Profile 提供只读输入 =features.sops.ageKeyFile=, 不依赖 OS SOPS Feature; Agent 独立消费 provider 的 enable 和 =apiKeyFile=, 不依赖 SOPS. 原生接线读取实际 OS/HM config, 例如 Greeter 消费 Niri/X11 session packages (Niri 优先), HM Shell 消费 OS =features.shell.{bash,zsh}.package=, File-manager 消费 OS file chooser 和当前 HM Niri 选择. OS Noctalia、OS FileChooser 默认随所属 Feature 启用, HM Noctalia 默认读取 OS Niri/Noctalia 状态, HM Waybar 默认随 HM Niri 启用且 HM Noctalia 禁用.
+内部数据接线与派生接口通常为 =readOnly=, 不通过多个生产者合并数据; 可选输入按其 native option 类型和消费契约处理. SOPS HM 可不声明 secrets, 但启用时要求 Profile 提供只读输入 =features.sops.ageKeyFile=, 不依赖 OS SOPS Feature; Agent 独立消费 provider 的 enable 和 =apiKeyFile=, 不依赖特定秘密管理机制. 当前 lingyu Profile 通过 Base HM =secrets= 提供 API key 路径. 原生接线读取实际 OS/HM config, 例如 Greeter 消费 Niri/X11 session packages (Niri 优先), HM Shell 消费 OS =features.shell.{bash,zsh}.package=, File-manager 消费 OS file chooser 和当前 HM Niri 选择. OS Noctalia、OS FileChooser 默认随所属 Feature 启用, HM Noctalia 默认读取 OS Niri/Noctalia 状态, HM Waybar 默认随 HM Niri 启用且 HM Noctalia 禁用.
 
 Host 数据不变量由 =modules/hosts/options.nix= 的 option types 与 =apply= 表达: Registry 保证 number 全局唯一, monitors 保证名称唯一、默认 monitor 至多一个且具有 mode, users 保证 UID registry key 与值一致, wireguard 保证 endpoint 非空时 listenPort 非空. =apply= 在对应 option 被消费时执行; =checks.host-registry= 强制求值所有 Host 的这些领域数据, 包括未被选中的 Host, 而不求值 deferredModules. Registry 的 number 检查不应依赖再次读取同一 Registry 的最终值; 局部字段可以读取其他已登记对象. Greeter 接线自行要求唯一默认 monitor, HM Niri 使用原生 assertion, OS Niri 不需要显示器数据. 构造时验证所有 System configurations 的选择及 Account 绑定, 不强制未选中的 deferredModules. 仅依赖最终原生状态的约束由相应原生 assertions 检查 (例如 Proxy 互斥、Noctalia 服务依赖、HM SOPS 与 API keys).
 
@@ -284,12 +278,12 @@ HM 的 =secrets= 是 Base 提供的递归资源声明, 默认空树, 不属于 F
   ...
 }:
 {
-  secrets.deepseek.apiKey.pi.rekeyFile = ./deepseek.apiKey.pi.age;
-  # A consumer reads config.secrets.deepseek.apiKey.pi.path.
+  secrets.foo.bar.rekeyFile = ./foo/bar.age;
+  # A consumer reads config.secrets.foo.bar.path.
 }
 #+end_src
 
-OS 按当前 =accounts= 的 UID 收集 =config.home-manager.users.<uid>.secrets=, 仅遍历节点并消费 =rekeyFile=, 不读取 HM 派生的 =path=. 原生 secret 名为 =secrets.user.<uid>.<dot-separated-path>=, 由 OS agenix 以 Account username 所有、group =root=、mode =0400= 交付. User identity 不参与该解密过程, 不需要 HM agenix module 或额外的运行时服务. 此接口与现有 HM SOPS 暂时独立共存; 既有消费者及 systemd ordering 不变.
+OS 按当前 =accounts= 的 UID 收集 =config.home-manager.users.<uid>.secrets=, 仅遍历节点并消费 =rekeyFile=, 不读取 HM 派生的 =path=. 原生 secret 名为 =secrets.user.<uid>.<dot-separated-path>=, 由 OS agenix 以 Account username 所有、group =root=、mode =0400= 交付. User identity 不参与该解密过程, 不需要 HM agenix module 或额外的运行时服务. 此接口与 HM SOPS 相互独立; lingyu 已将所有 HM secrets 迁移至此, HM SOPS Feature 暂时保留, 但当前无 Account 选择.
 
 **** [[file:./modules/features/][/modules/features]]
 #+begin_example
@@ -433,26 +427,30 @@ NixOS-WSL host, hostname =nixos-wsl=.
 ├── default.nix
 ├── hm/
 │   ├── default.nix
-│   └── home/
-│       ├── .local/
-│       │   └── bin/
-│       │       ├── git-push-loop.sh
-│       │       ├── org.sh
-│       │       ├── rc.sh
-│       │       └── ssha.sh
-│       ├── cloud-server.nix
+│   ├── home/
+│   │   ├── .local/
+│   │   │   └── bin/
+│   │   │       ├── git-push-loop.sh
+│   │   │       ├── org.sh
+│   │   │       ├── rc.sh
+│   │   │       └── ssha.sh
+│   │   ├── cloud-server.nix
+│   │   ├── default.nix
+│   │   ├── email.nix
+│   │   ├── git.nix
+│   │   ├── keyring.nix
+│   │   ├── langs.nix
+│   │   └── rclone.nix
+│   └── secrets/
 │       ├── default.nix
-│       ├── email.nix
-│       ├── git.nix
-│       ├── keyring.nix
-│       ├── langs.nix
-│       └── rclone.nix
+│       └── <path>/
+│           └── <name>.age
 └── sops/
     ├── .sops.yaml
     └── default.yaml
 #+end_example
 
-配置 lingyu 用户的个人 home-manager 模块, 包含 cloud-server, email, git, keyring, langs, rclone 等用户级配置. User age identity 密文位于 =age.private.age=, SOPS 密文和编辑配置位于 =sops/=, 均由 User FP module 直接引用; rclone remotes 只在当前 Account 的 HM SOPS 启用时配置.
+配置 lingyu 用户的个人 home-manager 模块, 包含 cloud-server, email, git, keyring, langs, rclone 等用户级配置. User age identity 密文位于 =age.private.age=. 各 secret 的 age 密文按 secrets tree 的层级组织于 =hm/secrets/=, 由 =hm/secrets/default.nix= 声明. 例如 =hm/secrets/foo/bar.age= 对应 =secrets.foo.bar.rekeyFile=, 消费者通过 =config.secrets.foo.bar.path= 获取实际交付路径. Rclone remotes 与 Agent providers 均采用此机制. =sops/= 暂时保留原有密文与编辑配置, 不再被 Profile 引用.
 
 =modules/users/lingyu/hm/home/.local/bin/= 放置个人脚本:
 - =org=: 进入 =~/org= 目录并准备使用 =~/org/config/Makefile= 的 make 函数.

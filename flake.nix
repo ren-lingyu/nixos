@@ -229,7 +229,6 @@
                     };
                     office.enable = true;
                     shell.enable = true;
-                    sops.enable = true;
                     terminal.enable = true;
                     x11-session.enable = true;
                   };
@@ -302,7 +301,6 @@
                       };
                     };
                     shell.enable = true;
-                    sops.enable = true;
                     terminal.enable = true;
                   };
                 };
@@ -371,7 +369,6 @@
                     file-manager.enable = true;
                     font.enable = true;
                     shell.enable = true;
-                    sops.enable = true;
                     terminal.enable = true;
                   };
                 };

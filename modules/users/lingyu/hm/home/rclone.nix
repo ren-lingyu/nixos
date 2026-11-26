@@ -1,15 +1,9 @@
-{
-  config,
-  pkgs,
-  lib,
-  ...
-}:
-{
+{ config, pkgs, ... }: {
   config = {
     programs.rclone = {
       enable = true;
       package = pkgs.rclone;
-      remotes = lib.mkIf (config.features.sops.enable or false) {
+      remotes = {
         "Nutstore" = {
           config = {
             type = "webdav";
@@ -17,8 +11,8 @@
             vendor = "other";
           };
           secrets = {
-            user = config.sops.secrets."nutstore.user".path;
-            pass = config.sops.secrets."nutstore.pass".path;
+            user = config.secrets.nutstore.user.path;
+            pass = config.secrets.nutstore.pass.path;
           };
         };
         "123Cloud" = {
@@ -28,8 +22,8 @@
             vendor = "other";
           };
           secrets = {
-            user = config.sops.secrets."123cloud.user".path;
-            pass = config.sops.secrets."123cloud.pass".path;
+            user = config.secrets."123cloud".user.path;
+            pass = config.secrets."123cloud".pass.path;
           };
         };
         "Cloudflare" = {
@@ -39,9 +33,9 @@
             region = "auto";
           };
           secrets = {
-            access_key_id = config.sops.secrets."cloudflare.access_key_id".path;
-            secret_access_key = config.sops.secrets."cloudflare.secret_access_key".path;
-            endpoint = config.sops.secrets."cloudflare.endpoint".path;
+            access_key_id = config.secrets.cloudflare.access_key_id.path;
+            secret_access_key = config.secrets.cloudflare.secret_access_key.path;
+            endpoint = config.secrets.cloudflare.endpoint.path;
           };
         };
         "AliCloudOSS" = {
@@ -52,8 +46,8 @@
             endpoint = "oss-cn-beijing.aliyuncs.com";
           };
           secrets = {
-            access_key_id = config.sops.secrets."alibabacloud.oss.access_key_id".path;
-            secret_access_key = config.sops.secrets."alibabacloud.oss.secret_access_key".path;
+            access_key_id = config.secrets.alibabacloud.oss.access_key_id.path;
+            secret_access_key = config.secrets.alibabacloud.oss.secret_access_key.path;
           };
         };
       };
