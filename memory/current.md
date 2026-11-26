@@ -6,6 +6,12 @@ This repository provides composable NixOS and Home Manager configurations for Th
 
 ## Latest continuation state
 
+### Committed package aggregation and source locking split
+
+Static review of the committed package refactor confirmed that root imports `pkgs/default.nix` for local aggregation, owns upstream flake integrations and reads independently pinned non-flake sources through `pkgs/srcs/`. The committed root and source locks retain the same set of pinned external source identities as the preceding lock when local path nodes are excluded. See [architecture.md](architecture.md#local-packages-and-tools) for the adopted boundary and rationale. This supersedes the previous subflake exploration. No Nix evaluation or build of this committed refactor was run in this review. The earlier fixed-revision system evaluations and runtime observations below retain their original evidence boundaries.
+
+## Earlier implementation and verification
+
 ### Aliyun private SSH runtime check
 
 From ThinkBook, the live client resolved `aliyun.aliyun` to `10.100.3.3:22` with host key alias `wg-host-aliyun`. The route used `wg3` with source `10.100.3.2`. A fresh direct SSH attempt with strict host key verification reached the remote public-key authentication stage and returned `Permission denied (publickey)` for the credentials available to the agent. The owner separately confirmed successful authentication and remote command execution over the WireGuard private connection. The earlier SSH timeout did not recur in the agent's probe.
@@ -26,7 +32,7 @@ Static inspection of the committed project confirms three completed transitions.
 
 Source checks found constructor and fragment fixtures, generated firewall rule assertions, and mocked Account identity and secret-tree delivery checks. The tests' presence establishes intended coverage. The earlier rev-pinned experiments remain evidence for their tested module-system behavior against the old snapshot. The Owner's historical Aliyun packet capture and transition-era HM SOPS ordering observation apply to their respective mechanisms. This review performed no Nix evaluation, build, deployment, live secret delivery, decryption or post-change private SSH/ICMP retest. This was the evidence boundary of the static review. The later evaluation and runtime smoke tests are recorded above.
 
-The [remaining backlog](backlog.md) keeps independent backup, lifecycle and recovery questions and the unresolved subflake discussion.
+The [remaining backlog](backlog.md) keeps independent backup, lifecycle and recovery questions.
 
 ## Feature wiring preparation history
 
