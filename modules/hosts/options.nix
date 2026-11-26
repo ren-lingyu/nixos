@@ -86,55 +86,18 @@
             };
 
             identity = lib.mkOption {
-              type = lib.types.submodule {
-                options = {
-                  rootAccess = lib.mkOption {
-                    type = lib.types.bool;
-                    default = false;
-                    description = "Whether this host has direct access to the root identity.";
-                  };
-                  keys = lib.mkOption {
-                    type = lib.types.submodule {
-                      options = lib.genAttrs [ "age" "ssh" ] (keyFormat_: {
-                        public = {
-                          key = lib.mkOption {
-                            type = lib.types.nullOr lib.types.nonEmptyStr;
-                            default = null;
-                            description = "Public ${keyFormat_} key material for this host.";
-                          };
-                          ageRecipient = lib.mkOption {
-                            type = lib.types.nullOr lib.types.nonEmptyStr;
-                            default = null;
-                            description = "Age recipient derived from the public ${keyFormat_} key for this host.";
-                          };
-                          path = lib.mkOption {
-                            type = lib.types.nullOr lib.types.nonEmptyStr;
-                            default = null;
-                            description = "Runtime path of the public ${keyFormat_} key on this host.";
-                          };
-                        };
-                        private = {
-                          key = lib.mkOption {
-                            type = lib.types.nullOr (lib.types.either lib.types.path lib.types.nonEmptyStr);
-                            default = null;
-                            description = builtins.concatStringsSep "\n" [
-                              "Private ${keyFormat_} key material for this host."
-                              "Path values point to a repository file containing the key material; string values contain the key material inline."
-                              "Stored private key material should be encrypted."
-                            ];
-                          };
-                          path = lib.mkOption {
-                            type = lib.types.nullOr lib.types.nonEmptyStr;
-                            default = null;
-                            description = "Runtime path of the private ${keyFormat_} key on this host.";
-                          };
-                        };
-                      });
+              type = lib.types.submodule (
+                llib.types.identity.getSubModules
+                ++ [
+                  {
+                    options.rootAccess = lib.mkOption {
+                      type = lib.types.bool;
+                      default = false;
+                      description = "Whether this host has direct access to the root identity.";
                     };
-                    description = "Identity keys for this host, grouped by key format.";
-                  };
-                };
-              };
+                  }
+                ]
+              );
               internal = true;
               readOnly = true;
               example = {

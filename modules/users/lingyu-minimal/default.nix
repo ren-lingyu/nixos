@@ -1,1 +1,9 @@
-{ nixosBuilderArgs.userRegistry.lingyu-minimal.module = ./hm; }
+{
+  nixosBuilderArgs.userRegistry.lingyu-minimal = {
+    identity.keys = {
+      age = null;
+      ssh = null;
+    };
+    module = ./hm;
+  };
+}

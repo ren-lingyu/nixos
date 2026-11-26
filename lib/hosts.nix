@@ -46,7 +46,7 @@
         builtins.map (
           nodeName_:
           let
-            publicKey_ = registry.${nodeName_}.identity.keys.ssh.public.key;
+            publicKey_ = registry.${nodeName_}.identity.keys.ssh.public.key or null;
           in
           assert lib.assertMsg (publicKey_ != null) (
             "Missing SSH host public key for WireGuard node `${nodeName_}`."

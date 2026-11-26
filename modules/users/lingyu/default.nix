@@ -2,58 +2,74 @@
   nixosBuilderArgs.userRegistry.lingyu = {
     module = ./hm;
 
-    features.sops.module = {
-      defaultSopsFormat = "yaml";
-      defaultSopsFile = ./sops/default.yaml;
-      secretsInput = [
-        {
-          template = "user";
-          structure = {
-            "nutstore" = [
-              "user"
-              "pass"
-            ];
-            "123cloud" = [
-              "user"
-              "pass"
-            ];
-            "cloudflare" = [
-              "access_key_id"
-              "secret_access_key"
-              "endpoint"
-            ];
-            "onedrive" = [
-              "token"
-              "drive_id"
-            ];
-            "alibabacloud" = {
-              "oss" = [
+    identity.keys = {
+      age = {
+        public.key = "age1kgwar87m34mfg5zhtywg42umlax77y28tvucu0wkdwrq870wdf9s782jqe";
+        private.key = ./age.private.age;
+      };
+      ssh = null;
+    };
+
+    features.sops.module =
+      {
+        config,
+        osConfig,
+        llib,
+        ...
+      }:
+      {
+        ageKeyFile = osConfig.age.secrets.${llib.identity.userAgeSecretName config.home.uid}.path;
+        defaultSopsFormat = "yaml";
+        defaultSopsFile = ./sops/default.yaml;
+        secretsInput = [
+          {
+            template = "user";
+            structure = {
+              "nutstore" = [
+                "user"
+                "pass"
+              ];
+              "123cloud" = [
+                "user"
+                "pass"
+              ];
+              "cloudflare" = [
                 "access_key_id"
                 "secret_access_key"
+                "endpoint"
               ];
-            };
-          };
-        }
-        {
-          template = "user";
-          structure = {
-            "deepseek" = {
-              "apiKey" = [ "pi" ];
-            };
-            "moonshot" = {
-              "cn" = {
-                "apiKey" = [ "pi" ];
+              "onedrive" = [
+                "token"
+                "drive_id"
+              ];
+              "alibabacloud" = {
+                "oss" = [
+                  "access_key_id"
+                  "secret_access_key"
+                ];
               };
             };
-            "zai" = {
-              "cn" = {
+          }
+          {
+            template = "user";
+            structure = {
+              "deepseek" = {
                 "apiKey" = [ "pi" ];
               };
+              "moonshot" = {
+                "cn" = {
+                  "apiKey" = [ "pi" ];
+                };
+              };
+              "zai" = {
+                "cn" = {
+                  "apiKey" = [ "pi" ];
+                };
+              };
             };
-          };
-        }
-      ];
-    };
+          }
+        ];
+      };
     features.agent.module = { config, lib, ... }: {
       pi.providers = lib.mkIf (config.features.sops.enable or false) {
         deepseek = {

@@ -4,6 +4,7 @@
   flakeParts,
   hosts,
   types,
+  identity,
   modules,
 }:
 let
@@ -23,6 +24,16 @@ let
   osFixture = {
     options = {
       inherit markers;
+      accountMetadata = mkOption { type = lib.types.raw; };
+      age.secrets = mkOption {
+        type = attrsOf lib.types.anything;
+        default = { };
+      };
+      environment.systemPackages = mkOption {
+        type = listOf lib.types.package;
+        default = [ ];
+      };
+      services.pcscd.enable = lib.mkEnableOption "PC/SC fixture";
       users.users = mkOption {
         type = attrsOf (
           lib.types.submodule {
@@ -94,6 +105,7 @@ let
       specialArgs.llib = { inherit hosts types; };
       modules = [
         (modules + "/hosts/options.nix")
+        (modules + "/users/options.nix")
         ({ config, ... }: {
           options = flakeParts.mkOptions config // {
             test = {
@@ -112,10 +124,18 @@ let
               nixosSystem = args: lib.evalModules { inherit (args) specialArgs modules; };
               homeManager = osFixture;
               baseModule = {
+                imports = [
+                  (modules + "/base/os/identity.nix")
+                  ({ accounts, ... }: { accountMetadata = accounts; })
+                ];
                 markers = [ "base" ];
                 home-manager.sharedModules = [ { markers = [ "shared" ]; } ];
               };
-              specialArgs.marker = "argument";
+              specialArgs = {
+                marker = "argument";
+                llib = { inherit identity; };
+                pkgs = { };
+              };
               hostRegistry = {
                 first = hostData // {
                   number = 1;
@@ -142,7 +162,12 @@ let
                   };
                 };
               };
+              userRegistry.noIdentity.identity = { };
               userRegistry.profile = {
+                identity.keys.age = {
+                  public.key = "age1-test";
+                  private.key = ./test.nix;
+                };
                 module.markers = [ "profile" ];
                 features = {
                   alpha.module =
@@ -227,6 +252,14 @@ let
     (construct (evaluate [ { nixosConfigurations.one.features.alpha.module.markers = [ "merged" ]; } ]))
     .one.config;
 
+  withoutIdentity =
+    (construct (evaluate [
+      ({ config, ... }: {
+        nixosConfigurations.one.users."1001".profile =
+          lib.mkForce config.nixosBuilderArgs.userRegistry.noIdentity;
+      })
+    ])).one.config;
+
   hmFor =
     system: uid:
     (lib.evalModules {
@@ -298,6 +331,7 @@ let
           };
           userRegistry.profile.features = {
             sops.module = {
+              ageKeyFile = "/mock/identity";
               defaultSopsFormat = "yaml";
               defaultSopsFile = ./test.nix;
             };
@@ -312,10 +346,7 @@ let
           };
         };
         nixosConfigurations.one = {
-          features = {
-            greeter.enable = true;
-            sops.enable = true;
-          };
+          features.greeter.enable = true;
           users."1000".features = {
             agent.enable = true;
             niri.enable = true;
@@ -354,14 +385,9 @@ let
               type = types.monitor;
               readOnly = true;
             };
-            sops.authorizedUids = mkOption {
-              type = listOf lib.types.ints.unsigned;
-              readOnly = true;
-            };
           };
         }
         connected.features.greeter.module
-        connected.features.sops.module
       ];
     }).config.features;
 
@@ -376,6 +402,10 @@ let
             };
             sops = {
               enable = lib.mkEnableOption "SOPS fixture";
+              ageKeyFile = mkOption {
+                type = lib.types.nonEmptyStr;
+                readOnly = true;
+              };
               defaultSopsFormat = mkOption {
                 type = lib.types.nullOr str;
                 readOnly = true;
@@ -445,6 +475,28 @@ assert os.features.alpha.enable && os.workloads.service.enable;
 assert os.users.users."1000".uid == 1000;
 assert os.users.users."1000".name == "first";
 assert os.users.users."1001".home == "/home/second";
+assert
+  builtins.attrNames os.accountMetadata == [
+    "1000"
+    "1001"
+  ];
+assert os.accountMetadata."1000".username == "first";
+assert os.accountMetadata."1000".profile.name == "profile";
+assert !(os.accountMetadata."1000" ? features);
+assert !(os.accountMetadata."1000".profile ? module);
+assert !(os.accountMetadata."1000".profile ? features);
+assert os.accountMetadata."1000".profile.identity.keys.ssh == null;
+assert (evaluate [ ]).nixosBuilderArgs.hostRegistry.first.identity.keys.age == null;
+assert identity.userAgeSecretName 1000 == identity.userAgeSecretName "1000";
+assert
+  os.age.secrets.${identity.userAgeSecretName "1000"} == {
+    rekeyFile = ./test.nix;
+    owner = "first";
+    group = "root";
+    mode = "0400";
+  };
+assert os.age.secrets.${identity.userAgeSecretName "1001"}.owner == "second";
+assert !(builtins.hasAttr (identity.userAgeSecretName "1001") withoutIdentity.age.secrets);
 assert (hm "1000").home.uid == 1000;
 assert (hm "1000").home.username == "first";
 assert (hm "1000").features.alpha.enable;
@@ -528,8 +580,8 @@ assert fails [
 ];
 assert connectedOS.greeter.monitor == connectedHM.niri.monitors."eDP-1";
 assert connectedOS.greeter.monitor.name == "eDP-1";
-assert connectedOS.sops.authorizedUids == [ 1000 ];
 assert connectedHM.niri.monitors."eDP-1".mode.width == 1920;
+assert connectedHM.sops.ageKeyFile == "/mock/identity";
 assert connectedHM.sops.defaultSopsFormat == "yaml";
 assert connectedHM.sops.defaultSopsFile == ./test.nix;
 assert connectedHM.agent.pi.providers.deepseek.enable;

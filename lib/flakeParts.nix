@@ -129,6 +129,16 @@ let
           _: host: builtins.removeAttrs host [ "module" ]
         ) builderArgs.hostRegistry;
         hostTopology = builderArgs.hostTopology;
+        accounts = lib.mapAttrs (
+          _: account:
+          builtins.removeAttrs account [ "features" ]
+          // {
+            profile = builtins.removeAttrs account.profile [
+              "module"
+              "features"
+            ];
+          }
+        ) system.users;
       };
       modules = [
         builderArgs.homeManager

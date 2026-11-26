@@ -8,9 +8,7 @@
 }:
 let
   # Use the registered implementations, except where the fixture supplies upstream declarations.
-  nixosModules = featureRegistry.os // {
-    sops = modules + "/features/sops/os";
-  };
+  nixosModules = featureRegistry.os;
   homeModules = featureRegistry.hm // {
     editor = modules + "/features/editor/hm";
     niri = modules + "/features/niri/hm";
@@ -174,28 +172,19 @@ let
     nixosModules.file-manager
     { features.file-manager.enable = true; }
   ] unusedSystem unusedPackages;
-  sopsSystem = evaluate [
-    nixosModules.sops
-    ({ config, ... }: {
-      features.sops = {
-        enable = true;
-        authorizedUids = [ 1000 ];
-      };
-      users.users.account = {
-        uid = 1000;
-        name = "account";
-      };
-      age.secrets.${config.features.sops.ageKeys.hm.name}.path = "/mock/shared";
-    })
-  ] unusedSystem unusedPackages;
   sopsHome = evaluate [
     homeModules.sops
-    { features.sops.enable = true; }
-  ] sopsSystem unusedPackages;
+    {
+      features.sops = {
+        enable = true;
+        ageKeyFile = "/mock/identity";
+      };
+    }
+  ] unusedSystem unusedPackages;
   missingSops = evaluate [
     homeModules.sops
     { features.sops.enable = true; }
-  ] { } unusedPackages;
+  ] unusedSystem unusedPackages;
   agentAssertions =
     extra:
     (evaluate (
@@ -226,13 +215,10 @@ assert (niriHomeDefault true).features.niri.noctalia.enable;
 assert !(niriHomeDefault true).features.niri.waybar.enable;
 assert (niriHomeDefault false).features.niri.waybar.enable;
 assert fileManagerDefault.features.file-manager.fileChooser.enable;
-assert sopsSystem.features.sops.ageKeys.hm.path == "/mock/shared";
-assert sopsSystem.age.secrets.${sopsSystem.features.sops.ageKeys.hm.name}.group == "sops-decrypt";
-assert sopsSystem.users.groups.sops-decrypt.members == [ "account" ];
-assert sopsHome.home.sessionVariables.SOPS_AGE_KEY_FILE == "/mock/shared";
-assert sopsHome.sops.age.keyFile == "/mock/shared";
+assert sopsHome.home.sessionVariables.SOPS_AGE_KEY_FILE == "/mock/identity";
+assert sopsHome.sops.age.keyFile == "/mock/identity";
 assert sopsHome.sops.secrets == { };
-assert !(builtins.tryEval missingSops.features.sops.enable).success;
+assert !(builtins.tryEval missingSops.sops.age.keyFile).success;
 assert builtins.all (entry: entry.assertion) (agentAssertions [ ]);
 assert builtins.all (entry: entry.assertion) (agentAssertions [
   {

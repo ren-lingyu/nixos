@@ -3,5 +3,6 @@
     flakeParts = final_.llibFlakeParts;
     hosts = final_.llibHosts;
     types = final_.llibTypes;
+    identity = final_.llibIdentity;
   };
 }

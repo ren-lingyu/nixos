@@ -140,7 +140,6 @@
                       nixpkgs.overlays = [ inputs.local-nixpkgs.overlays.niri ];
                     };
                   };
-                  sops = lib.mkBefore inputs.local-nixpkgs.nixosModules.sops;
                 };
                 hm = {
                   editor = lib.mkBefore inputs.local-nixpkgs.homeModules.nixvim;
@@ -182,7 +181,6 @@
                     };
                   };
                   shell.enable = true;
-                  sops.enable = true;
                   texlive.enable = true;
                   x11-session.enable = true;
                 };
@@ -268,7 +266,6 @@
                     };
                   };
                   shell.enable = true;
-                  sops.enable = true;
                   texlive.enable = true;
                 };
 
@@ -316,7 +313,6 @@
 
                 features = {
                   shell.enable = true;
-                  sops.enable = true;
                 };
 
                 workloads.caddy = {
@@ -334,7 +330,6 @@
 
                   features = {
                     shell.enable = true;
-                    sops.enable = true;
                   };
                 };
               };
@@ -353,7 +348,6 @@
                   };
                   font.enable = true;
                   shell.enable = true;
-                  sops.enable = true;
                   texlive.enable = true;
                 };
 

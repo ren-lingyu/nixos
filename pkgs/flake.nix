@@ -106,7 +106,6 @@
             flake = {
               nixosModules = {
                 share = lpkgs.nixosModule;
-                sops = inputs.sops-nix.nixosModules.sops;
               };
 
               homeModules = {

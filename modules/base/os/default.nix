@@ -44,6 +44,10 @@
         kitty.terminfo
         foot.terminfo
         tmux.terminfo
+        age
+        sops
+        ssh-to-age
+        ssh-to-pgp
       ];
     };
 
@@ -58,7 +62,11 @@
     };
 
     age = {
-      identityPaths = [ host.identity.keys.ssh.private.path ];
+      identityPaths =
+        assert lib.assertMsg (
+          (host.identity.keys.ssh.private.path or null) != null
+        ) "OS agenix requires a Host SSH identity path.";
+        [ host.identity.keys.ssh.private.path ];
       rekey = {
         storageMode = "derivation";
         masterIdentities = [
@@ -71,7 +79,11 @@
             pubkey = "age1yubikey1qd0j85pkw0a6zjt4xy7ez0t7ehc6u9dqwjgjj5hh55dftvzlk9hyuxgl6c9";
           }
         ];
-        hostPubkey = host.identity.keys.ssh.public.key;
+        hostPubkey =
+          assert lib.assertMsg (
+            (host.identity.keys.ssh.public.key or null) != null
+          ) "OS agenix-rekey requires a Host SSH public key.";
+          host.identity.keys.ssh.public.key;
       };
     };
 

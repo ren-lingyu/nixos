@@ -186,6 +186,15 @@ let
     topology = topology_;
   };
 
+  missingIdentitySshTargets_ = hosts.mkWireGuardSshTargets {
+    registry = sshRegistry_ // {
+      matebook = sshRegistry_.matebook // {
+        identity.keys.ssh = null;
+      };
+    };
+    topology = topology_;
+  };
+
   evalSshModule_ =
     enabledHostName_:
     (lib.evalModules {
@@ -464,6 +473,7 @@ let
       }).hosts."aliyun.thinkbook".order == 1200
     )
     (!(builtins.tryEval (builtins.deepSeq missingKeySshTargets_.knownHosts true)).success)
+    (!(builtins.tryEval (builtins.deepSeq missingIdentitySshTargets_.knownHosts true)).success)
     ((evalSshModule_ "thinkbook").hosts == sshTargets_.hosts)
     ((evalSshModule_ "thinkbook").knownHosts == sshTargets_.knownHosts)
     (

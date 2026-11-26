@@ -5,6 +5,7 @@
     inherit (types) deferredModuleFragment;
     inherit (modules) mapModule;
   };
+  identity = import ./identity.nix;
   modules = import ./modules.nix { inherit lib; };
   types = import ./types.nix { inherit lib; };
 }

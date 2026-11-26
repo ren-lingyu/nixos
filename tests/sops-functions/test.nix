@@ -2,7 +2,6 @@
   lib,
   runCommand,
   secrets,
-  sops,
 }:
 let
 
@@ -75,61 +74,8 @@ let
     } secrets_."database.password")
     (assertEqual "user template path" "/run/user/1000/secrets/cloud.token" secrets_."cloud.token".path)
   ];
-  configFor =
-    enabled: accounts:
-    (lib.evalModules {
-      specialArgs.pkgs = { };
-      modules = [
-        sops
-        {
-          options = {
-            users.users = lib.mkOption { type = lib.types.raw; };
-            users.groups = lib.mkOption {
-              type = lib.types.raw;
-              default = { };
-            };
-            environment.systemPackages = lib.mkOption { type = lib.types.raw; };
-            age.secrets = lib.mkOption {
-              type = lib.types.raw;
-              default = { };
-            };
-          };
-          config = {
-            users.users = accounts;
-            features.sops = {
-              enable = enabled;
-              authorizedUids = [ 1000 ];
-            };
-          };
-        }
-      ];
-    }).config;
-  membersFor = accounts: (configFor true accounts).users.groups.sops-decrypt.members;
-  disabled = configFor false (throw "Disabled SOPS must not resolve authorized accounts");
-  fails = value: !(builtins.tryEval (builtins.deepSeq value true)).success;
-
 in
 assert builtins.deepSeq tests_ true;
-assert disabled.users.groups == { };
-assert disabled.age.secrets == { };
-assert
-  membersFor {
-    different-key = {
-      uid = 1000;
-      name = "actual-user";
-    };
-  } == [ "actual-user" ];
-assert fails (membersFor { });
-assert fails (membersFor {
-  first = {
-    uid = 1000;
-    name = "first";
-  };
-  second = {
-    uid = 1000;
-    name = "second";
-  };
-});
 runCommand "nixos-sops-functions" { } ''
   touch $out
 ''

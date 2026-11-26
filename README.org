@@ -81,15 +81,16 @@ Account entry 的存在即表示构造该账户, 不再提供 Account enable. UI
 每个已登记 Feature/Workload 具有默认 =false= 的 FP =enable= 及 =module= option. 启用时依次导入 Registry implementation、合并后的 consumer module 和显式原生 enable contribution; 禁用时两类 deferredModules 都不加载, 不贡献原生 enable. OS/HM implementations 各自声明原生 =features.<name>=, Workloads 声明原生 =workloads.<name>=. Feature 不启用、导入或配置其他 Feature, 可读取其他 Feature 的已定义值并通过原生 assertions 检查实际依赖. 外部 flake inputs 仅在所属 flake.nix 中引用. 选中对象的 native imports 在 FP 层决定, 不依赖同一原生求值的 =config= 计算 imports.
 
 ** 接线与验证
-构造器仅传递所需项目数据: NixOS 获得 =host=、不含 deferredModule 的 =hostRegistry= 及 =hostTopology=, OS/HM 均获得公共 =specialArgs=. NixOS 仍通过 =networking.wireguard.topology= 暴露拓扑. 不再使用旧 configuration adapter 或镜像 option space. 特定 Feature 的接线不属于构造器.
+构造器仅传递所需项目数据: NixOS 获得 =host=、不含 deferredModule 的 =hostRegistry=、=hostTopology= 以及当前 System 的 UID-keyed =accounts=, OS/HM 均获得公共 =specialArgs=. =accounts= 不含 Feature selections, 其中的 Profile metadata 不含 =module= 或 =features=. NixOS 仍通过 =networking.wireguard.topology= 暴露拓扑. 不再使用旧 configuration adapter 或镜像 option space. 特定 Feature 的接线不属于构造器.
 
-FP modules 可以扩展 Registry 与 System/Account 的 submodule schema. Greeter 和 Niri 的 FP 入口各自将选中 Host 的完整默认 Monitor 和 monitors 数据接入相应 native Feature; SOPS 的 FP 入口从 Account 的 HM SOPS 选择派生 OS SOPS 的授权 UID. 接线结果均进入对应 System 或 Account 的 =features.<name>.module=, 不由构造器处理业务逻辑.
+FP modules 可以扩展 Registry 与 System/Account 的 submodule schema. Greeter 和 Niri 的 FP 入口各自将选中 Host 的完整默认 Monitor 和 monitors 数据接入相应 native Feature. 接线结果均进入对应 System 或 Account 的 =features.<name>.module=, 不由构造器处理业务逻辑.
 
 User Registry 的 =features.<name>.module= 是稀疏的只读 =llib.types.deferredModuleFragment= option, 与通用 =module= (完整 HM deferredModule) 区分. 它接受 attrset 或函数, 不负责选择或启用 Feature. 通用 FP schema 通过 =mkFeatureModule= 将该值封装成原生 module 并合并到引用此 User 的 Account 对应 Feature 的 deferredModule. 该函数使用 =llib.modules.mapModule= 保留函数的参数需求并映射其返回值, 仅在 Account 选择对应 Feature 后于其 HM scope 求值. 返回值直接定义 =features.<name>= 下的配置, 不声明新的原生 options 或 imports, 也不在 FP 层重复声明业务数据类型.
 
 #+begin_src nix
 nixosBuilderArgs.userRegistry.lingyu.features = {
-  sops.module = {
+  sops.module = { config, osConfig, llib, ... }: {
+    ageKeyFile = osConfig.age.secrets.${llib.identity.userAgeSecretName config.home.uid}.path;
     defaultSopsFormat = "yaml";
     defaultSopsFile = ./sops/default.yaml;
     secretsInput = [ ... ];
@@ -105,7 +106,7 @@ nixosBuilderArgs.userRegistry.lingyu.features = {
 };
 #+end_src
 
-内部数据接线与派生接口通常为 =readOnly=, 不通过多个生产者合并数据; 可选输入按其 native option 类型和消费契约处理. SOPS HM 可不声明 secrets, 但启用时要求 OS SOPS 启用并消费其只读 =features.sops.ageKeys.hm.path=; Agent 独立消费 provider 的 enable 和 =apiKeyFile=, 不依赖 SOPS. 原生接线读取实际 OS/HM config, 例如 Greeter 消费 Niri/X11 session packages (Niri 优先), HM Shell 消费 OS =features.shell.{bash,zsh}.package=, File-manager 消费 OS file chooser 和当前 HM Niri 选择. OS Noctalia、OS FileChooser 默认随所属 Feature 启用, HM Noctalia 默认读取 OS Niri/Noctalia 状态, HM Waybar 默认随 HM Niri 启用且 HM Noctalia 禁用.
+内部数据接线与派生接口通常为 =readOnly=, 不通过多个生产者合并数据; 可选输入按其 native option 类型和消费契约处理. SOPS HM 可不声明 secrets, 但启用时要求 Profile 提供只读输入 =features.sops.ageKeyFile=, 不依赖 OS SOPS Feature; Agent 独立消费 provider 的 enable 和 =apiKeyFile=, 不依赖 SOPS. 原生接线读取实际 OS/HM config, 例如 Greeter 消费 Niri/X11 session packages (Niri 优先), HM Shell 消费 OS =features.shell.{bash,zsh}.package=, File-manager 消费 OS file chooser 和当前 HM Niri 选择. OS Noctalia、OS FileChooser 默认随所属 Feature 启用, HM Noctalia 默认读取 OS Niri/Noctalia 状态, HM Waybar 默认随 HM Niri 启用且 HM Noctalia 禁用.
 
 Host 数据不变量由 =modules/hosts/options.nix= 的 option types 与 =apply= 表达: Registry 保证 number 全局唯一, monitors 保证名称唯一、默认 monitor 至多一个且具有 mode, users 保证 UID registry key 与值一致, wireguard 保证 endpoint 非空时 listenPort 非空. =apply= 在对应 option 被消费时执行; =checks.host-registry= 强制求值所有 Host 的这些领域数据, 包括未被选中的 Host, 而不求值 deferredModules. Registry 的 number 检查不应依赖再次读取同一 Registry 的最终值; 局部字段可以读取其他已登记对象. Greeter 接线自行要求唯一默认 monitor, HM Niri 使用原生 assertion, OS Niri 不需要显示器数据. 构造时验证所有 System configurations 的选择及 Account 绑定, 不强制未选中的 deferredModules. 仅依赖最终原生状态的约束由相应原生 assertions 检查 (例如 Proxy 互斥、Noctalia 服务依赖、HM SOPS 与 API keys).
 
@@ -145,12 +146,13 @@ Host 数据不变量由 =modules/hosts/options.nix= 的 option types 与 =apply=
 ├── default.nix
 ├── flakeParts.nix
 ├── hosts.nix
+├── identity.nix
 ├── modules.nix
 ├── monitor-type.nix
 └── types.nix
 #+end_example
 
-[[file:./lib/default.nix][lib/default.nix]] 导出 =llib.hosts=, =llib.flakeParts=, =llib.modules= 与 =llib.types=. =hosts.nix= 提供 WireGuard network data、拓扑、接口/firewall 及 SSH targets 的派生; =mkWireGuardTopology= 返回全局 topology, =mkWireGuardNetworks= 直接返回指定 Host 的原生 networking 配置; =flakeParts.nix= 声明通用 FP schema 并构造原生系统和 Account modules. =modules.nix= 提供 =mapModule=, 在保留 callable value 的原生参数声明的同时变换其返回值, 不预设 module 的结构或目标 namespace. =types.nix= 中的 =deferredModuleFragment= 接受 attrset 或 callable value, 在合并时将普通 attrset 规范化为常值函数; 它不负责完整 module 的组合或 namespace 限制. 共享值类型由 =types.nix= 与 =monitor-type.nix= 定义, FP 与原生模块通过 =llib.types= 使用同一组类型. 根 flake 从 personal-nixpkgs 引入 tests. Host domain schema 和项目特有接线由显式 FP modules 扩展, 不在构造器内硬编码 Feature 业务逻辑.
+[[file:./lib/default.nix][lib/default.nix]] 导出 =llib.hosts=, =llib.flakeParts=, =llib.identity=, =llib.modules= 与 =llib.types=. =hosts.nix= 提供 WireGuard network data、拓扑、接口/firewall 及 SSH targets 的派生; =mkWireGuardTopology= 返回全局 topology, =mkWireGuardNetworks= 直接返回指定 Host 的原生 networking 配置; =flakeParts.nix= 声明通用 FP schema 并构造原生系统和 Account modules. =identity.nix= 提供基于 UID 的 User age secret 命名函数. =modules.nix= 提供 =mapModule=, 在保留 callable value 的原生参数声明的同时变换其返回值, 不预设 module 的结构或目标 namespace. =types.nix= 中的 =deferredModuleFragment= 接受 attrset 或 callable value, 在合并时将普通 attrset 规范化为常值函数; 它不负责完整 module 的组合或 namespace 限制. 共享值类型由 =types.nix= 与 =monitor-type.nix= 定义, FP 与原生模块通过 =llib.types= 使用同一组类型. 根 flake 从 personal-nixpkgs 引入 tests. Host 和 User domain schema 及项目特有接线由显式 FP modules 扩展, 不在构造器内硬编码 Feature 业务逻辑.
 
 *** [[file:./pkgs/][/pkgs]]
 #+begin_example
@@ -184,7 +186,7 @@ Host 数据不变量由 =modules/hosts/options.nix= 的 option types 与 =apply=
 - =emarccs=: 提供 editor 的 Emacs overlay, 固定 revision, 其内部 =personal-nixpkgs= 依赖由自身锁定.
 - =lem= 和 =nixvim=: 提供 editor 所需的 overlay 和 Home Manager module.
 - =niri-flake=: 提供 Niri 的 OS overlay 和 Home Manager module.
-- =sops-nix=: 提供 SOPS 的 NixOS 和 Home Manager modules.
+- =sops-nix=: 提供 SOPS 的 Home Manager module.
 - =git-agent-workflow=: 通过 =share= overlay 提供持久记忆工具.
 - =lean4-nix=: 通过 =share= overlay 提供 =lean4= 二进制包.
 
@@ -209,7 +211,7 @@ Host 数据不变量由 =modules/hosts/options.nix= 的 option types 与 =apply=
 - =nixosModules.share= 和 =homeModules.share=: 汇集包附带的 OS/HM 模块.
 - =overlays.niri=: 转发 niri-flake 的 overlay.
 - =homeModules.nixvim= 和 =homeModules.niri=: 分别转发上游 Nixvim 与 Niri HM modules.
-- =nixosModules.sops= 和 =homeModules.sops=: 转发 sops-nix 的 OS/HM modules. Agenix 和 Agenix-rekey 仍由 root 提供.
+- =homeModules.sops=: 转发 sops-nix 的 HM module. Agenix 和 Agenix-rekey 仍由 root 提供.
 
 =pkgs/pkgs/= 组织软件包和随包提供的 integrations. Nixvim、Niri 与 SOPS 的 inputs 暂时保留在子 flake, 其 exports 不再组合本地 Feature implementations.
 
@@ -261,13 +263,15 @@ Host 数据不变量由 =modules/hosts/options.nix= 的 option types 与 =apply=
 
 =os/default.nix= 提供 Nix, 防火墙, 基础工具, age 与 Home Manager 公共配置, 并声明原生 =xdg.createUserDirectories= (默认 false); =hm/default.nix= 提供 Fastfetch, XDG 路径和 home state version. Host module 直接使用 =nixpkgs.config.allowUnfreePackages= 与 =xdg.createUserDirectories= 声明本机策略. 两侧基础模块由 =baseModule= 无条件接入, 不参与 Feature selection. Host 通过其原生 =module= 显式定义 =base.{bluetooth,bootManager,networkmanager,power}.enable=; 这些只读 native options 不设默认值, 控制对应 Base 配置贡献是否参与合并, 禁用时不强制关闭上游服务. 它们不再属于 Host Registry 的结构化 FP 数据.
 
-=bluetooth.nix=, =boot-manager.nix=, =networkmanager.nix= 与 =power.nix= 分别声明并消费对应的 =base.*.enable=, 保留各自的原生配置贡献; boot manager 仍消费 Host monitor 数据派生分辨率. =identity.nix= 与 =wireguard.nix= 消费选中的 Host 领域数据, 生成 identity 与 WireGuard interface/secret 的配置; topology 由 FP 层派生并投影到原生 option.
+=bluetooth.nix=, =boot-manager.nix=, =networkmanager.nix= 与 =power.nix= 分别声明并消费对应的 =base.*.enable=, 保留各自的原生配置贡献; boot manager 仍消费 Host monitor 数据派生分辨率. =identity.nix= 消费选中的 Host 与 Account metadata, =wireguard.nix= 消费 Host 领域数据, 分别生成 identity 与 WireGuard interface/secret 的配置; topology 由 FP 层派生并投影到原生 option.
 
 各 Host 必须显式定义只读原生 option =base.wireguard.firewall.restrictOutput=. Aliyun 启用受管理 WireGuard 接口的本机 OUTPUT 默认拒绝策略, 其他 Host 禁用. =base.wireguard.firewall.extraOutputAllowRules= 为可合并的 =lib.types.lines= option, 由 Host 或 Workload 等可信原生模块贡献 nftables 授权规则; Base 将其置于返回流量例外之后、最终拒绝之前. 未启用限制或无受管理接口时不生成 Host OUTPUT table. =llib.hosts.getManagedWireGuardInterfaces= 根据 topology 中的 Host 成员关系确定接口集合, 不包含独立配置的其他 VPN. 返回流量例外匹配 conntrack reply 方向的 established 报文及相关 ICMP/ICMPv6 报文, 不无条件放行本机主动建立的连接. 此策略与既有 FORWARD 隔离及非受管理接口无关.
 
 [[file:./modules/base/os/ssh-targets.nix][modules/base/os/ssh-targets.nix]] 从 =networking.wireguard.topology= 与 Host Registry 生成系统级 SSH 客户端别名 =<hub>.<node>=, 使用拓扑中的 IPv4 地址作为 =HostName=. 同一节点经不同 Hub 访问时共用 =HostKeyAlias= 与 Registry 中的 SSH host public key, 并由 =programs.ssh.knownHosts= 声明式验证服务器身份. =programs.ssh.hosts= 的 =order= 从 1000 开始, 依据 =(hub.number, node.number)= 排序分配. 当选中 Host 没有 WireGuard 配置时不生成这些条目; 参与生成的节点缺少 SSH host public key 时显式报错. 该集成不依赖 =modules/users/=, 不指定 SSH 登录用户、认证凭据或认证方法, 也不启用或修改 SSH 服务端. 别名只描述网络路径与服务器身份, 不保证 SSH 登录权限.
 
 =identity.nix= 将当前 host 的非空 SSH 私钥备份引用登记为 =age.secrets.ssh-identity=, 设置 =intermediary = true;=, 使其参与 =agenix edit=, =agenix view= 和 =agenix update-masterkeys=. host rekey 跳过该备份, 上游 agenix module 安装 dummy secret, SSH host 私钥的安装与恢复需单独处理. 备份登记独立于 =identity.rootAccess=; 后者只控制 YubiKey 工具和 =pcscd= 的启用.
+
+Host 与 User Registry 共用 =llib.types.identity=, 其中 =keys.age= 和 =keys.ssh= 各为可空 submodule; Host 额外声明 =rootAccess=. Base 按 Account 绑定交付 Profile 中非空的 age 私钥文件, 不检查 SOPS Feature 选择. =llib.identity.userAgeSecretName= 根据 UID 生成原生 =age.secrets= 名称, 由 OS agenix 解密并以 Account username 所有、=0400= 权限安装. 此接线要求私钥材料为文件 path; =private.path= 为空时使用 agenix 默认安装位置, 显式指定时须避免同一 System 内的路径冲突. Profile 可通过 =osConfig.age.secrets.<name>.path= 消费实际安装路径. User SSH identity 暂不接线.
 
 **** [[file:./modules/features/][/modules/features]]
 #+begin_example
@@ -290,7 +294,7 @@ Host 数据不变量由 =modules/hosts/options.nix= 的 option types 与 =apply=
 └── x11-session/
 #+end_example
 
-每个 Feature 的 =default.nix= 是 FP 入口, 按已有实现向 =nixosBuilderArgs.featureRegistry.os= 与/或 =hm= 登记 =./os= 或 =./hm=. 原生模块、参数与本地资源位于相应作用域的目录, 原生 =features.<name>.enable= 语义保持不变. Root =flake.nix= 提供外部依赖的接线, 无需让子 flake 导出完整的 Feature. SOPS 的 bridge ciphertext 位于 =modules/features/sops/os/sops.hm.age=.
+每个 Feature 的 =default.nix= 是 FP 入口, 按已有实现向 =nixosBuilderArgs.featureRegistry.os= 与/或 =hm= 登记 =./os= 或 =./hm=. 原生模块、参数与本地资源位于相应作用域的目录, 原生 =features.<name>.enable= 语义保持不变. Root =flake.nix= 提供外部依赖的接线, 无需让子 flake 导出完整的 Feature.
 
 **** [[file:./modules/workloads/][/modules/workloads]]
 #+begin_example
@@ -398,14 +402,16 @@ NixOS-WSL host, hostname =nixos-wsl=.
 /modules/users/
 ├── default.nix
 ├── lingyu/
-└── lingyu-minimal/
+├── lingyu-minimal/
+└── options.nix
 #+end_example
 
-[[file:./modules/users/default.nix][modules/users/default.nix]] 聚合 User FP modules; 各 User 通过 Registry 的 =features.<name>.module= 提供对应 HM Feature 的内部配置定义, 通用 FP schema 负责 Account 接线. Account 的身份和 HM module 由通用构造函数送达. 每个 User profile 的 =default.nix= 贡献 Registry entry, =hm/default.nix= 是原生 HM 入口.
+[[file:./modules/users/default.nix][modules/users/default.nix]] 聚合 User FP modules 与 =options.nix= 中的 User identity schema; 各 User 通过 Registry 的 =features.<name>.module= 提供对应 HM Feature 的内部配置定义, 通用 FP schema 负责 Account 接线. 通用构造函数传递 Account metadata 并实例化 HM module, Base OS 消费 Account metadata 交付 User identity. 每个 User profile 的 =default.nix= 贡献 Registry entry, =hm/default.nix= 是原生 HM 入口.
 
 ***** [[file:./modules/users/lingyu/][/modules/users/lingyu]]
 #+begin_example
 /modules/users/lingyu/
+├── age.private.age
 ├── default.nix
 ├── hm/
 │   ├── default.nix
@@ -428,7 +434,7 @@ NixOS-WSL host, hostname =nixos-wsl=.
     └── default.yaml
 #+end_example
 
-配置 lingyu 用户的个人 home-manager 模块, 包含 cloud-server, email, git, keyring, langs, rclone 等用户级配置. SOPS 密文和编辑配置移到 User FP module 同级目录, 由其直接引用; rclone remotes 只在当前 Account 的 HM SOPS 启用时配置.
+配置 lingyu 用户的个人 home-manager 模块, 包含 cloud-server, email, git, keyring, langs, rclone 等用户级配置. User age identity 密文位于 =age.private.age=, SOPS 密文和编辑配置位于 =sops/=, 均由 User FP module 直接引用; rclone remotes 只在当前 Account 的 HM SOPS 启用时配置.
 
 =modules/users/lingyu/hm/home/.local/bin/= 放置个人脚本:
 - =org=: 进入 =~/org= 目录并准备使用 =~/org/config/Makefile= 的 make 函数.

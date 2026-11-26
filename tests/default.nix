@@ -22,6 +22,7 @@ llib.tests.mkChecks {
     inherit (pkgs) runCommand;
     llibFlakeParts = llib.flakeParts;
     llibHosts = llib.hosts;
+    llibIdentity = llib.identity;
     llibModules = llib.modules;
     llibTypes = llib.types;
   };

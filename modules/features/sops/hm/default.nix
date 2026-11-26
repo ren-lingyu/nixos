@@ -3,23 +3,20 @@
   lib,
   llib,
   ...
-}@args:
+}:
 let
   cfg = config.features.sops;
-  osConfig = args.osConfig or { };
   secrets = import ./secrets.nix { inherit config; };
   hasDefaults = cfg.defaultSopsFormat != null && cfg.defaultSopsFile != null;
 in
 {
   options = {
     features.sops = {
-      enable = lib.mkEnableOption "Home Manager SOPS integration" // {
-        apply =
-          enable:
-          assert lib.assertMsg (
-            !enable || (osConfig.features.sops.enable or false)
-          ) "Home Manager SOPS requires system SOPS.";
-          enable;
+      enable = lib.mkEnableOption "Home Manager SOPS integration";
+      ageKeyFile = lib.mkOption {
+        type = lib.types.nonEmptyStr;
+        readOnly = true;
+        description = "Path to the age identity used by SOPS.";
       };
       secretsInput = lib.mkOption {
         type = llib.types.sopsSecretsInput;
@@ -42,7 +39,7 @@ in
 
   config = lib.mkIf config.features.sops.enable {
     home.sessionVariables = {
-      SOPS_AGE_KEY_FILE = osConfig.features.sops.ageKeys.hm.path;
+      SOPS_AGE_KEY_FILE = cfg.ageKeyFile;
     };
 
     sops = lib.mkMerge [
@@ -59,7 +56,7 @@ in
 
         age = {
           generateKey = false;
-          keyFile = osConfig.features.sops.ageKeys.hm.path;
+          keyFile = cfg.ageKeyFile;
           plugins = [ ];
           sshKeyPaths = [ ];
         };
