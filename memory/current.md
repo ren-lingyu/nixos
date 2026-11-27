@@ -6,6 +6,12 @@ This repository provides composable NixOS and Home Manager configurations for Th
 
 ## Latest continuation state
 
+### Committed unified SSH targets
+
+Static inspection of `1fcff73` confirmed that `mkSshTargets` replaced `mkWireGuardSshTargets`, generates public and WireGuard aliases, and assigns each destination's Registry name as the shared system host identity. Public targets remain available without a local WireGuard configuration. The commit removed Lingyu's duplicate Host data and `cloud-server.nix`. `ssh root@aliyun` replaces the previous `root.aliyun` alias. Lingyu's User Profile intentionally applies the previously Aliyun-specific client identity policy globally.
+
+The owner reported that tests and a build passed after formatting and that SSH connections were working. The reported `ssh -G aliyun` and `ssh -G aliyun.aliyun` resolved to the public and WireGuard addresses respectively. Both reported `HostKeyAlias aliyun`, `User lingyu`, `Port 22`, `IdentityFile ~/.ssh/id_ed25519` and `IdentitiesOnly yes`. The specific test commands and build target were not supplied. This review read the committed implementation and test source. No additional hosts, paths or authentication methods were verified here. The earlier runtime observations below retain their original host key aliases.
+
 ### Committed FP User Secret allocation
 
 The owner adopted FP ownership for ordinary User Secrets and explicit Account allocation. MateBook is shifting from a full backup workstation toward long-running automation, including Hermes. A reusable Profile must be able to keep its personal resources while Accounts with different trust levels receive different subsets. The former HM-scoped declaration and OS Agenix delivery worked and had already replaced the User-side SOPS decryption and its ordering problem. This change addresses ownership and authorization. Profiles should favor identity, personal resources, service wiring and preferences over a fixed workstation role. Highly personal configuration can stay in a Profile when splitting it offers little independent value.
