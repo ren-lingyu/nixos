@@ -51,14 +51,31 @@ let
     };
   };
 
-  sshRegistry_ = lib.mapAttrs (
-    name_: host_:
-    host_
-    // {
-      identity.keys.ssh.public.key =
-        if name_ == "excluded" then null else "ssh-ed25519 ${name_}-host-key";
-    }
-  ) wireguardHosts_;
+  sshRegistry_ =
+    lib.mapAttrs
+      (
+        name_: host_:
+        host_
+        // {
+          publicIpAddress =
+            ({
+              aliyun = "203.0.113.3";
+              backup = "2001:db8::5";
+              public-only = "203.0.113.10";
+            }).${name_} or null;
+          identity.keys.ssh.public.key =
+            if name_ == "excluded" then null else "ssh-ed25519 ${name_}-host-key";
+        }
+      )
+      (
+        wireguardHosts_
+        // {
+          public-only = {
+            number = 10;
+            wireguard = null;
+          };
+        }
+      );
 
   mkNetworks_ =
     registry: enabledHostName:
@@ -172,12 +189,26 @@ let
   caddyAllow_ = ''meta skuid 239 oifname "wg3" ip daddr 10.100.3.2 tcp dport 18000 accept'';
   extraAllow_ = ''oifname "wg5" ip daddr 10.100.5.4 tcp dport 1234 accept'';
 
-  sshTargets_ = hosts.mkWireGuardSshTargets {
+  sshTargets_ = hosts.mkSshTargets {
     registry = sshRegistry_;
     topology = topology_;
   };
 
-  missingKeySshTargets_ = hosts.mkWireGuardSshTargets {
+  publicSshTargets_ = hosts.mkSshTargets {
+    registry = sshRegistry_;
+    topology = { };
+  };
+
+  missingPublicKeySshTargets_ = hosts.mkSshTargets {
+    registry = sshRegistry_ // {
+      public-only = sshRegistry_.public-only // {
+        identity.keys.ssh.public.key = null;
+      };
+    };
+    topology = { };
+  };
+
+  missingKeySshTargets_ = hosts.mkSshTargets {
     registry = sshRegistry_ // {
       matebook = sshRegistry_.matebook // {
         identity.keys.ssh.public.key = null;
@@ -186,7 +217,7 @@ let
     topology = topology_;
   };
 
-  missingIdentitySshTargets_ = hosts.mkWireGuardSshTargets {
+  missingIdentitySshTargets_ = hosts.mkSshTargets {
     registry = sshRegistry_ // {
       matebook = sshRegistry_.matebook // {
         identity.keys.ssh = null;
@@ -421,13 +452,13 @@ let
     (lib.hasInfix ''oifname { "wg3", "wg5" } drop'' (isolationRules_ thinkbook_))
     (lib.hasInfix "priority -10; policy accept;" (isolationRules_ matebook_))
 
-    (builtins.length (builtins.attrNames sshTargets_.hosts) == 8)
-    (builtins.length (builtins.attrNames sshTargets_.knownHosts) == 4)
+    (builtins.length (builtins.attrNames sshTargets_.hosts) == 11)
+    (builtins.length (builtins.attrNames sshTargets_.knownHosts) == 5)
     (
       sshTargets_.hosts."aliyun.thinkbook" == {
         order = 1000;
         HostName = "10.100.3.2";
-        HostKeyAlias = "wg-host-thinkbook";
+        HostKeyAlias = "thinkbook";
       }
     )
     (sshTargets_.hosts."aliyun.aliyun".order == 1001)
@@ -439,13 +470,26 @@ let
     (
       sshTargets_.hosts."backup.matebook".HostKeyAlias == sshTargets_.hosts."aliyun.matebook".HostKeyAlias
     )
-    (sshTargets_.knownHosts."wg-host-matebook".publicKey == "ssh-ed25519 matebook-host-key")
+    (
+      sshTargets_.hosts.aliyun == {
+        order = 1008;
+        HostName = "203.0.113.3";
+        HostKeyAlias = "aliyun";
+      }
+    )
+    (sshTargets_.hosts.backup.order == 1009)
+    (sshTargets_.hosts.backup.HostName == "2001:db8::5")
+    (sshTargets_.hosts.public-only.order == 1010)
+    (sshTargets_.hosts.public-only.HostName == "203.0.113.10")
+    (sshTargets_.hosts.aliyun.HostKeyAlias == sshTargets_.hosts."backup.aliyun".HostKeyAlias)
+    (sshTargets_.knownHosts.matebook.publicKey == "ssh-ed25519 matebook-host-key")
     (
       builtins.attrNames sshTargets_.knownHosts == [
-        "wg-host-aliyun"
-        "wg-host-backup"
-        "wg-host-matebook"
-        "wg-host-thinkbook"
+        "aliyun"
+        "backup"
+        "matebook"
+        "public-only"
+        "thinkbook"
       ]
     )
     (builtins.all (
@@ -457,8 +501,8 @@ let
       ]
     ) (builtins.attrValues sshTargets_.hosts))
     (
-      hosts.mkWireGuardSshTargets {
-        registry = sshRegistry_;
+      hosts.mkSshTargets {
+        registry = { };
         topology = { };
       } == {
         hosts = { };
@@ -466,22 +510,30 @@ let
       }
     )
     (
-      (hosts.mkWireGuardSshTargets {
+      (hosts.mkSshTargets {
         registry = sshRegistry_;
         topology = singleHubTopology_;
         baseOrder = 1200;
       }).hosts."aliyun.thinkbook".order == 1200
     )
+    (
+      builtins.attrNames publicSshTargets_.hosts == [
+        "aliyun"
+        "backup"
+        "public-only"
+      ]
+    )
+    (builtins.attrNames publicSshTargets_.knownHosts == builtins.attrNames publicSshTargets_.hosts)
+    (publicSshTargets_.hosts.aliyun.order == 1000)
+    (publicSshTargets_.hosts.public-only.order == 1002)
+    (publicSshTargets_.knownHosts.public-only.publicKey == "ssh-ed25519 public-only-host-key")
+    (!(builtins.tryEval (builtins.deepSeq missingPublicKeySshTargets_.knownHosts true)).success)
     (!(builtins.tryEval (builtins.deepSeq missingKeySshTargets_.knownHosts true)).success)
     (!(builtins.tryEval (builtins.deepSeq missingIdentitySshTargets_.knownHosts true)).success)
     ((evalSshModule_ "thinkbook").hosts == sshTargets_.hosts)
     ((evalSshModule_ "thinkbook").knownHosts == sshTargets_.knownHosts)
-    (
-      (evalSshModule_ "excluded") == {
-        hosts = { };
-        knownHosts = { };
-      }
-    )
+    ((evalSshModule_ "excluded") == publicSshTargets_)
+    ((evalSshModule_ "public-only") == publicSshTargets_)
   ];
 
 in

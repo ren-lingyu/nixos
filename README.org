@@ -254,7 +254,7 @@ Nixvim 与 Niri 的外部 integrations 直接由根 flake 接入.
 
 各 Host 必须显式定义只读原生 option =base.wireguard.firewall.restrictOutput=. Aliyun 启用受管理 WireGuard 接口的本机 OUTPUT 默认拒绝策略, 其他 Host 禁用. =base.wireguard.firewall.extraOutputAllowRules= 为可合并的 =lib.types.lines= option, 由 Host 或 Workload 等可信原生模块贡献 nftables 授权规则; Base 将其置于返回流量例外之后、最终拒绝之前. 未启用限制或无受管理接口时不生成 Host OUTPUT table. =llib.hosts.getManagedWireGuardInterfaces= 根据 topology 中的 Host 成员关系确定接口集合, 不包含独立配置的其他 VPN. 返回流量例外匹配 conntrack reply 方向的 established 报文及相关 ICMP/ICMPv6 报文, 不无条件放行本机主动建立的连接. 此策略与既有 FORWARD 隔离及非受管理接口无关.
 
-[[file:./modules/base/os/ssh-targets.nix][modules/base/os/ssh-targets.nix]] 从 =networking.wireguard.topology= 与 Host Registry 生成系统级 SSH 客户端别名 =<hub>.<node>=, 使用拓扑中的 IPv4 地址作为 =HostName=. 同一节点经不同 Hub 访问时共用 =HostKeyAlias= 与 Registry 中的 SSH host public key, 并由 =programs.ssh.knownHosts= 声明式验证服务器身份. =programs.ssh.hosts= 的 =order= 从 1000 开始, 依据 =(hub.number, node.number)= 排序分配. 当选中 Host 没有 WireGuard 配置时不生成这些条目; 参与生成的节点缺少 SSH host public key 时显式报错. 该集成不依赖 =modules/users/=, 不指定 SSH 登录用户、认证凭据或认证方法, 也不启用或修改 SSH 服务端. 别名只描述网络路径与服务器身份, 不保证 SSH 登录权限.
+[[file:./modules/base/os/ssh-targets.nix][modules/base/os/ssh-targets.nix]] 通过 =llib.hosts.mkSshTargets= 从 Host Registry 和 =networking.wireguard.topology= 生成系统级 SSH 客户端别名. 对每个具有非空 =publicIpAddress= 的 Host 生成 =<host>= 公网目标, 使用该地址作为 =HostName=; 当前 Host 参与 WireGuard 时还生成 =<hub>.<node>= 目标, 使用拓扑中的 IPv4 地址. 公网目标不依赖当前 Host 的 WireGuard 配置. =programs.ssh.hosts= 的 =order= 从 1000 开始, 保留 WireGuard 目标按 =(hub.number, node.number)= 排序的顺序, 随后按 Host number 排列公网目标. 所有指向同一 Host 的目标以 Registry 名称作为 =HostKeyAlias=, 并共用 =programs.ssh.knownHosts= 中由 Registry SSH host public key 生成的身份记录; 缺少公钥时显式报错. 该集成不依赖 =modules/users/=, 不指定 SSH 登录用户、认证凭据或认证方法, 不启用或修改 SSH 服务端, 不引入独立的信任文件. 别名只描述网络路径与服务器身份, 不保证 SSH 登录权限.
 
 =identity.nix= 将当前 host 的非空 SSH 私钥备份引用登记为 =age.secrets.ssh-identity=, 设置 =intermediary = true;=, 使其参与 =agenix edit=, =agenix view= 和 =agenix update-masterkeys=. host rekey 跳过该备份, 上游 agenix module 安装 dummy secret, SSH host 私钥的安装与恢复需单独处理. 备份登记独立于 =identity.rootAccess=; 后者只控制 YubiKey 工具和 =pcscd= 的启用.
 
@@ -418,7 +418,6 @@ NixOS-WSL host, hostname =nixos-wsl=.
 │       │       ├── org.sh
 │       │       ├── rc.sh
 │       │       └── ssha.sh
-│       ├── cloud-server.nix
 │       ├── default.nix
 │       ├── email.nix
 │       ├── git.nix
@@ -431,7 +430,9 @@ NixOS-WSL host, hostname =nixos-wsl=.
         └── <name>.age
 #+end_example
 
-配置 lingyu 用户的个人 home-manager 模块, 包含 cloud-server, email, git, keyring, langs, rclone 等用户级配置. User age identity 密文位于 =age.private.age=. 各 secret 的 age 密文按 secrets tree 的层级组织于 =secrets/=, 由 FP module =secrets/default.nix= 声明. 例如 =secrets/foo/bar.age= 对应 Registry 的 =secrets.foo.bar.rekeyFile=, Account 显式选择后消费者通过 =config.secrets.foo.bar.path= 获取实际交付路径. Rclone remotes 与 Agent providers 均采用此机制.
+配置 lingyu 用户的个人 home-manager 模块, 包含 email, git, keyring, langs, rclone 等用户级配置. User age identity 密文位于 =age.private.age=. 各 secret 的 age 密文按 secrets tree 的层级组织于 =secrets/=, 由 FP module =secrets/default.nix= 声明. 例如 =secrets/foo/bar.age= 对应 Registry 的 =secrets.foo.bar.rekeyFile=, Account 显式选择后消费者通过 =config.secrets.foo.bar.path= 获取实际交付路径. Rclone remotes 与 Agent providers 均采用此机制.
+
+Lingyu Profile 的 SSH 客户端通用配置统一使用 =~/.ssh/id_ed25519= 与 =IdentitiesOnly yes=, 将身份选择与系统级 SSH targets 分离. 公网 Aliyun 别名由 Base OS 生成, 不再指定登录用户; 原有 =root.aliyun= 改为 =ssh root@aliyun=. 此策略适用于该 Profile 的所有 SSH 连接, 不负责安装或授权用户私钥.
 
 =modules/users/lingyu/hm/home/.local/bin/= 放置个人脚本:
 - =org=: 进入 =~/org= 目录并准备使用 =~/org/config/Makefile= 的 make 函数.
@@ -449,7 +450,7 @@ NixOS-WSL host, hostname =nixos-wsl=.
 最小用户 profile, 提供空的 =hm/default.nix= 实现, 可以接收最终配置启用的公共 HM features.
 
 * 测试
-[[file:./tests/default.nix][tests/default.nix]] 调用 =llib.tests.mkChecks=, 按 =test-overlay.nix= 发现各组测试入口, 在独立测试 scope 中组合定义并收集检查派生物. 嵌套 check 名称以 =-= 连接. 测试覆盖 FP schema 扩展与合并、禁用模块不导入、Account 的独立 HM 选择与静态绑定约束、自定义类型及 Host 相关函数. 原生 Feature enable 契约由 =tests/native-feature-enables/= 检查. =tests/configurations/= 使用模拟 =apiKeyFile= 验证 Agent provider 接线. Host 函数测试还覆盖 WireGuard SSH targets 的多 Hub 别名、排序、主机身份去重、缺失公钥以及不依赖用户模块的系统级集成.
+[[file:./tests/default.nix][tests/default.nix]] 调用 =llib.tests.mkChecks=, 按 =test-overlay.nix= 发现各组测试入口, 在独立测试 scope 中组合定义并收集检查派生物. 嵌套 check 名称以 =-= 连接. 测试覆盖 FP schema 扩展与合并、禁用模块不导入、Account 的独立 HM 选择与静态绑定约束、自定义类型及 Host 相关函数. 原生 Feature enable 契约由 =tests/native-feature-enables/= 检查. =tests/configurations/= 使用模拟 =apiKeyFile= 验证 Agent provider 接线. Host 函数测试还覆盖 SSH targets 的公网及多 Hub 别名、排序、主机身份去重、缺失公钥、非 WireGuard Host 的公网目标以及不依赖用户模块的系统级集成.
 
 各组测试的 =test-overlay.nix= 使用与包相同的外层构造协议, 通过 =final.callPackage ./test.nix= 调用测试体. =test.nix= 保存断言和检查派生物, fixtures 保留在所属组内; 专用入口文件名避免将 fixtures 误识别为测试组.
 

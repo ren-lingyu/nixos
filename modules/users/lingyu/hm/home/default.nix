@@ -10,7 +10,6 @@
     ./git.nix
     ./langs.nix
     ./email.nix
-    ./cloud-server.nix
     ./rclone.nix
   ];
 
@@ -88,6 +87,8 @@
       settings = {
         "*" = {
           forwardAgent = false;
+          identityFile = "~/.ssh/id_ed25519";
+          identitiesOnly = true;
           serverAliveInterval = 0;
           serverAliveCountMax = 3;
           compression = false;

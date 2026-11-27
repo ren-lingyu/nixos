@@ -2,19 +2,18 @@
   config,
   host,
   hostRegistry,
-  lib,
   llib,
   ...
 }:
 let
-  sshTargets_ = llib.hosts.mkWireGuardSshTargets {
+  sshTargets_ = llib.hosts.mkSshTargets {
     registry = hostRegistry;
-    topology = config.networking.wireguard.topology;
+    topology = if host.wireguard == null then { } else config.networking.wireguard.topology;
     baseOrder = 1000;
   };
 in
 {
-  config.programs.ssh = lib.mkIf (host.wireguard != null) {
+  config.programs.ssh = {
     hosts = sshTargets_.hosts;
     knownHosts = sshTargets_.knownHosts;
   };

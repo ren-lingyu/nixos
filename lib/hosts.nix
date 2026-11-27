@@ -5,17 +5,17 @@
       lib.filterAttrs (_: network: builtins.hasAttr hostName network.nodes) topology
     );
 
-  mkWireGuardSshTargets =
+  mkSshTargets =
     {
       registry,
       topology,
       baseOrder ? 1000,
     }:
     let
-      entries_ = lib.concatMap (
+      wireguardEntries_ = lib.concatMap (
         hubName_:
         lib.mapAttrsToList (nodeName_: ip_: {
-          hub = hubName_;
+          name = "${hubName_}.${nodeName_}";
           node = nodeName_;
           hubNumber = registry.${hubName_}.number;
           nodeNumber = registry.${nodeName_}.number;
@@ -23,21 +23,30 @@
         }) topology.${hubName_}.nodes
       ) (builtins.attrNames topology);
 
-      orderedEntries_ = lib.sort (
-        a_: b_:
-        a_.hubNumber < b_.hubNumber || (a_.hubNumber == b_.hubNumber && a_.nodeNumber < b_.nodeNumber)
-      ) entries_;
+      publicEntries_ = lib.mapAttrsToList (name_: host_: {
+        name = name_;
+        node = name_;
+        nodeNumber = host_.number;
+        ip = host_.publicIpAddress;
+      }) (lib.filterAttrs (_: host_: host_.publicIpAddress != null) registry);
 
-      nodeNames_ = lib.unique (builtins.map (entry_: entry_.node) entries_);
+      orderedEntries_ =
+        lib.sort (
+          a_: b_:
+          a_.hubNumber < b_.hubNumber || (a_.hubNumber == b_.hubNumber && a_.nodeNumber < b_.nodeNumber)
+        ) wireguardEntries_
+        ++ lib.sort (a_: b_: a_.nodeNumber < b_.nodeNumber) publicEntries_;
+
+      nodeNames_ = lib.unique (builtins.map (entry_: entry_.node) orderedEntries_);
     in
     {
       hosts = builtins.listToAttrs (
         lib.imap0 (index_: entry_: {
-          name = "${entry_.hub}.${entry_.node}";
+          inherit (entry_) name;
           value = {
             order = baseOrder + index_;
             HostName = entry_.ip;
-            HostKeyAlias = "wg-host-${entry_.node}";
+            HostKeyAlias = entry_.node;
           };
         }) orderedEntries_
       );
@@ -48,11 +57,9 @@
           let
             publicKey_ = registry.${nodeName_}.identity.keys.ssh.public.key or null;
           in
-          assert lib.assertMsg (publicKey_ != null) (
-            "Missing SSH host public key for WireGuard node `${nodeName_}`."
-          );
+          assert lib.assertMsg (publicKey_ != null) ("Missing SSH host public key for Host `${nodeName_}`.");
           {
-            name = "wg-host-${nodeName_}";
+            name = nodeName_;
             value.publicKey = publicKey_;
           }
         ) nodeNames_
