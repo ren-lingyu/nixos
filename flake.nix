@@ -225,6 +225,29 @@
                   username = "lingyu";
                   profile = config.nixosBuilderArgs.userRegistry.lingyu;
 
+                  secrets = {
+                    nutstore = {
+                      user.enable = true;
+                      pass.enable = true;
+                    };
+                    "123cloud" = {
+                      user.enable = true;
+                      pass.enable = true;
+                    };
+                    cloudflare = {
+                      access_key_id.enable = true;
+                      secret_access_key.enable = true;
+                      endpoint.enable = true;
+                    };
+                    alibabacloud.oss = {
+                      access_key_id.enable = true;
+                      secret_access_key.enable = true;
+                    };
+                    deepseek.apiKey.pi.enable = true;
+                    moonshot.cn.apiKey.pi.enable = true;
+                    zai.cn.apiKey.pi.enable = true;
+                  };
+
                   features = {
                     agent.enable = true;
                     diagnostics.enable = true;
@@ -297,6 +320,29 @@
                 users."1000" = {
                   username = "lingyu";
                   profile = config.nixosBuilderArgs.userRegistry.lingyu;
+
+                  secrets = {
+                    nutstore = {
+                      user.enable = true;
+                      pass.enable = true;
+                    };
+                    "123cloud" = {
+                      user.enable = true;
+                      pass.enable = true;
+                    };
+                    cloudflare = {
+                      access_key_id.enable = true;
+                      secret_access_key.enable = true;
+                      endpoint.enable = true;
+                    };
+                    alibabacloud.oss = {
+                      access_key_id.enable = true;
+                      secret_access_key.enable = true;
+                    };
+                    deepseek.apiKey.pi.enable = true;
+                    moonshot.cn.apiKey.pi.enable = true;
+                    zai.cn.apiKey.pi.enable = true;
+                  };
 
                   features = {
                     agent.enable = true;
@@ -378,6 +424,29 @@
                 users."1000" = {
                   username = "lingyu";
                   profile = config.nixosBuilderArgs.userRegistry.lingyu;
+
+                  secrets = {
+                    nutstore = {
+                      user.enable = true;
+                      pass.enable = true;
+                    };
+                    "123cloud" = {
+                      user.enable = true;
+                      pass.enable = true;
+                    };
+                    cloudflare = {
+                      access_key_id.enable = true;
+                      secret_access_key.enable = true;
+                      endpoint.enable = true;
+                    };
+                    alibabacloud.oss = {
+                      access_key_id.enable = true;
+                      secret_access_key.enable = true;
+                    };
+                    deepseek.apiKey.pi.enable = true;
+                    moonshot.cn.apiKey.pi.enable = true;
+                    zai.cn.apiKey.pi.enable = true;
+                  };
 
                   features = {
                     agent.enable = true;

@@ -81,7 +81,7 @@ Account entry 的存在即表示构造该账户, 不再提供 Account enable. UI
 每个已登记 Feature/Workload 具有默认 =false= 的 FP =enable= 及 =module= option. 启用时依次导入 Registry implementation、合并后的 consumer module 和显式原生 enable contribution; 禁用时两类 deferredModules 都不加载, 不贡献原生 enable. OS/HM implementations 各自声明原生 =features.<name>=, Workloads 声明原生 =workloads.<name>=. Feature 不启用、导入或配置其他 Feature, 可读取其他 Feature 的已定义值并通过原生 assertions 检查实际依赖. 外部 flake inputs 仅在所属 flake.nix 中引用. 选中对象的 native imports 在 FP 层决定, 不依赖同一原生求值的 =config= 计算 imports.
 
 ** 接线与验证
-构造器仅传递所需项目数据: NixOS 获得 =host=、不含 deferredModule 的 =hostRegistry=、=hostTopology= 以及当前 System 的 UID-keyed =accounts=, OS/HM 均获得公共 =specialArgs=. =accounts= 不含 Feature selections, 其中的 Profile metadata 不含 =module= 或 =features=. NixOS 仍通过 =networking.wireguard.topology= 暴露拓扑. 不再使用旧 configuration adapter 或镜像 option space. 特定 Feature 的接线不属于构造器.
+构造器仅传递所需项目数据: NixOS 获得 =host=、不含 deferredModule 的 =hostRegistry=、=hostTopology= 以及当前 System 的 UID-keyed =accounts=, OS/HM 均获得公共 =specialArgs=. =accounts= 不含 Feature selections, 其中的 Profile metadata 不含 =module=、=features= 或 =secrets=, Account metadata 的 =secrets= 只包含被选中的秘密. NixOS 仍通过 =networking.wireguard.topology= 暴露拓扑. 不再使用旧 configuration adapter 或镜像 option space. 特定 Feature 的接线不属于构造器.
 
 FP modules 可以扩展 Registry 与 System/Account 的 submodule schema. Greeter 和 Niri 的 FP 入口各自将选中 Host 的完整默认 Monitor 和 monitors 数据接入相应 native Feature. 接线结果均进入对应 System 或 Account 的 =features.<name>.module=, 不由构造器处理业务逻辑.
 
@@ -100,7 +100,7 @@ nixosBuilderArgs.userRegistry.lingyu.features = {
 };
 #+end_src
 
-内部数据接线与派生接口通常为 =readOnly=, 不通过多个生产者合并数据; 可选输入按其 native option 类型和消费契约处理. Agent 独立消费 provider 的 enable 和 =apiKeyFile=, 不依赖特定秘密管理机制. 当前 lingyu Profile 通过 Base HM =secrets= 提供 API key 路径. 原生接线读取实际 OS/HM config, 例如 Greeter 消费 Niri/X11 session packages (Niri 优先), HM Shell 消费 OS =features.shell.{bash,zsh}.package=, File-manager 消费 OS file chooser 和当前 HM Niri 选择. OS Noctalia、OS FileChooser 默认随所属 Feature 启用, HM Noctalia 默认读取 OS Niri/Noctalia 状态, HM Waybar 默认随 HM Niri 启用且 HM Noctalia 禁用.
+内部数据接线与派生接口通常为 =readOnly=, 不通过多个生产者合并数据; 可选输入按其 native option 类型和消费契约处理. Agent 独立消费 provider 的 enable 和 =apiKeyFile=, 不依赖特定秘密管理机制. 当前 lingyu Profile 声明 API key 资源, Account 选择交付, Profile 的 Agent 接线通过 Base HM =secrets= 消费路径. 原生接线读取实际 OS/HM config, 例如 Greeter 消费 Niri/X11 session packages (Niri 优先), HM Shell 消费 OS =features.shell.{bash,zsh}.package=, File-manager 消费 OS file chooser 和当前 HM Niri 选择. OS Noctalia、OS FileChooser 默认随所属 Feature 启用, HM Noctalia 默认读取 OS Niri/Noctalia 状态, HM Waybar 默认随 HM Niri 启用且 HM Noctalia 禁用.
 
 Host 数据不变量由 =modules/hosts/options.nix= 的 option types 与 =apply= 表达: Registry 保证 number 全局唯一, monitors 保证名称唯一、默认 monitor 至多一个且具有 mode, users 保证 UID registry key 与值一致, wireguard 保证 endpoint 非空时 listenPort 非空. =apply= 在对应 option 被消费时执行; =checks.host-registry= 强制求值所有 Host 的这些领域数据, 包括未被选中的 Host, 而不求值 deferredModules. Registry 的 number 检查不应依赖再次读取同一 Registry 的最终值; 局部字段可以读取其他已登记对象. Greeter 接线自行要求唯一默认 monitor, HM Niri 使用原生 assertion, OS Niri 不需要显示器数据. 构造时验证所有 System configurations 的选择及 Account 绑定, 不强制未选中的 deferredModules. 仅依赖最终原生状态的约束由相应原生 assertions 检查 (例如 Proxy 互斥、Noctalia 服务依赖、Agent provider 的 API key 路径要求).
 
@@ -150,7 +150,7 @@ Host 数据不变量由 =modules/hosts/options.nix= 的 option types 与 =apply=
 └── types.nix
 #+end_example
 
-[[file:./lib/default.nix][lib/default.nix]] 导出 =llib.hosts=, =llib.flakeParts=, =llib.identity=, =llib.modules=, =llib.secrets= 与 =llib.types=. =hosts.nix= 提供 WireGuard network data、拓扑、接口/firewall 及 SSH targets 的派生; =mkWireGuardTopology= 返回全局 topology, =mkWireGuardNetworks= 直接返回指定 Host 的原生 networking 配置; =flakeParts.nix= 声明通用 FP schema 并构造原生系统和 Account modules. =identity.nix= 提供基于 UID 的 User age secret 命名函数. =secrets.nix= 提供 HM 递归 secrets 类型、叶节点遍历与基于 UID 和完整名称路径的 User secret 命名函数. =modules.nix= 提供 =mapModule=, 在保留 callable value 的原生参数声明的同时变换其返回值, 不预设 module 的结构或目标 namespace. =types.nix= 中的 =deferredModuleFragment= 接受 attrset 或 callable value, 在合并时将普通 attrset 规范化为常值函数; 它不负责完整 module 的组合或 namespace 限制. 共享值类型由 =types.nix= 与 =monitor-type.nix= 定义, FP 与原生模块通过 =llib.types= 使用同一组类型. 根 flake 从 personal-nixpkgs 引入 tests. Host 和 User domain schema 及项目特有接线由显式 FP modules 扩展, 不在构造器内硬编码 Feature 业务逻辑.
+[[file:./lib/default.nix][lib/default.nix]] 导出 =llib.hosts=, =llib.flakeParts=, =llib.identity=, =llib.modules=, =llib.secrets= 与 =llib.types=. =hosts.nix= 提供 WireGuard network data、拓扑、接口/firewall 及 SSH targets 的派生; =mkWireGuardTopology= 返回全局 topology, =mkWireGuardNetworks= 直接返回指定 Host 的原生 networking 配置; =flakeParts.nix= 声明通用 FP schema 并构造原生系统和 Account modules. =identity.nix= 提供基于 UID 的 User age secret 命名函数. =secrets.nix= 提供 FP 递归秘密声明/选择类型、有效秘密树计算、叶节点遍历与基于 UID 和完整名称路径的 User secret 命名函数. =modules.nix= 提供 =mapModule=, 在保留 callable value 的原生参数声明的同时变换其返回值, 不预设 module 的结构或目标 namespace. =types.nix= 中的 =deferredModuleFragment= 接受 attrset 或 callable value, 在合并时将普通 attrset 规范化为常值函数; 它不负责完整 module 的组合或 namespace 限制. 共享值类型由 =types.nix= 与 =monitor-type.nix= 定义, FP 与原生模块通过 =llib.types= 使用同一组类型. 根 flake 从 personal-nixpkgs 引入 tests. Host 和 User domain schema 及项目特有接线由显式 FP modules 扩展, 不在构造器内硬编码 Feature 业务逻辑.
 
 *** [[file:./pkgs/][/pkgs]]
 #+begin_example
@@ -260,20 +260,15 @@ Nixvim 与 Niri 的外部 integrations 直接由根 flake 接入.
 
 Host 与 User Registry 共用 =llib.types.identity=, 其中 =keys.age= 和 =keys.ssh= 各为可空 submodule; Host 额外声明 =rootAccess=. Base 按 Account 绑定交付 Profile 中非空的 age 私钥文件. =llib.identity.userAgeSecretName= 根据 UID 生成原生 =age.secrets= 名称, 由 OS agenix 解密并以 Account username 所有、=0400= 权限安装. 此接线要求私钥材料为文件 path; =private.path= 为空时使用 agenix 默认安装位置, 显式指定时须避免同一 System 内的路径冲突. Profile 可通过 =osConfig.age.secrets.<name>.path= 消费实际安装路径. User SSH identity 暂不接线.
 
-HM 的 =secrets= 是 Base 提供的递归资源声明, 默认空树, 不属于 Feature. 以 =rekeyFile= 字段识别叶节点, 其值为仓库密文 path; 叶节点的 =path= 是从 OS 原生 =age.secrets= 回读的只读输出. 各层名称分量只允许 ASCII 字母、数字、下划线及连字符, 且不得使用保留字 =rekeyFile=; 空分支不产生 secret, 叶节点不得兼作分支. 同一分支可由多个 HM modules 合并贡献.
+普通 User secrets 由 FP User Registry 的 =secrets= 声明, 以 =rekeyFile= 字段识别叶节点, 其值为仓库密文 path. Account 通过同形的 =secrets= tree 显式选择 leaf, =enable= 默认为 false (未选择的 leaf 同样禁用), 不支持子树级开关. 名称分量只允许 ASCII 字母、数字、下划线及连字符, 且不得使用保留字 =rekeyFile= 和 =enable=; 空分支不产生 secret, 叶节点不得兼作分支. 未声明的路径及错误的叶/分支选择在构造时拒绝. Secret selection 独立于 Feature 及其他原生配置的启用状态.
 
 #+begin_src nix
-{
-  config,
-  ...
-}:
-{
-  secrets.foo.bar.rekeyFile = ./foo/bar.age;
-  # A consumer reads config.secrets.foo.bar.path.
-}
+nixosBuilderArgs.userRegistry.lingyu.secrets.foo.bar.rekeyFile = ./foo/bar.age;
+nixosConfigurations.nixos-matebook.users."1000".secrets.foo.bar.enable = true;
+# An HM consumer reads config.secrets.foo.bar.path.
 #+end_src
 
-OS 按当前 =accounts= 的 UID 收集 =config.home-manager.users.<uid>.secrets=, 仅遍历节点并消费 =rekeyFile=, 不读取 HM 派生的 =path=. 原生 secret 名为 =secrets.user.<uid>.<dot-separated-path>=, 由 OS agenix 以 Account username 所有、group =root=、mode =0400= 交付. User identity 不参与该解密过程, 不需要 HM agenix module 或额外的运行时服务.
+构造器只将已选择的秘密树投影为 =accounts.<uid>.secrets=, 不向 OS 传递完整 Profile secret inventory. OS 从该树生成原生 =age.secrets=, 并向 HM 提供只读 =secrets= 路径树, 不再从 HM 回流声明. 原生 secret 名为 =secrets.user.<uid>.<dot-separated-path>=, 由 OS agenix 以 Account username 所有、group =root=、mode =0400= 交付. 未选择的 leaf 不生成 agenix 条目, 不通过此机制生成目标 Host 可解密的交付产物, 在 HM 中也不存在. 原始 flake source 可能仍包含仓库密文; 旧 generation 和已交付的秘密不受本次选择自动撤销. User identity 不参与该解密过程, 不需要 HM agenix module 或额外的运行时服务.
 
 **** [[file:./modules/features/][/modules/features]]
 #+begin_example
@@ -407,36 +402,36 @@ NixOS-WSL host, hostname =nixos-wsl=.
 └── options.nix
 #+end_example
 
-[[file:./modules/users/default.nix][modules/users/default.nix]] 聚合 User FP modules 与 =options.nix= 中的 User identity schema; 各 User 通过 Registry 的 =features.<name>.module= 提供对应 HM Feature 的内部配置定义, 通用 FP schema 负责 Account 接线. 通用构造函数传递 Account metadata 并实例化 HM module, Base OS 消费 Account metadata 交付 User identity. 每个 User profile 的 =default.nix= 贡献 Registry entry, =hm/default.nix= 是原生 HM 入口.
+[[file:./modules/users/default.nix][modules/users/default.nix]] 聚合 User FP modules 与 =options.nix= 中的 User identity 与 secrets schema; 各 User 通过 Registry 的 =features.<name>.module= 提供对应 HM Feature 的内部配置定义, 通用 FP schema 负责 Account 接线. 通用构造函数传递 Account metadata 并实例化 HM module, Base OS 消费 Account metadata 交付 User identity 和已选择的普通秘密. 每个 User profile 的 =default.nix= 贡献 Registry entry, =hm/default.nix= 是原生 HM 入口.
 
 ***** [[file:./modules/users/lingyu/][/modules/users/lingyu]]
 #+begin_example
 /modules/users/lingyu/
 ├── age.private.age
 ├── default.nix
-└── hm/
+├── hm/
+│   ├── default.nix
+│   └── home/
+│       ├── .local/
+│       │   └── bin/
+│       │       ├── git-push-loop.sh
+│       │       ├── org.sh
+│       │       ├── rc.sh
+│       │       └── ssha.sh
+│       ├── cloud-server.nix
+│       ├── default.nix
+│       ├── email.nix
+│       ├── git.nix
+│       ├── keyring.nix
+│       ├── langs.nix
+│       └── rclone.nix
+└── secrets/
     ├── default.nix
-    ├── home/
-    │   ├── .local/
-    │   │   └── bin/
-    │   │       ├── git-push-loop.sh
-    │   │       ├── org.sh
-    │   │       ├── rc.sh
-    │   │       └── ssha.sh
-    │   ├── cloud-server.nix
-    │   ├── default.nix
-    │   ├── email.nix
-    │   ├── git.nix
-    │   ├── keyring.nix
-    │   ├── langs.nix
-    │   └── rclone.nix
-    └── secrets/
-        ├── default.nix
-        └── <path>/
-            └── <name>.age
+    └── <path>/
+        └── <name>.age
 #+end_example
 
-配置 lingyu 用户的个人 home-manager 模块, 包含 cloud-server, email, git, keyring, langs, rclone 等用户级配置. User age identity 密文位于 =age.private.age=. 各 secret 的 age 密文按 secrets tree 的层级组织于 =hm/secrets/=, 由 =hm/secrets/default.nix= 声明. 例如 =hm/secrets/foo/bar.age= 对应 =secrets.foo.bar.rekeyFile=, 消费者通过 =config.secrets.foo.bar.path= 获取实际交付路径. Rclone remotes 与 Agent providers 均采用此机制.
+配置 lingyu 用户的个人 home-manager 模块, 包含 cloud-server, email, git, keyring, langs, rclone 等用户级配置. User age identity 密文位于 =age.private.age=. 各 secret 的 age 密文按 secrets tree 的层级组织于 =secrets/=, 由 FP module =secrets/default.nix= 声明. 例如 =secrets/foo/bar.age= 对应 Registry 的 =secrets.foo.bar.rekeyFile=, Account 显式选择后消费者通过 =config.secrets.foo.bar.path= 获取实际交付路径. Rclone remotes 与 Agent providers 均采用此机制.
 
 =modules/users/lingyu/hm/home/.local/bin/= 放置个人脚本:
 - =org=: 进入 =~/org= 目录并准备使用 =~/org/config/Makefile= 的 make 函数.

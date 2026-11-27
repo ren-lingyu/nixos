@@ -1,5 +1,5 @@
 {
-  secrets = {
+  nixosBuilderArgs.userRegistry.lingyu.secrets = {
     nutstore = {
       user.rekeyFile = ./nutstore/user.age;
       pass.rekeyFile = ./nutstore/pass.age;

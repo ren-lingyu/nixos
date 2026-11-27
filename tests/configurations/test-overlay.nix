@@ -4,5 +4,6 @@
     hosts = final_.llibHosts;
     types = final_.llibTypes;
     identity = final_.llibIdentity;
+    secrets = final_.llibSecrets;
   };
 }

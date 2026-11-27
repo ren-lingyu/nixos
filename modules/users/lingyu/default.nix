@@ -1,4 +1,6 @@
 {
+  imports = [ ./secrets ];
+
   nixosBuilderArgs.userRegistry.lingyu = {
     module = ./hm;
 

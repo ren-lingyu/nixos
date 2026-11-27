@@ -5,6 +5,7 @@
   hosts,
   types,
   identity,
+  secrets,
   modules,
 }:
 let
@@ -102,7 +103,7 @@ let
   evaluate =
     extra:
     (lib.evalModules {
-      specialArgs.llib = { inherit hosts types; };
+      specialArgs.llib = { inherit hosts types secrets; };
       modules = [
         (modules + "/hosts/options.nix")
         (modules + "/users/options.nix")
@@ -164,6 +165,11 @@ let
               };
               userRegistry.noIdentity.identity = { };
               userRegistry.profile = {
+                secrets = {
+                  cloud.key.rekeyFile = ./test.nix;
+                  cloud.other.rekeyFile = ./test-overlay.nix;
+                  unused.rekeyFile = ./test.nix;
+                };
                 identity.keys.age = {
                   public.key = "age1-test";
                   private.key = ./test.nix;
@@ -222,6 +228,7 @@ let
                 "1000" = {
                   username = "first";
                   profile = config.nixosBuilderArgs.userRegistry.profile;
+                  secrets.cloud.key.enable = true;
                   features.alpha.enable = true;
                   features.alpha.module = {
                     markers = [ "hm-consumer" ];
@@ -453,6 +460,9 @@ assert os.accountMetadata."1000".profile.name == "profile";
 assert !(os.accountMetadata."1000" ? features);
 assert !(os.accountMetadata."1000".profile ? module);
 assert !(os.accountMetadata."1000".profile ? features);
+assert !(os.accountMetadata."1000".profile ? secrets);
+assert os.accountMetadata."1000".secrets == { cloud.key.rekeyFile = ./test.nix; };
+assert os.accountMetadata."1001".secrets == { };
 assert os.accountMetadata."1000".profile.identity.keys.ssh == null;
 assert (evaluate [ ]).nixosBuilderArgs.hostRegistry.first.identity.keys.age == null;
 assert identity.userAgeSecretName 1000 == identity.userAgeSecretName "1000";
@@ -515,6 +525,9 @@ assert failsHostOption "wireguard" [
 ];
 assert crossHostMonitors.external.name == "external";
 assert !(builtins.tryEval missingGreeterMonitorValue).success;
+assert fails [ { nixosConfigurations.one.users."1000".secrets.unknown.enable = false; } ];
+assert fails [ { nixosConfigurations.one.users."1000".secrets.cloud.enable = true; } ];
+assert fails [ { nixosConfigurations.one.users."1001".secrets.unused.child.enable = true; } ];
 assert fails [ { nixosConfigurations.one.users."1001".username = lib.mkForce "first"; } ];
 assert fails [ { nixosConfigurations.one.users."1001".homeDirectory = "relative"; } ];
 assert fails [

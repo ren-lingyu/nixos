@@ -1,7 +1,7 @@
 { lib }: rec {
   hosts = import ./hosts.nix { inherit lib; };
   flakeParts = import ./flakeParts.nix {
-    inherit lib;
+    inherit lib secrets;
     inherit (types) deferredModuleFragment;
     inherit (modules) mapModule;
   };

@@ -1,5 +1,6 @@
 {
   lib,
+  secrets,
   deferredModuleFragment,
   mapModule,
 }:
@@ -95,7 +96,11 @@ let
         ) "System `${name}` account UID `${uid}` must be registered in its Host.";
         assert lib.assertMsg (lib.hasPrefix "/" account.homeDirectory)
           "System `${name}` account `${uid}` must have an absolute home directory.";
-        builtins.seq account.profile.name (validateSelections account.features)
+        builtins.seq account.profile.name (
+          builtins.deepSeq (secrets.selectTree account.profile.secrets account.secrets) (
+            validateSelections account.features
+          )
+        )
       ) system.users
     );
 
@@ -131,11 +136,16 @@ let
         hostTopology = builderArgs.hostTopology;
         accounts = lib.mapAttrs (
           _: account:
-          builtins.removeAttrs account [ "features" ]
+          builtins.removeAttrs account [
+            "features"
+            "secrets"
+          ]
           // {
+            secrets = secrets.selectTree account.profile.secrets account.secrets;
             profile = builtins.removeAttrs account.profile [
               "module"
               "features"
+              "secrets"
             ];
           }
         ) system.users;
@@ -233,6 +243,11 @@ in
                       };
                       profile = registryReference fpConfig.nixosBuilderArgs.userRegistry;
                       features = selection fpConfig.nixosBuilderArgs.featureRegistry.hm;
+                      secrets = mkOption {
+                        type = secrets.selectionType;
+                        default = { };
+                        description = "Explicit leaf selections for secrets declared by the selected User Profile.";
+                      };
                     };
                     config.features = lib.mapAttrs (name: entry: {
                       module = mkFeatureModule name entry.module;

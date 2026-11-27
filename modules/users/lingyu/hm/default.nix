@@ -1,6 +1,1 @@
-{
-  imports = [
-    ./home
-    ./secrets
-  ];
-}
+{ imports = [ ./home ]; }
