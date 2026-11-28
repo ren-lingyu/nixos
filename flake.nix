@@ -298,7 +298,6 @@
                   };
                   font.enable = true;
                   greeter.enable = true;
-                  media.enable = true;
                   niri = {
                     enable = true;
                     module = {
@@ -314,7 +313,6 @@
                     };
                   };
                   shell.enable = true;
-                  texlive.enable = true;
                 };
 
                 users."1000" = {
@@ -356,16 +354,14 @@
                           emacs.enable = true;
                           emacs.programs.package = pkgs.emacs-pgtk;
                           emacs.services.package = pkgs.emarccs-pgtk;
-                          lem = {
-                            enable = true;
-                            package = pkgs.lem-webview;
-                          };
                         };
                       };
                     };
-                    file-manager.enable = true;
+                    file-manager = {
+                      enable = true;
+                      module.features.file-manager.wayfile.enable = false;
+                    };
                     font.enable = true;
-                    media.enable = true;
                     niri = {
                       enable = true;
                       module = {
